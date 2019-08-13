@@ -1,14 +1,12 @@
 # Rules Engine
 
 ## Overview
-Rules Engine is a NuGet Package for abstracting business logic/rules/policies out of the system. This works in a very simple way by giving you an ability to put your rules in a store outside the core logic of the system thus ensuring that any change in rules doesn't affect the core system.
+Rules Engine is a library for abstracting business logic/rules/policies out of the system. This works in a very simple way by giving you an ability to put your rules in a store outside the core logic of the system thus ensuring that any change in rules doesn't affect the core system.
 
 ## Installation
-To install this NuGet Package, please install the NuGet RulesEngine from [NuGet.org](https://www.nuget.org/) using manage nuget explorer in visual studio.  
+To install this library, please clone this project and refer it as class library.  
 
 ## How to use it
-
-To use the Rules Engine, please install it as a NuGet Package into the project you want to use. 
 
 You need to store the rules based on the [schema definition](https://github.com/microsoft/RulesEngine/blob/master/schema/workflowRules-schema.json) given and they can be stored in any store as deemed appropriate like Azure Blob Storage, Cosmos DB, Azure App Configuration, SQL Servers, file systems etc. The expressions are supposed to be a [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
 
