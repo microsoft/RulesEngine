@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Rule": {
+      "properties": {
+        "RuleName": {
+          "type": "string"
+        },
+        "Operator": {
+          "enum": [ "And", "AndAlso", "Or", "OrElse" ]
+        },
+        "ErrorMessage": {
+          "type": "string"
+        },
+        "ErrorType": {
+          "enum": [ "Warning", "Error" ]
+        },
+        "SuccessEvent": {
+          "type": "string"
+        },
+        "Rules": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/definitions/LeafRule" },
+              { "$ref": "#/definitions/Rule" }
+            ]
+          }
+        }
+      },
+      "required": [
+        "RuleName",
+        "Operator",
+        "Rules"
+      ],
+      "type": "object"
+    },
+    "LeafRule": {
+      "type": "object",
+      "required": [
+        "RuleName",
+        "Expression",
+        "RuleExpressionType"
+      ],
+      "properties": {
+        "RuleName": {
+          "type": "string"
+        },
+        "Expression": {
+          "type": "string"
+        },
+        "RuleExpressionType": {
+          "enum": [ "LambdaExpression" ]
+        },
+        "ErrorMessage": {
+          "type": "string"
+        },
+        "ErrorType": {
+          "enum": [ "Warning", "Error" ]
+        },
+        "SuccessEvent": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "properties": {
+    "WorkFlowName": {
+      "type": "string"
+    },
+    "Rules": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/definitions/LeafRule" },
+          { "$ref": "#/definitions/Rule" }
+        ]
+      }
+    }
+  },
+  "required": [
+    "WorkflowName",
+    "Rules"
+  ],
+  "type": "object"
+}
+

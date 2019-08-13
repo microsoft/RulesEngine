@@ -1,0 +1,20 @@
+{
+  "WorkflowName": "inputWorkflow",
+  "Rules": [
+    {
+      "RuleName": "Rule1",
+      "Operator": "AndAlso",
+      "ErrorMessage": "One or more adjust rules failed.",
+      "ErrorType": "Error",
+      "Rules": [
+        {
+          "RuleName": "SubRule1",
+          "Expression": "input1.Request_RequestType == \"vod\" AND input1.Labor_BillingCode == \"billable\" AND ((input1.Request_RegistrationStatus == \"cancelled with t&e\" AND input1.Request_Status == \"cancelled\") OR (input1.Request_Status != \"cancelled\"))",
+          "ErrorMessage": "SubError message 1",
+          "ErrorType": "Error",
+          "RuleExpressionType": "LambdaExpression"
+        }
+      ]
+    }
+  ]
+}
