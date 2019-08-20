@@ -1,10 +1,10 @@
 # Rules Engine
 
 ## Overview
-Rules Engine is a library for abstracting business logic/rules/policies out of the system. This works in a very simple way by giving you an ability to put your rules in a store outside the core logic of the system thus ensuring that any change in rules doesn't affect the core system.
+Rules Engine is a library/NuGet package for abstracting business logic/rules/policies out of the system. This works in a very simple way by giving you an ability to put your rules in a store outside the core logic of the system thus ensuring that any change in rules doesn't affect the core system.
 
 ## Installation
-To install this library, please clone this project and refer it as class library.  
+To install this library, please download the latest version of  [NuGet Package](https://www.nuget.org/packages/RulesEngine/) from [nuget.org](https://www.nuget.org/) and refer it into your project.  
 
 ## How to use it
 
