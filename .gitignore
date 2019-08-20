@@ -329,3 +329,4 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
 /src/RulesEngine/RulesEngine.sln.licenseheader
+/assets/RulesEnginePackageFile.xml
