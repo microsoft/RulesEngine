@@ -41,6 +41,11 @@ namespace RulesEngine.Models
         public object Input { get; set; }
 
         /// <summary>
+        /// Gets the exception message in case an error is thrown during rules calculation.
+        /// </summary>
+        public string ExceptionMessage { get; set; }
+
+        /// <summary>
         /// This method will return all the error and warning messages to caller
         /// </summary>
         /// <returns>RuleResultMessage</returns>
