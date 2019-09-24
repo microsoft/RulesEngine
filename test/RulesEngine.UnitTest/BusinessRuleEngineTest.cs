@@ -13,6 +13,7 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using Xunit;
+using Newtonsoft.Json.Converters;
 
 namespace RulesEngine.UnitTest
 {
@@ -32,12 +33,12 @@ namespace RulesEngine.UnitTest
         public void RulesEngine_InjectedRules_ReturnsListOfRuleResultTree(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName);
-            dynamic input = GetInput();
+            
+            dynamic input1 = GetInput1();
+            dynamic input2 = GetInput2();
+            dynamic input3 = GetInput3();
 
-            dynamic input2 = GetInput();
-            input2.value1 = "val1";
-
-            var result = re.ExecuteRule("inputWorkflowReference", new List<dynamic>() { input, input2 }.AsEnumerable(), new object[] { });
+            var result = re.ExecuteRule("inputWorkflowReference", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { });
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
         }
@@ -47,12 +48,12 @@ namespace RulesEngine.UnitTest
         public void ExecuteRule_ReturnsListOfRuleResultTree(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName);
-            dynamic input = GetInput();
 
-            dynamic input2 = GetInput();
-            input2.value1 = "val1";
+            dynamic input1 = GetInput1();
+            dynamic input2 = GetInput2();
+            dynamic input3 = GetInput3();
 
-            var result = re.ExecuteRule("inputWorkflow", new List<dynamic>() { input, input2 }.AsEnumerable(), new object[] { });
+            var result = re.ExecuteRule("inputWorkflow", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { });
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
         }
@@ -62,14 +63,30 @@ namespace RulesEngine.UnitTest
         public void ExecuteRule_SingleObject_ReturnsListOfRuleResultTree(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName);
-            dynamic input = GetInput();
 
-            dynamic input2 = GetInput();
-            input2.value1 = "val1";
+            dynamic input1 = GetInput1();
+            dynamic input2 = GetInput2();
+            dynamic input3 = GetInput3();
 
-            var result = re.ExecuteRule("inputWorkflow",input);
+            var result = re.ExecuteRule("inputWorkflow",input1);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
+        }
+
+        [Theory]
+        [InlineData("rules3.json")]
+        public void ExecuteRule_ExceptionScenario_RulesInvalid(string ruleFileName)
+        {
+            var re = GetRulesEngine(ruleFileName);
+
+            dynamic input1 = GetInput1();
+            dynamic input2 = GetInput2();
+            dynamic input3 = GetInput3();
+
+            var result = re.ExecuteRule("inputWorkflow", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { });
+            Assert.NotNull(result);
+            Assert.IsType<List<RuleResultTree>>(result);
+            Assert.False(string.IsNullOrEmpty(result[0].ExceptionMessage) || string.IsNullOrWhiteSpace(result[0].ExceptionMessage));
         }
 
         [Theory]
@@ -77,12 +94,12 @@ namespace RulesEngine.UnitTest
         public void ExecuteRule_ReturnsListOfRuleResultTree_ResultMessage(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName);
-            dynamic input = GetInput();
 
-            dynamic input2 = GetInput();
-            input2.value1 = "val1";
+            dynamic input1 = GetInput1();
+            dynamic input2 = GetInput2();
+            dynamic input3 = GetInput3();
 
-            List<RuleResultTree> result = re.ExecuteRule("inputWorkflow", input);
+            var result = re.ExecuteRule("inputWorkflow", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { });
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
             Assert.NotNull(result.First().GetMessages());
@@ -116,7 +133,7 @@ namespace RulesEngine.UnitTest
         public void ExecuteRule_InvalidWorkFlow_ThrowsException(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName);
-            dynamic input = GetInput();
+            dynamic input = GetInput1();
 
             Assert.Throws<ArgumentException>(() => { re.ExecuteRule("inputWorkflow1", new List<dynamic>() { input }.AsEnumerable(), new object[] { }); });
         }
@@ -128,11 +145,11 @@ namespace RulesEngine.UnitTest
         {
             var re = GetRulesEngine(ruleFileName);
 
-            dynamic input = GetInput();
-            dynamic input2 = GetInput();
-            input2.valueX = "hello";
+            dynamic input1 = GetInput1();
+            dynamic input2 = GetInput2();
+            dynamic input3 = GetInput3();
 
-            var result = re.ExecuteRule("inputWorkflow", new List<dynamic>() { input, input2 }.AsEnumerable(), new object[] { });
+            var result = re.ExecuteRule("inputWorkflow", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { });
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
         }
@@ -159,14 +176,27 @@ namespace RulesEngine.UnitTest
             return new RulesEngine(new string[] { data, injectWorkflowStr}, mockLogger.Object);
         }
 
-        private dynamic GetInput()
+
+        private dynamic GetInput1()
         {
-            dynamic input = new ExpandoObject();
-            input.value1 = "value1";
-            input.value2 = "value2";
-            input.value3 = 1;
-            input.value4 = new { subValue = "subValue", nullValue = default(string) };
-            return input;
+            var converter = new ExpandoObjectConverter();
+            var basicInfo = "{\"name\": \"Dishant\",\"email\": \"dishantmunjal@live.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyalityFactor\": 3,\"totalPurchasesToDate\": 10000}";
+            return JsonConvert.DeserializeObject<ExpandoObject>(basicInfo, converter);
         }
+
+        private dynamic GetInput2()
+        {
+            var converter = new ExpandoObjectConverter();
+            var orderInfo = "{\"totalOrders\": 5,\"recurringItems\": 2}";
+            return JsonConvert.DeserializeObject<ExpandoObject>(orderInfo, converter);
+        }
+
+        private dynamic GetInput3()
+        {
+            var converter = new ExpandoObjectConverter();
+            var telemetryInfo = "{\"noOfVisitsPerMonth\": 10,\"percentageOfBuyingToVisit\": 15}";
+            return JsonConvert.DeserializeObject<ExpandoObject>(telemetryInfo, converter);
+        }
+        
     }
 }

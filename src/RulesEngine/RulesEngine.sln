@@ -8,6 +8,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RulesEngine.UnitTest", "..\..\test\RulesEngine.UnitTest\RulesEngine.UnitTest.csproj", "{50E0C2A5-E2C8-4B12-8C0E-B69F698A82BF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp", "..\..\demo\DemoApp\DemoApp.csproj", "{57BB8C07-799A-4F87-A7CC-D3D3F694DD02}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CD4DFE6A-083B-478E-8377-77F474833E30} = {CD4DFE6A-083B-478E-8377-77F474833E30}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
