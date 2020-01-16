@@ -17,15 +17,12 @@ namespace RulesEngine
     public class RulesEngine : IRulesEngine
     {
         #region Variables
-        private Dictionary<string, object> compileRulesDic;
-        private Dictionary<string, WorkflowRules> workflowRulesDic;
         private readonly ILogger _logger;
         private readonly ReSettings _reSettings;
+        private readonly RulesCache _rulesCache = new RulesCache();
         #endregion
 
         #region Constructor
-
-
         public RulesEngine(string[] jsonConfig, ILogger logger, ReSettings reSettings = null) : this(logger, reSettings)
         {
             var workflowRules = jsonConfig.Select(item => JsonConvert.DeserializeObject<WorkflowRules>(item)).ToArray();
@@ -41,7 +38,6 @@ namespace RulesEngine
         {
             _logger = logger ?? new NullLogger();
             _reSettings = reSettings ?? new ReSettings();
-            InitializeVariables();
         }
         #endregion
 
@@ -100,18 +96,6 @@ namespace RulesEngine
 
         #region Private Methods
 
-        /// <summary>
-        /// This is for Initializing the variables
-        /// </summary>
-        private void InitializeVariables()
-        {
-            if (compileRulesDic == null)
-                compileRulesDic = new Dictionary<string, object>();
-
-            if (workflowRulesDic == null)
-                workflowRulesDic = new Dictionary<string, WorkflowRules>();
-        }
-
         public void AddWorkflow(params WorkflowRules[] workflowRules)
         {
             try
@@ -120,14 +104,7 @@ namespace RulesEngine
                 {
                     var validator = new WorkflowRulesValidator();
                     validator.ValidateAndThrow(workflowRule);
-                    if (!workflowRulesDic.ContainsKey(workflowRule.WorkflowName))
-                    {
-                        workflowRulesDic[workflowRule.WorkflowName] = workflowRule;
-                    }
-                    else
-                    {
-                        throw new ArgumentException($"Workflow with name: {workflowRule} already exists");
-                    }
+                    _rulesCache.AddOrUpdateWorkflowRules(workflowRule.WorkflowName, workflowRule);
                 }
             }
             catch (ValidationException ex)
@@ -136,24 +113,16 @@ namespace RulesEngine
             }
         }
 
-
         public void ClearWorkflows()
         {
-            workflowRulesDic.Clear();
-            compileRulesDic.Clear();
+            _rulesCache.Clear();
         }
 
         public void RemoveWorkflow(params string[] workflowNames)
         {
             foreach (var workflowName in workflowNames)
             {
-                workflowRulesDic.Remove(workflowName);
-                var compiledKeysToRemove = compileRulesDic.Keys.Where(key => key.StartsWith(workflowName));
-                foreach(var key in compiledKeysToRemove)
-                {
-                    compileRulesDic.Remove(key);
-                }
-
+                _rulesCache.Remove(workflowName);
             }
         }
 
@@ -191,54 +160,27 @@ namespace RulesEngine
         private bool RegisterRule(string workflowName, params RuleParameter[] ruleParams)
         {
             string compileRulesKey = GetCompileRulesKey(workflowName, ruleParams);
-            if (compileRulesDic.ContainsKey(compileRulesKey))
+            if (_rulesCache.ContainsCompiledRules(compileRulesKey))
                 return true;
 
-
-            var workflowRules = GetWorkFlowRules(workflowName);
+            var workflowRules = _rulesCache.GetWorkFlowRules(workflowName);
 
             if (workflowRules != null)
             {
                 var lstFunc = new List<Delegate>();
-                foreach (var rule in workflowRulesDic[workflowName].Rules)
+                foreach (var rule in _rulesCache.GetRules(workflowName))
                 {
                     RuleCompiler ruleCompiler = new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings), _logger);
                     lstFunc.Add(ruleCompiler.CompileRule(rule, ruleParams));
                 }
-                compileRulesDic.Add(compileRulesKey, new CompiledRule() { CompiledRules = lstFunc });
+
+                _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, new CompiledRule() { CompiledRules = lstFunc });
                 _logger.LogTrace($"Rules has been compiled for the {workflowName} workflow and added to dictionary");
                 return true;
             }
             else
             {
                 return false;
-            }
-        }
-
-        private WorkflowRules GetWorkFlowRules(string workflowName)
-        {
-            workflowRulesDic.TryGetValue(workflowName, out var workflowRules);
-            if (workflowRules == null) return null;
-            else
-            {
-                if (workflowRules.WorkflowRulesToInject?.Any() == true)
-                {
-                    if (workflowRules.Rules == null)
-                    {
-                        workflowRules.Rules = new List<Rule>();
-                    }
-                    foreach (string wfname in workflowRules.WorkflowRulesToInject)
-                    {
-                        var injectedWorkflow = GetWorkFlowRules(wfname);
-                        if (injectedWorkflow == null)
-                        {
-                            throw new Exception($"Could not find injected Workflow: {wfname}");
-                        }
-                        workflowRules.Rules.AddRange(injectedWorkflow.Rules);
-                    }
-                }
-
-                return workflowRules;
             }
         }
 
@@ -260,7 +202,7 @@ namespace RulesEngine
             List<RuleResultTree> result = new List<RuleResultTree>();
             var compileRulesKey = GetCompileRulesKey(workflowName, ruleParams);
             var inputs = ruleParams.Select(c => c.Value);
-            foreach (var compiledRule in (compileRulesDic[compileRulesKey] as CompiledRule).CompiledRules)
+            foreach (var compiledRule in _rulesCache.GetCompiledRules(compileRulesKey).CompiledRules)
             {
                 result.Add(compiledRule.DynamicInvoke(new List<object>(inputs) { new RuleInput() }.ToArray()) as RuleResultTree);
             }
