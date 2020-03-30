@@ -1,4 +1,5 @@
 # Rules Engine
+![Nuget](https://img.shields.io/nuget/dt/RulesEngine)
 
 ## Overview
 Rules Engine is a library/NuGet package for abstracting business logic/rules/policies out of the system. This works in a very simple way by giving you an ability to put your rules in a store outside the core logic of the system thus ensuring that any change in rules doesn't affect the core system.
