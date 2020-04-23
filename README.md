@@ -1,4 +1,5 @@
 # Rules Engine
+![build](https://github.com/microsoft/RulesEngine/workflows/build/badge.svg?branch=master)
 [![Nuget download][download-image]][download-url]
 
 [download-image]: https://img.shields.io/nuget/dt/RulesEngine
