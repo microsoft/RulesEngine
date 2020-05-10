@@ -1,9 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine;
+using Microsoft.Extensions.Logging;
 using RulesEngine.Exceptions;
-using RulesEngine.HelperFunctions;
 using RulesEngine.Models;
 using Moq;
 using Newtonsoft.Json;

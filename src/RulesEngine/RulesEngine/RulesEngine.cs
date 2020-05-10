@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Microsoft.Extensions.Logging;
 using RulesEngine.HelperFunctions;
 using RulesEngine.Interfaces;
 using RulesEngine.Models;
@@ -46,30 +47,13 @@ namespace RulesEngine
         /// <summary>
         /// This will execute all the rules of the specified workflow
         /// </summary>
-        /// <typeparam name="T">type of input</typeparam>
-        /// <param name="input">input</param>
-        /// <param name="workflowName">Workflow Name</param>
-        /// <returns>List of Result</returns>
-        public List<RuleResultTree> ExecuteRule(string workflowName, IEnumerable<dynamic> input, object[] otherInputs)
+        /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
+        /// <param name="inputs">A variable number of inputs</param>
+        /// <returns>List of rule results</returns>
+        public List<RuleResultTree> ExecuteRule(string workflowName, params object[] inputs)
         {
-            _logger.LogTrace($"Called ExecuteRule for workflow {workflowName} and count of input {input.Count()}");
+            _logger.LogTrace($"Called ExecuteRule for workflow {workflowName} and count of input {inputs.Count()}");
 
-            var result = new List<RuleResultTree>();
-            foreach (var item in input)
-            {
-                var ruleInputs = new List<object>();
-                ruleInputs.Add(item);
-                if (otherInputs != null)
-                    ruleInputs.AddRange(otherInputs);
-                result.AddRange(ExecuteRule(workflowName, ruleInputs.ToArray()));
-
-            }
-
-            return result;
-        }
-
-        public List<RuleResultTree> ExecuteRule(string workflowName, object[] inputs)
-        {
             var ruleParams = new List<RuleParameter>();
 
             for (int i = 0; i < inputs.Length; i++)
@@ -78,16 +62,17 @@ namespace RulesEngine
                 var obj = Utils.GetTypedObject(input);
                 ruleParams.Add(new RuleParameter($"input{i + 1}", obj));
             }
+
             return ExecuteRule(workflowName, ruleParams.ToArray());
         }
 
-        public List<RuleResultTree> ExecuteRule(string workflowName, object input)
-        {
-            var inputs = new[] { input };
-            return ExecuteRule(workflowName, inputs);
-        }
-
-        public List<RuleResultTree> ExecuteRule(string workflowName, RuleParameter[] ruleParams)
+        /// <summary>
+        /// This will execute all the rules of the specified workflow
+        /// </summary>
+        /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
+        /// <param name="ruleParams">A variable number of rule parameters</param>
+        /// <returns>List of rule results</returns>
+        public List<RuleResultTree> ExecuteRule(string workflowName, params RuleParameter[] ruleParams)
         {
             return ValidateWorkflowAndExecuteRule(workflowName, ruleParams);
         }

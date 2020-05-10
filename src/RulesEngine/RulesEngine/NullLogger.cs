@@ -1,18 +1,27 @@
-﻿// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace RulesEngine
 {
-    internal class NullLogger : ILogger
+    public class NullLogger : ILogger
     {
-        public void LogError(Exception ex)
+        public IDisposable BeginScope<TState>(TState state)
         {
+            return new NullScope();
         }
 
-        public void LogTrace(string msg)
+        public bool IsEnabled(LogLevel logLevel)
         {
+            return true;
         }
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        { }
+    }
+
+    public class NullScope : IDisposable
+    {
+        public void Dispose()
+        { }
     }
 }
