@@ -30,4 +30,4 @@ jobs:
     - name: Uninstrument
       run: minicover uninstrument
     - name: Report
-      run: minicover coverallsreport --repo-token ${{ COVERALLS_TOKEN }}
+      run: minicover coverallsreport --repo-token ${{ secrets.COVERALLS_TOKEN }}
