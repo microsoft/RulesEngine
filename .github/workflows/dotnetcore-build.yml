@@ -33,5 +33,5 @@ jobs:
       run: minicover report --threshold 80
       if: ${{ github.event_name == 'pull_request' }}
     - name: Report coveralls
-      run: minicover coverallsreport --repo-token ${{ secrets.COVERALLS_TOKEN }} --branch ${{ github.ref#refs/heads/ }}
+      run: minicover coverallsreport --repo-token ${{ secrets.COVERALLS_TOKEN }} --branch master
       if: ${{ github.event_name == 'push' }}
