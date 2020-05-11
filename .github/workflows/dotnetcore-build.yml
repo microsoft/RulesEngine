@@ -24,7 +24,7 @@ jobs:
     - name: Build
       run: dotnet build src/RulesEngine/RulesEngine.sln --configuration Release --no-restore
     - name: Instrument
-      run: minicover insturment
+      run: minicover instrument
     - name: Test
       run: dotnet test src/RulesEngine/RulesEngine.sln --no-build --verbosity m
     - name: Uninstrument
