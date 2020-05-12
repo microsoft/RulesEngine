@@ -2,10 +2,8 @@
 // Licensed under the MIT License.
 
 using Microsoft.Extensions.Logging;
-using RulesEngine;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace RulesEngine.UnitTest
@@ -16,7 +14,7 @@ namespace RulesEngine.UnitTest
         [Fact]
         public void NullLogger_BeginScope_DoesNotThrow()
         {
-            var logger = new NullLogger();
+            var logger = new NullLogger<RulesEngine>();
 
             using (logger.BeginScope("test-value"))
             { }
@@ -32,14 +30,14 @@ namespace RulesEngine.UnitTest
         [InlineData(LogLevel.Warning)]
         public void NullLogger_IsEnabled_ReturnsTrue(LogLevel logLevel)
         {
-            var logger = new NullLogger();
+            var logger = new NullLogger<RulesEngine>();
             logger.IsEnabled(logLevel).Equals(true);
         }
 
         [Fact]
         public void NullLogger_Log_DoesNotThrow() 
         {
-            var logger = new NullLogger();
+            var logger = new NullLogger<RulesEngine>();
             logger.Log(LogLevel.Critical, 1, "This is a critical message.");
         }
     }

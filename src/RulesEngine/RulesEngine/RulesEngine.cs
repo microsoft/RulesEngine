@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using RulesEngine.HelperFunctions;
 using RulesEngine.Interfaces;
 using RulesEngine.Models;
@@ -37,7 +38,7 @@ namespace RulesEngine
 
         public RulesEngine(ILogger logger, ReSettings reSettings = null)
         {
-            _logger = logger ?? new NullLogger();
+            _logger = logger ?? new NullLogger<RulesEngine>();
             _reSettings = reSettings ?? new ReSettings();
         }
         #endregion
