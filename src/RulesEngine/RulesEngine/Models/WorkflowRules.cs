@@ -2,12 +2,14 @@
 // Licensed under the MIT License.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RulesEngine.Models
 {
     /// <summary>
     /// Workflow rules class for deserialization  the json config file
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class WorkflowRules
     {
         /// <summary>

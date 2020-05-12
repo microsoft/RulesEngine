@@ -3,12 +3,14 @@
 
 using RulesEngine.HelperFunctions;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RulesEngine.Models
 {
     /// <summary>
     /// Rule result class with child result heirarchy
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class RuleResultTree
     {
         /// <summary>
@@ -49,6 +51,7 @@ namespace RulesEngine.Models
         /// This method will return all the error and warning messages to caller
         /// </summary>
         /// <returns>RuleResultMessage</returns>
+        [ExcludeFromCodeCoverage]
         public RuleResultMessage GetMessages()
         {
             RuleResultMessage ruleResultMessage = new RuleResultMessage();
@@ -62,6 +65,7 @@ namespace RulesEngine.Models
     /// <summary>
     /// This class will hold the error messages
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class RuleResultMessage
     {
         /// <summary>

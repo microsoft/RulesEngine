@@ -4,12 +4,14 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RulesEngine.Models
 {
     /// <summary>
     /// Rule class
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class Rule
     {
         /// <summary>
