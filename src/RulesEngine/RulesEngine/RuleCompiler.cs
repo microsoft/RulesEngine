@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Microsoft.Extensions.Logging;
 using RulesEngine.HelperFunctions;
 using RulesEngine.Models;
 using System;
@@ -32,7 +33,7 @@ namespace RulesEngine
         /// </summary>
         /// <param name="expressionBuilderFactory">The expression builder factory.</param>
         /// <exception cref="ArgumentNullException">expressionBuilderFactory</exception>
-        internal RuleCompiler(RuleExpressionBuilderFactory expressionBuilderFactory,ILogger logger)
+        internal RuleCompiler(RuleExpressionBuilderFactory expressionBuilderFactory, ILogger logger)
         {
             if (expressionBuilderFactory == null)
             {
@@ -76,7 +77,7 @@ namespace RulesEngine
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex);
+                _logger.LogError(ex.Message);
                 throw;
             }
         }

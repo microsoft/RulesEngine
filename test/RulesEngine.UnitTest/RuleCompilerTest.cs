@@ -1,11 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine;
+using Microsoft.Extensions.Logging.Abstractions;
 using RulesEngine.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace RulesEngine.UnitTest
@@ -23,7 +21,7 @@ namespace RulesEngine.UnitTest
         [Fact]
         public void RuleCompiler_CompileRule_ThrowsException()
         {
-            var compiler = new RuleCompiler(new RuleExpressionBuilderFactory(new ReSettings()), new NullLogger());
+            var compiler = new RuleCompiler(new RuleExpressionBuilderFactory(new ReSettings()), new NullLogger<RuleCompiler>());
             Assert.Throws<ArgumentException>(() => compiler.CompileRule(null, null));
             Assert.Throws<ArgumentException>(() => compiler.CompileRule(null, new RuleParameter[] { null}));
         }
