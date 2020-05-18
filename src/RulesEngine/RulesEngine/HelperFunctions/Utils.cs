@@ -8,7 +8,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 
-namespace RulesEngine.HelperFunctions
+namespace Microsoft.Rules.HelperFunctions
 {
     public static class Utils
     {

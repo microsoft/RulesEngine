@@ -4,7 +4,7 @@
 using System;
 using System.Linq;
 
-namespace RulesEngine.HelperFunctions
+namespace Microsoft.Rules.HelperFunctions
 {
     public static class ExpressionUtils
     {

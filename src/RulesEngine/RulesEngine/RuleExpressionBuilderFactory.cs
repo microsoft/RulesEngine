@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine.ExpressionBuilders;
-using RulesEngine.Models;
+using Microsoft.Rules.ExpressionBuilders;
+using Microsoft.Rules.Models;
 using System;
 
-namespace RulesEngine
+namespace Microsoft.Rules
 {
     internal class RuleExpressionBuilderFactory
     {

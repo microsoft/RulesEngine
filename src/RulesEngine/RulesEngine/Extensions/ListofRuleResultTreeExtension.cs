@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine.Models;
+using Microsoft.Rules.Models;
 using System.Collections.Generic;
 using System.Linq;
 
 
-namespace RulesEngine.Extensions
+namespace Microsoft.Rules.Extensions
 {
     public static class ListofRuleResultTreeExtension
     {

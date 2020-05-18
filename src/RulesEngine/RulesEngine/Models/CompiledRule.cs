@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace RulesEngine.Models
+namespace Microsoft.Rules.Models
 {
     [ExcludeFromCodeCoverage]
     internal class CompiledRule

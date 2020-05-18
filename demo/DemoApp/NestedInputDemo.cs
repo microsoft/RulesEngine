@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
-using RulesEngine.Extensions;
-using RulesEngine.Models;
+using Microsoft.Rules.Extensions;
+using Microsoft.Rules.Models;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -46,7 +46,7 @@ namespace DemoApp
             var fileData = File.ReadAllText(files[0]);
             var workflowRules = JsonConvert.DeserializeObject<List<WorkflowRules>>(fileData);
 
-            var bre = new RulesEngine.RulesEngine(workflowRules.ToArray(),null);
+            var bre = new RulesEngine(workflowRules.ToArray(),null);
             foreach(var workflow in workflowRules)
             {
                 List<RuleResultTree> resultList = bre.ExecuteRule(workflow.WorkflowName, nestedInput);

@@ -1,11 +1,11 @@
-﻿using RulesEngine.Extensions;
-using RulesEngine.Models;
+﻿using Microsoft.Rules.Extensions;
+using Microsoft.Rules.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
 
-namespace RulesEngine.UnitTest
+namespace Microsoft.Rules.UnitTest
 {
     [Trait("Category", "Unit")]
     public class ListofRuleResultTreeExtensionTest

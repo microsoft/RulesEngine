@@ -2,11 +2,11 @@
 // Licensed under the MIT License.
 
 using Microsoft.Extensions.Logging.Abstractions;
-using RulesEngine.Models;
+using Microsoft.Rules.Models;
 using System;
 using Xunit;
 
-namespace RulesEngine.UnitTest
+namespace Microsoft.Rules.UnitTest
 {
     [Trait("Category","Unit")]
     public class RuleCompilerTest

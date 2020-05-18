@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using Xunit;
 
-namespace RulesEngine.UnitTest
+namespace Microsoft.Rules.UnitTest
 {
     [Trait("Category","Unit")]
     public class NullLoggerTest

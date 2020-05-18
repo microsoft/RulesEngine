@@ -3,10 +3,10 @@
 
 using System.Linq;
 using FluentValidation;
-using RulesEngine.HelperFunctions;
-using RulesEngine.Models;
+using Microsoft.Rules.HelperFunctions;
+using Microsoft.Rules.Models;
 
-namespace RulesEngine.Validators
+namespace Microsoft.Rules.Validators
 {
     internal class WorkflowRulesValidator : AbstractValidator<WorkflowRules>
     {

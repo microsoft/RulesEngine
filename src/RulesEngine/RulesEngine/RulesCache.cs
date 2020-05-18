@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine.Models;
+using Microsoft.Rules.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RulesEngine
+namespace Microsoft.Rules
 {
     internal class RulesCache
     {

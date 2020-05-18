@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine;
-using RulesEngine.Models;
+using Microsoft.Rules;
+using Microsoft.Rules.Models;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Xunit;
 
-namespace RulesEngine.UnitTest
+namespace Microsoft.Rules.UnitTest
 {
     [Trait("Category", "Unit")]
     public class LambdaExpressionBuilderTest

@@ -1,17 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine;
-using RulesEngine.ExpressionBuilders;
-using RulesEngine.HelperFunctions;
-using RulesEngine.Models;
+using Microsoft.Rules;
+using Microsoft.Rules.ExpressionBuilders;
+using Microsoft.Rules.HelperFunctions;
+using Microsoft.Rules.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 
-namespace RulesEngine.ExpressionBuilders
+namespace Microsoft.Rules.ExpressionBuilders
 {
     /// <summary>
     /// This class will build the list expression

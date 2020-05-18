@@ -4,7 +4,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace RulesEngine.Models
+namespace Microsoft.Rules.Models
 {
     [ExcludeFromCodeCoverage]
     public class RuleParameter

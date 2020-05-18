@@ -6,7 +6,7 @@ using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace RulesEngine.Models
+namespace Microsoft.Rules.Models
 {
     /// <summary>
     /// Rule class

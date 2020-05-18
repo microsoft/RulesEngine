@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine.HelperFunctions;
+using Microsoft.Rules.HelperFunctions;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Text;
 using Xunit;
 
-namespace RulesEngine.UnitTest
+namespace Microsoft.Rules.UnitTest
 {
     public class TestClass
     {

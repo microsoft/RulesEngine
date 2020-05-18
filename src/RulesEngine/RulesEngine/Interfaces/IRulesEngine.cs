@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine.Models;
+using Microsoft.Rules.Models;
 using System.Collections.Generic;
 
-namespace RulesEngine.Interfaces
+namespace Microsoft.Rules.Interfaces
 {
     public interface IRulesEngine
     { 

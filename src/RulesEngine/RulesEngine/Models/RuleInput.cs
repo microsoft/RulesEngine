@@ -5,7 +5,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace RulesEngine.Models
+namespace Microsoft.Rules.Models
 {
     /// <summary>
     /// Rule input

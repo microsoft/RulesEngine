@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine.Models;
+using Microsoft.Rules.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace RulesEngine.ExpressionBuilders
+namespace Microsoft.Rules.ExpressionBuilders
 {
     /// <summary>
     /// Base class for expression builders

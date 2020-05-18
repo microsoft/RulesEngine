@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-namespace RulesEngine.HelperFunctions
+namespace Microsoft.Rules.HelperFunctions
 {
     /// <summary>
     /// Constants

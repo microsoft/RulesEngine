@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-namespace RulesEngine.Models
+namespace Microsoft.Rules.Models
 {
     /// <summary>
     /// This is error type of rules which will use in rule config files

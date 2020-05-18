@@ -3,12 +3,12 @@
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using RulesEngine.Models;
+using Microsoft.Rules.Models;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
-using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
+using static Microsoft.Rules.Extensions.ListofRuleResultTreeExtension;
 
 namespace DemoApp
 {
@@ -40,7 +40,7 @@ namespace DemoApp
             var fileData = File.ReadAllText(files[0]);
             var workflowRules = JsonConvert.DeserializeObject<List<WorkflowRules>>(fileData);
 
-            var bre = new RulesEngine.RulesEngine(workflowRules.ToArray(), null);
+            var bre = new RulesEngine(workflowRules.ToArray(), null);
 
             string discountOffered = "No discount offered.";
 

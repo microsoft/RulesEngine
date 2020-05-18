@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine.HelperFunctions;
+using Microsoft.Rules.HelperFunctions;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace RulesEngine.Models
+namespace Microsoft.Rules.Models
 {
     /// <summary>
     /// Rule result class with child result heirarchy

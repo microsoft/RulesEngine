@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 using Microsoft.Extensions.Logging;
-using RulesEngine.Exceptions;
-using RulesEngine.Models;
+using Microsoft.Rules.Exceptions;
+using Microsoft.Rules.Models;
 using Moq;
 using Newtonsoft.Json;
 using System;
@@ -14,7 +14,7 @@ using System.Linq;
 using Xunit;
 using Newtonsoft.Json.Converters;
 
-namespace RulesEngine.UnitTest
+namespace Microsoft.Rules.UnitTest
 {
     [Trait("Category", "Unit")]
     public class RulesEngineTest

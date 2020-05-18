@@ -6,10 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using FluentValidation;
-using RulesEngine.HelperFunctions;
-using RulesEngine.Models;
+using Microsoft.Rules.HelperFunctions;
+using Microsoft.Rules.Models;
 
-namespace RulesEngine.Validators
+namespace Microsoft.Rules.Validators
 {
     internal class RuleValidator : AbstractValidator<Rule>
     {

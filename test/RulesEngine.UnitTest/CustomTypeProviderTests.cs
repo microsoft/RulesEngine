@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine;
+using Microsoft.Rules;
 using Moq;
 using System;
 using Xunit;
 
-namespace RulesEngine.UnitTest
+namespace Microsoft.Rules.UnitTest
 {
     [Trait("Category", "Unit")]
     public class CustomTypeProviderTests : IDisposable

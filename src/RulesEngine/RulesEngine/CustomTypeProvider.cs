@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine.HelperFunctions;
+using Microsoft.Rules.HelperFunctions;
 using System;
 using System.Collections.Generic;
 using System.Linq.Dynamic.Core.CustomTypeProviders;
 
-namespace RulesEngine
+namespace Microsoft.Rules
 {
     public class CustomTypeProvider : DefaultDynamicLinqCustomTypeProvider
     {

@@ -5,7 +5,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using System.Collections.Generic;
 
-namespace RulesEngine.Exceptions
+namespace Microsoft.Rules.Exceptions
 {
     public class RuleValidationException : ValidationException
     {
