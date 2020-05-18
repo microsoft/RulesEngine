@@ -3,9 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RulesEngine.Models
 {
+    [ExcludeFromCodeCoverage]
     internal class CompiledRule
     {
         /// <summary>
