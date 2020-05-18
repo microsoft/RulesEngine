@@ -3,8 +3,8 @@ using Microsoft.Rules.Extensions;
 using Microsoft.Rules.Models;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
+using Microsoft.Rules;
 
 namespace DemoApp
 {

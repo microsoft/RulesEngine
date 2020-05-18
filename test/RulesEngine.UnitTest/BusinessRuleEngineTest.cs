@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using Xunit;
 using Newtonsoft.Json.Converters;
+using Microsoft.Rules.Interfaces;
 
 namespace Microsoft.Rules.UnitTest
 {
@@ -153,13 +154,13 @@ namespace Microsoft.Rules.UnitTest
             Assert.IsType<List<RuleResultTree>>(result);
         }
 
-        private RulesEngine CreateRulesEngine(WorkflowRules workflow)
+        private IRulesEngine CreateRulesEngine(WorkflowRules workflow)
         {
             var json = JsonConvert.SerializeObject(workflow);
             return new RulesEngine(new string[] { json }, null);
         }
 
-        private RulesEngine GetRulesEngine(string filename)
+        private IRulesEngine GetRulesEngine(string filename)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory() as string, "TestData", filename);
             var data = File.ReadAllText(filePath);

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using static Microsoft.Rules.Extensions.ListofRuleResultTreeExtension;
+using Microsoft.Rules;
 
 namespace DemoApp
 {
