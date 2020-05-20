@@ -2,18 +2,27 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
     "Rule": {
+      "title": "Rule",
       "properties": {
         "RuleName": {
           "type": "string"
         },
         "Operator": {
-          "enum": [ "And", "AndAlso", "Or", "OrElse" ]
+          "enum": [
+            "And",
+            "AndAlso",
+            "Or",
+            "OrElse"
+          ]
         },
         "ErrorMessage": {
           "type": "string"
         },
         "ErrorType": {
-          "enum": [ "Warning", "Error" ]
+          "enum": [
+            "Warning",
+            "Error"
+          ]
         },
         "SuccessEvent": {
           "type": "string"
@@ -22,8 +31,12 @@
           "type": "array",
           "items": {
             "anyOf": [
-              { "$ref": "#/definitions/LeafRule" },
-              { "$ref": "#/definitions/Rule" }
+              {
+                "$ref": "#/definitions/LeafRule"
+              },
+              {
+                "$ref": "#/definitions/Rule"
+              }
             ]
           }
         }
@@ -36,6 +49,7 @@
       "type": "object"
     },
     "LeafRule": {
+      "title": "Leaf Rule",
       "type": "object",
       "required": [
         "RuleName",
@@ -50,13 +64,18 @@
           "type": "string"
         },
         "RuleExpressionType": {
-          "enum": [ "LambdaExpression" ]
+          "enum": [
+            "LambdaExpression"
+          ]
         },
         "ErrorMessage": {
           "type": "string"
         },
         "ErrorType": {
-          "enum": [ "Warning", "Error" ]
+          "enum": [
+            "Warning",
+            "Error"
+          ]
         },
         "SuccessEvent": {
           "type": "string"
@@ -72,16 +91,19 @@
       "type": "array",
       "items": {
         "anyOf": [
-          { "$ref": "#/definitions/LeafRule" },
-          { "$ref": "#/definitions/Rule" }
+          {
+            "$ref": "#/definitions/LeafRule"
+          },
+          {
+            "$ref": "#/definitions/Rule"
+          }
         ]
       }
     }
   },
   "required": [
-    "WorkflowName",
+    "WorkFlowName",
     "Rules"
   ],
   "type": "object"
 }
-
