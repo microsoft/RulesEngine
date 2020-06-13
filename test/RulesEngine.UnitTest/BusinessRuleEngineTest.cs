@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using Xunit;
 using Newtonsoft.Json.Converters;
+using RulesEngine.HelperFunctions;
 
 namespace RulesEngine.UnitTest
 {
@@ -32,7 +33,7 @@ namespace RulesEngine.UnitTest
         public void RulesEngine_InjectedRules_ReturnsListOfRuleResultTree(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName);
-            
+
             dynamic input1 = GetInput1();
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
@@ -67,7 +68,7 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            var result = re.ExecuteRule("inputWorkflow",input1);
+            var result = re.ExecuteRule("inputWorkflow", input1);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
         }
@@ -153,6 +154,37 @@ namespace RulesEngine.UnitTest
             Assert.IsType<List<RuleResultTree>>(result);
         }
 
+        /// <summary>
+        /// Ruleses the engine execute rule for nested rull parameters returns success.
+        /// </summary>
+        /// <param name="ruleFileName">Name of the rule file.</param>
+        /// <exception cref="Exception">Rules not found.</exception>
+        [Theory]
+        [InlineData("rules4.json")]
+        public void RulesEngine_Execute_Rule_For_Nested_Rull_Params_Returns_Success(string ruleFileName)
+        {
+            dynamic[] inputs = GetInputs4();
+
+            var ruleParams = new List<RuleParameter>();
+
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                var input = inputs[i];
+                var obj = Utils.GetTypedObject(input);
+                ruleParams.Add(new RuleParameter($"input{i + 1}", obj));
+            }
+
+            var files = Directory.GetFiles(Directory.GetCurrentDirectory(), ruleFileName, SearchOption.AllDirectories);
+            if (files == null || files.Length == 0)
+                throw new Exception("Rules not found.");
+
+            var fileData = File.ReadAllText(files[0]);
+            var bre = new RulesEngine(JsonConvert.DeserializeObject<WorkflowRules[]>(fileData), null);
+            var result = bre.ExecuteRule("inputWorkflow", ruleParams?.ToArray()); ;
+            var ruleResult = result?.FirstOrDefault(r => string.Equals(r.Rule.RuleName, "GiveDiscount10", StringComparison.OrdinalIgnoreCase));
+            Assert.True(ruleResult.IsSuccess);
+        }
+
         private RulesEngine CreateRulesEngine(WorkflowRules workflow)
         {
             var json = JsonConvert.SerializeObject(workflow);
@@ -172,7 +204,7 @@ namespace RulesEngine.UnitTest
 
             var injectWorkflowStr = JsonConvert.SerializeObject(injectWorkflow);
             var mockLogger = new Mock<ILogger>();
-            return new RulesEngine(new string[] { data, injectWorkflowStr}, mockLogger.Object);
+            return new RulesEngine(new string[] { data, injectWorkflowStr }, mockLogger.Object);
         }
 
 
@@ -196,6 +228,44 @@ namespace RulesEngine.UnitTest
             var telemetryInfo = "{\"noOfVisitsPerMonth\": 10,\"percentageOfBuyingToVisit\": 15}";
             return JsonConvert.DeserializeObject<ExpandoObject>(telemetryInfo, converter);
         }
-        
+
+        /// <summary>
+        /// Gets the inputs.
+        /// </summary>
+        /// <returns>
+        /// The inputs.
+        /// </returns>
+        private static dynamic[] GetInputs4()
+        {
+            var basicInfo = "{\"name\": \"Dishant\",\"email\": \"dishantmunjal@live.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyalityFactor\": 3,\"totalPurchasesToDate\": 70000}";
+            var orderInfo = "{\"totalOrders\": 50,\"recurringItems\": 2}";
+            var telemetryInfo = "{\"noOfVisitsPerMonth\": 10,\"percentageOfBuyingToVisit\": 15}";
+            var laborCategoriesInput = "[{\"country\": \"india\", \"loyalityFactor\": 2, \"totalPurchasesToDate\": 20000}]";
+            var currentLaborCategoryInput = "{\"CurrentLaborCategoryProp\":\"TestVal2\"}";
+
+            var converter = new ExpandoObjectConverter();
+            var settings = new JsonSerializerSettings
+            {
+                ContractResolver = new PrivateSetterContractResolver()
+            };
+
+            dynamic input1 = JsonConvert.DeserializeObject<List<RuleTestClass>>(laborCategoriesInput, settings);
+            dynamic input2 = JsonConvert.DeserializeObject<ExpandoObject>(currentLaborCategoryInput, converter);
+            dynamic input3 = JsonConvert.DeserializeObject<ExpandoObject>(telemetryInfo, converter);
+            dynamic input4 = JsonConvert.DeserializeObject<ExpandoObject>(basicInfo, converter);
+            dynamic input5 = JsonConvert.DeserializeObject<ExpandoObject>(orderInfo, converter);
+
+            var inputs = new dynamic[]
+                {
+                    input1,
+                    input2,
+                    input3,
+                    input4,
+                    input5
+                };
+
+            return inputs;
+        }
+
     }
 }

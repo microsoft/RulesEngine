@@ -16,7 +16,16 @@ namespace RulesEngine.Models
         /// <value>
         /// The compiled rules.
         /// </value>
-        internal List<Delegate> CompiledRules { get; set; }
+        internal Delegate Rule { get; set; }
+
+
+        /// <summary>
+        /// Gets or sets the rule parameters.
+        /// </summary>
+        /// <value>
+        /// The rule parameters.
+        /// </value>
+        internal CompiledRuleParam CompiledParameters { get; set; }
     }
 
 }
