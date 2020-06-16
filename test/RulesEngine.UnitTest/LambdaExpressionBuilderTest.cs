@@ -5,6 +5,7 @@ using RulesEngine;
 using RulesEngine.Models;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using Xunit;
 
 namespace RulesEngine.UnitTest
@@ -34,13 +35,13 @@ namespace RulesEngine.UnitTest
             dummyRule.Expression = "RequestType == \"vod\"";
 
             mainRule.Rules.Add(dummyRule);
-
+           
             ParameterExpression ruleInputExp = Expression.Parameter(typeof(RuleInput), nameof(RuleInput));
 
-            var expression = builder.BuildExpressionForRule(dummyRule, parameterExpressions, ruleInputExp);
+            var expression = builder.BuildExpressionForRule(dummyRule, parameterExpressions);
 
             Assert.NotNull(expression);
-            Assert.Equal(typeof(RuleResultTree), expression.ReturnType);
+            Assert.Equal(typeof(RuleResultTree), expression.GetMethodInfo().ReturnType);
         }
     }
 }

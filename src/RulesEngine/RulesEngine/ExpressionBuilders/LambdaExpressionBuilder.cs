@@ -24,20 +24,21 @@ namespace RulesEngine.ExpressionBuilders
         {
             _reSettings = reSettings;
         }
-        internal override Expression<Func<RuleInput, RuleResultTree>> BuildExpressionForRule(Rule rule, IEnumerable<ParameterExpression> typeParamExpressions, ParameterExpression ruleInputExp)
+        internal override RuleFunc<RuleResultTree> BuildExpressionForRule(Rule rule, IEnumerable<ParameterExpression> typeParamExpressions)
         {
             try
             {
                 var config = new ParsingConfig { CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes) };
-                var e = DynamicExpressionParser.ParseLambda(config, typeParamExpressions.ToArray(), null, rule.Expression);
-                var body = (BinaryExpression)e.Body;
-                return Helpers.ToResultTreeExpression(rule, null, body, typeParamExpressions, ruleInputExp);
+                var e = DynamicExpressionParser.ParseLambda(config, true, typeParamExpressions.ToArray(),typeof(bool), rule.Expression);
+                var ruleDelegate = e.Compile();
+                bool func(object[] paramList) => (bool)ruleDelegate.DynamicInvoke(paramList);
+                return Helpers.ToResultTree(rule, null, func);
             }
-            catch (Exception ex)
+             catch (Exception ex)
             {
-                var binaryExpression = Expression.And(Expression.Constant(true), Expression.Constant(false));
+                bool func(object[] param) => false;
                 var exceptionMessage = ex.Message;
-                return Helpers.ToResultTreeExpression(rule, null, binaryExpression, typeParamExpressions, ruleInputExp, exceptionMessage);
+                return Helpers.ToResultTree(rule, null, func, exceptionMessage);
             }           
         }
     }

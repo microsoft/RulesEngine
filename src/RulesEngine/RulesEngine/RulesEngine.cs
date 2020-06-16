@@ -190,7 +190,8 @@ namespace RulesEngine
             var inputs = ruleParams.Select(c => c.Value);
             foreach (var compiledRule in _rulesCache.GetCompiledRules(compileRulesKey).CompiledRules)
             {
-                result.Add(compiledRule.DynamicInvoke(new List<object>(inputs) { new RuleInput() }.ToArray()) as RuleResultTree);
+                var func = (RuleFunc<RuleResultTree>)compiledRule;
+                result.Add(func(inputs.ToArray()));
             }
 
             return result;

@@ -65,15 +65,9 @@ namespace RulesEngine
 
                 ParameterExpression ruleInputExp = Expression.Parameter(typeof(RuleInput), nameof(RuleInput));
 
-                Expression<Func<RuleInput, RuleResultTree>> ruleExpression = GetExpressionForRule(rule, typeParameterExpressions, ruleInputExp);
+                RuleFunc<RuleResultTree> ruleExpression = GetExpressionForRule(rule, typeParameterExpressions,ruleParams, ruleInputExp);
 
-                var lambdaParameterExps = new List<ParameterExpression>(typeParameterExpressions) { ruleInputExp };
-
-
-                var expression = Expression.Lambda(ruleExpression.Body, lambdaParameterExps);
-
-
-                return expression.Compile();
+                return ruleExpression;
             }
             catch (Exception ex)
             {
@@ -117,18 +111,18 @@ namespace RulesEngine
         /// <param name="typeParameterExpressions">The type parameter expressions.</param>
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns></returns>
-        private Expression<Func<RuleInput, RuleResultTree>> GetExpressionForRule(Rule rule, IEnumerable<ParameterExpression> typeParameterExpressions, ParameterExpression ruleInputExp)
+        private RuleFunc<RuleResultTree> GetExpressionForRule(Rule rule, IEnumerable<ParameterExpression> typeParameterExpressions, RuleParameter[] ruleParams, ParameterExpression ruleInputExp)
         {
             ExpressionType nestedOperator;
 
             if (Enum.TryParse(rule.Operator, out nestedOperator) && nestedOperators.Contains(nestedOperator) &&
                 rule.Rules != null && rule.Rules.Any())
             {
-                return BuildNestedExpression(rule, nestedOperator, typeParameterExpressions, ruleInputExp);
+                return BuildNestedExpression(rule, nestedOperator, typeParameterExpressions, ruleParams, ruleInputExp);
             }
             else
             {
-                return BuildExpression(rule, typeParameterExpressions, ruleInputExp);
+                return BuildExpression(rule, typeParameterExpressions,ruleParams);
             }
         }
 
@@ -140,7 +134,7 @@ namespace RulesEngine
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        private Expression<Func<RuleInput, RuleResultTree>> BuildExpression(Rule rule, IEnumerable<ParameterExpression> typeParameterExpressions, ParameterExpression ruleInputExp)
+        private RuleFunc<RuleResultTree> BuildExpression(Rule rule, IEnumerable<ParameterExpression> typeParameterExpressions, RuleParameter[] ruleParams)
         {
             if (!rule.RuleExpressionType.HasValue)
             {
@@ -149,7 +143,7 @@ namespace RulesEngine
 
             var ruleExpressionBuilder = _expressionBuilderFactory.RuleGetExpressionBuilder(rule.RuleExpressionType.Value);
 
-            var expression = ruleExpressionBuilder.BuildExpressionForRule(rule, typeParameterExpressions, ruleInputExp);
+            var expression = ruleExpressionBuilder.BuildExpressionForRule(rule, typeParameterExpressions);
 
             return expression;
         }
@@ -164,104 +158,38 @@ namespace RulesEngine
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns>Expression of func delegate</returns>
         /// <exception cref="InvalidCastException"></exception>
-        private Expression<Func<RuleInput, RuleResultTree>> BuildNestedExpression(Rule parentRule, ExpressionType operation, IEnumerable<ParameterExpression> typeParameterExpressions, ParameterExpression ruleInputExp)
+        private RuleFunc<RuleResultTree> BuildNestedExpression(Rule parentRule, ExpressionType operation, IEnumerable<ParameterExpression> typeParameterExpressions, RuleParameter[] ruleParams, ParameterExpression ruleInputExp)
         {
-            List<Expression<Func<RuleInput, RuleResultTree>>> expressions = new List<Expression<Func<RuleInput, RuleResultTree>>>();
+            var expressions = new List<RuleFunc<RuleResultTree>>();
             foreach (var r in parentRule.Rules)
             {
-                expressions.Add(GetExpressionForRule(r, typeParameterExpressions, ruleInputExp));
+                expressions.Add(GetExpressionForRule(r, typeParameterExpressions, ruleParams ,ruleInputExp));
             }
 
-            List<MemberInitExpression> childRuleResultTree = new List<MemberInitExpression>();
-
-            foreach (var exp in expressions)
-            {
-                var resultMemberInitExpression = exp.Body as MemberInitExpression;
-
-                if (resultMemberInitExpression == null)// assert is a MemberInitExpression
-                {
-                    throw new InvalidCastException($"expression.Body '{exp.Body}' is not of MemberInitExpression type.");
-                }
-
-                childRuleResultTree.Add(resultMemberInitExpression);
-            }
-
-            Expression<Func<RuleInput, RuleResultTree>> nestedExpression = Helpers.ToResultTreeExpression(parentRule, childRuleResultTree, BinaryExpression(expressions, operation), typeParameterExpressions, ruleInputExp);
-
-            return nestedExpression;
+            return (paramArray) =>
+             {
+                 var resultList = expressions.Select(fn => fn(paramArray));
+                 RuleFunc<bool> isSuccess = (p) => ApplyOperation(resultList, operation);
+                 RuleFunc<RuleResultTree> result =  Helpers.ToResultTree(parentRule, resultList,isSuccess);
+                 return result(paramArray);
+             };
         }
 
-        /// <summary>
-        /// Binaries the expression.
-        /// </summary>
-        /// <param name="expressions">The expressions.</param>
-        /// <param name="operationType">Type of the operation.</param>
-        /// <returns>Binary Expression</returns>
-        private BinaryExpression BinaryExpression(IList<Expression<Func<RuleInput, RuleResultTree>>> expressions, ExpressionType operationType)
+
+        private bool ApplyOperation(IEnumerable<RuleResultTree> ruleResults, ExpressionType operation)
         {
-            if (expressions.Count == 1)
+            switch (operation)
             {
-                return ResolveIsSuccessBinding(expressions.First());
+                case ExpressionType.And:
+                case ExpressionType.AndAlso:
+                    return ruleResults.All(r => r.IsSuccess);
+
+                case ExpressionType.Or:
+                case ExpressionType.OrElse:
+                    return ruleResults.Any(r => r.IsSuccess);
+                default:
+                    return false;
             }
-
-            BinaryExpression nestedBinaryExp = Expression.MakeBinary(operationType, ResolveIsSuccessBinding(expressions[0]), ResolveIsSuccessBinding(expressions[1]));
-
-            for (int i = 2; expressions.Count > i; i++)
-            {
-                nestedBinaryExp = Expression.MakeBinary(operationType, nestedBinaryExp, ResolveIsSuccessBinding(expressions[i]));
-            }
-
-            return nestedBinaryExp;
         }
-
-        /// <summary>
-        /// Resolves the is success binding.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns>Binary expression of IsSuccess prop</returns>
-        /// <exception cref="ArgumentNullException">expression</exception>
-        /// <exception cref="InvalidCastException"></exception>
-        /// <exception cref="NullReferenceException">
-        /// IsSuccess
-        /// or
-        /// IsSuccess
-        /// or
-        /// IsSuccess
-        /// </exception>
-        private BinaryExpression ResolveIsSuccessBinding(Expression<Func<RuleInput, RuleResultTree>> expression)
-        {
-            if (expression == null)
-            {
-                throw new ArgumentNullException($"{nameof(expression)} should not be null.");
-            }
-
-            var memberInitExpression = expression.Body as MemberInitExpression;
-
-            if (memberInitExpression == null)// assert it's a MemberInitExpression
-            {
-                throw new InvalidCastException($"expression.Body '{expression.Body}' is not of MemberInitExpression type.");
-            }
-
-            MemberAssignment isSuccessBinding = (MemberAssignment)memberInitExpression.Bindings.FirstOrDefault(f => f.Member.Name == nameof(RuleResultTree.IsSuccess));
-
-            if (isSuccessBinding == null)
-            {
-                throw new NullReferenceException($"Expected {nameof(RuleResultTree.IsSuccess)} property binding not found in {memberInitExpression}.");
-            }
-
-            if (isSuccessBinding.Expression == null)
-            {
-                throw new NullReferenceException($"{nameof(RuleResultTree.IsSuccess)} assignment expression can not be null.");
-            }
-
-            BinaryExpression isSuccessExpression = isSuccessBinding.Expression as BinaryExpression;
-
-            if (isSuccessExpression == null)
-            {
-                throw new NullReferenceException($"Expected {nameof(RuleResultTree.IsSuccess)} assignment expression to be of {typeof(BinaryExpression)} and not {isSuccessBinding.Expression.GetType()}");
-            }
-
-            return isSuccessExpression;
-        } 
     }
 }

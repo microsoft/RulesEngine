@@ -17,6 +17,8 @@ namespace RulesEngine.Models
         /// </summary>
         public string WorkflowName { get; set; }
 
+        public string TriggerRule { get; set; }
+
         public List<string> WorkflowRulesToInject { get; set; }
         /// <summary>
         /// list of rules.

@@ -37,7 +37,8 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            var result = re.ExecuteRule("inputWorkflowReference", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { });
+            var inputList = new List<dynamic>(){ input1, input2, input3 };
+            var result = re.ExecuteRule("inputWorkflowReference", inputList.ToArray());
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
         }
