@@ -13,10 +13,11 @@ namespace DemoApp
         public string Value { get; set; }
     }
 
-    class NestedInputDemo
+    public class NestedInputDemo
     {
-        public static void Main(string[] args)
+        public void Run()
         {
+            Console.WriteLine($"Running {nameof(NestedInputDemo)}....");
             var nestedInput = new { 
                 SimpleProp = "simpleProp",
                 NestedProp = new
@@ -57,8 +58,7 @@ namespace DemoApp
                 }).OnFail(() =>
                 {
                     Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in failure");
-                })
-                    ;
+                });
               
             }
 

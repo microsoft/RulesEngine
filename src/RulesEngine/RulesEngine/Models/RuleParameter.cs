@@ -3,34 +3,23 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using RulesEngine.HelperFunctions;
 
 namespace RulesEngine.Models
 {
     [ExcludeFromCodeCoverage]
     public class RuleParameter
     {
-        public RuleParameter(Type type)
-        {
-            Type = type;
-            Name = type.Name;
-        }
-        public RuleParameter(Type type,string name)
-        {
-            Type = type;
-            Name = name;
-        }
-
         public RuleParameter(string name,object value)
         {
-            Type = value.GetType();
+            Value = Utils.GetTypedObject(value);
+            Type = Value.GetType();
             Name = name;
-            Value = value;
         }
 
-
-        public Type Type { get; set; }
-        public string Name { get; set; }
-        public object Value { get; set; }
+        public Type Type { get; }
+        public string Name { get; }
+        public object Value { get; }
 
     }
 }

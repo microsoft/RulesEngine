@@ -60,8 +60,7 @@ namespace RulesEngine
             for (int i = 0; i < inputs.Length; i++)
             {
                 var input = inputs[i];
-                var obj = Utils.GetTypedObject(input);
-                ruleParams.Add(new RuleParameter($"input{i + 1}", obj));
+                ruleParams.Add(new RuleParameter($"input{i + 1}", input));
             }
 
             return ExecuteRule(workflowName, ruleParams.ToArray());
