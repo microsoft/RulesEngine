@@ -32,6 +32,24 @@ namespace RulesEngine.UnitTest
         }
 
         [Fact]
+        public void GetTypedObject_dynamicObject_multipleObjects()
+        {
+            dynamic obj = new ExpandoObject();
+            obj.test = "hello";
+            obj.testList = new List<int> { 1, 2, 3 };
+            dynamic obj2 = new ExpandoObject();
+            obj2.test = "world";
+            obj2.testList = new List<int> { 1, 2, 3 };
+            object typedobj = Utils.GetTypedObject(obj);
+            object typedobj2 = Utils.GetTypedObject(obj2);
+            Assert.IsNotType<ExpandoObject>(typedobj);
+            Assert.NotNull(typedobj.GetType().GetProperty("test"));
+            Console.WriteLine($"{typedobj.GetType()} & {typedobj2.GetType()}");
+            Assert.Equal(typedobj.GetType(),typedobj2.GetType());
+        }
+
+
+        [Fact]
         public void GetTypedObject_nonDynamicObject()
         {
             var obj = new {
