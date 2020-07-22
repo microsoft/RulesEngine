@@ -78,7 +78,7 @@ namespace RulesEngine.Models
         /// The parameters.
         /// </value>
         [JsonProperty]
-        public IEnumerable<Param> Params { get; private set; }
+        public IEnumerable<LocalParam> LocalParams { get; private set; }
 
         /// <summary>
         /// Gets or Sets the lambda expression. 

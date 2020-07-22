@@ -8,7 +8,9 @@ namespace RulesEngine
     /// <summary>Maintains the cache of evaludated param.</summary>
     internal class ParamCache<T> where T : class
     {
-        /// <summary>The compile rules</summary>
+        /// <summary>
+        /// The compile rules
+        /// </summary>
         private readonly ConcurrentDictionary<string, T> _evaluatedParams = new ConcurrentDictionary<string, T>();
 
         /// <summary>
@@ -58,12 +60,12 @@ namespace RulesEngine
             }
             else
             {
-                if (rule?.Params == null)
+                if (rule?.LocalParams == null)
                 {
                     return $"Compiled_{workflowName}_{rule.RuleName}";
                 }
 
-                return $"Compiled_{workflowName}_{rule.RuleName}_{string.Join("_", rule?.Params.Select(r => r?.Name))}";
+                return $"Compiled_{workflowName}_{rule.RuleName}_{string.Join("_", rule?.LocalParams.Select(r => r?.Name))}";
             }
         }
 

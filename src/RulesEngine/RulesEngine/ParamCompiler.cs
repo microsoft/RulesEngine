@@ -57,11 +57,11 @@ namespace RulesEngine
 
             CompiledRuleParam compiledRuleParam = null;
 
-            if (rule.Params != null)
+            if (rule.LocalParams != null)
             {
                 var compiledParameters = new List<CompiledParam>();
                 var evaluatedParameters = new List<RuleParameter>();
-                foreach (var param in rule.Params)
+                foreach (var param in rule.LocalParams)
                 {
                     IEnumerable<ParameterExpression> typeParameterExpressions = GetParameterExpression(ruleParams.ToArray()).ToList(); // calling ToList to avoid multiple calls this the method for nested rule scenario.
                     ParameterExpression ruleInputExp = Expression.Parameter(typeof(RuleInput), nameof(RuleInput));
@@ -123,7 +123,7 @@ namespace RulesEngine
         /// <param name="typeParameterExpressions">The type parameter expressions.</param>
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns></returns>
-        private Expression GetExpressionForRuleParam(Param param, IEnumerable<ParameterExpression> typeParameterExpressions, ParameterExpression ruleInputExp)
+        private Expression GetExpressionForRuleParam(LocalParam param, IEnumerable<ParameterExpression> typeParameterExpressions, ParameterExpression ruleInputExp)
         {
             return BuildExpression(param, typeParameterExpressions, ruleInputExp);
         }
@@ -136,7 +136,7 @@ namespace RulesEngine
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        private Expression BuildExpression(Param param, IEnumerable<ParameterExpression> typeParameterExpressions, ParameterExpression ruleInputExp)
+        private Expression BuildExpression(LocalParam param, IEnumerable<ParameterExpression> typeParameterExpressions, ParameterExpression ruleInputExp)
         {
             var ruleExpressionBuilder = _expressionBuilderFactory.RuleGetExpressionBuilder(RuleExpressionType.LambdaExpression);
 

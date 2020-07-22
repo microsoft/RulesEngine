@@ -4,7 +4,7 @@ namespace RulesEngine.Models
 {
     /// <summary>Class Param.
     /// Implements the <see cref="RulesEngine.Models.Rule" /></summary>
-    public class Param
+    public class LocalParam
     {
 
         /// <summary>
