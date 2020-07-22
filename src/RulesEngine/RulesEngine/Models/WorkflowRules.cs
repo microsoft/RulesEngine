@@ -17,10 +17,13 @@ namespace RulesEngine.Models
         /// </summary>
         public string WorkflowName { get; set; }
 
-        public List<string> WorkflowRulesToInject { get; set; }
+        /// <summary>Gets or sets the workflow rules to inject.</summary>
+        /// <value>The workflow rules to inject.</value>
+        public IEnumerable<string> WorkflowRulesToInject { get; set; }
+
         /// <summary>
         /// list of rules.
         /// </summary>
-        public List<Rule> Rules { get; set; }
+        public IEnumerable<Rule> Rules { get; set; }
     }
 }

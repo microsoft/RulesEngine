@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace RulesEngine.Models
 {
@@ -71,11 +72,26 @@ namespace RulesEngine.Models
         public List<Rule> Rules { get; set; }
 
         /// <summary>
+        /// Gets the parameters.
+        /// </summary>
+        /// <value>
+        /// The parameters.
+        /// </value>
+        [JsonProperty]
+        public IEnumerable<LocalParam> LocalParams { get; private set; }
+
+        /// <summary>
         /// Gets or Sets the lambda expression. 
         /// </summary>
         public string Expression { get; set; }
 
 
+        /// <summary>
+        /// Gets or sets the success event.
+        /// </summary>
+        /// <value>
+        /// The success event.
+        /// </value>
         public string SuccessEvent { get; set; }
 
     }

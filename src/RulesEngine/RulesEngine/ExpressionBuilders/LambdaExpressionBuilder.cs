@@ -38,7 +38,20 @@ namespace RulesEngine.ExpressionBuilders
                 var binaryExpression = Expression.And(Expression.Constant(true), Expression.Constant(false));
                 var exceptionMessage = ex.Message;
                 return Helpers.ToResultTreeExpression(rule, null, binaryExpression, typeParamExpressions, ruleInputExp, exceptionMessage);
-            }           
+            }
         }
+
+        /// <summary>Builds the expression for rule parameter.</summary>
+        /// <param name="param">The parameter.</param>
+        /// <param name="typeParamExpressions">The type parameter expressions.</param>
+        /// <param name="ruleInputExp">The rule input exp.</param>
+        /// <returns>Expression.</returns>
+        internal override Expression BuildExpressionForRuleParam(LocalParam param, IEnumerable<ParameterExpression> typeParamExpressions, ParameterExpression ruleInputExp)
+        {
+            var config = new ParsingConfig { CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes) };
+            var e = DynamicExpressionParser.ParseLambda(config, typeParamExpressions.ToArray(), null, param.Expression);
+            return e.Body;
+        }
+
     }
 }

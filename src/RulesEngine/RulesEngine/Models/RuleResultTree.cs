@@ -48,6 +48,14 @@ namespace RulesEngine.Models
         public string ExceptionMessage { get; set; }
 
         /// <summary>
+        /// Gets or sets the rule evaluated parameters.
+        /// </summary>
+        /// <value>
+        /// The rule evaluated parameters.
+        /// </value>
+        public IEnumerable<RuleParameter> RuleEvaluatedParams { get; set; }
+
+        /// <summary>
         /// This method will return all the error and warning messages to caller
         /// </summary>
         /// <returns>RuleResultMessage</returns>

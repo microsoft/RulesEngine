@@ -26,6 +26,9 @@ namespace RulesEngine
         /// </summary>
         private readonly RuleExpressionBuilderFactory _expressionBuilderFactory;
 
+        /// <summary>
+        /// The logger
+        /// </summary>
         private readonly ILogger _logger;
 
         /// <summary>

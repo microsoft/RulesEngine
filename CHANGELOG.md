@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 18-05-2020
+- Adding local param support to make expression authroing more intuitive.
+
 ## [2.0.0] - 18-05-2020
 ### Changed
 - Interface simplified by removing redundant parameters in the IRulesEngine.
