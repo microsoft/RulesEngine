@@ -161,7 +161,7 @@ namespace RulesEngine.UnitTest
         /// <exception cref="Exception">Rules not found.</exception>
         [Theory]
         [InlineData("rules4.json")]
-        public void RulesEngine_Execute_Rule_For_Nested_Rull_Params_Returns_Success(string ruleFileName)
+        public void RulesEngine_Execute_Rule_For_Nested_Rule_Params_Returns_Success(string ruleFileName)
         {
             dynamic[] inputs = GetInputs4();
 

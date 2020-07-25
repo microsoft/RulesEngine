@@ -34,13 +34,10 @@ namespace RulesEngine.UnitTest
             dummyRule.Expression = "RequestType == \"vod\"";
 
             mainRule.Rules.Add(dummyRule);
+            var func = builder.BuildExpressionForRule(dummyRule, parameterExpressions);
 
-            ParameterExpression ruleInputExp = Expression.Parameter(typeof(RuleInput), nameof(RuleInput));
-
-            var expression = builder.BuildExpressionForRule(dummyRule, parameterExpressions, ruleInputExp);
-
-            Assert.NotNull(expression);
-            Assert.Equal(typeof(RuleResultTree), expression.ReturnType);
+            Assert.NotNull(func);
+            Assert.Equal(typeof(RuleResultTree), func.Method.ReturnType);
         }
     }
 }

@@ -60,14 +60,12 @@ namespace RulesEngine
         /// <param name="input"></param>
         /// <param name="ruleParam"></param>
         /// <returns>Compiled func delegate</returns>
-        public Delegate CompileRule(Rule rule,params RuleParameter[] ruleParams)
+        public RuleFunc<RuleResultTree> CompileRule(Rule rule,params RuleParameter[] ruleParams)
         {
             try
             {
-                IEnumerable<ParameterExpression> typeParameterExpressions = GetParameterExpression(ruleParams).ToList(); // calling ToList to avoid multiple calls this the method for nested rule scenario.
-
+                IEnumerable<ParameterExpression> typeParameterExpressions = GetParameterExpression(ruleParams).ToList();
                 ParameterExpression ruleInputExp = Expression.Parameter(typeof(RuleInput), nameof(RuleInput));
-
                 RuleFunc<RuleResultTree> ruleExpression = GetExpressionForRule(rule, typeParameterExpressions,ruleParams, ruleInputExp);
 
                 return ruleExpression;
