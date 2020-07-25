@@ -241,6 +241,8 @@ namespace RulesEngine
         /// <param name="workflowName"></param>
         /// <param name="ruleParams"></param>
         /// <returns>list of rule result set</returns>
+
+        // TODO: Cleanup and fix this
         private List<RuleResultTree> ExecuteRuleByWorkflow(string workflowName, RuleParameter[] ruleParameters)
         {
             _logger.LogTrace($"Compiled rules found for {workflowName} workflow and executed");
@@ -263,6 +265,8 @@ namespace RulesEngine
                 var resultTree = compiledRule.Rule.DynamicInvoke(new List<object>(inputs) { new RuleInput() }.ToArray()) as RuleResultTree;
                 resultTree.RuleEvaluatedParams = evaluatedRuleParams;
                 result.Add(resultTree);
+                //var func = (RuleFunc<RuleResultTree>)compiledRule;
+                //result.Add(func(inputs.ToArray()));
             }
 
             FormatErrorMessages(result?.Where(r => !r.IsSuccess));

@@ -85,6 +85,9 @@ namespace RulesEngine.Models
         /// </summary>
         public string Expression { get; set; }
 
+        public RuleAction Action { get; set; }
+
+        public RuleOutput Output { get; set; }
 
         /// <summary>
         /// Gets or sets the success event.
@@ -96,4 +99,18 @@ namespace RulesEngine.Models
 
     }
 
+    public class RuleOutput
+    {
+        public string Alias { get; set; }
+        public string Value { get; set; }
+    }
+
+    public class RuleAction
+    {
+        public string On { get; set; } = "success";
+
+        public string ActionType { get; set; }
+
+        public string Value { get; set; }
+    }
 }
