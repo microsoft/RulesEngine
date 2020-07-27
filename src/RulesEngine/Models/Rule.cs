@@ -99,12 +99,14 @@ namespace RulesEngine.Models
 
     }
 
+    [ExcludeFromCodeCoverage]
     public class RuleOutput
     {
         public string Alias { get; set; }
         public string Value { get; set; }
     }
 
+    [ExcludeFromCodeCoverage]
     public class RuleAction
     {
         public string On { get; set; } = "success";

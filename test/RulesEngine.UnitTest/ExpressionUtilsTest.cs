@@ -2,11 +2,13 @@
 // Licensed under the MIT License.
 
 using RulesEngine.HelperFunctions;
+using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
 namespace RulesEngine.UnitTest
 {
     [Trait("Category", "Unit")]
+    [ExcludeFromCodeCoverage]
     public class ExpressionUtilsTest
     {
         [Fact]

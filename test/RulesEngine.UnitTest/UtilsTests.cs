@@ -4,12 +4,14 @@
 using RulesEngine.HelperFunctions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Text;
 using Xunit;
 
 namespace RulesEngine.UnitTest
 {
+    [ExcludeFromCodeCoverage]
     public class TestClass
     {
         public string test { get; set; }
@@ -17,6 +19,7 @@ namespace RulesEngine.UnitTest
     }
 
     [Trait("Category","Unit")]
+    [ExcludeFromCodeCoverage]
     public class UtilsTests
     {
 

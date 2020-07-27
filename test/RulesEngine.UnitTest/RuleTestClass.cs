@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace RulesEngine.UnitTest
@@ -8,6 +9,8 @@ namespace RulesEngine.UnitTest
     /// <summary>
     /// Class RuleTestClass.
     /// </summary>
+
+    [ExcludeFromCodeCoverage]
     public class RuleTestClass
     {
         /// <summary>
@@ -17,7 +20,7 @@ namespace RulesEngine.UnitTest
         /// The country.
         /// </value>
         [JsonProperty("country")]
-        public string Country { get; private set; }
+        public string Country { get; set; }
 
         /// <summary>
         /// Gets the loyality factor.
@@ -26,7 +29,7 @@ namespace RulesEngine.UnitTest
         /// The loyality factor.
         /// </value>
         [JsonProperty("loyalityFactor")]
-        public int LoyalityFactor { get; private set; }
+        public int LoyalityFactor { get; set; }
 
         /// <summary>
         /// Gets the total purchases to date.
@@ -35,6 +38,6 @@ namespace RulesEngine.UnitTest
         /// The total purchases to date.
         /// </value>
         [JsonProperty("totalPurchasesToDate")]
-        public int TotalPurchasesToDate { get; private set; }
+        public int TotalPurchasesToDate { get; set; }
     }
 }

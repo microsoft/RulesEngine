@@ -65,8 +65,7 @@ namespace RulesEngine
             try
             {
                 IEnumerable<ParameterExpression> typeParameterExpressions = GetParameterExpression(ruleParams).ToList();
-                ParameterExpression ruleInputExp = Expression.Parameter(typeof(RuleInput), nameof(RuleInput));
-                RuleFunc<RuleResultTree> ruleExpression = GetExpressionForRule(rule, typeParameterExpressions,ruleParams, ruleInputExp);
+                RuleFunc<RuleResultTree> ruleExpression = GetExpressionForRule(rule, typeParameterExpressions,ruleParams);
 
                 return ruleExpression;
             }
@@ -112,14 +111,14 @@ namespace RulesEngine
         /// <param name="typeParameterExpressions">The type parameter expressions.</param>
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns></returns>
-        private RuleFunc<RuleResultTree> GetExpressionForRule(Rule rule, IEnumerable<ParameterExpression> typeParameterExpressions, RuleParameter[] ruleParams, ParameterExpression ruleInputExp)
+        private RuleFunc<RuleResultTree> GetExpressionForRule(Rule rule, IEnumerable<ParameterExpression> typeParameterExpressions, RuleParameter[] ruleParams)
         {
             ExpressionType nestedOperator;
 
             if (Enum.TryParse(rule.Operator, out nestedOperator) && nestedOperators.Contains(nestedOperator) &&
                 rule.Rules != null && rule.Rules.Any())
             {
-                return BuildNestedExpression(rule, nestedOperator, typeParameterExpressions, ruleParams, ruleInputExp);
+                return BuildNestedExpression(rule, nestedOperator, typeParameterExpressions, ruleParams);
             }
             else
             {
@@ -159,12 +158,12 @@ namespace RulesEngine
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns>Expression of func delegate</returns>
         /// <exception cref="InvalidCastException"></exception>
-        private RuleFunc<RuleResultTree> BuildNestedExpression(Rule parentRule, ExpressionType operation, IEnumerable<ParameterExpression> typeParameterExpressions, RuleParameter[] ruleParams, ParameterExpression ruleInputExp)
+        private RuleFunc<RuleResultTree> BuildNestedExpression(Rule parentRule, ExpressionType operation, IEnumerable<ParameterExpression> typeParameterExpressions, RuleParameter[] ruleParams)
         {
             var expressions = new List<RuleFunc<RuleResultTree>>();
             foreach (var r in parentRule.Rules)
             {
-                expressions.Add(GetExpressionForRule(r, typeParameterExpressions, ruleParams ,ruleInputExp));
+                expressions.Add(GetExpressionForRule(r, typeParameterExpressions, ruleParams));
             }
 
             return (paramArray) =>

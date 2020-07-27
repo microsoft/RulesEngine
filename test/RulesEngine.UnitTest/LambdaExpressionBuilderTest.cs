@@ -4,12 +4,14 @@
 using RulesEngine;
 using RulesEngine.Models;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Xunit;
 
 namespace RulesEngine.UnitTest
 {
     [Trait("Category", "Unit")]
+    [ExcludeFromCodeCoverage]
     public class LambdaExpressionBuilderTest
     {
         [Fact]

@@ -14,10 +14,12 @@ using System.Linq;
 using Xunit;
 using Newtonsoft.Json.Converters;
 using RulesEngine.HelperFunctions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RulesEngine.UnitTest
 {
     [Trait("Category", "Unit")]
+    [ExcludeFromCodeCoverage]
     public class RulesEngineTest
     {
         [Theory]
@@ -244,12 +246,8 @@ namespace RulesEngine.UnitTest
             var currentLaborCategoryInput = "{\"CurrentLaborCategoryProp\":\"TestVal2\"}";
 
             var converter = new ExpandoObjectConverter();
-            var settings = new JsonSerializerSettings
-            {
-                ContractResolver = new PrivateSetterContractResolver()
-            };
 
-            dynamic input1 = JsonConvert.DeserializeObject<List<RuleTestClass>>(laborCategoriesInput, settings);
+            dynamic input1 = JsonConvert.DeserializeObject<List<RuleTestClass>>(laborCategoriesInput);
             dynamic input2 = JsonConvert.DeserializeObject<ExpandoObject>(currentLaborCategoryInput, converter);
             dynamic input3 = JsonConvert.DeserializeObject<ExpandoObject>(telemetryInfo, converter);
             dynamic input4 = JsonConvert.DeserializeObject<ExpandoObject>(basicInfo, converter);
