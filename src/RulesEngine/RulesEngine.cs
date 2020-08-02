@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using FluentValidation;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
@@ -28,7 +29,7 @@ namespace RulesEngine
         private readonly ILogger _logger;
         private readonly ReSettings _reSettings;
         private readonly RulesCache _rulesCache = new RulesCache();
-        private readonly ParamCache<CompiledRuleParam> _compiledParamsCache = new ParamCache<CompiledRuleParam>();
+        private readonly MemoryCache _compiledParamsCache = new MemoryCache(new MemoryCacheOptions());
         private readonly ParamCompiler ruleParamCompiler;
         private const string ParamParseRegex = "(\\$\\(.*?\\))";
         #endregion
@@ -178,17 +179,8 @@ namespace RulesEngine
                 var ruleCompiler = new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings), _logger);
                 foreach (var rule in _rulesCache.GetRules(workflowName))
                 {
-                    var compiledParamsKey = _compiledParamsCache.GetCompiledParamsCacheKey(workflowName, rule);
-                    CompiledRuleParam compiledRuleParam;
-                    if (_compiledParamsCache.ContainsParams(compiledParamsKey))
-                    {
-                        compiledRuleParam = _compiledParamsCache.GetParams(compiledParamsKey);
-                    }
-                    else
-                    {
-                        compiledRuleParam = ruleParamCompiler.CompileParamsExpression(rule, ruleParams);
-                        _compiledParamsCache.AddOrUpdateParams(compiledParamsKey, compiledRuleParam);
-                    }
+                    var compiledParamsKey = GetCompiledParamsCacheKey(workflowName, rule);
+                    CompiledRuleParam compiledRuleParam = _compiledParamsCache.GetOrCreate(compiledParamsKey, (entry) => ruleParamCompiler.CompileParamsExpression(rule, ruleParams));
 
                     var updatedRuleParams = compiledRuleParam != null ? ruleParams?.Concat(compiledRuleParam?.RuleParameters) : ruleParams;
                     var compiledRule = ruleCompiler.CompileRule(rule, updatedRuleParams?.ToArray());
@@ -220,12 +212,6 @@ namespace RulesEngine
             }
         }
 
-
-        private static string GetCompileRulesKey(string workflowName, RuleParameter[] ruleParams)
-        {
-            return $"{workflowName}-" + String.Join("-", ruleParams.Select(c => c.Type.Name));
-        }
-
         /// <summary>
         /// This will execute the compiled rules 
         /// </summary>
@@ -251,6 +237,23 @@ namespace RulesEngine
 
             FormatErrorMessages(result?.Where(r => !r.IsSuccess));
             return result;
+        }
+
+        private string GetCompiledParamsCacheKey(string workflowName, Rule rule)
+        {
+            if (rule == null)
+            {
+                return string.Empty;
+            }
+            else
+            {
+                if (rule?.LocalParams == null)
+                {
+                    return $"Compiled_{workflowName}_{rule.RuleName}";
+                }
+
+                return $"Compiled_{workflowName}_{rule.RuleName}_{string.Join("_", rule?.LocalParams.Select(r => r?.Name))}";
+            }
         }
 
         /// <summary>

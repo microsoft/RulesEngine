@@ -39,7 +39,7 @@ namespace RulesEngine.HelperFunctions
             }
             else
             {
-                if (ruleResultTree.IsSuccess)
+                if (!ruleResultTree.IsSuccess)
                 {
                     string errMsg = ruleResultTree.Rule.ErrorMessage;
                     errMsg = string.IsNullOrEmpty(errMsg) ? $"Error message does not configured for {ruleResultTree.Rule.RuleName}" : errMsg;
