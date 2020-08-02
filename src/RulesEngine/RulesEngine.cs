@@ -193,12 +193,9 @@ namespace RulesEngine
                             inputs = inputs.Append(evaluatedLocalParam.Value);
                         }
                         var result = compiledRule(inputs.ToArray());
-                        //TODO: validate
                         result.RuleEvaluatedParams = compiledRuleParam?.RuleParameters;
                         return result;
                     };
-
-
                     lstFunc.Add(updatedRule);
                 }
 
@@ -231,8 +228,6 @@ namespace RulesEngine
                 var inputs = ruleParameters.Select(c => c.Value).ToArray();
                 var resultTree = compiledRule(inputs);
                 result.Add(resultTree);
-                //var func = (RuleFunc<RuleResultTree>)compiledRule;
-                //result.Add(func(inputs.ToArray()));
             }
 
             FormatErrorMessages(result?.Where(r => !r.IsSuccess));
