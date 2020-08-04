@@ -30,7 +30,7 @@ jobs:
     - name: Uninstrument
       run: minicover uninstrument
     - name: Report
-      run: minicover report --threshold 80
+      run: minicover report --threshold 95
       if: ${{ github.event_name == 'pull_request' }}
     - name: Report coveralls
       run: minicover coverallsreport --repo-token ${{ secrets.COVERALLS_TOKEN }} --branch master
