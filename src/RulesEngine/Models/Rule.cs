@@ -85,7 +85,6 @@ namespace RulesEngine.Models
         /// </summary>
         public string Expression { get; set; }
 
-
         /// <summary>
         /// Gets or sets the success event.
         /// </summary>
@@ -95,5 +94,4 @@ namespace RulesEngine.Models
         public string SuccessEvent { get; set; }
 
     }
-
 }

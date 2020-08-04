@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace RulesEngine.Models
@@ -7,6 +8,7 @@ namespace RulesEngine.Models
     /// <summary>
     /// CompiledParam class.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal class CompiledParam
     {
         /// <summary>

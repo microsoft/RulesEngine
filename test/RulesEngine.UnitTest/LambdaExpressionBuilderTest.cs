@@ -4,12 +4,14 @@
 using RulesEngine;
 using RulesEngine.Models;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Xunit;
 
 namespace RulesEngine.UnitTest
 {
     [Trait("Category", "Unit")]
+    [ExcludeFromCodeCoverage]
     public class LambdaExpressionBuilderTest
     {
         [Fact]
@@ -34,13 +36,10 @@ namespace RulesEngine.UnitTest
             dummyRule.Expression = "RequestType == \"vod\"";
 
             mainRule.Rules.Add(dummyRule);
+            var func = builder.BuildExpressionForRule(dummyRule, parameterExpressions);
 
-            ParameterExpression ruleInputExp = Expression.Parameter(typeof(RuleInput), nameof(RuleInput));
-
-            var expression = builder.BuildExpressionForRule(dummyRule, parameterExpressions, ruleInputExp);
-
-            Assert.NotNull(expression);
-            Assert.Equal(typeof(RuleResultTree), expression.ReturnType);
+            Assert.NotNull(func);
+            Assert.Equal(typeof(RuleResultTree), func.Method.ReturnType);
         }
     }
 }
