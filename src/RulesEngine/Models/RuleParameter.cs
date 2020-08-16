@@ -17,6 +17,10 @@ namespace RulesEngine.Models
             Name = name;
         }
 
+        internal RuleParameter(string name,Type type){
+            Name = name;
+            Type = type;
+        }
         public Type Type { get; }
         public string Name { get; }
         public object Value { get; }

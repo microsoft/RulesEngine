@@ -180,20 +180,22 @@ namespace RulesEngine
                 foreach (var rule in _rulesCache.GetRules(workflowName))
                 {
                     var compiledParamsKey = GetCompiledParamsCacheKey(workflowName, rule);
-                    CompiledRuleParam compiledRuleParam = _compiledParamsCache.GetOrCreate(compiledParamsKey, (entry) => ruleParamCompiler.CompileParamsExpression(rule, ruleParams));
-
-                    var updatedRuleParams = compiledRuleParam != null ? ruleParams?.Concat(compiledRuleParam?.RuleParameters) : ruleParams;
+                    IEnumerable<CompiledParam> compiledParamList = _compiledParamsCache.GetOrCreate(compiledParamsKey, (entry) => ruleParamCompiler.CompileParamsExpression(rule, ruleParams));
+                    var compiledRuleParameters = compiledParamList?.Select(c => c.AsRuleParameter()) ?? new List<RuleParameter>();
+                    var updatedRuleParams = ruleParams?.Concat(compiledRuleParameters);
                     var compiledRule = ruleCompiler.CompileRule(rule, updatedRuleParams?.ToArray());
                     
                     RuleFunc<RuleResultTree> updatedRule = (object[] paramList) => {
                         var inputs = paramList.AsEnumerable();
-                        IEnumerable<CompiledParam> localParams = compiledRuleParam?.CompiledParameters ?? new List<CompiledParam>();
+                        IEnumerable<CompiledParam> localParams = compiledParamList ?? new List<CompiledParam>();
+                        var evaluatedParamList = new List<RuleParameter>();
                         foreach(var localParam in localParams){
                             var evaluatedLocalParam = ruleParamCompiler.EvaluateCompiledParam(localParam.Name,localParam.Value,inputs);
                             inputs = inputs.Append(evaluatedLocalParam.Value);
+                            evaluatedParamList.Add(evaluatedLocalParam);
                         }
                         var result = compiledRule(inputs.ToArray());
-                        result.RuleEvaluatedParams = compiledRuleParam?.RuleParameters;
+                        result.RuleEvaluatedParams = evaluatedParamList;
                         return result;
                     };
                     lstFunc.Add(updatedRule);

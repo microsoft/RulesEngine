@@ -52,32 +52,27 @@ namespace RulesEngine
         /// <returns>
         /// IEnumerable&lt;RuleParameter&gt;.
         /// </returns>
-        public CompiledRuleParam CompileParamsExpression(Rule rule, IEnumerable<RuleParameter> ruleParams)
+        public IEnumerable<CompiledParam> CompileParamsExpression(Rule rule, IEnumerable<RuleParameter> ruleParams)
         {
+           
+            if(rule.LocalParams == null)    return null;
 
-            CompiledRuleParam compiledRuleParam = null;
-
-            if (rule.LocalParams != null)
+            var compiledParameters = new List<CompiledParam>();
+            var evaluatedParameters = new List<RuleParameter>();
+            foreach (var param in rule.LocalParams)
             {
-                var compiledParameters = new List<CompiledParam>();
-                var evaluatedParameters = new List<RuleParameter>();
-                foreach (var param in rule.LocalParams)
-                {
-                    IEnumerable<ParameterExpression> typeParameterExpressions = GetParameterExpression(ruleParams.ToArray()).ToList(); // calling ToList to avoid multiple calls this the method for nested rule scenario.
-                    var ruleParamExpression = GetExpressionForRuleParam(param, typeParameterExpressions);
-                    var lambdaParameterExps = new List<ParameterExpression>(typeParameterExpressions);
-                    var expression = Expression.Lambda(ruleParamExpression, lambdaParameterExps);
-                    var compiledParam = expression.Compile();
-                    compiledParameters.Add(new CompiledParam { Name = param.Name, Value = compiledParam, Parameters = evaluatedParameters });
-                    var evaluatedParam = this.EvaluateCompiledParam(param.Name, compiledParam, ruleParams.Select(c => c.Value).ToArray());
-                    ruleParams = ruleParams.Append(evaluatedParam);
-                    evaluatedParameters.Add(evaluatedParam);
-                }
-
-                compiledRuleParam = new CompiledRuleParam { Name = rule.RuleName, CompiledParameters = compiledParameters, RuleParameters = evaluatedParameters };
+                IEnumerable<ParameterExpression> typeParameterExpressions = GetParameterExpression(ruleParams.ToArray()).ToList(); // calling ToList to avoid multiple calls this the method for nested rule scenario.
+                var ruleParamExpression = GetExpressionForRuleParam(param, typeParameterExpressions);
+                var lambdaParameterExps = new List<ParameterExpression>(typeParameterExpressions);
+                var expression = Expression.Lambda(ruleParamExpression, lambdaParameterExps);
+                var compiledParam = expression.Compile();
+                compiledParameters.Add(new CompiledParam { Name = param.Name, Value = compiledParam, Parameters = evaluatedParameters });
+                var evaluatedParam = this.EvaluateCompiledParam(param.Name, compiledParam, ruleParams.Select(c => c.Value).ToArray());
+                ruleParams = ruleParams.Append(evaluatedParam);
+                evaluatedParameters.Add(evaluatedParam);
             }
 
-            return compiledRuleParam;
+            return compiledParameters;
         }
 
         /// <summary>Evaluates the compiled parameter.</summary>
