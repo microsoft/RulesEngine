@@ -179,26 +179,7 @@ namespace RulesEngine
                 var ruleCompiler = new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings), _logger);
                 foreach (var rule in _rulesCache.GetRules(workflowName))
                 {
-                    var compiledParamsKey = GetCompiledParamsCacheKey(workflowName, rule);
-                    IEnumerable<CompiledParam> compiledParamList = _compiledParamsCache.GetOrCreate(compiledParamsKey, (entry) => ruleParamCompiler.CompileParamsExpression(rule, ruleParams));
-                    var compiledRuleParameters = compiledParamList?.Select(c => c.AsRuleParameter()) ?? new List<RuleParameter>();
-                    var updatedRuleParams = ruleParams?.Concat(compiledRuleParameters);
-                    var compiledRule = ruleCompiler.CompileRule(rule, updatedRuleParams?.ToArray());
-                    
-                    RuleFunc<RuleResultTree> updatedRule = (object[] paramList) => {
-                        var inputs = paramList.AsEnumerable();
-                        IEnumerable<CompiledParam> localParams = compiledParamList ?? new List<CompiledParam>();
-                        var evaluatedParamList = new List<RuleParameter>();
-                        foreach(var localParam in localParams){
-                            var evaluatedLocalParam = ruleParamCompiler.EvaluateCompiledParam(localParam.Name,localParam.Value,inputs);
-                            inputs = inputs.Append(evaluatedLocalParam.Value);
-                            evaluatedParamList.Add(evaluatedLocalParam);
-                        }
-                        var result = compiledRule(inputs.ToArray());
-                        result.RuleEvaluatedParams = evaluatedParamList;
-                        return result;
-                    };
-                    lstFunc.Add(updatedRule);
+                    lstFunc.Add(CompileRule(workflowName, ruleParams, ruleCompiler, rule));
                 }
 
                 _rulesCache.AddOrUpdateCompiledRule(compileRulesKey,lstFunc );
@@ -211,14 +192,38 @@ namespace RulesEngine
             }
         }
 
+        private RuleFunc<RuleResultTree> CompileRule(string workflowName, RuleParameter[] ruleParams,RuleCompiler ruleCompiler, Rule rule)
+        {
+            var compiledParamsKey = GetCompiledParamsCacheKey(workflowName, rule);
+            IEnumerable<CompiledParam> compiledParamList = _compiledParamsCache.GetOrCreate(compiledParamsKey, (entry) => ruleParamCompiler.CompileParamsExpression(rule, ruleParams));
+            var compiledRuleParameters = compiledParamList?.Select(c => c.AsRuleParameter()) ?? new List<RuleParameter>();
+            var updatedRuleParams = ruleParams?.Concat(compiledRuleParameters);
+            var compiledRule = ruleCompiler.CompileRule(rule, updatedRuleParams?.ToArray());
+
+            RuleFunc<RuleResultTree> updatedRule = (object[] paramList) =>
+            {
+                var inputs = paramList.AsEnumerable();
+                IEnumerable<CompiledParam> localParams = compiledParamList ?? new List<CompiledParam>();
+                var evaluatedParamList = new List<RuleParameter>();
+                foreach (var localParam in localParams)
+                {
+                    var evaluatedLocalParam = ruleParamCompiler.EvaluateCompiledParam(localParam.Name, localParam.Value, inputs);
+                    inputs = inputs.Append(evaluatedLocalParam.Value);
+                    evaluatedParamList.Add(evaluatedLocalParam);
+                }
+                var result = compiledRule(inputs.ToArray());
+                result.RuleEvaluatedParams = evaluatedParamList;
+                return result;
+            };
+            return updatedRule;
+        }
+
         /// <summary>
         /// This will execute the compiled rules 
         /// </summary>
         /// <param name="workflowName"></param>
         /// <param name="ruleParams"></param>
         /// <returns>list of rule result set</returns>
-
-        // TODO: Cleanup and fix this
         private List<RuleResultTree> ExecuteRuleByWorkflow(string workflowName, RuleParameter[] ruleParameters)
         {
             _logger.LogTrace($"Compiled rules found for {workflowName} workflow and executed");
@@ -256,15 +261,15 @@ namespace RulesEngine
         /// <summary>
         /// The result
         /// </summary>
-        /// <param name="result">The result.</param>
+        /// <param name="ruleResultList">The result.</param>
         /// <returns>Updated error message.</returns>
-        private IEnumerable<RuleResultTree> FormatErrorMessages(IEnumerable<RuleResultTree> result)
+        private IEnumerable<RuleResultTree> FormatErrorMessages(IEnumerable<RuleResultTree> ruleResultList)
         {
-            foreach (var error in result)
+            foreach (var ruleResult in ruleResultList)
             {
-                var errorParameters = Regex.Matches(error?.Rule?.ErrorMessage, ParamParseRegex);
-                var errorMessage = error?.Rule?.ErrorMessage;
-                var evaluatedParams = error?.RuleEvaluatedParams;
+                var errorParameters = Regex.Matches(ruleResult?.Rule?.ErrorMessage, ParamParseRegex);
+                var errorMessage = ruleResult?.Rule?.ErrorMessage;
+                var evaluatedParams = ruleResult?.RuleEvaluatedParams;
                 foreach (var param in errorParameters)
                 {
                     var paramVal = param?.ToString();
@@ -284,10 +289,10 @@ namespace RulesEngine
                     }
                 }
 
-                error.Rule.ErrorMessage = errorMessage;
+                ruleResult.Rule.ErrorMessage = errorMessage;
             }
 
-            return result;
+            return ruleResultList;
         }
 
         /// <summary>
