@@ -64,9 +64,8 @@ namespace RulesEngine
                 foreach (var param in rule.LocalParams)
                 {
                     IEnumerable<ParameterExpression> typeParameterExpressions = GetParameterExpression(ruleParams.ToArray()).ToList(); // calling ToList to avoid multiple calls this the method for nested rule scenario.
-                    ParameterExpression ruleInputExp = Expression.Parameter(typeof(RuleInput), nameof(RuleInput));
-                    var ruleParamExpression = GetExpressionForRuleParam(param, typeParameterExpressions, ruleInputExp);
-                    var lambdaParameterExps = new List<ParameterExpression>(typeParameterExpressions) { ruleInputExp };
+                    var ruleParamExpression = GetExpressionForRuleParam(param, typeParameterExpressions);
+                    var lambdaParameterExps = new List<ParameterExpression>(typeParameterExpressions);
                     var expression = Expression.Lambda(ruleParamExpression, lambdaParameterExps);
                     var compiledParam = expression.Compile();
                     compiledParameters.Add(new CompiledParam { Name = param.Name, Value = compiledParam, Parameters = evaluatedParameters });
@@ -88,7 +87,7 @@ namespace RulesEngine
         /// <returns>RuleParameter.</returns>
         public RuleParameter EvaluateCompiledParam(string paramName, Delegate compiledParam, IEnumerable<object> inputs)
         {
-            var result = compiledParam.DynamicInvoke(new List<object>(inputs) { new RuleInput() }.ToArray());
+            var result = compiledParam.DynamicInvoke(new List<object>(inputs).ToArray());
             return new RuleParameter(paramName, result);
         }
 
@@ -122,9 +121,9 @@ namespace RulesEngine
         /// <param name="typeParameterExpressions">The type parameter expressions.</param>
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns></returns>
-        private Expression GetExpressionForRuleParam(LocalParam param, IEnumerable<ParameterExpression> typeParameterExpressions, ParameterExpression ruleInputExp)
+        private Expression GetExpressionForRuleParam(LocalParam param, IEnumerable<ParameterExpression> typeParameterExpressions)
         {
-            return BuildExpression(param, typeParameterExpressions, ruleInputExp);
+            return BuildExpression(param, typeParameterExpressions);
         }
 
         /// <summary>
@@ -135,11 +134,11 @@ namespace RulesEngine
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        private Expression BuildExpression(LocalParam param, IEnumerable<ParameterExpression> typeParameterExpressions, ParameterExpression ruleInputExp)
+        private Expression BuildExpression(LocalParam param, IEnumerable<ParameterExpression> typeParameterExpressions)
         {
             var ruleExpressionBuilder = _expressionBuilderFactory.RuleGetExpressionBuilder(RuleExpressionType.LambdaExpression);
 
-            var expression = ruleExpressionBuilder.BuildExpressionForRuleParam(param, typeParameterExpressions, ruleInputExp);
+            var expression = ruleExpressionBuilder.BuildExpressionForRuleParam(param, typeParameterExpressions);
 
             return expression;
         }

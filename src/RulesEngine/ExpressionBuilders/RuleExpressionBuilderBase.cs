@@ -27,6 +27,6 @@ namespace RulesEngine.ExpressionBuilders
         /// <param name="typeParamExpressions">The type parameter expressions.</param>
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns>Expression.</returns>
-        internal abstract Expression BuildExpressionForRuleParam(LocalParam rule, IEnumerable<ParameterExpression> typeParamExpressions, ParameterExpression ruleInputExp);
+        internal abstract Expression BuildExpressionForRuleParam(LocalParam rule, IEnumerable<ParameterExpression> typeParamExpressions);
     }
 }

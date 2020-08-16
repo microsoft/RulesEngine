@@ -47,7 +47,7 @@ namespace RulesEngine.ExpressionBuilders
         /// <param name="typeParamExpressions">The type parameter expressions.</param>
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns>Expression.</returns>
-        internal override Expression BuildExpressionForRuleParam(LocalParam param, IEnumerable<ParameterExpression> typeParamExpressions, ParameterExpression ruleInputExp)
+        internal override Expression BuildExpressionForRuleParam(LocalParam param, IEnumerable<ParameterExpression> typeParamExpressions)
         {
             var config = new ParsingConfig { CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes) };
             var e = DynamicExpressionParser.ParseLambda(config, typeParamExpressions.ToArray(), null, param.Expression);
