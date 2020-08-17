@@ -168,7 +168,7 @@ namespace RulesEngine
         /// </returns>
         private bool RegisterRule(string workflowName, params RuleParameter[] ruleParams)
         {
-            string compileRulesKey = _rulesCache.GetRulesCacheKey(workflowName);
+            string compileRulesKey = GetCompiledRulesKey(workflowName,ruleParams);
             if (_rulesCache.ContainsCompiledRules(compileRulesKey))
                 return true;
 
@@ -194,7 +194,7 @@ namespace RulesEngine
 
         private RuleFunc<RuleResultTree> CompileRule(string workflowName, RuleParameter[] ruleParams,RuleCompiler ruleCompiler, Rule rule)
         {
-            var compiledParamsKey = GetCompiledParamsCacheKey(workflowName, rule);
+            var compiledParamsKey = GetCompiledParamsCacheKey(workflowName, rule.RuleName, ruleParams);
             IEnumerable<CompiledParam> compiledParamList = _compiledParamsCache.GetOrCreate(compiledParamsKey, (entry) => ruleParamCompiler.CompileParamsExpression(rule, ruleParams));
             var compiledRuleParameters = compiledParamList?.Select(c => c.AsRuleParameter()) ?? new List<RuleParameter>();
             var updatedRuleParams = ruleParams?.Concat(compiledRuleParameters);
@@ -229,7 +229,7 @@ namespace RulesEngine
             _logger.LogTrace($"Compiled rules found for {workflowName} workflow and executed");
 
             List<RuleResultTree> result = new List<RuleResultTree>();
-            string compiledRulesCacheKey = _rulesCache.GetRulesCacheKey(workflowName);
+            string compiledRulesCacheKey = GetCompiledRulesKey(workflowName,ruleParameters);
             foreach (var compiledRule in _rulesCache.GetCompiledRules(compiledRulesCacheKey))
             {
                 var inputs = ruleParameters.Select(c => c.Value).ToArray();
@@ -240,22 +240,17 @@ namespace RulesEngine
             FormatErrorMessages(result?.Where(r => !r.IsSuccess));
             return result;
         }
-
-        private string GetCompiledParamsCacheKey(string workflowName, Rule rule)
+        
+        private string GetCompiledRulesKey(string workflowName, RuleParameter[] ruleParams)
         {
-            if (rule == null)
-            {
-                return string.Empty;
-            }
-            else
-            {
-                if (rule?.LocalParams == null)
-                {
-                    return $"Compiled_{workflowName}_{rule.RuleName}";
-                }
+            var key =  $"{workflowName}-" + String.Join("-", ruleParams.Select(c => c.Type.Name));
+            return key.GetHashCode().ToString();
+        }
 
-                return $"Compiled_{workflowName}_{rule.RuleName}_{string.Join("_", rule?.LocalParams.Select(r => r?.Name))}";
-            }
+        private string GetCompiledParamsCacheKey(string workflowName,string ruleName,RuleParameter[] ruleParams)
+        {
+           var key = $"compiledparams-{workflowName}-{ruleName}" + String.Join("-", ruleParams.Select(c => c.Type.Name));
+           return key.GetHashCode().ToString();
         }
 
         /// <summary>

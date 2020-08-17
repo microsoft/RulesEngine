@@ -40,7 +40,7 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            var result = re.ExecuteRule("inputWorkflowReference", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { });
+            var result = re.ExecuteRule("inputWorkflowReference",input1, input2, input3);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
         }
@@ -55,9 +55,10 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            var result = re.ExecuteRule("inputWorkflow", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { });
+            List<RuleResultTree> result = re.ExecuteRule("inputWorkflow", input1, input2, input3);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
+            Assert.True(result.Any(c => c.IsSuccess));
         }
 
         [Theory]
@@ -70,9 +71,10 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            var result = re.ExecuteRule("inputWorkflow", input1);
+            List<RuleResultTree> result = re.ExecuteRule("inputWorkflow", input1);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
+            Assert.False(result.Any(c => c.IsSuccess));
         }
 
         [Theory]
@@ -85,9 +87,8 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            var result = re.ExecuteRule("inputWorkflow", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { });
+            List<RuleResultTree> result = re.ExecuteRule("inputWorkflow", input1, input2, input3);
             Assert.NotNull(result);
-            Assert.IsType<List<RuleResultTree>>(result);
             Assert.False(string.IsNullOrEmpty(result[0].ExceptionMessage) || string.IsNullOrWhiteSpace(result[0].ExceptionMessage));
         }
 
@@ -101,9 +102,8 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            var result = re.ExecuteRule("inputWorkflow", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { });
+            List<RuleResultTree> result = re.ExecuteRule("inputWorkflow",input1, input2, input3);
             Assert.NotNull(result);
-            Assert.IsType<List<RuleResultTree>>(result);
             Assert.NotNull(result.First().GetMessages());
             Assert.NotNull(result.First().GetMessages().WarningMessages);
         }
@@ -111,22 +111,17 @@ namespace RulesEngine.UnitTest
         [Fact]
         public void RulesEngine_New_IncorrectJSON_ThrowsException()
         {
-
             Assert.Throws<RuleValidationException>(() =>
             {
                 var workflow = new WorkflowRules();
                 var re = CreateRulesEngine(workflow);
             });
 
-
             Assert.Throws<RuleValidationException>(() =>
             {
                 var workflow = new WorkflowRules() { WorkflowName = "test" };
                 var re = CreateRulesEngine(workflow);
             });
-
-
-
         }
 
 
@@ -137,7 +132,7 @@ namespace RulesEngine.UnitTest
             var re = GetRulesEngine(ruleFileName);
             dynamic input = GetInput1();
 
-            Assert.Throws<ArgumentException>(() => { re.ExecuteRule("inputWorkflow1", new List<dynamic>() { input }.AsEnumerable(), new object[] { }); });
+            Assert.Throws<ArgumentException>(() => { re.ExecuteRule("inputWorkflow1",  input); });
         }
 
         [Theory]
@@ -151,7 +146,7 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            Assert.Throws<ArgumentException>(() => re.ExecuteRule("inputWorkflow", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { }));
+            Assert.Throws<ArgumentException>(() => re.ExecuteRule("inputWorkflow",input1, input2, input3 ));
         }
 
 
@@ -166,8 +161,8 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            Assert.Throws<ArgumentException>(() => re.ExecuteRule("inputWorkflow", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { }));
-            Assert.Throws<ArgumentException>(() => re.ExecuteRule("inputWorkflowReference", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { }));
+            Assert.Throws<ArgumentException>(() => re.ExecuteRule("inputWorkflow", input1, input2, input3));
+            Assert.Throws<ArgumentException>(() => re.ExecuteRule("inputWorkflowReference", input1, input2, input3));
         }
 
 
@@ -182,9 +177,17 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            var result = re.ExecuteRule("inputWorkflow", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { });
+            List<RuleResultTree> result = re.ExecuteRule("inputWorkflow", input1, input2, input3);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
+            Assert.True(result.Any(c => c.IsSuccess));
+
+            input3.hello = "world";
+
+            result = re.ExecuteRule("inputWorkflow", input1, input2, input3);
+            Assert.NotNull(result);
+            Assert.IsType<List<RuleResultTree>>(result);
+            Assert.True(result.Any(c => c.IsSuccess));
         }
 
 
@@ -240,7 +243,7 @@ namespace RulesEngine.UnitTest
         private dynamic GetInput1()
         {
             var converter = new ExpandoObjectConverter();
-            var basicInfo = "{\"name\": \"Dishant\",\"email\": \"dishantmunjal@live.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyalityFactor\": 3,\"totalPurchasesToDate\": 10000}";
+            var basicInfo = "{\"name\": \"Dishant\",\"email\": \"abc@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyalityFactor\": 3,\"totalPurchasesToDate\": 10000}";
             return JsonConvert.DeserializeObject<ExpandoObject>(basicInfo, converter);
         }
 
@@ -266,7 +269,7 @@ namespace RulesEngine.UnitTest
         /// </returns>
         private static dynamic[] GetInputs4()
         {
-            var basicInfo = "{\"name\": \"Dishant\",\"email\": \"dishantmunjal@live.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyalityFactor\": 3,\"totalPurchasesToDate\": 70000}";
+            var basicInfo = "{\"name\": \"Dishant\",\"email\": \"abc@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyalityFactor\": 3,\"totalPurchasesToDate\": 70000}";
             var orderInfo = "{\"totalOrders\": 50,\"recurringItems\": 2}";
             var telemetryInfo = "{\"noOfVisitsPerMonth\": 10,\"percentageOfBuyingToVisit\": 15}";
             var laborCategoriesInput = "[{\"country\": \"india\", \"loyalityFactor\": 2, \"totalPurchasesToDate\": 20000}]";

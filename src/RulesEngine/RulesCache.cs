@@ -98,47 +98,7 @@ namespace RulesEngine
                 return workflowRules;
             }
         }
-
-        /// <summary>Gets the rules cache key.</summary>
-        /// <param name="workflowName">Name of the workflow.</param>
-        /// <returns>System.String.</returns>
-        /// <exception cref="Exception">Could not find injected Workflow: {wfname}</exception>
-        public string GetRulesCacheKey(string workflowName)
-        {
-            _workflowRules.TryGetValue(workflowName, out var workflowRules);
-            if (workflowRules == null) return string.Empty;
-            else
-            {
-                var ruleCacheKey = workflowName + "_";
-                if (workflowRules.WorkflowRulesToInject?.Any() == true)
-                {
-                    if (workflowRules.Rules == null)
-                    {
-                        workflowRules.Rules = new List<Rule>();
-                    }
-                    foreach (string wfname in workflowRules.WorkflowRulesToInject)
-                    {
-                        var injectedWorkflow = GetWorkFlowRules(wfname);
-                        if (injectedWorkflow == null)
-                        {
-                            throw new Exception($"Could not find injected Workflow: {wfname}");
-                        }
-
-                        var lstRuleNames = injectedWorkflow.Rules.Select(s => s.RuleName)?.ToList();
-                        lstRuleNames?.Add(workflowName);
-                        ruleCacheKey += string.Join("_", lstRuleNames);
-                    }
-                }
-
-                if (workflowRules.Rules != null)
-                {
-                    var lstRuleNames = workflowRules.Rules.Select(s => s.RuleName)?.ToList();
-                    ruleCacheKey += string.Join("_", lstRuleNames);
-                }
-
-                return ruleCacheKey;
-            }
-        }
+       
 
         /// <summary>Gets the compiled rules.</summary>
         /// <param name="compiledRulesKey">The compiled rules key.</param>
