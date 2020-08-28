@@ -217,6 +217,22 @@ namespace RulesEngine.UnitTest
             Assert.True(ruleResult.IsSuccess);
         }
 
+        [Theory]
+        [InlineData("rules2.json")]
+        public void ExecuteRule_ReturnsProperErrorOnMissingRuleParameter(string ruleFileName)
+        {
+            var re = GetRulesEngine(ruleFileName);
+
+            var input1 = new RuleParameter("customName",GetInput1());
+            var input2 = new RuleParameter("input2",GetInput2());
+            var input3 = new RuleParameter("input3",GetInput3());
+
+            List<RuleResultTree> result = re.ExecuteRule("inputWorkflow", input1,input2, input3);
+            Assert.NotNull(result);
+            Assert.IsType<List<RuleResultTree>>(result);
+            Assert.Contains(result.First().ChildResults, c => c.ExceptionMessage.Contains("Unknown identifier 'input1'"));
+        }
+
         private RulesEngine CreateRulesEngine(WorkflowRules workflow)
         {
             var json = JsonConvert.SerializeObject(workflow);
