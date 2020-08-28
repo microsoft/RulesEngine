@@ -1,11 +1,9 @@
 ﻿using Newtonsoft.Json;
-using System.Diagnostics.CodeAnalysis;
 
 namespace RulesEngine.Models
 {
-    /// <summary>Class LocalParam.
-    /// </summary>
-    [ExcludeFromCodeCoverage]
+    /// <summary>Class Param.
+    /// Implements the <see cref="RulesEngine.Models.Rule" /></summary>
     public class LocalParam
     {
 

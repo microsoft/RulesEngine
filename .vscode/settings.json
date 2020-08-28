@@ -1,3 +1,0 @@
-{
-    "dotnetCoreExplorer.searchpatterns": "test/**/bin/Debug/netcoreapp*/*.{dll,exe,json}"
-}
