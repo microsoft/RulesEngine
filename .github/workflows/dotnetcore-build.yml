@@ -16,17 +16,17 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1
+        dotnet-version: 3.1.101
     - name: Install minicover
       run: dotnet tool install --global minicover --version 3.0.6
     - name: Install dependencies
-      run: dotnet restore RulesEngine.sln
+      run: dotnet restore src/RulesEngine/RulesEngine.sln
     - name: Build
-      run: dotnet build RulesEngine.sln --configuration Release --no-restore
+      run: dotnet build src/RulesEngine/RulesEngine.sln --configuration Release --no-restore
     - name: Instrument
       run: minicover instrument
     - name: Test
-      run: dotnet test RulesEngine.sln --no-build --configuration Release --verbosity m
+      run: dotnet test src/RulesEngine/RulesEngine.sln --no-build --configuration Release --verbosity m
     - name: Uninstrument
       run: minicover uninstrument
     - name: Report

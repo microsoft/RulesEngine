@@ -14,12 +14,10 @@ using System.Linq;
 using Xunit;
 using Newtonsoft.Json.Converters;
 using RulesEngine.HelperFunctions;
-using System.Diagnostics.CodeAnalysis;
 
 namespace RulesEngine.UnitTest
 {
     [Trait("Category", "Unit")]
-    [ExcludeFromCodeCoverage]
     public class RulesEngineTest
     {
         [Theory]
@@ -142,37 +140,6 @@ namespace RulesEngine.UnitTest
 
         [Theory]
         [InlineData("rules1.json")]
-        public void RemoveWorkflow_RemovesWorkflow(string ruleFileName)
-        {
-            var re = GetRulesEngine(ruleFileName);
-            re.RemoveWorkflow("inputWorkflow");
-
-            dynamic input1 = GetInput1();
-            dynamic input2 = GetInput2();
-            dynamic input3 = GetInput3();
-
-            Assert.Throws<ArgumentException>(() => re.ExecuteRule("inputWorkflow", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { }));
-        }
-
-
-        [Theory]
-        [InlineData("rules1.json")]
-        public void ClearWorkflow_RemovesAllWorkflow(string ruleFileName)
-        {
-            var re = GetRulesEngine(ruleFileName);
-            re.ClearWorkflows();
-
-            dynamic input1 = GetInput1();
-            dynamic input2 = GetInput2();
-            dynamic input3 = GetInput3();
-
-            Assert.Throws<ArgumentException>(() => re.ExecuteRule("inputWorkflow", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { }));
-            Assert.Throws<ArgumentException>(() => re.ExecuteRule("inputWorkflowReference", new List<dynamic>() { input1, input2, input3 }.AsEnumerable(), new object[] { }));
-        }
-
-
-        [Theory]
-        [InlineData("rules1.json")]
         [InlineData("rules2.json")]
         public void ExecuteRule_InputWithVariableProps_ReturnsResult(string ruleFileName)
         {
@@ -187,10 +154,14 @@ namespace RulesEngine.UnitTest
             Assert.IsType<List<RuleResultTree>>(result);
         }
 
-
+        /// <summary>
+        /// Ruleses the engine execute rule for nested rull parameters returns success.
+        /// </summary>
+        /// <param name="ruleFileName">Name of the rule file.</param>
+        /// <exception cref="Exception">Rules not found.</exception>
         [Theory]
         [InlineData("rules4.json")]
-        public void RulesEngine_Execute_Rule_For_Nested_Rule_Params_Returns_Success(string ruleFileName)
+        public void RulesEngine_Execute_Rule_For_Nested_Rull_Params_Returns_Success(string ruleFileName)
         {
             dynamic[] inputs = GetInputs4();
 
@@ -273,8 +244,12 @@ namespace RulesEngine.UnitTest
             var currentLaborCategoryInput = "{\"CurrentLaborCategoryProp\":\"TestVal2\"}";
 
             var converter = new ExpandoObjectConverter();
+            var settings = new JsonSerializerSettings
+            {
+                ContractResolver = new PrivateSetterContractResolver()
+            };
 
-            dynamic input1 = JsonConvert.DeserializeObject<List<RuleTestClass>>(laborCategoriesInput);
+            dynamic input1 = JsonConvert.DeserializeObject<List<RuleTestClass>>(laborCategoriesInput, settings);
             dynamic input2 = JsonConvert.DeserializeObject<ExpandoObject>(currentLaborCategoryInput, converter);
             dynamic input3 = JsonConvert.DeserializeObject<ExpandoObject>(telemetryInfo, converter);
             dynamic input4 = JsonConvert.DeserializeObject<ExpandoObject>(basicInfo, converter);
