@@ -330,3 +330,4 @@ ASALocalRun/
 .mfractor/
 /src/RulesEngine/RulesEngine.sln.licenseheader
 /assets/RulesEnginePackageFile.xml
+coveragereport/
