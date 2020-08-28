@@ -58,7 +58,7 @@ namespace RulesEngine.UnitTest
             List<RuleResultTree> result = re.ExecuteRule("inputWorkflow", input1, input2, input3);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
-            Assert.True(result.Any(c => c.IsSuccess));
+            Assert.Contains(result,c => c.IsSuccess);
         }
 
         [Theory]
@@ -74,7 +74,7 @@ namespace RulesEngine.UnitTest
             List<RuleResultTree> result = re.ExecuteRule("inputWorkflow", input1);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
-            Assert.False(result.Any(c => c.IsSuccess));
+            Assert.DoesNotContain(result,c => c.IsSuccess);
         }
 
         [Theory]
@@ -180,14 +180,14 @@ namespace RulesEngine.UnitTest
             List<RuleResultTree> result = re.ExecuteRule("inputWorkflow", input1, input2, input3);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
-            Assert.True(result.Any(c => c.IsSuccess));
+            Assert.Contains(result,c => c.IsSuccess);
 
             input3.hello = "world";
 
             result = re.ExecuteRule("inputWorkflow", input1, input2, input3);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
-            Assert.True(result.Any(c => c.IsSuccess));
+            Assert.Contains(result,c => c.IsSuccess);
         }
 
 
