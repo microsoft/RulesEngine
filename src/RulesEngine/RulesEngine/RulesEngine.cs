@@ -278,6 +278,11 @@ namespace RulesEngine
         {
             foreach (var error in result)
             {
+                if (string.IsNullOrWhiteSpace(error?.Rule?.ErrorMessage))
+                {
+                    continue;
+                }
+
                 var errorParameters = Regex.Matches(error?.Rule?.ErrorMessage, ParamParseRegex);
                 var errorMessage = error?.Rule?.ErrorMessage;
                 var evaluatedParams = error?.RuleEvaluatedParams;
@@ -300,7 +305,7 @@ namespace RulesEngine
                     }
                 }
 
-                error.Rule.ErrorMessage = errorMessage;
+                error.ExceptionMessage = errorMessage;
             }
 
             return result;

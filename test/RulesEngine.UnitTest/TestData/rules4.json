@@ -23,7 +23,6 @@
       {
         "RuleName": "GiveDiscount100",
         "SuccessEvent": "10",
-        "ErrorMessage": "One or more adjust rules failed, with loyalityFactor : $(model1.loyalityFactor), country : $(model1.country), totalPurchasesToDate : $(model1.totalPurchasesToDate), model2 : $(model2)",
         "ErrorType": "Error",
         "localParams": [
           {
