@@ -67,7 +67,7 @@ namespace RulesEngine
                 var expression = Expression.Lambda(ruleParamExpression, lambdaParameterExps);
                 var compiledParam = expression.Compile();
                 compiledParameters.Add(new CompiledParam { Name = param.Name, Value = compiledParam, Parameters = evaluatedParameters });
-                var evaluatedParam = this.EvaluateCompiledParam(param.Name, compiledParam, ruleParams.Select(c => c.Value).ToArray());
+                var evaluatedParam = this.EvaluateCompiledParam(param.Name, compiledParam, ruleParams);
                 ruleParams = ruleParams.Append(evaluatedParam);
                 evaluatedParameters.Add(evaluatedParam);
             }
@@ -80,9 +80,9 @@ namespace RulesEngine
         /// <param name="compiledParam">The compiled parameter.</param>
         /// <param name="ruleParams">The rule parameters.</param>
         /// <returns>RuleParameter.</returns>
-        public RuleParameter EvaluateCompiledParam(string paramName, Delegate compiledParam, IEnumerable<object> inputs)
+        public RuleParameter EvaluateCompiledParam(string paramName, Delegate compiledParam, IEnumerable<RuleParameter> inputs)
         {
-            var result = compiledParam.DynamicInvoke(new List<object>(inputs).ToArray());
+            var result = compiledParam.DynamicInvoke(inputs.Select(c => c.Value).ToArray());
             return new RuleParameter(paramName, result);
         }
 

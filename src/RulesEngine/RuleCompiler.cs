@@ -169,7 +169,7 @@ namespace RulesEngine
             return (paramArray) =>
                     {
                         var resultList = ruleFuncList.Select(fn => fn(paramArray));
-                        RuleFunc<bool> isSuccess = (p) => ApplyOperation(resultList, operation);
+                        Func<object[],bool> isSuccess = (p) => ApplyOperation(resultList, operation);
                         RuleFunc<RuleResultTree> result =  Helpers.ToResultTree(parentRule, resultList,isSuccess);
                         return result(paramArray);
                     };
