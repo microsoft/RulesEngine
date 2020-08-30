@@ -72,6 +72,35 @@ The wrapper needs to be created over the Rules Engine package, which will get th
 
 _Note: To know in detail of the workings of Rules Engine, please visit [How it works section](https://github.com/microsoft/RulesEngine/wiki/Introduction#how-it-works) in [Rules Engine Wiki](https://github.com/microsoft/RulesEngine/wiki)._
 
+## Defining local params
+
+Rules Engine has a param (like ‘var’ in c#) feature support now, it makes authoring and troubleshooting of issues very easy. Now you can breakdown your bigger statements into smaller logical expressions as parameters within a rule definition.
+
+Below is an example of a complex rule which can be authored easily using logical intermediate parameters and can be used to write the final rule expression to return a binary value. Sample rule requirement here is to provide access to a user only when user has completed some mandatory trainings or the user is accessing the site it from a secure domain. 
+
+```
+{
+        "name": "allow_access_if_all_mandatory_trainings_are_done_or_access_isSecure",
+        "errorMessage": "Please complete all your training(s) to get access to this content or access it from a secure domain/location.",
+        "errorType": "Error",
+        "localParams": [
+          {
+            "name": "completedSecurityTrainings",
+            "expression": "MasterSecurityComplainceTrainings.Where(Status.Equals(\"Completed\", StringComparison.InvariantCultureIgnoreCase))"
+          },
+          {
+            "name": "completedProjectTrainings",
+            "expression": "MasterProjectComplainceTrainings.Where(Status.Equals(\"Completed\", StringComparison.InvariantCultureIgnoreCase))"
+          },
+          {
+            "name": "isRequestAccessSecured",
+            "expression": "UserRequestDetails.Location.Country == \"India\" ? ((UserRequestDetails.Location.City == \"Bangalore\" && UserRequestDetails.Domain=\"xxxx\")? true : false):false"
+          }
+        ],
+        "expression": "(completedSecurityTrainings.Any() && completedProjectTrainings.Any()) || isRequestAccessSecured "
+      }
+ ```
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
