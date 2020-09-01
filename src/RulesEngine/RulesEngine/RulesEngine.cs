@@ -191,7 +191,7 @@ namespace RulesEngine
         /// </returns>
         private bool RegisterCompiledRule(string workflowName, params RuleParameter[] ruleParams)
         {
-            string compileRulesKey = _rulesCache.GetRulesCacheKey(workflowName);
+            string compileRulesKey = GetCompiledRulesKey(workflowName,ruleParams);
             if (_rulesCache.ContainsCompiledRules(compileRulesKey))
                 return true;
 
@@ -202,7 +202,7 @@ namespace RulesEngine
                 var ruleCompiler = new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings), _logger);
                 foreach (var rule in _rulesCache.GetRules(workflowName))
                 {
-                    var compiledParamsKey = _compiledParamsCache.GetCompiledParamsCacheKey(workflowName, rule);
+                    var compiledParamsKey = GetCompiledParamsCacheKey(workflowName, rule.RuleName, ruleParams);
                     CompiledRuleParam compiledRuleParam;
                     if (_compiledParamsCache.ContainsParams(compiledParamsKey))
                     {
@@ -228,11 +228,16 @@ namespace RulesEngine
                 return false;
             }
         }
-
-
-        private static string GetCompileRulesKey(string workflowName, RuleParameter[] ruleParams)
+        private string GetCompiledRulesKey(string workflowName, RuleParameter[] ruleParams)
         {
-            return $"{workflowName}-" + String.Join("-", ruleParams.Select(c => c.Type.Name));
+            var key =  $"{workflowName}-" + String.Join("-", ruleParams.Select(c => c.Type.Name));
+            return key.GetHashCode().ToString();
+        }
+
+        private string GetCompiledParamsCacheKey(string workflowName,string ruleName,RuleParameter[] ruleParams)
+        {
+           var key = $"compiledparams-{workflowName}-{ruleName}" + String.Join("-", ruleParams.Select(c => c.Type.Name));
+           return key.GetHashCode().ToString();
         }
 
         /// <summary>
@@ -246,7 +251,7 @@ namespace RulesEngine
             _logger.LogTrace($"Compiled rules found for {workflowName} workflow and executed");
 
             List<RuleResultTree> result = new List<RuleResultTree>();
-            string compileRulesKey = _rulesCache.GetRulesCacheKey(workflowName);
+            string compileRulesKey = GetCompiledRulesKey(workflowName,ruleParameters);
             foreach (var compiledRule in _rulesCache.GetCompiledRules(compileRulesKey))
             {
                 IEnumerable<RuleParameter> evaluatedRuleParams = new List<RuleParameter>(ruleParameters);
