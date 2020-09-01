@@ -48,27 +48,6 @@ namespace RulesEngine
             return _evaluatedParams[paramKeyName];
         }
 
-        /// <summary>Gets the evaluated parameters cache key.</summary>
-        /// <param name="workflowName">Name of the workflow.</param>
-        /// <param name="rule">The rule.</param>
-        /// <returns>Cache key.</returns>
-        public string GetCompiledParamsCacheKey(string workflowName, Rule rule)
-        {
-            if (rule == null)
-            {
-                return string.Empty;
-            }
-            else
-            {
-                if (rule?.LocalParams == null)
-                {
-                    return $"Compiled_{workflowName}_{rule.RuleName}";
-                }
-
-                return $"Compiled_{workflowName}_{rule.RuleName}_{string.Join("_", rule?.LocalParams.Select(r => r?.Name))}";
-            }
-        }
-
         /// <summary>Removes the specified workflow name.</summary>
         /// <param name="workflowName">Name of the workflow.</param>
         public void RemoveCompiledParams(string paramKeyName)

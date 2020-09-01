@@ -107,7 +107,6 @@ namespace RulesEngine.HelperFunctions
 
             return obj;
         }
-
         private static IEnumerable Cast(this IEnumerable self, Type innerType)
         {
             var methodInfo = typeof(Enumerable).GetMethod("Cast");
@@ -122,6 +121,4 @@ namespace RulesEngine.HelperFunctions
             return genericMethod.Invoke(null, new[] { self }) as IList;
         }
     }
-
-   
 }
