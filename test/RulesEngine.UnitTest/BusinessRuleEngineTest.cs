@@ -233,6 +233,28 @@ namespace RulesEngine.UnitTest
             Assert.Contains(result.First().ChildResults, c => c.ExceptionMessage.Contains("Unknown identifier 'input1'"));
         }
 
+        [Theory]
+        [InlineData("rules5.json","hello",true)]
+        [InlineData("rules5.json",null,false)]
+        public void ExecuteRule_WithInjectedUtils_ReturnsListOfRuleResultTree(string ruleFileName,string propValue,bool expectedResult)
+        {
+            var re = GetRulesEngine(ruleFileName);
+
+            dynamic input1 = new ExpandoObject();
+            if(propValue != null)
+            input1.Property1 = propValue;
+
+            if(propValue == null)
+            input1.Property1 = null;
+            
+            var utils = new TestInstanceUtils();
+
+            List<RuleResultTree> result = re.ExecuteRule("inputWorkflow", new RuleParameter("input1",input1),new RuleParameter("utils",utils));
+            Assert.NotNull(result);
+            Assert.IsType<List<RuleResultTree>>(result);
+            Assert.All(result,c => Assert.Equal(expectedResult,c.IsSuccess));
+        }
+
         private RulesEngine CreateRulesEngine(WorkflowRules workflow)
         {
             var json = JsonConvert.SerializeObject(workflow);
@@ -309,6 +331,16 @@ namespace RulesEngine.UnitTest
                 };
 
             return inputs;
+        }
+
+        [ExcludeFromCodeCoverage]
+        private class TestInstanceUtils{
+            public bool CheckExists(string str){
+                if(str != null && str.Length > 0)
+                    return true;
+                return false;
+            }
+            
         }
 
     }

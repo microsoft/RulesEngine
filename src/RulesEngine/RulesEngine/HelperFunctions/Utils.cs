@@ -28,10 +28,15 @@ namespace RulesEngine.HelperFunctions
         {
             List<DynamicProperty> props = new List<DynamicProperty>();
 
-            if(input == null || !(input is ExpandoObject))
+            if(input == null)
             {
-                return GetTypeSafe(input);
+                return typeof(object);
             }
+            if(!(input is ExpandoObject))
+            {
+                return input.GetType();
+            }
+
             else
             {
                 foreach (var expando in (IDictionary<string, object>)input)
@@ -102,14 +107,6 @@ namespace RulesEngine.HelperFunctions
 
             return obj;
         }
-
-        private static Type GetTypeSafe<T>(T obj){
-            if (obj == null)
-                return typeof(T);
-            else 
-                return obj.GetType();
-        }
-
         private static IEnumerable Cast(this IEnumerable self, Type innerType)
         {
             var methodInfo = typeof(Enumerable).GetMethod("Cast");
