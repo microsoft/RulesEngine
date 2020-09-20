@@ -7,7 +7,7 @@
       "ErrorMessage": "One or more adjust rules failed.",
       "ErrorType": "Error",
       "RuleExpressionType": "LambdaExpression",
-      "Expression": "input1.Property1.Contains(\"hell\")"
+      "Expression": "!input1.Boolean"
     },
     {
       "RuleName": "GiveDiscount20",
@@ -15,15 +15,7 @@
       "ErrorMessage": "One or more adjust rules failed.",
       "ErrorType": "Error",
       "RuleExpressionType": "LambdaExpression",
-      "Expression": "input1.Property1.Contains(\"hell\") && !input1.Boolean"
-    },
-    {
-      "RuleName": "GiveDiscount30",
-      "SuccessEvent": "30",
-      "ErrorMessage": "One or more adjust rules failed.",
-      "ErrorType": "Error",
-      "RuleExpressionType": "LambdaExpression",
-      "Expression": "input1.Method.Invoke()"
+      "Expression": "!input1.Boolean && true"
     }
   ]
 }

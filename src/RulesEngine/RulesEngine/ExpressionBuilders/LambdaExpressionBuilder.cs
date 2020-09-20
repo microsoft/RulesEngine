@@ -31,9 +31,9 @@ namespace RulesEngine.ExpressionBuilders
             {
                 var config = new ParsingConfig { CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes) };
                 var e = DynamicExpressionParser.ParseLambda(config, typeParamExpressions.ToArray(), null, rule.Expression);
-                var body = e.Body is MethodCallExpression
-                            ? Expression.MakeBinary(ExpressionType.And, e.Body, Expression.Constant(true))
-                            : (BinaryExpression)e.Body;
+                var body = e.Body is BinaryExpression binaryExpression
+                            ? binaryExpression
+                            : Expression.MakeBinary(ExpressionType.And, e.Body, Expression.Constant(true));
                 return Helpers.ToResultTreeExpression(rule, null, body, typeParamExpressions, ruleInputExp);
             }
             catch (Exception ex)
