@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RulesEngine.Actions;
+using RulesEngine.Enums;
 using RulesEngine.Exceptions;
 using RulesEngine.HelperFunctions;
 using RulesEngine.Interfaces;
@@ -30,7 +32,8 @@ namespace RulesEngine
         private readonly ReSettings _reSettings;
         private readonly RulesCache _rulesCache = new RulesCache();
         private readonly MemoryCache _compiledParamsCache = new MemoryCache(new MemoryCacheOptions());
-        private readonly ParamCompiler ruleParamCompiler;
+        private readonly ParamCompiler _ruleParamCompiler;
+        private readonly ActionFactory _actionFactory = new ActionFactory();
         private const string ParamParseRegex = "(\\$\\(.*?\\))";
         #endregion
 
@@ -50,7 +53,7 @@ namespace RulesEngine
         {
             _logger = logger ?? new NullLogger<RulesEngine>();
             _reSettings = reSettings ?? new ReSettings();
-            ruleParamCompiler = new ParamCompiler(new RuleExpressionBuilderFactory(_reSettings), _logger);
+            _ruleParamCompiler = new ParamCompiler(_reSettings);
         }
         #endregion
 
@@ -195,7 +198,7 @@ namespace RulesEngine
         private RuleFunc<RuleResultTree> CompileRule(string workflowName, RuleParameter[] ruleParams,RuleCompiler ruleCompiler, Rule rule)
         {
             var compiledParamsKey = GetCompiledParamsCacheKey(workflowName, rule.RuleName, ruleParams);
-            IEnumerable<CompiledParam> compiledParamList = _compiledParamsCache.GetOrCreate(compiledParamsKey, (entry) => ruleParamCompiler.CompileParamsExpression(rule, ruleParams));
+            IEnumerable<CompiledParam> compiledParamList = _compiledParamsCache.GetOrCreate(compiledParamsKey, (entry) => _ruleParamCompiler.CompileParamsExpression(rule, ruleParams));
             var compiledRuleParameters = compiledParamList?.Select(c => c.AsRuleParameter()) ?? new List<RuleParameter>();
             var updatedRuleParams = ruleParams?.Concat(compiledRuleParameters);
             var compiledRule = ruleCompiler.CompileRule(rule, updatedRuleParams?.ToArray());
@@ -207,7 +210,7 @@ namespace RulesEngine
                 var evaluatedParamList = new List<RuleParameter>();
                 foreach (var localParam in localParams)
                 {
-                    var evaluatedLocalParam = ruleParamCompiler.EvaluateCompiledParam(localParam.Name, localParam.Value, inputs);
+                    var evaluatedLocalParam = _ruleParamCompiler.EvaluateCompiledParam(localParam.Name, localParam.Value, inputs);
                     inputs = inputs.Append(evaluatedLocalParam);
                     evaluatedParamList.Add(evaluatedLocalParam);
                 }
@@ -218,13 +221,27 @@ namespace RulesEngine
             return updatedRule;
         }
 
+        public object ExecuteActionWorkflow(string workflowName, string ruleName, RuleParameter[] ruleParameters)
+        {
+            var resultTree = ExecuteRuleByWorkflow(workflowName, ruleName, ruleParameters);
+            ActionTriggerType triggerType = resultTree.IsSuccess ? ActionTriggerType.onSuccess : ActionTriggerType.onFailure;
+
+            if (resultTree.Rule.Actions.ContainsKey(triggerType))
+            {
+                var actionInfo = resultTree.Rule.Actions[triggerType];
+                var action = _actionFactory.Get(actionInfo.Name);
+                return action.Run(new ActionContext(actionInfo.Context), ruleParameters);
+            }
+            return null;
+        }
+     
+
         private RuleResultTree ExecuteRuleByWorkflow( string workflowName,
                                                             string RuleName,
                                                             RuleParameter[] ruleParameters)
         {
             _logger.LogTrace($"Compiled rules found for {workflowName} workflow and executed");
 
-            //List<RuleResultTree> result = new List<RuleResultTree>();
             string compiledRulesCacheKey = GetCompiledRulesKey(workflowName,ruleParameters);
             var workflowRuleDict = _rulesCache.GetCompiledRules(compiledRulesCacheKey);
             var compiledRule = workflowRuleDict[RuleName];

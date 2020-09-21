@@ -3,6 +3,7 @@
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using RulesEngine.Enums;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -32,6 +33,8 @@ namespace RulesEngine.Models
         [JsonProperty]
         public IEnumerable<LocalParam> LocalParams { get; private set; }
         public string Expression { get; set; }
+
+        public Dictionary<ActionTriggerType, ActionInfo> Actions { get; set; }
         public string SuccessEvent { get; set; }
 
     }

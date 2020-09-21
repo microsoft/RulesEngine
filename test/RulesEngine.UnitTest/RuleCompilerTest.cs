@@ -24,8 +24,8 @@ namespace RulesEngine.UnitTest
         public void RuleCompiler_CompileRule_ThrowsException()
         {
             var compiler = new RuleCompiler(new RuleExpressionBuilderFactory(new ReSettings()), new NullLogger<RuleCompiler>());
-            Assert.Throws<ArgumentException>(() => compiler.CompileRule(null, null));
-            Assert.Throws<ArgumentException>(() => compiler.CompileRule(null, new RuleParameter[] { null}));
+            Assert.Throws<ArgumentNullException>(() => compiler.CompileRule(null, null));
+            Assert.Throws<ArgumentNullException>(() => compiler.CompileRule(null, new RuleParameter[] { null}));
         }
 
 

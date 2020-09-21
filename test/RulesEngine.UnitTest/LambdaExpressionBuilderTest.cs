@@ -20,10 +20,12 @@ namespace RulesEngine.UnitTest
             var objBuilderFactory = new RuleExpressionBuilderFactory(new ReSettings());
             var builder = objBuilderFactory.RuleGetExpressionBuilder(RuleExpressionType.LambdaExpression);
 
-            var parameterExpressions = new List<ParameterExpression>();
-            parameterExpressions.Add(Expression.Parameter(typeof(string), "RequestType"));
-            parameterExpressions.Add(Expression.Parameter(typeof(string), "RequestStatus"));
-            parameterExpressions.Add(Expression.Parameter(typeof(string), "RegistrationStatus"));
+            var ruleParameters = new RuleParameter[] {
+                new RuleParameter("RequestType","Sales"),
+                new RuleParameter("RequestStatus", "Active"),
+                new RuleParameter("RegistrationStatus", "InProcess")
+            };
+
 
             Rule mainRule = new Rule();
             mainRule.RuleName = "rule1";
@@ -36,7 +38,7 @@ namespace RulesEngine.UnitTest
             dummyRule.Expression = "RequestType == \"vod\"";
 
             mainRule.Rules.Add(dummyRule);
-            var func = builder.BuildExpressionForRule(dummyRule, parameterExpressions);
+            var func = builder.BuildDelegateForRule(dummyRule, ruleParameters);
 
             Assert.NotNull(func);
             Assert.Equal(typeof(RuleResultTree), func.Method.ReturnType);
