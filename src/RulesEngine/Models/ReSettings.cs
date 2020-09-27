@@ -13,6 +13,6 @@ namespace RulesEngine.Models
     {
         public Type[] CustomTypes { get; set; }
 
-        public Dictionary<string, ActionBase> CustomActions { get; set; }
+        public Dictionary<string, Func<ActionBase>> CustomActions { get; set; }
     }
 }

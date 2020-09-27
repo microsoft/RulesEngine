@@ -3,21 +3,21 @@ using System.Collections.Generic;
 
 namespace RulesEngine.Actions
 {
-    public class ActionFactory
+    internal class ActionFactory
     {
         private readonly IDictionary<string, Func<ActionBase>> _actionRegistry;
 
-        public ActionFactory()
+        internal ActionFactory()
         {
             _actionRegistry = new Dictionary<string, Func<ActionBase>>();
 
         }
-        public ActionFactory(IDictionary<string,Func<ActionBase>> actionRegistry)
+        internal ActionFactory(IDictionary<string,Func<ActionBase>> actionRegistry)
         {
             _actionRegistry = actionRegistry;
         }
 
-        public ActionBase Get(string name)
+        internal ActionBase Get(string name)
         {
             if (_actionRegistry.ContainsKey(name))
             {

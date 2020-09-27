@@ -1,4 +1,5 @@
-﻿// Copyright (c) Microsoft Corporation.
+﻿using System.Threading.Tasks;
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using FluentValidation;
@@ -33,7 +34,8 @@ namespace RulesEngine
         private readonly RulesCache _rulesCache = new RulesCache();
         private readonly MemoryCache _compiledParamsCache = new MemoryCache(new MemoryCacheOptions());
         private readonly ParamCompiler _ruleParamCompiler;
-        private readonly ActionFactory _actionFactory = new ActionFactory();
+        private readonly RuleCompiler _ruleCompiler;
+        private readonly ActionFactory _actionFactory;
         private const string ParamParseRegex = "(\\$\\(.*?\\))";
         #endregion
 
@@ -44,16 +46,30 @@ namespace RulesEngine
             AddWorkflow(workflowRules);
         }
 
-        public RulesEngine(WorkflowRules[] workflowRules, ILogger logger, ReSettings reSettings = null) : this(logger, reSettings)
+        public RulesEngine(WorkflowRules[] workflowRules, ILogger logger = null, ReSettings reSettings = null) : this(logger, reSettings)
         {
             AddWorkflow(workflowRules);
         }
 
-        public RulesEngine(ILogger logger, ReSettings reSettings = null)
+        public RulesEngine(ILogger logger = null, ReSettings reSettings = null)
         {
             _logger = logger ?? new NullLogger<RulesEngine>();
             _reSettings = reSettings ?? new ReSettings();
             _ruleParamCompiler = new ParamCompiler(_reSettings);
+            _ruleCompiler =  new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings),_logger);
+            _actionFactory = new ActionFactory(GetActionRegistry(_reSettings));
+        }
+
+        private IDictionary<string,Func<ActionBase>> GetActionRegistry(ReSettings reSettings)
+        {
+            var actionDictionary = GetDefaultActionRegistry();
+            var customActions = reSettings.CustomActions ?? new Dictionary<string, Func<ActionBase>>();
+
+            foreach(var customAction in customActions){
+                actionDictionary.Add(customAction);
+            }
+            return actionDictionary;
+
         }
         #endregion
 
@@ -179,10 +195,9 @@ namespace RulesEngine
             if (workflowRules != null)
             {
                 var dictFunc = new Dictionary<string,RuleFunc<RuleResultTree>>();
-                var ruleCompiler = new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings), _logger);
                 foreach (var rule in _rulesCache.GetRules(workflowName))
                 {
-                    dictFunc.Add(rule.RuleName,CompileRule(workflowName, ruleParams, ruleCompiler, rule));
+                    dictFunc.Add(rule.RuleName,CompileRule(workflowName, ruleParams, rule));
                 }
 
                 _rulesCache.AddOrUpdateCompiledRule(compileRulesKey,dictFunc);
@@ -195,13 +210,23 @@ namespace RulesEngine
             }
         }
 
-        private RuleFunc<RuleResultTree> CompileRule(string workflowName, RuleParameter[] ruleParams,RuleCompiler ruleCompiler, Rule rule)
+
+        private RuleFunc<RuleResultTree> CompileRule(string workflowName,string ruleName,RuleParameter[] ruleParameters){
+            var rules = _rulesCache.GetRules(workflowName);
+            var currentRule = rules?.SingleOrDefault(c => c.RuleName == ruleName);
+            if(currentRule == null){
+                throw new ArgumentException($"Workflow `{workflowName}` does not contain any rule named `{ruleName}`");
+            }
+            return CompileRule(workflowName,ruleParameters,currentRule);
+        }
+
+        private RuleFunc<RuleResultTree> CompileRule(string workflowName, RuleParameter[] ruleParams, Rule rule)
         {
             var compiledParamsKey = GetCompiledParamsCacheKey(workflowName, rule.RuleName, ruleParams);
             IEnumerable<CompiledParam> compiledParamList = _compiledParamsCache.GetOrCreate(compiledParamsKey, (entry) => _ruleParamCompiler.CompileParamsExpression(rule, ruleParams));
             var compiledRuleParameters = compiledParamList?.Select(c => c.AsRuleParameter()) ?? new List<RuleParameter>();
             var updatedRuleParams = ruleParams?.Concat(compiledRuleParameters);
-            var compiledRule = ruleCompiler.CompileRule(rule, updatedRuleParams?.ToArray());
+            var compiledRule = _ruleCompiler.CompileRule(rule, updatedRuleParams?.ToArray());
 
             RuleFunc<RuleResultTree> updatedRule = (RuleParameter[] paramList) =>
             {
@@ -221,16 +246,17 @@ namespace RulesEngine
             return updatedRule;
         }
 
-        public object ExecuteActionWorkflow(string workflowName, string ruleName, RuleParameter[] ruleParameters)
+        public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters)
         {
-            var resultTree = ExecuteRuleByWorkflow(workflowName, ruleName, ruleParameters);
+            var compiledRule = CompileRule(workflowName,ruleName,ruleParameters);
+            var resultTree = compiledRule(ruleParameters);
             ActionTriggerType triggerType = resultTree.IsSuccess ? ActionTriggerType.onSuccess : ActionTriggerType.onFailure;
 
             if (resultTree.Rule.Actions.ContainsKey(triggerType))
             {
                 var actionInfo = resultTree.Rule.Actions[triggerType];
                 var action = _actionFactory.Get(actionInfo.Name);
-                return action.Run(new ActionContext(actionInfo.Context), ruleParameters);
+                return await action.ExecuteAndReturnResultAsync(new ActionContext(actionInfo.Context,resultTree), ruleParameters);
             }
             return null;
         }
@@ -283,6 +309,13 @@ namespace RulesEngine
            return key.GetHashCode().ToString();
         }
 
+        private IDictionary<string,Func<ActionBase>> GetDefaultActionRegistry(){
+            return new Dictionary<string, Func<ActionBase>>{
+                {"OutputExpression",() => new OutputExpressionAction(_reSettings) },
+                {"EvaluateRule", () => new EvaluateRuleAction(_reSettings,this) }
+            };
+        }
+
         /// <summary>
         /// The result
         /// </summary>
@@ -313,10 +346,8 @@ namespace RulesEngine
                         errorMessage = errorMessage?.Replace($"$({property})", value ?? $"$({property})");
                     }
                 }
-
                 ruleResult.Rule.ErrorMessage = errorMessage;
             }
-
             return ruleResultList;
         }
 
