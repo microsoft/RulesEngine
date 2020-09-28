@@ -9,7 +9,7 @@ namespace RulesEngine.Actions
 
         internal ActionFactory()
         {
-            _actionRegistry = new Dictionary<string, Func<ActionBase>>();
+            _actionRegistry = new Dictionary<string, Func<ActionBase>>(StringComparer.OrdinalIgnoreCase);
 
         }
         internal ActionFactory(IDictionary<string,Func<ActionBase>> actionRegistry)

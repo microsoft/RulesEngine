@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using RulesEngine.Models;
+using System;
 using System.Collections.Generic;
 
 namespace RulesEngine.Actions
@@ -11,10 +12,10 @@ namespace RulesEngine.Actions
 
         public ActionContext(IDictionary<string, object> context, RuleResultTree parentResult)
         {
-            _context = new Dictionary<string, string>();
+            _context = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (var kv in context)
             {
-                string key = kv.Key.ToLower();
+                string key = kv.Key;
                 string value = kv.Value is string ? kv.Value.ToString() : JsonConvert.SerializeObject(kv.Value);
                 _context.Add(key, value);
             }
@@ -26,7 +27,6 @@ namespace RulesEngine.Actions
         }
         public T GetContext<T>(string name) where T : class
         {
-            name = name.ToLower();
             if (typeof(T) == typeof(string))
             {
                 return _context[name] as T;
