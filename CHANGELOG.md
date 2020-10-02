@@ -1,6 +1,13 @@
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
+## [2.1.2] - 02-10-2020
+- Fixed binary expression requirement. Now any expression will work as long as it evalutes to boolean.
+
+## [2.1.1] - 01-09-2020
+- Fixed exception thrown when errormessage field is null
+- Added better messaging when identifier is not found in expression
+- Fixed other minor bugs
 
 ## [2.1.0] - 18-05-2020
 - Adding local param support to make expression authroing more intuitive.
