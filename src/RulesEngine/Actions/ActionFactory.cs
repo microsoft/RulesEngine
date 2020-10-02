@@ -12,9 +12,11 @@ namespace RulesEngine.Actions
             _actionRegistry = new Dictionary<string, Func<ActionBase>>(StringComparer.OrdinalIgnoreCase);
 
         }
-        internal ActionFactory(IDictionary<string,Func<ActionBase>> actionRegistry)
+        internal ActionFactory(IDictionary<string,Func<ActionBase>> actionRegistry): this()
         {
-            _actionRegistry = actionRegistry;
+            foreach(var kv in actionRegistry){
+                _actionRegistry.Add(kv.Key, kv.Value);
+            }
         }
 
         internal ActionBase Get(string name)
