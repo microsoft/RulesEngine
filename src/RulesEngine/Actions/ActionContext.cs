@@ -25,13 +25,13 @@ namespace RulesEngine.Actions
         public RuleResultTree GetParentRuleResult(){
             return _parentResult;
         }
-        public T GetContext<T>(string name) where T : class
+        public T GetContext<T>(string name)
         {
             try
             {
                 if (typeof(T) == typeof(string))
                 {
-                    return _context[name] as T;
+                    return (T)Convert.ChangeType(_context[name], typeof(T));
                 }
                 return JsonConvert.DeserializeObject<T>(_context[name]);
             }

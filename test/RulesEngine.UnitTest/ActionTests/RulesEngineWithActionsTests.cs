@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
@@ -26,6 +27,14 @@ namespace RulesEngine.UnitTest{
             Assert.NotNull(result);
             Assert.Equal(2 * 2, result.Output);
             Assert.Contains(result.Results, c => c.Rule.RuleName == "ExpressionOutputRuleTest");
+        }
+
+        [Fact]
+        public async Task ExecuteActionWorkflowAsync_CalledWithIncorrectWorkflowOrRuleName_ThrowsArgumentException()
+        {
+            var engine = new RulesEngine(GetWorkflowWithActions());
+            await Assert.ThrowsAsync<ArgumentException>(async () => await engine.ExecuteActionWorkflowAsync("WrongWorkflow", "ExpressionOutputRuleTest", new RuleParameter[0]));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await engine.ExecuteActionWorkflowAsync("ActionWorkflow", "WrongRule", new RuleParameter[0]));
         }
 
         private WorkflowRules[] GetWorkflowWithActions(){
