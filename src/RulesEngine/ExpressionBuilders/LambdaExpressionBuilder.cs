@@ -36,7 +36,7 @@ namespace RulesEngine.ExpressionBuilders
              catch (Exception ex)
             {
                 bool func(object[] param) => false;
-                var exceptionMessage = $"Exception while parsing expression `{rule?.Expression}` - ex.Message";
+                var exceptionMessage = $"Exception while parsing expression `{rule?.Expression}` - {ex.Message}";
                 return Helpers.ToResultTree(rule, null, func, exceptionMessage);
             }           
         }
