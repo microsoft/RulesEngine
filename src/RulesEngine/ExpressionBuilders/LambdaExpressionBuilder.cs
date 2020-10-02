@@ -17,25 +17,26 @@ namespace RulesEngine.ExpressionBuilders
     internal sealed class LambdaExpressionBuilder : RuleExpressionBuilderBase
     {
         private readonly ReSettings _reSettings;
+        private readonly RuleExpressionParser _ruleExpressionParser;
 
         internal LambdaExpressionBuilder(ReSettings reSettings)
         {
             _reSettings = reSettings;
+            _ruleExpressionParser = new RuleExpressionParser(_reSettings);
         }
 
         internal override RuleFunc<RuleResultTree> BuildDelegateForRule(Rule rule, RuleParameter[] ruleParams)
         {
             try
             {
-                var expressionParser = new RuleExpressionParser(_reSettings);
-                var ruleDelegate = expressionParser.Compile(rule.Expression, ruleParams,typeof(bool));
+                var ruleDelegate = _ruleExpressionParser.Compile(rule.Expression, ruleParams,typeof(bool));
                 bool func(object[] paramList) => (bool)ruleDelegate.DynamicInvoke(paramList);
                 return Helpers.ToResultTree(rule, null, func);
             }
              catch (Exception ex)
             {
                 bool func(object[] param) => false;
-                var exceptionMessage = ex.Message;
+                var exceptionMessage = $"Exception while parsing expression `{rule?.Expression}` - ex.Message";
                 return Helpers.ToResultTree(rule, null, func, exceptionMessage);
             }           
         }

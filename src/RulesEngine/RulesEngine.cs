@@ -64,7 +64,6 @@ namespace RulesEngine
         {
             var actionDictionary = GetDefaultActionRegistry();
             var customActions = reSettings.CustomActions ?? new Dictionary<string, Func<ActionBase>>();
-
             foreach(var customAction in customActions){
                 actionDictionary.Add(customAction);
             }
@@ -256,23 +255,17 @@ namespace RulesEngine
             {
                 var actionInfo = resultTree.Rule.Actions[triggerType];
                 var action = _actionFactory.Get(actionInfo.Name);
-                return await action.ExecuteAndReturnResultAsync(new ActionContext(actionInfo.Context,resultTree), ruleParameters);
+                return await action.ExecuteAndReturnResultAsync(new ActionContext(actionInfo.Context, resultTree), ruleParameters);
             }
-            return null;
-        }
-     
-
-        private RuleResultTree ExecuteRuleByWorkflow( string workflowName,
-                                                            string RuleName,
-                                                            RuleParameter[] ruleParameters)
-        {
-            _logger.LogTrace($"Compiled rules found for {workflowName} workflow and executed");
-
-            string compiledRulesCacheKey = GetCompiledRulesKey(workflowName,ruleParameters);
-            var workflowRuleDict = _rulesCache.GetCompiledRules(compiledRulesCacheKey);
-            var compiledRule = workflowRuleDict[RuleName];
-            var resultTree = compiledRule(ruleParameters);
-            return resultTree;
+            else
+            {
+                //If there is no action,return output as null and return the result for rule
+                return new ActionRuleResult
+                {
+                    Output = null,
+                    Results = new List<RuleResultTree>() { resultTree }
+                };
+            }
         }
 
         /// <summary>
@@ -312,7 +305,7 @@ namespace RulesEngine
         private IDictionary<string,Func<ActionBase>> GetDefaultActionRegistry(){
             return new Dictionary<string, Func<ActionBase>>{
                 {"OutputExpression",() => new OutputExpressionAction(_reSettings) },
-                {"EvaluateRule", () => new EvaluateRuleAction(_reSettings,this) }
+                {"EvaluateRule", () => new EvaluateRuleAction(this) }
             };
         }
 

@@ -27,11 +27,22 @@ namespace RulesEngine.Actions
         }
         public T GetContext<T>(string name) where T : class
         {
-            if (typeof(T) == typeof(string))
+            try
             {
-                return _context[name] as T;
+                if (typeof(T) == typeof(string))
+                {
+                    return _context[name] as T;
+                }
+                return JsonConvert.DeserializeObject<T>(_context[name]);
             }
-            return JsonConvert.DeserializeObject<T>(_context[name]);
+            catch (KeyNotFoundException)
+            {
+                throw new ArgumentException($"Argument `{name}` was not found in the action context");
+            }
+            catch (JsonException)
+            {
+                throw new ArgumentException($"Failed to convert argument `{name}` to type `{typeof(T).Name}` in the action context");
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ namespace RulesEngine.ExpressionBuilders
         public Delegate Compile(string expression, RuleParameter[] ruleParams, Type returnType = null)
         {
             var cacheKey = GetCacheKey(expression,ruleParams,returnType);
-            return _memoryCache.GetOrCreate<Delegate>(cacheKey,(entry) => {
+            return _memoryCache.GetOrCreate(cacheKey,(entry) => {
                 entry.SetSize(1);
                 var config = new ParsingConfig { CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes) };
                 var typeParamExpressions = GetParameterExpression(ruleParams).ToArray();
