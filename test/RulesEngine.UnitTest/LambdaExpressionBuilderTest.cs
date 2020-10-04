@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using RulesEngine;
+using RulesEngine.ExpressionBuilders;
 using RulesEngine.Models;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,7 +18,8 @@ namespace RulesEngine.UnitTest
         [Fact]
         public void BuildExpressionForRuleTest()
         {
-            var objBuilderFactory = new RuleExpressionBuilderFactory(new ReSettings());
+            var reSettings = new ReSettings();
+            var objBuilderFactory = new RuleExpressionBuilderFactory(reSettings,new RuleExpressionParser(reSettings));
             var builder = objBuilderFactory.RuleGetExpressionBuilder(RuleExpressionType.LambdaExpression);
 
             var ruleParameters = new RuleParameter[] {

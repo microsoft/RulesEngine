@@ -11,10 +11,10 @@ namespace RulesEngine
     {
         private ReSettings _reSettings;
         private LambdaExpressionBuilder _lambdaExpressionBuilder;
-        public RuleExpressionBuilderFactory(ReSettings reSettings)
+        public RuleExpressionBuilderFactory(ReSettings reSettings, RuleExpressionParser expressionParser)
         {
             _reSettings = reSettings;
-            _lambdaExpressionBuilder = new LambdaExpressionBuilder(_reSettings);
+            _lambdaExpressionBuilder = new LambdaExpressionBuilder(_reSettings, expressionParser);
         }
         public RuleExpressionBuilderBase RuleGetExpressionBuilder(RuleExpressionType ruleExpressionType)
         {

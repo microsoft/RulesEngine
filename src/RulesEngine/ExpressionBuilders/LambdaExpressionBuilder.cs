@@ -4,10 +4,6 @@
 using RulesEngine.HelperFunctions;
 using RulesEngine.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
 
 namespace RulesEngine.ExpressionBuilders
 {
@@ -19,10 +15,10 @@ namespace RulesEngine.ExpressionBuilders
         private readonly ReSettings _reSettings;
         private readonly RuleExpressionParser _ruleExpressionParser;
 
-        internal LambdaExpressionBuilder(ReSettings reSettings)
+        internal LambdaExpressionBuilder(ReSettings reSettings, RuleExpressionParser ruleExpressionParser)
         {
             _reSettings = reSettings;
-            _ruleExpressionParser = new RuleExpressionParser(_reSettings);
+            _ruleExpressionParser = ruleExpressionParser;
         }
 
         internal override RuleFunc<RuleResultTree> BuildDelegateForRule(Rule rule, RuleParameter[] ruleParams)

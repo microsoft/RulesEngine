@@ -11,7 +11,6 @@ using Newtonsoft.Json.Linq;
 using RulesEngine.Actions;
 using RulesEngine.Enums;
 using RulesEngine.Exceptions;
-using RulesEngine.HelperFunctions;
 using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using RulesEngine.Validators;
@@ -19,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using RulesEngine.ExpressionBuilders;
 
 namespace RulesEngine
 {
@@ -34,6 +34,7 @@ namespace RulesEngine
         private readonly RulesCache _rulesCache = new RulesCache();
         private readonly MemoryCache _compiledParamsCache = new MemoryCache(new MemoryCacheOptions());
         private readonly ParamCompiler _ruleParamCompiler;
+        private readonly RuleExpressionParser _ruleExpressionParser;
         private readonly RuleCompiler _ruleCompiler;
         private readonly ActionFactory _actionFactory;
         private const string ParamParseRegex = "(\\$\\(.*?\\))";
@@ -56,7 +57,8 @@ namespace RulesEngine
             _logger = logger ?? new NullLogger<RulesEngine>();
             _reSettings = reSettings ?? new ReSettings();
             _ruleParamCompiler = new ParamCompiler(_reSettings);
-            _ruleCompiler =  new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings),_logger);
+            _ruleExpressionParser = new RuleExpressionParser(_reSettings);
+            _ruleCompiler =  new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings, _ruleExpressionParser),_logger);
             _actionFactory = new ActionFactory(GetActionRegistry(_reSettings));
         }
 
@@ -304,7 +306,7 @@ namespace RulesEngine
 
         private IDictionary<string,Func<ActionBase>> GetDefaultActionRegistry(){
             return new Dictionary<string, Func<ActionBase>>{
-                {"OutputExpression",() => new OutputExpressionAction(_reSettings) },
+                {"OutputExpression",() => new OutputExpressionAction(_ruleExpressionParser) },
                 {"EvaluateRule", () => new EvaluateRuleAction(this) }
             };
         }
