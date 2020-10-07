@@ -16,10 +16,12 @@ namespace RulesEngine
     {
 
         private readonly ReSettings _reSettings;
+        private readonly RuleExpressionParser _ruleExpressionParser;
 
-        internal ParamCompiler(ReSettings reSettings)
+        internal ParamCompiler(ReSettings reSettings, RuleExpressionParser ruleExpressionParser)
         {
             _reSettings = reSettings;
+            _ruleExpressionParser = ruleExpressionParser;
         }
 
         /// <summary>
@@ -70,8 +72,7 @@ namespace RulesEngine
         /// <returns></returns>
         private Delegate GetDelegateForRuleParam(LocalParam param, RuleParameter[] ruleParameters)
         {
-            var expressionParser = new RuleExpressionParser(_reSettings);
-            return expressionParser.Compile(param.Expression, ruleParameters);
+            return _ruleExpressionParser.Compile(param.Expression, ruleParameters);
         }
     }
 }

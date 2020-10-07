@@ -56,8 +56,8 @@ namespace RulesEngine
         {
             _logger = logger ?? new NullLogger<RulesEngine>();
             _reSettings = reSettings ?? new ReSettings();
-            _ruleParamCompiler = new ParamCompiler(_reSettings);
             _ruleExpressionParser = new RuleExpressionParser(_reSettings);
+            _ruleParamCompiler = new ParamCompiler(_reSettings, _ruleExpressionParser);
             _ruleCompiler =  new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings, _ruleExpressionParser),_logger);
             _actionFactory = new ActionFactory(GetActionRegistry(_reSettings));
         }
@@ -295,13 +295,13 @@ namespace RulesEngine
         private string GetCompiledRulesKey(string workflowName, RuleParameter[] ruleParams)
         {
             var key =  $"{workflowName}-" + String.Join("-", ruleParams.Select(c => c.Type.Name));
-            return key.GetHashCode().ToString();
+            return key;
         }
 
         private string GetCompiledParamsCacheKey(string workflowName,string ruleName,RuleParameter[] ruleParams)
         {
            var key = $"compiledparams-{workflowName}-{ruleName}" + String.Join("-", ruleParams.Select(c => c.Type.Name));
-           return key.GetHashCode().ToString();
+           return key;
         }
 
         private IDictionary<string,Func<ActionBase>> GetDefaultActionRegistry(){
