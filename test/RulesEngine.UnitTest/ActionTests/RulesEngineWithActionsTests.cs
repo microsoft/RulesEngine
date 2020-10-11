@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using RulesEngine.Enums;
 using RulesEngine.Models;
@@ -35,6 +36,33 @@ namespace RulesEngine.UnitTest{
             var engine = new RulesEngine(GetWorkflowWithActions());
             await Assert.ThrowsAsync<ArgumentException>(async () => await engine.ExecuteActionWorkflowAsync("WrongWorkflow", "ExpressionOutputRuleTest", new RuleParameter[0]));
             await Assert.ThrowsAsync<ArgumentException>(async () => await engine.ExecuteActionWorkflowAsync("ActionWorkflow", "WrongRule", new RuleParameter[0]));
+        }
+
+
+        [Fact]
+        public async Task ExecuteActionWorkflowAsync_CalledWithNoActionsInWorkflow_ExecutesSuccessfully()
+        {
+
+            var engine = new RulesEngine(GetWorkflowRulesWithoutActions());
+            var result = await engine.ExecuteActionWorkflowAsync("NoActionWorkflow", "NoActionTest", new RuleParameter[0]);
+            Assert.NotNull(result);
+            Assert.Null(result.Output);
+        }
+
+
+        private WorkflowRules[] GetWorkflowRulesWithoutActions(){
+             var workflow1 = new WorkflowRules{
+                WorkflowName = "NoActionWorkflow",
+                Rules = new List<Rule>{
+                    new Rule{
+                        RuleName = "NoActionTest",
+                        RuleExpressionType = RuleExpressionType.LambdaExpression,
+                        Expression = "1 == 1",
+                    }
+
+                }
+            };
+            return new []{workflow1};
         }
 
         private WorkflowRules[] GetWorkflowWithActions(){

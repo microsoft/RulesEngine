@@ -251,9 +251,9 @@ namespace RulesEngine
         {
             var compiledRule = CompileRule(workflowName,ruleName,ruleParameters);
             var resultTree = compiledRule(ruleParameters);
-            ActionTriggerType triggerType = resultTree.IsSuccess ? ActionTriggerType.onSuccess : ActionTriggerType.onFailure;
+            ActionTriggerType triggerType = resultTree?.IsSuccess == true ? ActionTriggerType.onSuccess : ActionTriggerType.onFailure;
 
-            if (resultTree.Rule.Actions.ContainsKey(triggerType))
+            if (resultTree?.Rule?.Actions != null && resultTree.Rule.Actions.ContainsKey(triggerType))
             {
                 var actionInfo = resultTree.Rule.Actions[triggerType];
                 var action = _actionFactory.Get(actionInfo.Name);
