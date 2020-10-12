@@ -1,6 +1,9 @@
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
+## [2.1.3] - 12-10-2020
+- Optional parameter for rethrow exception on failure of expression compilation.
+
 ## [2.1.2] - 02-10-2020
 - Fixed binary expression requirement. Now any expression will work as long as it evalutes to boolean.
 
