@@ -38,6 +38,8 @@ namespace RulesEngine.ExpressionBuilders
             }
             catch (Exception ex)
             {
+                if (!_reSettings.EnableExceptionAsErrorMessage) throw;
+                
                 var binaryExpression = Expression.And(Expression.Constant(true), Expression.Constant(false));
                 var exceptionMessage = ex.Message;
                 return Helpers.ToResultTreeExpression(rule, null, binaryExpression, typeParamExpressions, ruleInputExp, exceptionMessage);

@@ -306,13 +306,49 @@ namespace RulesEngine.UnitTest
             Assert.All(result, c => Assert.False(c.IsSuccess));
         }
 
+        [Theory]
+        [InlineData("rules9.json")]
+        public void ExecuteRule_MissingMethodInExpression_ReturnsException(string ruleFileName)
+        {
+            var re = GetRulesEngine(ruleFileName, new ReSettings() { EnableExceptionAsErrorMessage = false });
+
+            dynamic input1 = new ExpandoObject();
+            input1.Data = new { TestProperty = "" };
+            input1.Boolean = false;
+
+            var utils = new TestInstanceUtils();
+
+            Assert.Throws<System.Linq.Dynamic.Core.Exceptions.ParseException>(()=>
+            {
+                List<RuleResultTree> result = re.ExecuteRule("inputWorkflow", new RuleParameter("input1", input1));
+            });
+        }
+
+        [Theory]
+        [InlineData("rules9.json")]
+        public void ExecuteRule_MissingMethodInExpression_DefaultParameter(string ruleFileName)
+        {
+            var re = GetRulesEngine(ruleFileName);
+
+            dynamic input1 = new ExpandoObject();
+            input1.Data = new { TestProperty = "" };
+            input1.Boolean = false;
+
+            var utils = new TestInstanceUtils();
+
+            List<RuleResultTree> result = re.ExecuteRule("inputWorkflow", new RuleParameter("input1", input1));
+            Assert.NotNull(result);
+            Assert.IsType<List<RuleResultTree>>(result);
+            Assert.All(result, c => Assert.False(c.IsSuccess));
+        }
+
         private RulesEngine CreateRulesEngine(WorkflowRules workflow)
         {
             var json = JsonConvert.SerializeObject(workflow);
             return new RulesEngine(new string[] { json }, null);
         }
 
-        private RulesEngine GetRulesEngine(string filename)
+        private RulesEngine GetRulesEngine(string filename, ReSettings reSettings = null)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory() as string, "TestData", filename);
             var data = File.ReadAllText(filePath);
@@ -325,7 +361,7 @@ namespace RulesEngine.UnitTest
 
             var injectWorkflowStr = JsonConvert.SerializeObject(injectWorkflow);
             var mockLogger = new Mock<ILogger>();
-            return new RulesEngine(new string[] { data, injectWorkflowStr }, mockLogger.Object);
+            return new RulesEngine(new string[] { data, injectWorkflowStr }, mockLogger.Object, reSettings);
         }
 
         private dynamic GetInput1()
