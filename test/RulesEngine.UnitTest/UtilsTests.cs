@@ -47,7 +47,6 @@ namespace RulesEngine.UnitTest
             object typedobj2 = Utils.GetTypedObject(obj2);
             Assert.IsNotType<ExpandoObject>(typedobj);
             Assert.NotNull(typedobj.GetType().GetProperty("test"));
-            Console.WriteLine($"{typedobj.GetType()} & {typedobj2.GetType()}");
             Assert.Equal(typedobj.GetType(),typedobj2.GetType());
         }
 

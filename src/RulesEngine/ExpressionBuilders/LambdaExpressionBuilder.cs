@@ -1,15 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine;
-using RulesEngine.ExpressionBuilders;
 using RulesEngine.HelperFunctions;
 using RulesEngine.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
 
 namespace RulesEngine.ExpressionBuilders
 {
@@ -19,40 +13,28 @@ namespace RulesEngine.ExpressionBuilders
     internal sealed class LambdaExpressionBuilder : RuleExpressionBuilderBase
     {
         private readonly ReSettings _reSettings;
+        private readonly RuleExpressionParser _ruleExpressionParser;
 
-        internal LambdaExpressionBuilder(ReSettings reSettings)
+        internal LambdaExpressionBuilder(ReSettings reSettings, RuleExpressionParser ruleExpressionParser)
         {
             _reSettings = reSettings;
+            _ruleExpressionParser = ruleExpressionParser;
         }
-        internal override RuleFunc<RuleResultTree> BuildExpressionForRule(Rule rule, IEnumerable<ParameterExpression> typeParamExpressions)
+
+        internal override RuleFunc<RuleResultTree> BuildDelegateForRule(Rule rule, RuleParameter[] ruleParams)
         {
             try
             {
-                var config = new ParsingConfig { CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes) };
-                var e = DynamicExpressionParser.ParseLambda(config, true, typeParamExpressions.ToArray(),typeof(bool), rule.Expression);
-                var ruleDelegate = e.Compile();
+                var ruleDelegate = _ruleExpressionParser.Compile(rule.Expression, ruleParams,typeof(bool));
                 bool func(object[] paramList) => (bool)ruleDelegate.DynamicInvoke(paramList);
                 return Helpers.ToResultTree(rule, null, func);
             }
              catch (Exception ex)
             {
                 bool func(object[] param) => false;
-                var exceptionMessage = ex.Message;
+                var exceptionMessage = $"Exception while parsing expression `{rule?.Expression}` - {ex.Message}";
                 return Helpers.ToResultTree(rule, null, func, exceptionMessage);
             }           
         }
-
-        /// <summary>Builds the expression for rule parameter.</summary>
-        /// <param name="param">The parameter.</param>
-        /// <param name="typeParamExpressions">The type parameter expressions.</param>
-        /// <param name="ruleInputExp">The rule input exp.</param>
-        /// <returns>Expression.</returns>
-        internal override Expression BuildExpressionForRuleParam(LocalParam param, IEnumerable<ParameterExpression> typeParamExpressions, ParameterExpression ruleInputExp)
-        {
-            var config = new ParsingConfig { CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes) };
-            var e = DynamicExpressionParser.ParseLambda(config, typeParamExpressions.ToArray(), null, param.Expression);
-            return e.Body;
-        }
-
     }
 }

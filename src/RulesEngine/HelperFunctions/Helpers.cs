@@ -14,13 +14,13 @@ namespace RulesEngine.HelperFunctions
     /// </summary>
     internal static class Helpers
     {
-        internal static RuleFunc<RuleResultTree> ToResultTree(Rule rule, IEnumerable<RuleResultTree> childRuleResults, RuleFunc<bool> isSuccessFunc, string exceptionMessage = "")
+        internal static RuleFunc<RuleResultTree> ToResultTree(Rule rule, IEnumerable<RuleResultTree> childRuleResults, Func<object[],bool> isSuccessFunc, string exceptionMessage = "")
         {
             return (inputs) => new RuleResultTree
             {
                 Rule = rule,
-                Input = inputs.FirstOrDefault(),
-                IsSuccess = isSuccessFunc(inputs),
+                Inputs = inputs.ToDictionary(c => c.Name,c => c.Value),
+                IsSuccess = isSuccessFunc(inputs.Select(c => c.Value).ToArray()),
                 ChildResults = childRuleResults,
                 ExceptionMessage = exceptionMessage
             };

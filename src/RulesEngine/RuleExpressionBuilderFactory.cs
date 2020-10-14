@@ -10,16 +10,18 @@ namespace RulesEngine
     internal class RuleExpressionBuilderFactory
     {
         private ReSettings _reSettings;
-        public RuleExpressionBuilderFactory(ReSettings reSettings)
+        private LambdaExpressionBuilder _lambdaExpressionBuilder;
+        public RuleExpressionBuilderFactory(ReSettings reSettings, RuleExpressionParser expressionParser)
         {
             _reSettings = reSettings;
+            _lambdaExpressionBuilder = new LambdaExpressionBuilder(_reSettings, expressionParser);
         }
         public RuleExpressionBuilderBase RuleGetExpressionBuilder(RuleExpressionType ruleExpressionType)
         {
             switch (ruleExpressionType)
             {
                 case RuleExpressionType.LambdaExpression:
-                    return new LambdaExpressionBuilder(_reSettings);
+                    return _lambdaExpressionBuilder;
                 default:
                     throw new InvalidOperationException($"{nameof(ruleExpressionType)} has not been supported yet.");
             }

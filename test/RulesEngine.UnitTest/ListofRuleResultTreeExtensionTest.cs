@@ -21,7 +21,7 @@ namespace RulesEngine.UnitTest
                 {
                     ChildResults = null,
                     ExceptionMessage = string.Empty,
-                    Input = new object(),
+                    Inputs = new Dictionary<string, object>(),
                     IsSuccess = true,
                     Rule = new Rule()
                     {
@@ -32,7 +32,7 @@ namespace RulesEngine.UnitTest
                 {
                     ChildResults = null,
                     ExceptionMessage = string.Empty,
-                    Input = new object(),
+                    Inputs = new Dictionary<string, object>(),
                     IsSuccess = false,
                     Rule = new Rule()
                     {
@@ -61,7 +61,7 @@ namespace RulesEngine.UnitTest
                 {
                     ChildResults = null,
                     ExceptionMessage = string.Empty,
-                    Input = new object(),
+                    Inputs = new Dictionary<string, object>(),
                     IsSuccess = true,
                     Rule = new Rule()
                     {
@@ -73,7 +73,7 @@ namespace RulesEngine.UnitTest
                 {
                     ChildResults = null,
                     ExceptionMessage = string.Empty,
-                    Input = new object(),
+                    Inputs = new Dictionary<string, object>(),
                     IsSuccess = false,
                     Rule = new Rule()
                     {
@@ -102,7 +102,7 @@ namespace RulesEngine.UnitTest
                 {
                     ChildResults = null,
                     ExceptionMessage = string.Empty,
-                    Input = new object(),
+                    Inputs = new Dictionary<string, object>(),
                     IsSuccess = false,
                     Rule = new Rule()
                     {
@@ -113,7 +113,7 @@ namespace RulesEngine.UnitTest
                 {
                     ChildResults = null,
                     ExceptionMessage = string.Empty,
-                    Input = new object(),
+                    Inputs = new Dictionary<string, object>(),
                     IsSuccess = false,
                     Rule = new Rule()
                     {
@@ -143,7 +143,7 @@ namespace RulesEngine.UnitTest
                 {
                     ChildResults = null,
                     ExceptionMessage = string.Empty,
-                    Input = new object(),
+                    Inputs = new Dictionary<string, object>(),
                     IsSuccess = true,
                     Rule = new Rule()
                     {
@@ -154,7 +154,7 @@ namespace RulesEngine.UnitTest
                 {
                     ChildResults = null,
                     ExceptionMessage = string.Empty,
-                    Input = new object(),
+                    Inputs = new Dictionary<string, object>(),
                     IsSuccess = false,
                     Rule = new Rule()
                     {
@@ -183,7 +183,7 @@ namespace RulesEngine.UnitTest
                 {
                     ChildResults = null,
                     ExceptionMessage = string.Empty,
-                    Input = new object(),
+                    Inputs = new Dictionary<string, object>(),
                     IsSuccess = false,
                     Rule = new Rule()
                     {
@@ -194,7 +194,7 @@ namespace RulesEngine.UnitTest
                 {
                     ChildResults = null,
                     ExceptionMessage = string.Empty,
-                    Input = new object(),
+                    Inputs = new Dictionary<string, object>(),
                     IsSuccess = false,
                     Rule = new Rule()
                     {

@@ -34,5 +34,10 @@ namespace RulesEngine.Models
         /// The parameters.
         /// </value>
         internal IEnumerable<RuleParameter> Parameters { get; set; }
+
+        internal RuleParameter AsRuleParameter()
+        {
+            return new RuleParameter(Name,Value.Method.ReturnType);
+        }
     }
 }

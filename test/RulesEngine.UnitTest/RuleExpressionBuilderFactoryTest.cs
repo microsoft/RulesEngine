@@ -18,7 +18,9 @@ namespace RulesEngine.UnitTest
         [InlineData(RuleExpressionType.LambdaExpression, typeof(LambdaExpressionBuilder))]
         public void RuleGetExpressionBuilderTest(RuleExpressionType expressionType, Type expectedExpressionBuilderType)
         {
-            var objBuilderFactory = new RuleExpressionBuilderFactory(new ReSettings());
+            var reSettings = new ReSettings();
+            var parser = new RuleExpressionParser(reSettings);
+            var objBuilderFactory = new RuleExpressionBuilderFactory(reSettings,parser);
             var builder = objBuilderFactory.RuleGetExpressionBuilder(expressionType);
 
             var builderType = builder.GetType();
