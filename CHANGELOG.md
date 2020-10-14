@@ -1,6 +1,9 @@
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
+## [2.1.4] - 15-10-2020
+- Added exception data properties to identify RuleName.
+
 ## [2.1.3] - 12-10-2020
 - Optional parameter for rethrow exception on failure of expression compilation.
 
