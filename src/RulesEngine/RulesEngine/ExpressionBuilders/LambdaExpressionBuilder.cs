@@ -38,6 +38,9 @@ namespace RulesEngine.ExpressionBuilders
             }
             catch (Exception ex)
             {
+                ex.Data.Add(nameof(rule.RuleName), rule.RuleName);
+                ex.Data.Add(nameof(rule.Expression), rule.Expression);
+
                 if (!_reSettings.EnableExceptionAsErrorMessage) throw;
                 
                 var binaryExpression = Expression.And(Expression.Constant(true), Expression.Constant(false));
