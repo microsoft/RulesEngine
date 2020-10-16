@@ -255,7 +255,60 @@ namespace RulesEngine.UnitTest
             Assert.All(result,c => Assert.Equal(expectedResult,c.IsSuccess));
         }
 
+        [Theory]
+        [InlineData("rules6.json")]
+        public void ExecuteRule_RuleWithMethodExpression_ReturnsSucess(string ruleFileName)
+        {
+            var re = GetRulesEngine(ruleFileName);
 
+            Func<bool> func = () => true;
+
+            dynamic input1 = new ExpandoObject();
+            input1.Property1 = "hello";
+            input1.Boolean = false;
+            input1.Method = func;
+
+            var utils = new TestInstanceUtils();
+
+            List<RuleResultTree> result = re.ExecuteRule("inputWorkflow", new RuleParameter("input1", input1));
+            Assert.NotNull(result);
+            Assert.IsType<List<RuleResultTree>>(result);
+            Assert.All(result, c => Assert.True(c.IsSuccess));
+        }
+
+        [Theory]
+        [InlineData("rules7.json")]
+        public void ExecuteRule_RuleWithUnaryExpression_ReturnsSucess(string ruleFileName)
+        {
+            var re = GetRulesEngine(ruleFileName);
+
+            dynamic input1 = new ExpandoObject();
+            input1.Boolean = false;
+
+            var utils = new TestInstanceUtils();
+
+            List<RuleResultTree> result = re.ExecuteRule("inputWorkflow", new RuleParameter("input1", input1));
+            Assert.NotNull(result);
+            Assert.IsType<List<RuleResultTree>>(result);
+            Assert.All(result, c => Assert.True(c.IsSuccess));
+        }
+
+        [Theory]
+        [InlineData("rules8.json")]
+        public void ExecuteRule_RuleWithMemberAccessExpression_ReturnsSucess(string ruleFileName)
+        {
+            var re = GetRulesEngine(ruleFileName);
+
+            dynamic input1 = new ExpandoObject();
+            input1.Boolean = false;
+
+            var utils = new TestInstanceUtils();
+
+            List<RuleResultTree> result = re.ExecuteRule("inputWorkflow", new RuleParameter("input1", input1));
+            Assert.NotNull(result);
+            Assert.IsType<List<RuleResultTree>>(result);
+            Assert.All(result, c => Assert.False(c.IsSuccess));
+        }
         private RulesEngine CreateRulesEngine(WorkflowRules workflow)
         {
             var json = JsonConvert.SerializeObject(workflow);

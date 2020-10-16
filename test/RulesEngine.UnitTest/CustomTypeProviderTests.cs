@@ -14,14 +14,9 @@ namespace RulesEngine.UnitTest
     public class CustomTypeProviderTests : IDisposable
     {
         private MockRepository mockRepository;
-
-
-
         public CustomTypeProviderTests()
         {
             this.mockRepository = new MockRepository(MockBehavior.Strict);
-
-
         }
 
         public void Dispose()
