@@ -1,4 +1,4 @@
-name: Nuget Publish
+name: Nuget Publish to github
 on:
   [workflow_dispatch]
 jobs:
