@@ -318,30 +318,35 @@ namespace RulesEngine
         /// <returns>Updated error message.</returns>
         private IEnumerable<RuleResultTree> FormatErrorMessages(IEnumerable<RuleResultTree> ruleResultList)
         {
+
             foreach (var ruleResult in ruleResultList?.Where(r => !r.IsSuccess))
             {
-                var errorParameters = Regex.Matches(ruleResult?.Rule?.ErrorMessage, ParamParseRegex);
                 var errorMessage = ruleResult?.Rule?.ErrorMessage;
-                var evaluatedParams = ruleResult?.RuleEvaluatedParams;
-                foreach (var param in errorParameters)
-                {
-                    var paramVal = param?.ToString();
-                    var property = paramVal?.Substring(2, paramVal.Length - 3);
-                    if (property?.Split('.')?.Count() > 1)
+                if(errorMessage != null){
+                    var errorParameters = Regex.Matches(errorMessage, ParamParseRegex);
+
+                    var inputs = ruleResult.Inputs;
+                    foreach (var param in errorParameters)
                     {
-                        var typeName = property?.Split('.')?[0];
-                        var propertyName = property?.Split('.')?[1];
-                        errorMessage = UpdateErrorMessage(errorMessage, evaluatedParams, property, typeName, propertyName);
+                        var paramVal = param?.ToString();
+                        var property = paramVal?.Substring(2, paramVal.Length - 3);
+                        if (property?.Split('.')?.Count() > 1)
+                        {
+                            var typeName = property?.Split('.')?[0];
+                            var propertyName = property?.Split('.')?[1];
+                            errorMessage = UpdateErrorMessage(errorMessage, inputs, property, typeName, propertyName);
+                        }
+                        else
+                        {
+                            var arrParams = inputs?.Select(c => new { Name = c.Key, c.Value });
+                            var model = arrParams?.Where(a => string.Equals(a.Name, property))?.FirstOrDefault();
+                            var value = model?.Value != null ? JsonConvert.SerializeObject(model?.Value) : null;
+                            errorMessage = errorMessage?.Replace($"$({property})", value ?? $"$({property})");
+                        }
                     }
-                    else
-                    {
-                        var arrParams = evaluatedParams?.Select(c => new { c.Name, c.Value });
-                        var model = arrParams?.Where(a => string.Equals(a.Name, property))?.FirstOrDefault();
-                        var value = model?.Value != null ? JsonConvert.SerializeObject(model?.Value) : null;
-                        errorMessage = errorMessage?.Replace($"$({property})", value ?? $"$({property})");
-                    }
+                    ruleResult.ExceptionMessage = errorMessage;
                 }
-                ruleResult.Rule.ErrorMessage = errorMessage;
+                
             }
             return ruleResultList;
         }
@@ -355,9 +360,9 @@ namespace RulesEngine
         /// <param name="typeName">Name of the type.</param>
         /// <param name="propertyName">Name of the property.</param>
         /// <returns>Updated error message.</returns>
-        private static string UpdateErrorMessage(string errorMessage, IEnumerable<RuleParameter> evaluatedParams, string property, string typeName, string propertyName)
+        private static string UpdateErrorMessage(string errorMessage, IDictionary<string,object> inputs, string property, string typeName, string propertyName)
         {
-            var arrParams = evaluatedParams?.Select(c => new { c.Name, c.Value });
+            var arrParams = inputs?.Select(c => new {Name = c.Key, c.Value });
             var model = arrParams?.Where(a => string.Equals(a.Name, typeName))?.FirstOrDefault();
             if (model != null)
             {
