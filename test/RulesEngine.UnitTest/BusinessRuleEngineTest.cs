@@ -63,6 +63,33 @@ namespace RulesEngine.UnitTest
 
         [Theory]
         [InlineData("rules2.json")]
+        public void ExecuteRule_CalledMultipleTimes_ReturnsSameResult(string ruleFileName)
+        {
+            var re = GetRulesEngine(ruleFileName);
+
+            dynamic input1 = GetInput1();
+            dynamic input2 = GetInput2();
+            dynamic input3 = GetInput3();
+
+            List<RuleResultTree> result1 = re.ExecuteRule("inputWorkflow", input1, input2, input3);
+            Assert.NotNull(result1);
+            Assert.IsType<List<RuleResultTree>>(result1);
+            Assert.Contains(result1, c => c.IsSuccess);
+
+            List<RuleResultTree> result2 = re.ExecuteRule("inputWorkflow", input1, input2, input3);
+            Assert.NotNull(result2);
+            Assert.IsType<List<RuleResultTree>>(result2);
+            Assert.Contains(result2, c => c.IsSuccess);
+
+            var expected = result1.Select(c => new { c.Rule.RuleName, c.IsSuccess });
+            var actual = result2.Select(c => new { c.Rule.RuleName, c.IsSuccess });
+            Assert.Equal(expected, actual);
+            
+                
+        }
+
+        [Theory]
+        [InlineData("rules2.json")]
         public void ExecuteRule_SingleObject_ReturnsListOfRuleResultTree(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName);
@@ -140,11 +167,13 @@ namespace RulesEngine.UnitTest
         public void RemoveWorkflow_RemovesWorkflow(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName);
-            re.RemoveWorkflow("inputWorkflow");
-
             dynamic input1 = GetInput1();
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
+
+            var result = re.ExecuteRule("inputWorkflow", input1, input2, input3);
+            Assert.NotNull(result);
+            re.RemoveWorkflow("inputWorkflow");
 
             Assert.Throws<ArgumentException>(() => re.ExecuteRule("inputWorkflow",input1, input2, input3 ));
         }
