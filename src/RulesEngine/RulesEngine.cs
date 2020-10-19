@@ -325,7 +325,7 @@ namespace RulesEngine
                 if(errorMessage != null){
                     var errorParameters = Regex.Matches(errorMessage, ParamParseRegex);
 
-                    var evaluatedParams = ruleResult.RuleEvaluatedParams;
+                    var inputs = ruleResult.Inputs;
                     foreach (var param in errorParameters)
                     {
                         var paramVal = param?.ToString();
@@ -334,11 +334,11 @@ namespace RulesEngine
                         {
                             var typeName = property?.Split('.')?[0];
                             var propertyName = property?.Split('.')?[1];
-                            errorMessage = UpdateErrorMessage(errorMessage, evaluatedParams, property, typeName, propertyName);
+                            errorMessage = UpdateErrorMessage(errorMessage, inputs, property, typeName, propertyName);
                         }
                         else
                         {
-                            var arrParams = evaluatedParams?.Select(c => new { c.Name, c.Value });
+                            var arrParams = inputs?.Select(c => new { Name = c.Key, c.Value });
                             var model = arrParams?.Where(a => string.Equals(a.Name, property))?.FirstOrDefault();
                             var value = model?.Value != null ? JsonConvert.SerializeObject(model?.Value) : null;
                             errorMessage = errorMessage?.Replace($"$({property})", value ?? $"$({property})");
@@ -360,9 +360,9 @@ namespace RulesEngine
         /// <param name="typeName">Name of the type.</param>
         /// <param name="propertyName">Name of the property.</param>
         /// <returns>Updated error message.</returns>
-        private static string UpdateErrorMessage(string errorMessage, IEnumerable<RuleParameter> evaluatedParams, string property, string typeName, string propertyName)
+        private static string UpdateErrorMessage(string errorMessage, IDictionary<string,object> inputs, string property, string typeName, string propertyName)
         {
-            var arrParams = evaluatedParams?.Select(c => new { c.Name, c.Value });
+            var arrParams = inputs?.Select(c => new {Name = c.Key, c.Value });
             var model = arrParams?.Where(a => string.Equals(a.Name, typeName))?.FirstOrDefault();
             if (model != null)
             {

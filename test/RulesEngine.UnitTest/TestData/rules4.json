@@ -42,6 +42,16 @@
         "SuccessEvent": "25",
         "ErrorMessage": "One or more adjust rules failed, country : $(input4.country), loyalityFactor : $(input4.loyalityFactor), totalPurchasesToDate : $(input4.totalPurchasesToDate), totalOrders : $(input5.totalOrders), noOfVisitsPerMonth : $(input30.noOfVisitsPerMonth)",
         "ErrorType": "Error",
+        "localParams": [
+          {
+            "Name": "model1",
+            "Expression": "input1.FirstOrDefault(country.Equals(\"india\", StringComparison.OrdinalIgnoreCase))"
+          },
+          {
+            "Name": "model2",
+            "Expression": "model1.country == \"india\""
+          }
+        ],
         "RuleExpressionType": "LambdaExpression",
         "Expression": "input4.country == \"india\" AND input4.loyalityFactor >= 2 AND input4.totalPurchasesToDate <= 10 AND input5.totalOrders > 2 AND input3.noOfVisitsPerMonth > 5"
       },
