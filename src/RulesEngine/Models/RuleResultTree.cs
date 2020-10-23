@@ -42,6 +42,8 @@ namespace RulesEngine.Models
         /// </summary>
         public Dictionary<string,object> Inputs { get; set; }
 
+        public ActionResult ActionResult {get; set;}
+
         /// <summary>
         /// Gets the exception message in case an error is thrown during rules calculation.
         /// </summary>

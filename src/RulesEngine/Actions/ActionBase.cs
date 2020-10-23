@@ -7,7 +7,7 @@ namespace RulesEngine.Actions
 {
     public abstract class ActionBase
     {
-        internal virtual async ValueTask<ActionRuleResult> ExecuteAndReturnResultAsync(ActionContext context, RuleParameter[] ruleParameters){
+        internal virtual async ValueTask<ActionRuleResult> ExecuteAndReturnResultAsync(ActionContext context, RuleParameter[] ruleParameters,bool includeRuleResults=false){
             ActionRuleResult result = new ActionRuleResult();
             try
             {
@@ -19,10 +19,12 @@ namespace RulesEngine.Actions
             }
             finally
             {
-                result.Results = new List<RuleResultTree>()
-                {
-                    context.GetParentRuleResult()
-                };
+                if(includeRuleResults){
+                    result.Results = new List<RuleResultTree>()
+                    {
+                        context.GetParentRuleResult()
+                    };
+                }
             }
             return result;
         }

@@ -14,11 +14,14 @@ namespace RulesEngine.Actions
             _ruleEngine = ruleEngine;
         }
 
-        internal override async ValueTask<ActionRuleResult> ExecuteAndReturnResultAsync(ActionContext context, RuleParameter[] ruleParameters){
-            var innerResult = await base.ExecuteAndReturnResultAsync(context,ruleParameters);
+        internal override async ValueTask<ActionRuleResult> ExecuteAndReturnResultAsync(ActionContext context, RuleParameter[] ruleParameters, bool includeRuleResults=false){
+            var innerResult = await base.ExecuteAndReturnResultAsync(context,ruleParameters,includeRuleResults);
             var output = innerResult.Output as ActionRuleResult;
-            var resultList = new List<RuleResultTree>(output.Results);
-            resultList.AddRange(innerResult.Results);
+            List<RuleResultTree> resultList = null;
+            if(includeRuleResults){
+                resultList = new List<RuleResultTree>(output.Results);
+                resultList.AddRange(innerResult.Results);
+            }
             return new ActionRuleResult {
                 Output = output.Output,
                 Exception = innerResult.Exception,

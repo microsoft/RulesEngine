@@ -1,10 +1,7 @@
-using System;
 using System.Collections.Generic;
 using RulesEngine.Models;
 
-public class ActionRuleResult{
-    public object Output {get; set;}
 
-    public Exception Exception { get; set; }
+public class ActionRuleResult : ActionResult{
     public List<RuleResultTree> Results {get; set;} 
 }

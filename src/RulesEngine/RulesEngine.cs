@@ -82,9 +82,9 @@ namespace RulesEngine
         /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
         /// <param name="inputs">A variable number of inputs</param>
         /// <returns>List of rule results</returns>
-        public List<RuleResultTree> ExecuteRule(string workflowName, params object[] inputs)
+        public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params object[] inputs)
         {
-            _logger.LogTrace($"Called ExecuteRule for workflow {workflowName} and count of input {inputs.Count()}");
+            _logger.LogTrace($"Called {nameof(ExecuteAllRulesAsync)} for workflow {workflowName} and count of input {inputs.Count()}");
 
             var ruleParams = new List<RuleParameter>();
 
@@ -94,7 +94,7 @@ namespace RulesEngine
                 ruleParams.Add(new RuleParameter($"input{i + 1}", input));
             }
 
-            return ExecuteRule(workflowName, ruleParams.ToArray());
+            return await ExecuteAllRulesAsync(workflowName, ruleParams.ToArray());
         }
 
         /// <summary>
@@ -103,9 +103,47 @@ namespace RulesEngine
         /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
         /// <param name="ruleParams">A variable number of rule parameters</param>
         /// <returns>List of rule results</returns>
-        public List<RuleResultTree> ExecuteRule(string workflowName, params RuleParameter[] ruleParams)
+        public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params RuleParameter[] ruleParams)
         {
-            return ValidateWorkflowAndExecuteRule(workflowName, ruleParams);
+            var ruleResultList =  ValidateWorkflowAndExecuteRule(workflowName, ruleParams);
+            foreach(var ruleResult in ruleResultList){
+                var actionResult = await ExecuteActionForRuleResult(ruleResult,false);
+                ruleResult.ActionResult = new ActionResult{
+                    Output = actionResult.Output,
+                    Exception = actionResult.Exception
+                };
+            }
+            return ruleResultList;
+        }
+
+
+        public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters)
+        {
+            var compiledRule = CompileRule(workflowName, ruleName, ruleParameters);
+            var resultTree = compiledRule(ruleParameters);
+            return await ExecuteActionForRuleResult(resultTree,true);
+        }
+
+        private async ValueTask<ActionRuleResult> ExecuteActionForRuleResult(RuleResultTree resultTree, bool includeRuleResults=false)
+        {
+            ActionTriggerType triggerType = resultTree?.IsSuccess == true ? ActionTriggerType.onSuccess : ActionTriggerType.onFailure;
+
+            if (resultTree?.Rule?.Actions != null && resultTree.Rule.Actions.ContainsKey(triggerType))
+            {
+                var actionInfo = resultTree.Rule.Actions[triggerType];
+                var action = _actionFactory.Get(actionInfo.Name);
+                var ruleParameters = resultTree.Inputs.Select(kv => new RuleParameter(kv.Key,kv.Value)).ToArray();
+                return await action.ExecuteAndReturnResultAsync(new ActionContext(actionInfo.Context, resultTree), ruleParameters,includeRuleResults);
+            }
+            else
+            {
+                //If there is no action,return output as null and return the result for rule
+                return new ActionRuleResult
+                {
+                    Output = null,
+                    Results = includeRuleResults ? new List<RuleResultTree>() { resultTree }: null
+                };
+            }
         }
 
         #endregion
@@ -247,28 +285,7 @@ namespace RulesEngine
             return updatedRule;
         }
 
-        public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters)
-        {
-            var compiledRule = CompileRule(workflowName,ruleName,ruleParameters);
-            var resultTree = compiledRule(ruleParameters);
-            ActionTriggerType triggerType = resultTree?.IsSuccess == true ? ActionTriggerType.onSuccess : ActionTriggerType.onFailure;
-
-            if (resultTree?.Rule?.Actions != null && resultTree.Rule.Actions.ContainsKey(triggerType))
-            {
-                var actionInfo = resultTree.Rule.Actions[triggerType];
-                var action = _actionFactory.Get(actionInfo.Name);
-                return await action.ExecuteAndReturnResultAsync(new ActionContext(actionInfo.Context, resultTree), ruleParameters);
-            }
-            else
-            {
-                //If there is no action,return output as null and return the result for rule
-                return new ActionRuleResult
-                {
-                    Output = null,
-                    Results = new List<RuleResultTree>() { resultTree }
-                };
-            }
-        }
+       
 
         /// <summary>
         /// This will execute the compiled rules 
@@ -288,7 +305,7 @@ namespace RulesEngine
                 result.Add(resultTree);
             }
 
-            FormatErrorMessages(result?.Where(r => !r.IsSuccess));
+            FormatErrorMessages(result);
             return result;
         }
         
