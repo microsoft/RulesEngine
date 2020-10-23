@@ -48,9 +48,9 @@ var rulesEngine = new RulesEngine(workflowRules, logger);
 ```
 Here, *workflowRules* is a list of deserialized object based out of the schema explained above and *logger* is a custom logger instance made out of an [ILogger](https://github.com/microsoft/RulesEngine/wiki/Getting-Started#logger) instance.
 
-Once done, the Rules Engine needs to execute the rules for a given input. It can be done by calling the method ExecuteRule as shown below - 
+Once done, the Rules Engine needs to execute the rules for a given input. It can be done by calling the method ExecuteAllRulesAsync as shown below - 
 ```c#
-List<RuleResultTree> response = rulesEngine.ExecuteRule(workflowName, input);
+List<RuleResultTree> response = await rulesEngine.ExecuteAllRulesAsync(workflowName, input);
 ```
 Here, *workflowName* is the name of the workflow, which is *Discount* in the above mentioned example. And *input* is the object which needs to be checked against the rules.
 
