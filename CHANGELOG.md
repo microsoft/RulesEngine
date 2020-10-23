@@ -1,6 +1,9 @@
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
+## [3.0.0-preview.1] - 23-10-2020
+- Renamed `ExecuteRule` to `ExecuteAllRulesAsync`
+- Added Actions support. More details on [actions wiki](https://github.com/microsoft/RulesEngine/wiki/Actions)
 
 ## [2.1.0] - 18-05-2020
 - Adding local param support to make expression authroing more intuitive.
