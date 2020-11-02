@@ -1,6 +1,9 @@
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
+## [2.1.5] - 02-11-2020
+- Added `Properties` field to Rule to allow custom fields to Rule
+
 ## [2.1.4] - 15-10-2020
 - Added exception data properties to identify RuleName.
 

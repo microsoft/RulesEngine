@@ -24,6 +24,14 @@ namespace RulesEngine.Models
         public string RuleName { get; set; }
 
         /// <summary>
+        /// Gets or sets the custom property or tags of the rule.
+        /// </summary>
+        /// <value>
+        /// The properties of the rule.
+        /// </value>
+        public Dictionary<string, object> Properties { get; set; }
+        
+        /// <summary>
         /// Gets or sets the operator.
         /// </summary>
         /// <value>
