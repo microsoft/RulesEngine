@@ -4,12 +4,14 @@
 using RulesEngine.HelperFunctions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Text;
 using Xunit;
 
 namespace RulesEngine.UnitTest
 {
+    [ExcludeFromCodeCoverage]
     public class TestClass
     {
         public string test { get; set; }
@@ -17,6 +19,7 @@ namespace RulesEngine.UnitTest
     }
 
     [Trait("Category","Unit")]
+    [ExcludeFromCodeCoverage]
     public class UtilsTests
     {
 
@@ -44,7 +47,6 @@ namespace RulesEngine.UnitTest
             object typedobj2 = Utils.GetTypedObject(obj2);
             Assert.IsNotType<ExpandoObject>(typedobj);
             Assert.NotNull(typedobj.GetType().GetProperty("test"));
-            Console.WriteLine($"{typedobj.GetType()} & {typedobj2.GetType()}");
             Assert.Equal(typedobj.GetType(),typedobj2.GetType());
         }
 

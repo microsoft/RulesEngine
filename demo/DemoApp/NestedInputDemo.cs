@@ -50,7 +50,7 @@ namespace DemoApp
             var bre = new RulesEngine.RulesEngine(workflowRules.ToArray(),null);
             foreach(var workflow in workflowRules)
             {
-                List<RuleResultTree> resultList = bre.ExecuteRule(workflow.WorkflowName, nestedInput);
+                List<RuleResultTree> resultList = bre.ExecuteAllRulesAsync(workflow.WorkflowName, nestedInput).Result;
 
                 resultList.OnSuccess((eventName) =>
                 {

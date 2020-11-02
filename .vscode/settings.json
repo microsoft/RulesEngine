@@ -1,0 +1,5 @@
+{
+    "dotnetCoreExplorer.searchpatterns": "test/**/bin/Debug/netcoreapp*/*.{dll,exe,json}",
+    "coverage-gutters.coverageBaseDir": "coveragereport",
+    "coverage-gutters.coverageReportFileName": "coveragereport/**/index.html"
+}

@@ -42,7 +42,7 @@ namespace DemoApp
 
             string discountOffered = "No discount offered.";
 
-            List<RuleResultTree> resultList = bre.ExecuteRule("Discount", inputs);
+            List<RuleResultTree> resultList = bre.ExecuteAllRulesAsync("Discount", inputs).Result;
 
             resultList.OnSuccess((eventName) =>
             {

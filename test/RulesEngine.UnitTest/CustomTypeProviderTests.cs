@@ -5,21 +5,18 @@ using RulesEngine;
 using Moq;
 using System;
 using Xunit;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RulesEngine.UnitTest
 {
     [Trait("Category", "Unit")]
+    [ExcludeFromCodeCoverage]
     public class CustomTypeProviderTests : IDisposable
     {
         private MockRepository mockRepository;
-
-
-
         public CustomTypeProviderTests()
         {
             this.mockRepository = new MockRepository(MockBehavior.Strict);
-
-
         }
 
         public void Dispose()

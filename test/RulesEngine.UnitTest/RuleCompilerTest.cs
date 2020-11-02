@@ -2,28 +2,35 @@
 // Licensed under the MIT License.
 
 using Microsoft.Extensions.Logging.Abstractions;
+using RulesEngine.ExpressionBuilders;
 using RulesEngine.Models;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
 namespace RulesEngine.UnitTest
 {
     [Trait("Category","Unit")]
+    [ExcludeFromCodeCoverage]
     public class RuleCompilerTest
     {
         [Fact]
         public void RuleCompiler_NullCheck()
         {
             Assert.Throws<ArgumentNullException>(() => new RuleCompiler(null, null));
-            Assert.Throws<ArgumentNullException>(() => new RuleCompiler(new RuleExpressionBuilderFactory(new ReSettings()), null));
+            var reSettings = new ReSettings();
+            var parser = new RuleExpressionParser(reSettings);
+            Assert.Throws<ArgumentNullException>(() => new RuleCompiler(new RuleExpressionBuilderFactory(reSettings,parser), null));
         }
 
         [Fact]
         public void RuleCompiler_CompileRule_ThrowsException()
         {
-            var compiler = new RuleCompiler(new RuleExpressionBuilderFactory(new ReSettings()), new NullLogger<RuleCompiler>());
-            Assert.Throws<ArgumentException>(() => compiler.CompileRule(null, null));
-            Assert.Throws<ArgumentException>(() => compiler.CompileRule(null, new RuleParameter[] { null}));
+            var reSettings = new ReSettings();
+            var parser = new RuleExpressionParser(reSettings);
+            var compiler = new RuleCompiler(new RuleExpressionBuilderFactory(reSettings,parser), new NullLogger<RuleCompiler>());
+            Assert.Throws<ArgumentNullException>(() => compiler.CompileRule(null, null));
+            Assert.Throws<ArgumentNullException>(() => compiler.CompileRule(null, new RuleParameter[] { null}));
         }
 
 

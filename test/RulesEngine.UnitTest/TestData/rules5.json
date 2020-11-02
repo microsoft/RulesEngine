@@ -10,4 +10,4 @@
       "Expression": "utils.CheckExists(String(input1.Property1)) == true"
     }
   ]
-}
+} 
