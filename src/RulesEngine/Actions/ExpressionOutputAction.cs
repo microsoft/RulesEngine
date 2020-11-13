@@ -17,7 +17,7 @@ namespace RulesEngine.Actions
         public override ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters)
         {
             var expression = context.GetContext<string>("expression");
-            return new ValueTask<object>(_ruleExpressionParser.Evaluate(expression, ruleParameters));
+            return new ValueTask<object>(_ruleExpressionParser.Evaluate<object>(expression, ruleParameters));
         }
     }
 }

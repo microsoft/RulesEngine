@@ -25,7 +25,7 @@ namespace RulesEngine.Models
         /// <value>
         /// The value.
         /// </value>
-        internal Delegate Value { get; set; }
+        internal Func<object[],object> Value { get; set; }
 
         /// <summary>
         /// Gets or sets the parameters.
