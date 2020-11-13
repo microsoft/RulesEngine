@@ -39,9 +39,9 @@ namespace RulesEngine
             var evaluatedParameters = new List<RuleParameter>();
             foreach (var param in rule.LocalParams)
             {
-                var compiledParam = GetDelegateForRuleParam(param, ruleParams.ToArray());
-                compiledParameters.Add(new CompiledParam { Name = param.Name, Value = compiledParam, Parameters = evaluatedParameters });
-                var evaluatedParam = EvaluateCompiledParam(param.Name, compiledParam, ruleParams);
+                var compiledParamDelegate = GetDelegateForRuleParam(param, ruleParams.ToArray());
+                var evaluatedParam = EvaluateCompiledParam(param.Name, compiledParamDelegate, ruleParams);
+                compiledParameters.Add(new CompiledParam { Name = param.Name, Value = compiledParamDelegate, ReturnType = evaluatedParam.Type });
                 ruleParams = ruleParams.Append(evaluatedParam);
                 evaluatedParameters.Add(evaluatedParam);
             }
