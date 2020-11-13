@@ -19,7 +19,7 @@ jobs:
         uses: rohith/publish-nuget@v2
         with:
           # Filepath of the project to be packaged, relative to root of repository
-          PROJECT_FILE_PATH: src/RulesEngine/RulesEngine/RulesEngine.csproj
+          PROJECT_FILE_PATH: src/RulesEngine/RulesEngine.csproj
           
           # NuGet package id, used for version detection & defaults to project name
           # PACKAGE_NAME: Core

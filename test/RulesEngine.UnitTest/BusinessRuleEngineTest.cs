@@ -242,8 +242,7 @@ namespace RulesEngine.UnitTest
 
             var fileData = File.ReadAllText(files[0]);
             var bre = new RulesEngine(JsonConvert.DeserializeObject<WorkflowRules[]>(fileData), null);
-            var result = await bre.ExecuteAllRulesAsync("inputWorkflow", ruleParams?.ToArray());
-            Console.WriteLine(JsonConvert.SerializeObject(result));
+            var result = await bre.ExecuteAllRulesAsync("inputWorkflow", ruleParams?.ToArray()); ;
             var ruleResult = result?.FirstOrDefault(r => string.Equals(r.Rule.RuleName, "GiveDiscount10", StringComparison.OrdinalIgnoreCase));
             Assert.True(ruleResult.IsSuccess);
         }
