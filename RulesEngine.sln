@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29123.89
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RulesEngine", "src\RulesEngine\\RulesEngine.csproj", "{CD4DFE6A-083B-478E-8377-77F474833E30}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RulesEngine", "src\RulesEngine\RulesEngine.csproj", "{CD4DFE6A-083B-478E-8377-77F474833E30}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RulesEngine.UnitTest", "test\RulesEngine.UnitTest\RulesEngine.UnitTest.csproj", "{50E0C2A5-E2C8-4B12-8C0E-B69F698A82BF}"
 EndProject
@@ -15,6 +15,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{019DF693-8442-45B4-88C3-55CB7AFCB42E}"
 	ProjectSection(SolutionItems) = preProject
 		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RulesEngineBenchmark", "benchmark\RulesEngineBenchmark\RulesEngineBenchmark.csproj", "{C058809F-C720-4EFC-925D-A486627B238B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CD4DFE6A-083B-478E-8377-77F474833E30} = {CD4DFE6A-083B-478E-8377-77F474833E30}
 	EndProjectSection
 EndProject
 Global
@@ -35,6 +40,10 @@ Global
 		{57BB8C07-799A-4F87-A7CC-D3D3F694DD02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57BB8C07-799A-4F87-A7CC-D3D3F694DD02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57BB8C07-799A-4F87-A7CC-D3D3F694DD02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C058809F-C720-4EFC-925D-A486627B238B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C058809F-C720-4EFC-925D-A486627B238B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C058809F-C720-4EFC-925D-A486627B238B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C058809F-C720-4EFC-925D-A486627B238B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
