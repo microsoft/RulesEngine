@@ -25,8 +25,8 @@ namespace RulesEngine.ExpressionBuilders
         {
             try
             {
-                var ruleDelegate = _ruleExpressionParser.Compile(rule.Expression, ruleParams,typeof(bool));
-                bool func(object[] paramList) => (bool)ruleDelegate.DynamicInvoke(paramList);
+                var ruleDelegate = _ruleExpressionParser.Compile<bool>(rule.Expression, ruleParams);
+                bool func(object[] paramList) => ruleDelegate(paramList);
                 return Helpers.ToResultTree(rule, null, func);
             }
              catch (Exception ex)

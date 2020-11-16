@@ -11,33 +11,12 @@ namespace RulesEngine.Models
     [ExcludeFromCodeCoverage]
     internal class CompiledParam
     {
-        /// <summary>
-        /// Gets or sets the name.
-        /// </summary>
-        /// <value>
-        /// The name.
-        /// </value>
         internal string Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the value.
-        /// </summary>
-        /// <value>
-        /// The value.
-        /// </value>
-        internal Delegate Value { get; set; }
-
-        /// <summary>
-        /// Gets or sets the parameters.
-        /// </summary>
-        /// <value>
-        /// The parameters.
-        /// </value>
-        internal IEnumerable<RuleParameter> Parameters { get; set; }
-
+        internal Type ReturnType { get; set; }
+        internal Func<object[],object> Value { get; set; }
         internal RuleParameter AsRuleParameter()
         {
-            return new RuleParameter(Name,Value.Method.ReturnType);
+            return new RuleParameter(Name,ReturnType);
         }
     }
 }

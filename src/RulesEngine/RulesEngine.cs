@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-// Copyright (c) Microsoft Corporation.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.Threading.Tasks;
 using FluentValidation;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -234,7 +234,7 @@ namespace RulesEngine
             if (workflowRules != null)
             {
                 var dictFunc = new Dictionary<string,RuleFunc<RuleResultTree>>();
-                foreach (var rule in _rulesCache.GetRules(workflowName))
+                foreach (var rule in workflowRules.Rules)
                 {
                     dictFunc.Add(rule.RuleName,CompileRule(workflowName, ruleParams, rule));
                 }
@@ -261,6 +261,9 @@ namespace RulesEngine
 
         private RuleFunc<RuleResultTree> CompileRule(string workflowName, RuleParameter[] ruleParams, Rule rule)
         {
+            if(!_reSettings.EnableLocalParams){
+                return _ruleCompiler.CompileRule(rule,ruleParams);
+            }
             var compiledParamsKey = GetCompiledParamsCacheKey(workflowName, rule.RuleName, ruleParams);
             IEnumerable<CompiledParam> compiledParamList = _compiledParamsCache.GetOrCreate(compiledParamsKey, (entry) => _ruleParamCompiler.CompileParamsExpression(rule, ruleParams));
             var compiledRuleParameters = compiledParamList?.Select(c => c.AsRuleParameter()) ?? new List<RuleParameter>();
@@ -335,35 +338,36 @@ namespace RulesEngine
         /// <returns>Updated error message.</returns>
         private IEnumerable<RuleResultTree> FormatErrorMessages(IEnumerable<RuleResultTree> ruleResultList)
         {
+            if(_reSettings.EnableFormattedErrorMessage){
+                foreach (var ruleResult in ruleResultList?.Where(r => !r.IsSuccess))
+                {
+                    var errorMessage = ruleResult?.Rule?.ErrorMessage;
+                    if(errorMessage != null){
+                        var errorParameters = Regex.Matches(errorMessage, ParamParseRegex);
 
-            foreach (var ruleResult in ruleResultList?.Where(r => !r.IsSuccess))
-            {
-                var errorMessage = ruleResult?.Rule?.ErrorMessage;
-                if(errorMessage != null){
-                    var errorParameters = Regex.Matches(errorMessage, ParamParseRegex);
-
-                    var inputs = ruleResult.Inputs;
-                    foreach (var param in errorParameters)
-                    {
-                        var paramVal = param?.ToString();
-                        var property = paramVal?.Substring(2, paramVal.Length - 3);
-                        if (property?.Split('.')?.Count() > 1)
+                        var inputs = ruleResult.Inputs;
+                        foreach (var param in errorParameters)
                         {
-                            var typeName = property?.Split('.')?[0];
-                            var propertyName = property?.Split('.')?[1];
-                            errorMessage = UpdateErrorMessage(errorMessage, inputs, property, typeName, propertyName);
+                            var paramVal = param?.ToString();
+                            var property = paramVal?.Substring(2, paramVal.Length - 3);
+                            if (property?.Split('.')?.Count() > 1)
+                            {
+                                var typeName = property?.Split('.')?[0];
+                                var propertyName = property?.Split('.')?[1];
+                                errorMessage = UpdateErrorMessage(errorMessage, inputs, property, typeName, propertyName);
+                            }
+                            else
+                            {
+                                var arrParams = inputs?.Select(c => new { Name = c.Key, c.Value });
+                                var model = arrParams?.Where(a => string.Equals(a.Name, property))?.FirstOrDefault();
+                                var value = model?.Value != null ? JsonConvert.SerializeObject(model?.Value) : null;
+                                errorMessage = errorMessage?.Replace($"$({property})", value ?? $"$({property})");
+                            }
                         }
-                        else
-                        {
-                            var arrParams = inputs?.Select(c => new { Name = c.Key, c.Value });
-                            var model = arrParams?.Where(a => string.Equals(a.Name, property))?.FirstOrDefault();
-                            var value = model?.Value != null ? JsonConvert.SerializeObject(model?.Value) : null;
-                            errorMessage = errorMessage?.Replace($"$({property})", value ?? $"$({property})");
-                        }
+                        ruleResult.ExceptionMessage = errorMessage;
                     }
-                    ruleResult.ExceptionMessage = errorMessage;
+                    
                 }
-                
             }
             return ruleResultList;
         }

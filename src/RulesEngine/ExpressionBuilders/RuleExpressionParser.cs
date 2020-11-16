@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using FastExpressionCompiler;
 
 namespace RulesEngine.ExpressionBuilders
 {
@@ -21,23 +22,34 @@ namespace RulesEngine.ExpressionBuilders
             });
         }
 
-        public Delegate Compile(string expression, RuleParameter[] ruleParams, Type returnType = null)
+        public Func<object[],T> Compile<T>(string expression, RuleParameter[] ruleParams)
         {
-            var cacheKey = GetCacheKey(expression,ruleParams,returnType);
+            var cacheKey = GetCacheKey(expression,ruleParams,typeof(T));
             return _memoryCache.GetOrCreate(cacheKey,(entry) => {
                 entry.SetSize(1);
                 var config = new ParsingConfig { CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes) };
                 var typeParamExpressions = GetParameterExpression(ruleParams).ToArray();
-                var e = DynamicExpressionParser.ParseLambda(config, true, typeParamExpressions.ToArray(), returnType, expression);
-                return e.Compile();
+                var e = DynamicExpressionParser.ParseLambda(config, true, typeParamExpressions.ToArray(), typeof(T), expression);
+                var wrappedExpression = WrapExpression<T>(e,typeParamExpressions);
+                return wrappedExpression.CompileFast<Func<object[],T>>();
             });
             
         }
 
-        public object Evaluate(string expression, RuleParameter[] ruleParams, Type returnType = null)
+        private Expression<Func<object[],T>> WrapExpression<T>(Expression expression, ParameterExpression[] parameters){
+            var argExp = Expression.Parameter(typeof(object[]),"args");
+            var paramExps = parameters.Select((c,i) => {
+                var arg = Expression.ArrayAccess(argExp,Expression.Constant(i));
+                return Expression.Convert(arg,c.Type);
+            });
+            var invokeExp = Expression.Invoke(expression,paramExps);
+            return Expression.Lambda<Func<object[],T>>(invokeExp, argExp);
+        }
+
+        public T Evaluate<T>(string expression, RuleParameter[] ruleParams)
         {
-            var func = Compile(expression, ruleParams, returnType);
-            return func.DynamicInvoke(ruleParams.Select(c => c.Value).ToArray());
+            var func = Compile<T>(expression, ruleParams);
+            return func(ruleParams.Select(c => c.Value).ToArray());
         }
 
         // <summary>
