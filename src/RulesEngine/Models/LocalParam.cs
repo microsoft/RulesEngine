@@ -16,12 +16,12 @@ namespace RulesEngine.Models
         /// The name of the rule.
         /// </value>
         [JsonProperty, JsonRequired]
-        public string Name { get; private set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets or Sets the lambda expression. 
         /// </summary>
         [JsonProperty, JsonRequired]
-        public string Expression { get; private set; }
+        public string Expression { get; set; }
     }
 }

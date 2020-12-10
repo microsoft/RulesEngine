@@ -38,7 +38,7 @@ namespace RulesEngine.Models
         public List<Rule> Rules { get; set; }
 
         [JsonProperty]
-        public IEnumerable<LocalParam> LocalParams { get; private set; }
+        public IEnumerable<LocalParam> LocalParams { get; set; }
         public string Expression { get; set; }
 
         public Dictionary<ActionTriggerType, ActionInfo> Actions { get; set; }
