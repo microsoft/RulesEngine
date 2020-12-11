@@ -1,6 +1,9 @@
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
+## [3.0.0-preview.3]
+- Made LocalParams public so they can be set at runtime
+- Removed limitation inputs passed to RulesEngine. RulesEngine now virtually supports unlimited inputs.
 
 ## [3.0.0-preview.2]
 - Made LocalParams and ErrorMessage formatting optional via ReSettings
