@@ -36,15 +36,17 @@ namespace RulesEngine.ExpressionBuilders
             
         }
 
-        private Expression<Func<object[],T>> WrapExpression<T>(Expression expression, ParameterExpression[] parameters){
+        private Expression<Func<object[],T>> WrapExpression<T>(LambdaExpression expression, ParameterExpression[] parameters){
             var argExp = Expression.Parameter(typeof(object[]),"args");
-            var paramExps = parameters.Select((c,i) => {
-                var arg = Expression.ArrayAccess(argExp,Expression.Constant(i));
-                return Expression.Convert(arg,c.Type);
+            IEnumerable<Expression> paramExps = parameters.Select((c, i) => {
+                var arg = Expression.ArrayAccess(argExp, Expression.Constant(i));
+                return (Expression)Expression.Assign(c, Expression.Convert(arg, c.Type));
             });
-            var invokeExp = Expression.Invoke(expression,paramExps);
-            return Expression.Lambda<Func<object[],T>>(invokeExp, argExp);
+            var blockExpSteps = paramExps.Concat(new List<Expression> { expression.Body });
+            var blockExp = Expression.Block(parameters, blockExpSteps);
+            return Expression.Lambda<Func<object[],T>>(blockExp, argExp);
         }
+
 
         public T Evaluate<T>(string expression, RuleParameter[] ruleParams)
         {
