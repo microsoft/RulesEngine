@@ -64,6 +64,44 @@ namespace RulesEngine.UnitTest
 
         [Theory]
         [InlineData("rules2.json")]
+        public async Task ExecuteRule_ManyInputs_ReturnsListOfRuleResultTree(string ruleFileName)
+        {
+            var re = GetRulesEngine(ruleFileName);
+
+            dynamic input1 = GetInput1();
+            dynamic input2 = GetInput2();
+            dynamic input3 = GetInput3();
+
+            dynamic input4 = GetInput1();
+            dynamic input5 = GetInput2();
+            dynamic input6 = GetInput3();
+
+            dynamic input7 = GetInput1();
+            dynamic input8 = GetInput2();
+            dynamic input9 = GetInput3();
+            
+            dynamic input10 = GetInput1();
+            dynamic input11 = GetInput2();
+            dynamic input12 = GetInput3();
+
+            dynamic input13 = GetInput1();
+            dynamic input14 = GetInput2();
+            dynamic input15 = GetInput3();
+
+
+            dynamic input16 = GetInput1();
+            dynamic input17 = GetInput2();
+            dynamic input18 = GetInput3();
+
+            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3,input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18);
+            Assert.NotNull(result);
+            Assert.IsType<List<RuleResultTree>>(result);
+            Assert.Contains(result, c => c.IsSuccess);
+        }
+
+
+        [Theory]
+        [InlineData("rules2.json")]
         public async Task ExecuteRule_CalledMultipleTimes_ReturnsSameResult(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName);
