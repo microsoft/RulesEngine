@@ -7,7 +7,8 @@ All notable changes to this project will be documented in this file.
 - Major performance improvement
 	- 25% improvement from previous version
 	- Upto 35% improvement by disabling optional features
-- Removed limitation inputs passed to RulesEngine. RulesEngine now virtually supports unlimited inputs.
+- RulesEngine now virtually supports unlimited inputs (Previous limitation was 16 inputs)
+- RuleExpressionParser is now available to use expression evaluation outside RulesEngine
 
 ### Breaking Changes
 - `ExecuteRule` method has been renamed to `ExecuteAllRulesAsync`
