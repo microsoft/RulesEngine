@@ -1,19 +1,17 @@
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
-## [3.0.0-preview.3]
-- Made LocalParams public so they can be set at runtime
-- Removed limitation inputs passed to RulesEngine. RulesEngine now virtually supports unlimited inputs.
-
-## [3.0.0-preview.2]
-- Made LocalParams and ErrorMessage formatting optional via ReSettings
+## [3.0.0]
+### Major Enhancements
+- Added support for Actions. More details on [actions wiki](https://github.com/microsoft/RulesEngine/wiki/Actions)
 - Major performance improvement
 	- 25% improvement from previous version
 	- Upto 35% improvement by disabling optional features
+- Removed limitation inputs passed to RulesEngine. RulesEngine now virtually supports unlimited inputs.
 
-## [3.0.0-preview.1] - 23-10-2020
-- Renamed `ExecuteRule` to `ExecuteAllRulesAsync`
-- Added Actions support. More details on [actions wiki](https://github.com/microsoft/RulesEngine/wiki/Actions)
+### Breaking Changes
+- `ExecuteRule` method has been renamed to `ExecuteAllRulesAsync`
+- `Input` field in RuleResultTree has been changed to `Inputs` which returns all the the inputs as Dictionary of name and value pair
 
 ## [2.1.5] - 02-11-2020
 - Added `Properties` field to Rule to allow custom fields to Rule
