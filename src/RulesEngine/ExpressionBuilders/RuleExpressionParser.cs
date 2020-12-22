@@ -1,11 +1,14 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿// Copyright (c) Microsoft Corporation.
+//  Licensed under the MIT License.
+
+using FastExpressionCompiler;
+using Microsoft.Extensions.Caching.Memory;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using FastExpressionCompiler;
 
 namespace RulesEngine.ExpressionBuilders
 {
@@ -17,34 +20,35 @@ namespace RulesEngine.ExpressionBuilders
         public RuleExpressionParser(ReSettings reSettings)
         {
             _reSettings = reSettings;
-            _memoryCache = new MemoryCache(new MemoryCacheOptions{
+            _memoryCache = new MemoryCache(new MemoryCacheOptions {
                 SizeLimit = 1000
             });
         }
 
-        public Func<object[],T> Compile<T>(string expression, RuleParameter[] ruleParams)
+        public Func<object[], T> Compile<T>(string expression, RuleParameter[] ruleParams)
         {
-            var cacheKey = GetCacheKey(expression,ruleParams,typeof(T));
-            return _memoryCache.GetOrCreate(cacheKey,(entry) => {
+            var cacheKey = GetCacheKey(expression, ruleParams, typeof(T));
+            return _memoryCache.GetOrCreate(cacheKey, (entry) => {
                 entry.SetSize(1);
                 var config = new ParsingConfig { CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes) };
                 var typeParamExpressions = GetParameterExpression(ruleParams).ToArray();
                 var e = DynamicExpressionParser.ParseLambda(config, true, typeParamExpressions.ToArray(), typeof(T), expression);
-                var wrappedExpression = WrapExpression<T>(e,typeParamExpressions);
-                return wrappedExpression.CompileFast<Func<object[],T>>();
+                var wrappedExpression = WrapExpression<T>(e, typeParamExpressions);
+                return wrappedExpression.CompileFast<Func<object[], T>>();
             });
-            
+
         }
 
-        private Expression<Func<object[],T>> WrapExpression<T>(LambdaExpression expression, ParameterExpression[] parameters){
-            var argExp = Expression.Parameter(typeof(object[]),"args");
-            IEnumerable<Expression> paramExps = parameters.Select((c, i) => {
+        private Expression<Func<object[], T>> WrapExpression<T>(LambdaExpression expression, ParameterExpression[] parameters)
+        {
+            var argExp = Expression.Parameter(typeof(object[]), "args");
+            var paramExps = parameters.Select((c, i) => {
                 var arg = Expression.ArrayAccess(argExp, Expression.Constant(i));
                 return (Expression)Expression.Assign(c, Expression.Convert(arg, c.Type));
             });
             var blockExpSteps = paramExps.Concat(new List<Expression> { expression.Body });
             var blockExp = Expression.Block(parameters, blockExpSteps);
-            return Expression.Lambda<Func<object[],T>>(blockExp, argExp);
+            return Expression.Lambda<Func<object[], T>>(blockExp, argExp);
         }
 
 
@@ -77,9 +81,10 @@ namespace RulesEngine.ExpressionBuilders
             }
         }
 
-        private string GetCacheKey(string expression, RuleParameter[] ruleParameters,Type returnType){
-            var paramKey = string.Join("|",ruleParameters.Select(c => c.Type.ToString()));
-            var returnTypeKey = returnType?.ToString() ?? "null"; 
+        private string GetCacheKey(string expression, RuleParameter[] ruleParameters, Type returnType)
+        {
+            var paramKey = string.Join("|", ruleParameters.Select(c => c.Type.ToString()));
+            var returnTypeKey = returnType?.ToString() ?? "null";
             var combined = $"Expression:{expression}-Params:{paramKey}-ReturnType:{returnTypeKey}";
             return combined;
         }

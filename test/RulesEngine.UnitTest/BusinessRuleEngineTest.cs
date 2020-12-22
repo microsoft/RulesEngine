@@ -2,20 +2,20 @@
 // Licensed under the MIT License.
 
 using Microsoft.Extensions.Logging;
-using RulesEngine.Exceptions;
-using RulesEngine.Models;
 using Moq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using RulesEngine.Exceptions;
+using RulesEngine.HelperFunctions;
+using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
-using Xunit;
-using Newtonsoft.Json.Converters;
-using RulesEngine.HelperFunctions;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace RulesEngine.UnitTest
 {
@@ -41,7 +41,7 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            var result = await re.ExecuteAllRulesAsync("inputWorkflowReference",input1, input2, input3);
+            var result = await re.ExecuteAllRulesAsync("inputWorkflowReference", input1, input2, input3);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
         }
@@ -59,7 +59,7 @@ namespace RulesEngine.UnitTest
             List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
-            Assert.Contains(result,c => c.IsSuccess);
+            Assert.Contains(result, c => c.IsSuccess);
         }
 
         [Theory]
@@ -79,7 +79,7 @@ namespace RulesEngine.UnitTest
             dynamic input7 = GetInput1();
             dynamic input8 = GetInput2();
             dynamic input9 = GetInput3();
-            
+
             dynamic input10 = GetInput1();
             dynamic input11 = GetInput2();
             dynamic input12 = GetInput3();
@@ -93,7 +93,7 @@ namespace RulesEngine.UnitTest
             dynamic input17 = GetInput2();
             dynamic input18 = GetInput3();
 
-            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3,input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18);
+            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
             Assert.Contains(result, c => c.IsSuccess);
@@ -123,8 +123,8 @@ namespace RulesEngine.UnitTest
             var expected = result1.Select(c => new { c.Rule.RuleName, c.IsSuccess });
             var actual = result2.Select(c => new { c.Rule.RuleName, c.IsSuccess });
             Assert.Equal(expected, actual);
-            
-                
+
+
         }
 
         [Theory]
@@ -140,7 +140,7 @@ namespace RulesEngine.UnitTest
             List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", input1);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
-            Assert.DoesNotContain(result,c => c.IsSuccess);
+            Assert.DoesNotContain(result, c => c.IsSuccess);
         }
 
         [Theory]
@@ -168,7 +168,7 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow",input1, input2, input3);
+            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
             Assert.NotNull(result);
             Assert.NotNull(result.First().GetMessages());
             Assert.NotNull(result.First().GetMessages().WarningMessages);
@@ -177,14 +177,12 @@ namespace RulesEngine.UnitTest
         [Fact]
         public void RulesEngine_New_IncorrectJSON_ThrowsException()
         {
-            Assert.Throws<RuleValidationException>(() =>
-            {
+            Assert.Throws<RuleValidationException>(() => {
                 var workflow = new WorkflowRules();
                 var re = CreateRulesEngine(workflow);
             });
 
-            Assert.Throws<RuleValidationException>(() =>
-            {
+            Assert.Throws<RuleValidationException>(() => {
                 var workflow = new WorkflowRules() { WorkflowName = "test" };
                 var re = CreateRulesEngine(workflow);
             });
@@ -198,7 +196,7 @@ namespace RulesEngine.UnitTest
             var re = GetRulesEngine(ruleFileName);
             dynamic input = GetInput1();
 
-            await Assert.ThrowsAsync<ArgumentException>(async() => { await re.ExecuteAllRulesAsync("inputWorkflow1",  input); });
+            await Assert.ThrowsAsync<ArgumentException>(async () => { await re.ExecuteAllRulesAsync("inputWorkflow1", input); });
         }
 
         [Theory]
@@ -214,7 +212,7 @@ namespace RulesEngine.UnitTest
             Assert.NotNull(result);
             re.RemoveWorkflow("inputWorkflow");
 
-            await Assert.ThrowsAsync<ArgumentException>(async() => await re.ExecuteAllRulesAsync("inputWorkflow",input1, input2, input3 ));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3));
         }
 
 
@@ -229,8 +227,8 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            await Assert.ThrowsAsync<ArgumentException>(async() => await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3));
-            await Assert.ThrowsAsync<ArgumentException>(async() => await re.ExecuteAllRulesAsync("inputWorkflowReference", input1, input2, input3));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await re.ExecuteAllRulesAsync("inputWorkflowReference", input1, input2, input3));
         }
 
 
@@ -248,14 +246,14 @@ namespace RulesEngine.UnitTest
             List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
-            Assert.Contains(result,c => c.IsSuccess);
+            Assert.Contains(result, c => c.IsSuccess);
 
             input3.hello = "world";
 
             result = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
-            Assert.Contains(result,c => c.IsSuccess);
+            Assert.Contains(result, c => c.IsSuccess);
         }
 
 
@@ -263,11 +261,11 @@ namespace RulesEngine.UnitTest
         [InlineData("rules4.json")]
         public async Task RulesEngine_Execute_Rule_For_Nested_Rule_Params_Returns_Success(string ruleFileName)
         {
-            dynamic[] inputs = GetInputs4();
+            var inputs = GetInputs4();
 
             var ruleParams = new List<RuleParameter>();
 
-            for (int i = 0; i < inputs.Length; i++)
+            for (var i = 0; i < inputs.Length; i++)
             {
                 var input = inputs[i];
                 var obj = Utils.GetTypedObject(input);
@@ -276,7 +274,9 @@ namespace RulesEngine.UnitTest
 
             var files = Directory.GetFiles(Directory.GetCurrentDirectory(), ruleFileName, SearchOption.AllDirectories);
             if (files == null || files.Length == 0)
+            {
                 throw new Exception("Rules not found.");
+            }
 
             var fileData = File.ReadAllText(files[0]);
             var bre = new RulesEngine(JsonConvert.DeserializeObject<WorkflowRules[]>(fileData), null);
@@ -291,36 +291,40 @@ namespace RulesEngine.UnitTest
         {
             var re = GetRulesEngine(ruleFileName);
 
-            var input1 = new RuleParameter("customName",GetInput1());
-            var input2 = new RuleParameter("input2",GetInput2());
-            var input3 = new RuleParameter("input3",GetInput3());
+            var input1 = new RuleParameter("customName", GetInput1());
+            var input2 = new RuleParameter("input2", GetInput2());
+            var input3 = new RuleParameter("input3", GetInput3());
 
-            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", input1,input2, input3);
+            var result = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
             Assert.Contains(result.First().ChildResults, c => c.ExceptionMessage.Contains("Unknown identifier 'input1'"));
         }
 
         [Theory]
-        [InlineData("rules5.json","hello",true)]
-        [InlineData("rules5.json",null,false)]
-        public async Task ExecuteRule_WithInjectedUtils_ReturnsListOfRuleResultTree(string ruleFileName,string propValue,bool expectedResult)
+        [InlineData("rules5.json", "hello", true)]
+        [InlineData("rules5.json", null, false)]
+        public async Task ExecuteRule_WithInjectedUtils_ReturnsListOfRuleResultTree(string ruleFileName, string propValue, bool expectedResult)
         {
             var re = GetRulesEngine(ruleFileName);
 
             dynamic input1 = new ExpandoObject();
-            if(propValue != null)
-            input1.Property1 = propValue;
+            if (propValue != null)
+            {
+                input1.Property1 = propValue;
+            }
 
-            if(propValue == null)
-            input1.Property1 = null;
+            if (propValue == null)
+            {
+                input1.Property1 = null;
+            }
 
             var utils = new TestInstanceUtils();
 
-            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1",input1),new RuleParameter("utils",utils));
+            var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1), new RuleParameter("utils", utils));
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
-            Assert.All(result,c => Assert.Equal(expectedResult,c.IsSuccess));
+            Assert.All(result, c => Assert.Equal(expectedResult, c.IsSuccess));
         }
 
         [Theory]
@@ -338,7 +342,7 @@ namespace RulesEngine.UnitTest
 
             var utils = new TestInstanceUtils();
 
-            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
+            var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
             Assert.All(result, c => Assert.True(c.IsSuccess));
@@ -355,7 +359,7 @@ namespace RulesEngine.UnitTest
 
             var utils = new TestInstanceUtils();
 
-            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
+            var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
             Assert.All(result, c => Assert.True(c.IsSuccess));
@@ -372,7 +376,7 @@ namespace RulesEngine.UnitTest
 
             var utils = new TestInstanceUtils();
 
-            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
+            var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
             Assert.All(result, c => Assert.False(c.IsSuccess));
@@ -390,9 +394,8 @@ namespace RulesEngine.UnitTest
 
             var utils = new TestInstanceUtils();
 
-            await Assert.ThrowsAsync<System.Linq.Dynamic.Core.Exceptions.ParseException>(async()=>
-            {
-                List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
+            await Assert.ThrowsAsync<System.Linq.Dynamic.Core.Exceptions.ParseException>(async () => {
+                var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
             });
         }
 
@@ -408,7 +411,7 @@ namespace RulesEngine.UnitTest
 
             var utils = new TestInstanceUtils();
 
-            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
+            var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
             Assert.All(result, c => Assert.False(c.IsSuccess));
@@ -424,8 +427,7 @@ namespace RulesEngine.UnitTest
             var filePath = Path.Combine(Directory.GetCurrentDirectory() as string, "TestData", filename);
             var data = File.ReadAllText(filePath);
 
-            var injectWorkflow = new WorkflowRules
-            {
+            var injectWorkflow = new WorkflowRules {
                 WorkflowName = "inputWorkflowReference",
                 WorkflowRulesToInject = new List<string> { "inputWorkflow" }
             };
@@ -490,10 +492,15 @@ namespace RulesEngine.UnitTest
         }
 
         [ExcludeFromCodeCoverage]
-        private class TestInstanceUtils{
-            public bool CheckExists(string str){
-                if(str != null && str.Length > 0)
+        private class TestInstanceUtils
+        {
+            public bool CheckExists(string str)
+            {
+                if (str != null && str.Length > 0)
+                {
                     return true;
+                }
+
                 return false;
             }
 

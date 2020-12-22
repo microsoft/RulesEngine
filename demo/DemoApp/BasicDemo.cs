@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿// Copyright (c) Microsoft Corporation.
+//  Licensed under the MIT License.
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using RulesEngine.Models;
 using System;
@@ -44,13 +47,11 @@ namespace DemoApp
 
             List<RuleResultTree> resultList = bre.ExecuteAllRulesAsync("Discount", inputs).Result;
 
-            resultList.OnSuccess((eventName) =>
-            {
+            resultList.OnSuccess((eventName) => {
                 discountOffered = $"Discount offered is {eventName} % over MRP.";
             });
 
-            resultList.OnFail(() =>
-            {
+            resultList.OnFail(() => {
                 discountOffered = "The user is not eligible for any discount.";
             });
 

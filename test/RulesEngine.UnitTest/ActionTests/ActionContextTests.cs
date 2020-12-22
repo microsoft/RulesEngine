@@ -1,5 +1,7 @@
+// Copyright (c) Microsoft Corporation.
+//  Licensed under the MIT License.
+
 using AutoFixture;
-using Moq;
 using RulesEngine.Actions;
 using RulesEngine.Models;
 using System;

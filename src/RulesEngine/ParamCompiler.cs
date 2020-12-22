@@ -1,9 +1,11 @@
-﻿using RulesEngine.Models;
+﻿// Copyright (c) Microsoft Corporation.
+//  Licensed under the MIT License.
+
+using RulesEngine.ExpressionBuilders;
+using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RulesEngine.ExpressionBuilders;
-using RulesEngine.HelperFunctions;
 
 namespace RulesEngine
 {
@@ -32,8 +34,8 @@ namespace RulesEngine
         /// </returns>
         public IEnumerable<CompiledParam> CompileParamsExpression(Rule rule, IEnumerable<RuleParameter> ruleParams)
         {
-           
-            if(rule.LocalParams == null)    return null;
+
+            if (rule.LocalParams == null) return null;
 
             var compiledParameters = new List<CompiledParam>();
             var evaluatedParameters = new List<RuleParameter>();
@@ -54,7 +56,7 @@ namespace RulesEngine
         /// <param name="compiledParam">The compiled parameter.</param>
         /// <param name="ruleParams">The rule parameters.</param>
         /// <returns>RuleParameter.</returns>
-        public RuleParameter EvaluateCompiledParam(string paramName, Func<object[],object> compiledParam, IEnumerable<RuleParameter> inputs)
+        public RuleParameter EvaluateCompiledParam(string paramName, Func<object[], object> compiledParam, IEnumerable<RuleParameter> inputs)
         {
             var result = compiledParam(inputs.Select(c => c.Value).ToArray());
             return new RuleParameter(paramName, result);
@@ -68,7 +70,7 @@ namespace RulesEngine
         /// <param name="typeParameterExpressions">The type parameter expressions.</param>
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns></returns>
-        private Func<object[],object> GetDelegateForRuleParam(LocalParam param, RuleParameter[] ruleParameters)
+        private Func<object[], object> GetDelegateForRuleParam(LocalParam param, RuleParameter[] ruleParameters)
         {
             return _ruleExpressionParser.Compile<object>(param.Expression, ruleParameters);
         }

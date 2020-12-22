@@ -13,7 +13,7 @@ namespace RulesEngine
     internal class RulesCache
     {
         /// <summary>The compile rules</summary>
-        private ConcurrentDictionary<string, IDictionary<string,RuleFunc<RuleResultTree>>> _compileRules = new ConcurrentDictionary<string, IDictionary<string,RuleFunc<RuleResultTree>>>();
+        private ConcurrentDictionary<string, IDictionary<string, RuleFunc<RuleResultTree>>> _compileRules = new ConcurrentDictionary<string, IDictionary<string, RuleFunc<RuleResultTree>>>();
 
         /// <summary>The workflow rules</summary>
         private ConcurrentDictionary<string, WorkflowRules> _workflowRules = new ConcurrentDictionary<string, WorkflowRules>();
@@ -47,7 +47,7 @@ namespace RulesEngine
         /// <summary>Adds the or update compiled rule.</summary>
         /// <param name="compiledRuleKey">The compiled rule key.</param>
         /// <param name="compiledRule">The compiled rule.</param>
-        public void AddOrUpdateCompiledRule(string compiledRuleKey, IDictionary<string,RuleFunc<RuleResultTree>> compiledRule)
+        public void AddOrUpdateCompiledRule(string compiledRuleKey, IDictionary<string, RuleFunc<RuleResultTree>> compiledRule)
         {
             _compileRules.AddOrUpdate(compiledRuleKey, compiledRule, (k, v) => compiledRule);
         }
@@ -100,7 +100,7 @@ namespace RulesEngine
                 return workflowRules;
             }
         }
-       
+
 
         /// <summary>Gets the compiled rules.</summary>
         /// <param name="compiledRulesKey">The compiled rules key.</param>
@@ -119,7 +119,7 @@ namespace RulesEngine
                 var compiledKeysToRemove = _compileRules.Keys.Where(key => key.StartsWith(workflowName));
                 foreach (var key in compiledKeysToRemove)
                 {
-                    _compileRules.TryRemove(key, out IDictionary<string,RuleFunc<RuleResultTree>> val);
+                    _compileRules.TryRemove(key, out IDictionary<string, RuleFunc<RuleResultTree>> val);
                 }
             }
         }

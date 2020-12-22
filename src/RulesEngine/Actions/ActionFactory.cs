@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Corporation.
+//  Licensed under the MIT License.
+
+using System;
 using System.Collections.Generic;
 
 namespace RulesEngine.Actions
@@ -12,9 +15,10 @@ namespace RulesEngine.Actions
             _actionRegistry = new Dictionary<string, Func<ActionBase>>(StringComparer.OrdinalIgnoreCase);
 
         }
-        internal ActionFactory(IDictionary<string,Func<ActionBase>> actionRegistry): this()
+        internal ActionFactory(IDictionary<string, Func<ActionBase>> actionRegistry) : this()
         {
-            foreach(var kv in actionRegistry){
+            foreach (var kv in actionRegistry)
+            {
                 _actionRegistry.Add(kv.Key, kv.Value);
             }
         }

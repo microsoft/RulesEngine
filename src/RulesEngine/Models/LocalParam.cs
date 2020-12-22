@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿// Copyright (c) Microsoft Corporation.
+//  Licensed under the MIT License.
+
+using Newtonsoft.Json;
 using System.Diagnostics.CodeAnalysis;
 
 namespace RulesEngine.Models

@@ -14,7 +14,7 @@ namespace RulesEngine.HelperFunctions
     {
         public static object GetTypedObject(dynamic input)
         {
-            if(input is ExpandoObject)
+            if (input is ExpandoObject)
             {
                 Type type = CreateAbstractClassType(input);
                 return CreateObject(type, input);
@@ -28,11 +28,11 @@ namespace RulesEngine.HelperFunctions
         {
             List<DynamicProperty> props = new List<DynamicProperty>();
 
-            if(input == null)
+            if (input == null)
             {
                 return typeof(object);
             }
-            if(!(input is ExpandoObject))
+            if (!(input is ExpandoObject))
             {
                 return input.GetType();
             }
@@ -51,7 +51,7 @@ namespace RulesEngine.HelperFunctions
                             var internalType = CreateAbstractClassType(((IList)expando.Value)[0]);
                             value = new List<object>().Cast(internalType).ToList(internalType).GetType();
                         }
-                       
+
                     }
                     else
                     {
@@ -86,7 +86,7 @@ namespace RulesEngine.HelperFunctions
                     }
                     else if (expando.Value is IList)
                     {
-                        var internalType = type.GetProperty(expando.Key).PropertyType.GenericTypeArguments.FirstOrDefault()??typeof(object);
+                        var internalType = type.GetProperty(expando.Key).PropertyType.GenericTypeArguments.FirstOrDefault() ?? typeof(object);
                         var temp = (IList)expando.Value;
                         var newList = new List<object>();
                         for (int i = 0; i < temp.Count; i++)
@@ -123,5 +123,5 @@ namespace RulesEngine.HelperFunctions
         }
     }
 
-   
+
 }

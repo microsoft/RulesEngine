@@ -1,6 +1,11 @@
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
+
+## [3.0.1]
+- Moved ActionResult and ActionRuleResult under RulesEngine.Models namespace
+
+
 ## [3.0.0]
 ### Major Enhancements
 - Added support for Actions. More details on [actions wiki](https://github.com/microsoft/RulesEngine/wiki/Actions)

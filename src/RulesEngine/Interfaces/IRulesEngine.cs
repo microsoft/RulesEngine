@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace RulesEngine.Interfaces
 {
     public interface IRulesEngine
-    { 
+    {
         /// <summary>
         /// This will execute all the rules of the specified workflow
         /// </summary>

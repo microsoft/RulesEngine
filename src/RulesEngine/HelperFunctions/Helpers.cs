@@ -5,7 +5,6 @@ using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace RulesEngine.HelperFunctions
 {
@@ -14,12 +13,11 @@ namespace RulesEngine.HelperFunctions
     /// </summary>
     internal static class Helpers
     {
-        internal static RuleFunc<RuleResultTree> ToResultTree(Rule rule, IEnumerable<RuleResultTree> childRuleResults, Func<object[],bool> isSuccessFunc, string exceptionMessage = "")
+        internal static RuleFunc<RuleResultTree> ToResultTree(Rule rule, IEnumerable<RuleResultTree> childRuleResults, Func<object[], bool> isSuccessFunc, string exceptionMessage = "")
         {
-            return (inputs) => new RuleResultTree
-            {
+            return (inputs) => new RuleResultTree {
                 Rule = rule,
-                Inputs = inputs.ToDictionary(c => c.Name,c => c.Value),
+                Inputs = inputs.ToDictionary(c => c.Name, c => c.Value),
                 IsSuccess = isSuccessFunc(inputs.Select(c => c.Value).ToArray()),
                 ChildResults = childRuleResults,
                 ExceptionMessage = exceptionMessage

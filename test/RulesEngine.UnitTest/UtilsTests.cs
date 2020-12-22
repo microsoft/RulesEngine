@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
-using System.Text;
 using Xunit;
 
 namespace RulesEngine.UnitTest
@@ -14,11 +13,11 @@ namespace RulesEngine.UnitTest
     [ExcludeFromCodeCoverage]
     public class TestClass
     {
-        public string test { get; set; }
-        public List<int> testList { get; set; }
+        public string Test { get; set; }
+        public List<int> TestList { get; set; }
     }
 
-    [Trait("Category","Unit")]
+    [Trait("Category", "Unit")]
     [ExcludeFromCodeCoverage]
     public class UtilsTests
     {
@@ -47,7 +46,7 @@ namespace RulesEngine.UnitTest
             object typedobj2 = Utils.GetTypedObject(obj2);
             Assert.IsNotType<ExpandoObject>(typedobj);
             Assert.NotNull(typedobj.GetType().GetProperty("test"));
-            Assert.Equal(typedobj.GetType(),typedobj2.GetType());
+            Assert.Equal(typedobj.GetType(), typedobj2.GetType());
         }
 
 
@@ -57,12 +56,12 @@ namespace RulesEngine.UnitTest
             var obj = new {
                 test = "hello"
             };
-            object typedobj = Utils.GetTypedObject(obj);
+            var typedobj = Utils.GetTypedObject(obj);
             Assert.IsNotType<ExpandoObject>(typedobj);
             Assert.NotNull(typedobj.GetType().GetProperty("test"));
         }
 
-       [Fact]
+        [Fact]
         public void CreateObject_dynamicObject()
         {
             dynamic obj = new ExpandoObject();
@@ -83,7 +82,7 @@ namespace RulesEngine.UnitTest
             obj.testList = new List<int> { 1, 2, 3 };
             obj.testEmptyList = new List<object>();
 
-            Type type = Utils.CreateAbstractClassType( obj);
+            Type type = Utils.CreateAbstractClassType(obj);
             Assert.NotEqual(typeof(ExpandoObject), type);
             Assert.NotNull(type.GetProperty("test"));
 

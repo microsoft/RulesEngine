@@ -40,9 +40,9 @@ namespace RulesEngine.Models
         /// <summary>
         /// Gets or sets the input object
         /// </summary>
-        public Dictionary<string,object> Inputs { get; set; }
+        public Dictionary<string, object> Inputs { get; set; }
 
-        public ActionResult ActionResult {get; set;}
+        public ActionResult ActionResult { get; set; }
 
         /// <summary>
         /// Gets the exception message in case an error is thrown during rules calculation.

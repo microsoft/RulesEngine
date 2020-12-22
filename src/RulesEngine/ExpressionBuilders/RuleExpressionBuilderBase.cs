@@ -2,9 +2,6 @@
 // Licensed under the MIT License.
 
 using RulesEngine.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace RulesEngine.ExpressionBuilders
 {

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine;
 using RulesEngine.ExpressionBuilders;
 using RulesEngine.Models;
 using System;
@@ -20,7 +19,7 @@ namespace RulesEngine.UnitTest
         {
             var reSettings = new ReSettings();
             var parser = new RuleExpressionParser(reSettings);
-            var objBuilderFactory = new RuleExpressionBuilderFactory(reSettings,parser);
+            var objBuilderFactory = new RuleExpressionBuilderFactory(reSettings, parser);
             var builder = objBuilderFactory.RuleGetExpressionBuilder(expressionType);
 
             var builderType = builder.GetType();
