@@ -1,23 +1,28 @@
+// Copyright (c) Microsoft Corporation.
+//  Licensed under the MIT License.
+
+using RulesEngine.Enums;
+using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading.Tasks;
-using RulesEngine.Enums;
-using RulesEngine.Models;
 using Xunit;
 
-namespace RulesEngine.UnitTest{
+namespace RulesEngine.UnitTest
+{
 
     [ExcludeFromCodeCoverage]
-    public class RulesEngineWithActionsTests{
+    public class RulesEngineWithActionsTests
+    {
 
         [Fact]
-        public async Task WhenExpressionIsSuccess_OutputExpressionAction_ReturnsExpressionEvaluation(){
+        public async Task WhenExpressionIsSuccess_OutputExpressionAction_ReturnsExpressionEvaluation()
+        {
             var engine = new RulesEngine(GetWorkflowWithActions());
             var result = await engine.ExecuteActionWorkflowAsync("ActionWorkflow", "ExpressionOutputRuleTest", new RuleParameter[0]);
             Assert.NotNull(result);
-            Assert.Equal(2*2,result.Output);
+            Assert.Equal(2 * 2, result.Output);
         }
 
         [Fact]
@@ -50,8 +55,9 @@ namespace RulesEngine.UnitTest{
         }
 
 
-        private WorkflowRules[] GetWorkflowRulesWithoutActions(){
-             var workflow1 = new WorkflowRules{
+        private WorkflowRules[] GetWorkflowRulesWithoutActions()
+        {
+            var workflow1 = new WorkflowRules {
                 WorkflowName = "NoActionWorkflow",
                 Rules = new List<Rule>{
                     new Rule{
@@ -62,12 +68,13 @@ namespace RulesEngine.UnitTest{
 
                 }
             };
-            return new []{workflow1};
+            return new[] { workflow1 };
         }
 
-        private WorkflowRules[] GetWorkflowWithActions(){
-            
-            var workflow1 = new WorkflowRules{
+        private WorkflowRules[] GetWorkflowWithActions()
+        {
+
+            var workflow1 = new WorkflowRules {
                 WorkflowName = "ActionWorkflow",
                 Rules = new List<Rule>{
                     new Rule{
@@ -100,7 +107,7 @@ namespace RulesEngine.UnitTest{
 
                 }
             };
-            return new []{workflow1};
+            return new[] { workflow1 };
         }
     }
 }

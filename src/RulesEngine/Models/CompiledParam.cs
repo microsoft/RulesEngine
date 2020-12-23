@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// Copyright (c) Microsoft Corporation.
+//  Licensed under the MIT License.
+
+using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
 namespace RulesEngine.Models
 {
@@ -13,10 +14,10 @@ namespace RulesEngine.Models
     {
         internal string Name { get; set; }
         internal Type ReturnType { get; set; }
-        internal Func<object[],object> Value { get; set; }
+        internal Func<object[], object> Value { get; set; }
         internal RuleParameter AsRuleParameter()
         {
-            return new RuleParameter(Name,ReturnType);
+            return new RuleParameter(Name, ReturnType);
         }
     }
 }

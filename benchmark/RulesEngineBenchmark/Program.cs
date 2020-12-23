@@ -1,4 +1,7 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿// Copyright (c) Microsoft Corporation.
+//  Licensed under the MIT License.
+
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using Newtonsoft.Json;
 using RulesEngine.Models;
@@ -14,7 +17,8 @@ namespace RulesEngineBenchmark
         private readonly RulesEngine.RulesEngine rulesEngine;
         private readonly object ruleInput;
         private readonly List<WorkflowRules> workflows;
-        class ListItem
+
+        private class ListItem
         {
             public int Id { get; set; }
             public string Value { get; set; }
@@ -25,21 +29,21 @@ namespace RulesEngineBenchmark
         {
             var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "NestedInputDemo.json", SearchOption.AllDirectories);
             if (files == null || files.Length == 0)
+            {
                 throw new Exception("Rules not found.");
+            }
 
             var fileData = File.ReadAllText(files[0]);
             workflows = JsonConvert.DeserializeObject<List<WorkflowRules>>(fileData);
-            
-            rulesEngine = new RulesEngine.RulesEngine(workflows.ToArray(), null,new ReSettings { 
+
+            rulesEngine = new RulesEngine.RulesEngine(workflows.ToArray(), null, new ReSettings {
                 EnableFormattedErrorMessage = false,
                 EnableLocalParams = false
             });
 
-            ruleInput =  new
-            {
+            ruleInput = new {
                 SimpleProp = "simpleProp",
-                NestedProp = new
-                {
+                NestedProp = new {
                     SimpleProp = "nestedSimpleProp",
                     ListProp = new List<ListItem>
                     {
@@ -67,15 +71,15 @@ namespace RulesEngineBenchmark
         {
             foreach (var workflow in workflows)
             {
-                List<RuleResultTree> resultList = rulesEngine.ExecuteAllRulesAsync(workflow.WorkflowName, ruleInput).Result;
+                _ = rulesEngine.ExecuteAllRulesAsync(workflow.WorkflowName, ruleInput).Result;
             }
         }
     }
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<REBenchmark>();
+            _ = BenchmarkRunner.Run<REBenchmark>();
         }
     }
 }

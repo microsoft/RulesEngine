@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿// Copyright (c) Microsoft Corporation.
+//  Licensed under the MIT License.
+
+using Newtonsoft.Json;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -22,7 +25,8 @@ namespace RulesEngine.Actions
             _parentResult = parentResult;
         }
 
-        public RuleResultTree GetParentRuleResult(){
+        public RuleResultTree GetParentRuleResult()
+        {
             return _parentResult;
         }
         public T GetContext<T>(string name)

@@ -10,7 +10,7 @@ using Xunit;
 
 namespace RulesEngine.UnitTest
 {
-    [Trait("Category","Unit")]
+    [Trait("Category", "Unit")]
     [ExcludeFromCodeCoverage]
     public class RuleCompilerTest
     {
@@ -20,7 +20,7 @@ namespace RulesEngine.UnitTest
             Assert.Throws<ArgumentNullException>(() => new RuleCompiler(null, null));
             var reSettings = new ReSettings();
             var parser = new RuleExpressionParser(reSettings);
-            Assert.Throws<ArgumentNullException>(() => new RuleCompiler(new RuleExpressionBuilderFactory(reSettings,parser), null));
+            Assert.Throws<ArgumentNullException>(() => new RuleCompiler(new RuleExpressionBuilderFactory(reSettings, parser), null));
         }
 
         [Fact]
@@ -28,9 +28,9 @@ namespace RulesEngine.UnitTest
         {
             var reSettings = new ReSettings();
             var parser = new RuleExpressionParser(reSettings);
-            var compiler = new RuleCompiler(new RuleExpressionBuilderFactory(reSettings,parser), new NullLogger<RuleCompiler>());
+            var compiler = new RuleCompiler(new RuleExpressionBuilderFactory(reSettings, parser), new NullLogger<RuleCompiler>());
             Assert.Throws<ArgumentNullException>(() => compiler.CompileRule(null, null));
-            Assert.Throws<ArgumentNullException>(() => compiler.CompileRule(null, new RuleParameter[] { null}));
+            Assert.Throws<ArgumentNullException>(() => compiler.CompileRule(null, new RuleParameter[] { null }));
         }
 
 

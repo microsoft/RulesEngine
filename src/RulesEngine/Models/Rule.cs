@@ -6,7 +6,6 @@ using Newtonsoft.Json.Converters;
 using RulesEngine.Enums;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace RulesEngine.Models
 {

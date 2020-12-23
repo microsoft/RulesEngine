@@ -38,18 +38,8 @@ namespace RulesEngine
         /// <exception cref="ArgumentNullException">expressionBuilderFactory</exception>
         internal RuleCompiler(RuleExpressionBuilderFactory expressionBuilderFactory, ILogger logger)
         {
-            if (expressionBuilderFactory == null)
-            {
-                throw new ArgumentNullException($"{nameof(expressionBuilderFactory)} can't be null.");
-            }
-
-            if (logger == null)
-            {
-                throw new ArgumentNullException($"{nameof(logger)} can't be null.");
-            }
-
-            _logger = logger;
-            _expressionBuilderFactory = expressionBuilderFactory;
+            _logger = logger ?? throw new ArgumentNullException($"{nameof(logger)} can't be null.");
+            _expressionBuilderFactory = expressionBuilderFactory ?? throw new ArgumentNullException($"{nameof(expressionBuilderFactory)} can't be null.");
         }
 
         /// <summary>
@@ -60,15 +50,15 @@ namespace RulesEngine
         /// <param name="input"></param>
         /// <param name="ruleParam"></param>
         /// <returns>Compiled func delegate</returns>
-        internal RuleFunc<RuleResultTree> CompileRule(Rule rule,params RuleParameter[] ruleParams)
+        internal RuleFunc<RuleResultTree> CompileRule(Rule rule, params RuleParameter[] ruleParams)
         {
             try
             {
-                if(rule == null)
+                if (rule == null)
                 {
                     throw new ArgumentNullException(nameof(rule));
                 }
-                RuleFunc<RuleResultTree> ruleExpression = GetDelegateForRule(rule,ruleParams);
+                var ruleExpression = GetDelegateForRule(rule, ruleParams);
                 return ruleExpression;
             }
             catch (Exception ex)
@@ -78,7 +68,7 @@ namespace RulesEngine
             }
         }
 
-       
+
 
         /// <summary>
         /// Gets the expression for rule.
@@ -89,9 +79,7 @@ namespace RulesEngine
         /// <returns></returns>
         private RuleFunc<RuleResultTree> GetDelegateForRule(Rule rule, RuleParameter[] ruleParams)
         {
-            ExpressionType nestedOperator;
-
-            if (Enum.TryParse(rule.Operator, out nestedOperator) && nestedOperators.Contains(nestedOperator) &&
+            if (Enum.TryParse(rule.Operator, out ExpressionType nestedOperator) && nestedOperators.Contains(nestedOperator) &&
                 rule.Rules != null && rule.Rules.Any())
             {
                 return BuildNestedRuleFunc(rule, nestedOperator, ruleParams);
@@ -142,13 +130,12 @@ namespace RulesEngine
                 ruleFuncList.Add(GetDelegateForRule(r, ruleParams));
             }
 
-            return (paramArray) =>
-                    {
-                        var resultList = ruleFuncList.Select(fn => fn(paramArray));
-                        Func<object[],bool> isSuccess = (p) => ApplyOperation(resultList, operation);
-                        RuleFunc<RuleResultTree> result =  Helpers.ToResultTree(parentRule, resultList,isSuccess);
-                        return result(paramArray);
-                    };
+            return (paramArray) => {
+                var resultList = ruleFuncList.Select(fn => fn(paramArray));
+                Func<object[], bool> isSuccess = (p) => ApplyOperation(resultList, operation);
+                var result = Helpers.ToResultTree(parentRule, resultList, isSuccess);
+                return result(paramArray);
+            };
         }
 
 

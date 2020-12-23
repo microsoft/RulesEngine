@@ -1,11 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine;
 using Moq;
 using System;
-using Xunit;
 using System.Diagnostics.CodeAnalysis;
+using Xunit;
 
 namespace RulesEngine.UnitTest
 {
@@ -13,15 +12,15 @@ namespace RulesEngine.UnitTest
     [ExcludeFromCodeCoverage]
     public class CustomTypeProviderTests : IDisposable
     {
-        private MockRepository mockRepository;
+        private readonly MockRepository _mockRepository;
         public CustomTypeProviderTests()
         {
-            this.mockRepository = new MockRepository(MockBehavior.Strict);
+            _mockRepository = new MockRepository(MockBehavior.Strict);
         }
 
         public void Dispose()
         {
-            this.mockRepository.VerifyAll();
+            _mockRepository.VerifyAll();
         }
 
         private CustomTypeProvider CreateProvider()
@@ -33,7 +32,7 @@ namespace RulesEngine.UnitTest
         public void GetCustomTypes_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            var unitUnderTest = this.CreateProvider();
+            var unitUnderTest = CreateProvider();
 
             // Act
             var result = unitUnderTest.GetCustomTypes();
