@@ -38,7 +38,7 @@ var re = new RulesEngine.RulesEngine(workflowRules, null);
 ### Execute the workflow rules with input:
 ```c#
 // Declare input1,input2,input3 
-var resultList  = re.ExecuteRule("Discount", input1,input2,input3);
+var resultList  = await re.ExecuteAllRulesAsync("Discount", input1,input2,input3);
 ```
 This will execute all the rules under `Discount` workflow and return ruleResultTree for all rules
 
@@ -85,6 +85,6 @@ var rp1 = new RuleParameter("basicInfo",input1);
 var rp2 = new RuleParameter("orderInfo", input2);
 var rp3 = new RuleParameter("telemetryInfo",input3);
 
-var resultList  = re.ExecuteRule("DiscountWithCustomInputNames",rp1,rp2,rp3);
+var resultList  = await re.ExecuteAllRulesAsync("DiscountWithCustomInputNames",rp1,rp2,rp3);
 
 ```
