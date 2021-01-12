@@ -17,6 +17,6 @@ namespace RulesEngine.ExpressionBuilders
         /// <param name="typeParamExpressions">The type parameter expressions.</param>
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns>Expression type</returns>
-        internal abstract RuleFunc<RuleResultTree> BuildDelegateForRule(Rule rule, RuleParameter[] ruleParams);
+        internal abstract RuleFunc<RuleResultTree> BuildDelegateForRule(Rule rule, RuleParameter[] ruleParams, RuleExpressionParameter[] ruleExpParams);
     }
 }

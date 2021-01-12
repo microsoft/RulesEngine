@@ -32,8 +32,6 @@ namespace RulesEngine
         private readonly ILogger _logger;
         private readonly ReSettings _reSettings;
         private readonly RulesCache _rulesCache = new RulesCache();
-        private readonly MemoryCache _compiledParamsCache = new MemoryCache(new MemoryCacheOptions());
-        private readonly ParamCompiler _ruleParamCompiler;
         private readonly RuleExpressionParser _ruleExpressionParser;
         private readonly RuleCompiler _ruleCompiler;
         private readonly ActionFactory _actionFactory;
@@ -57,8 +55,7 @@ namespace RulesEngine
             _logger = logger ?? new NullLogger<RulesEngine>();
             _reSettings = reSettings ?? new ReSettings();
             _ruleExpressionParser = new RuleExpressionParser(_reSettings);
-            _ruleParamCompiler = new ParamCompiler(_reSettings, _ruleExpressionParser);
-            _ruleCompiler = new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings, _ruleExpressionParser), _logger);
+            _ruleCompiler = new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings, _ruleExpressionParser),_ruleExpressionParser, _logger);
             _actionFactory = new ActionFactory(GetActionRegistry(_reSettings));
         }
 
@@ -266,31 +263,9 @@ namespace RulesEngine
 
         private RuleFunc<RuleResultTree> CompileRule(string workflowName, RuleParameter[] ruleParams, Rule rule)
         {
-            if (!_reSettings.EnableLocalParams)
-            {
-                return _ruleCompiler.CompileRule(rule, ruleParams);
-            }
-            var compiledParamsKey = GetCompiledParamsCacheKey(workflowName, rule.RuleName, ruleParams);
-            var compiledParamList = _compiledParamsCache.GetOrCreate(compiledParamsKey, (entry) => _ruleParamCompiler.CompileParamsExpression(rule, ruleParams));
-            var compiledRuleParameters = compiledParamList?.Select(c => c.AsRuleParameter()) ?? new List<RuleParameter>();
-            var updatedRuleParams = ruleParams?.Concat(compiledRuleParameters);
-            var compiledRule = _ruleCompiler.CompileRule(rule, updatedRuleParams?.ToArray());
-
-            RuleFunc<RuleResultTree> updatedRule = (RuleParameter[] paramList) => {
-                var inputs = paramList.AsEnumerable();
-                var localParams = compiledParamList ?? new List<CompiledParam>();
-                var evaluatedParamList = new List<RuleParameter>();
-                foreach (var localParam in localParams)
-                {
-                    var evaluatedLocalParam = _ruleParamCompiler.EvaluateCompiledParam(localParam.Name, localParam.Value, inputs);
-                    inputs = inputs.Append(evaluatedLocalParam);
-                    evaluatedParamList.Add(evaluatedLocalParam);
-                }
-                var result = compiledRule(inputs.ToArray());
-                result.RuleEvaluatedParams = evaluatedParamList;
-                return result;
-            };
-            return updatedRule;
+            //ToDo pass global params
+                return _ruleCompiler.CompileRule(rule, ruleParams, new LocalParam[] { });
+            
         }
 
 

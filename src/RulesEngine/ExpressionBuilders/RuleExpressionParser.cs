@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace RulesEngine.ExpressionBuilders
 {
@@ -25,37 +26,54 @@ namespace RulesEngine.ExpressionBuilders
             });
         }
 
-        public Func<object[], T> Compile<T>(string expression, RuleParameter[] ruleParams)
+        public LambdaExpression Parse(string expression, ParameterExpression[] parameters, Type returnType)
         {
+            var config = new ParsingConfig { CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes) };
+
+            return DynamicExpressionParser.ParseLambda(config, false, parameters, returnType, expression);
+        }
+
+        public Func<object[], T> Compile<T>(string expression, RuleParameter[] ruleParams, RuleExpressionParameter[] ruleExpParams)
+        {
+            ruleExpParams = ruleExpParams ?? new RuleExpressionParameter[] { };
             var cacheKey = GetCacheKey(expression, ruleParams, typeof(T));
             return _memoryCache.GetOrCreate(cacheKey, (entry) => {
                 entry.SetSize(1);
-                var config = new ParsingConfig { CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes) };
-                var typeParamExpressions = GetParameterExpression(ruleParams).ToArray();
-                var e = DynamicExpressionParser.ParseLambda(config, true, typeParamExpressions.ToArray(), typeof(T), expression);
-                var wrappedExpression = WrapExpression<T>(e, typeParamExpressions);
-                return wrappedExpression.CompileFast<Func<object[], T>>();
+                var parameterExpressions = GetParameterExpression(ruleParams).ToArray();
+                var extendedParamExpressions = ruleExpParams.Select(c => c.ParameterExpression).ToArray();
+                var e = Parse(expression, parameterExpressions.Concat(extendedParamExpressions).ToArray(), typeof(T));
+                var expressionBody = CreateAssignedParameterExpression(ruleExpParams).ToList();
+                expressionBody.Add(e.Body);
+                var wrappedExpression = WrapExpression<T>(expressionBody, parameterExpressions, extendedParamExpressions);
+                return wrappedExpression.CompileFast();
             });
 
         }
 
-        private Expression<Func<object[], T>> WrapExpression<T>(LambdaExpression expression, ParameterExpression[] parameters)
+        private Expression<Func<object[], T>> WrapExpression<T>(List<Expression> expressionList, ParameterExpression[] parameters, ParameterExpression[] variables)
         {
             var argExp = Expression.Parameter(typeof(object[]), "args");
             var paramExps = parameters.Select((c, i) => {
                 var arg = Expression.ArrayAccess(argExp, Expression.Constant(i));
                 return (Expression)Expression.Assign(c, Expression.Convert(arg, c.Type));
             });
-            var blockExpSteps = paramExps.Concat(new List<Expression> { expression.Body });
-            var blockExp = Expression.Block(parameters, blockExpSteps);
+            var blockExpSteps = paramExps.Concat(expressionList);
+            var blockExp = Expression.Block(parameters.Concat(variables), blockExpSteps);
             return Expression.Lambda<Func<object[], T>>(blockExp, argExp);
         }
 
 
-        public T Evaluate<T>(string expression, RuleParameter[] ruleParams)
+        public T Evaluate<T>(string expression, RuleParameter[] ruleParams, RuleExpressionParameter[] ruleExpParams = null)
         {
-            var func = Compile<T>(expression, ruleParams);
+            var func = Compile<T>(expression, ruleParams, ruleExpParams);
             return func(ruleParams.Select(c => c.Value).ToArray());
+        }
+
+        private IEnumerable<Expression> CreateAssignedParameterExpression(RuleExpressionParameter[] ruleExpParams)
+        {
+            return ruleExpParams.Select((c, i) => {
+                return Expression.Assign(c.ParameterExpression, c.ValueExpression);
+            });
         }
 
         // <summary>
@@ -68,7 +86,7 @@ namespace RulesEngine.ExpressionBuilders
         /// or
         /// type
         /// </exception>
-        private IEnumerable<ParameterExpression> GetParameterExpression(params RuleParameter[] ruleParams)
+        private IEnumerable<ParameterExpression> GetParameterExpression(RuleParameter[] ruleParams)
         {
             foreach (var ruleParam in ruleParams)
             {
@@ -77,7 +95,7 @@ namespace RulesEngine.ExpressionBuilders
                     throw new ArgumentException($"{nameof(ruleParam)} can't be null.");
                 }
 
-                yield return Expression.Parameter(ruleParam.Type, ruleParam.Name);
+                yield return ruleParam.ParameterExpression;
             }
         }
 

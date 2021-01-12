@@ -4,6 +4,7 @@
 using RulesEngine.HelperFunctions;
 using RulesEngine.Models;
 using System;
+using System.Linq.Expressions;
 
 namespace RulesEngine.ExpressionBuilders
 {
@@ -21,11 +22,11 @@ namespace RulesEngine.ExpressionBuilders
             _ruleExpressionParser = ruleExpressionParser;
         }
 
-        internal override RuleFunc<RuleResultTree> BuildDelegateForRule(Rule rule, RuleParameter[] ruleParams)
+        internal override RuleFunc<RuleResultTree> BuildDelegateForRule(Rule rule, RuleParameter[] ruleParams,RuleExpressionParameter[] ruleExpParams)
         {
             try
             {
-                var ruleDelegate = _ruleExpressionParser.Compile<bool>(rule.Expression, ruleParams);
+                var ruleDelegate = _ruleExpressionParser.Compile<bool>(rule.Expression, ruleParams,ruleExpParams);
                 bool func(object[] paramList) => ruleDelegate(paramList);
                 return Helpers.ToResultTree(rule, null, func);
             }
