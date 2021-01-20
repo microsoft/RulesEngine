@@ -170,6 +170,11 @@ namespace RulesEngine
             }
         }
 
+        public List<string> GetAllRegisteredWorkflowNames()
+        {
+            return _rulesCache.GetAllWorkflowNames();
+        }
+
         /// <summary>
         /// Clears the workflows.
         /// </summary>

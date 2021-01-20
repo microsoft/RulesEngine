@@ -40,7 +40,7 @@ namespace RulesEngine.UnitTest
             };
 
             mainRule.Rules.Add(dummyRule);
-            var func = builder.BuildDelegateForRule(dummyRule, ruleParameters,new RuleExpressionParameter[] { });
+            var func = builder.BuildDelegateForRule(dummyRule, ruleParameters);
 
             Assert.NotNull(func);
             Assert.Equal(typeof(RuleResultTree), func.Method.ReturnType);

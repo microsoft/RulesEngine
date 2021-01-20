@@ -28,5 +28,6 @@ namespace RulesEngine.Interfaces
         void AddWorkflow(params WorkflowRules[] workflowRules);
         void ClearWorkflows();
         void RemoveWorkflow(params string[] workflowNames);
+        List<string> GetAllRegisteredWorkflowNames();
     }
 }

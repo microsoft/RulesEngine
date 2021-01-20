@@ -33,21 +33,18 @@ namespace RulesEngine.ExpressionBuilders
             return DynamicExpressionParser.ParseLambda(config, false, parameters, returnType, expression);
         }
 
-        public Func<object[], T> Compile<T>(string expression, RuleParameter[] ruleParams, RuleExpressionParameter[] ruleExpParams)
-        {
-            ruleExpParams = ruleExpParams ?? new RuleExpressionParameter[] { };
+        public Func<object[], T> Compile<T>(string expression, RuleParameter[] ruleParams)
+        {           
             var cacheKey = GetCacheKey(expression, ruleParams, typeof(T));
             return _memoryCache.GetOrCreate(cacheKey, (entry) => {
                 entry.SetSize(1);
                 var parameterExpressions = GetParameterExpression(ruleParams).ToArray();
-                var extendedParamExpressions = ruleExpParams.Select(c => c.ParameterExpression).ToArray();
-                var e = Parse(expression, parameterExpressions.Concat(extendedParamExpressions).ToArray(), typeof(T));
-                var expressionBody = CreateAssignedParameterExpression(ruleExpParams).ToList();
-                expressionBody.Add(e.Body);
-                var wrappedExpression = WrapExpression<T>(expressionBody, parameterExpressions, extendedParamExpressions);
+            
+                var e = Parse(expression, parameterExpressions, typeof(T));
+                var expressionBody = new List<Expression>() { e.Body };
+                var wrappedExpression = WrapExpression<T>(expressionBody, parameterExpressions, new ParameterExpression[] { });
                 return wrappedExpression.CompileFast();
             });
-
         }
 
         private Expression<Func<object[], T>> WrapExpression<T>(List<Expression> expressionList, ParameterExpression[] parameters, ParameterExpression[] variables)
@@ -62,10 +59,16 @@ namespace RulesEngine.ExpressionBuilders
             return Expression.Lambda<Func<object[], T>>(blockExp, argExp);
         }
 
+        internal Func<object[],Dictionary<string,object>> CompileRuleExpressionParameters(RuleParameter[] ruleParams, RuleExpressionParameter[] ruleExpParams = null)
+        {
+            ruleExpParams = ruleExpParams ?? new RuleExpressionParameter[] { };
+            var expression = CreateDictionaryExpression(ruleParams, ruleExpParams);
+            return expression.CompileFast();
+        }
 
         public T Evaluate<T>(string expression, RuleParameter[] ruleParams, RuleExpressionParameter[] ruleExpParams = null)
         {
-            var func = Compile<T>(expression, ruleParams, ruleExpParams);
+            var func = Compile<T>(expression, ruleParams);
             return func(ruleParams.Select(c => c.Value).ToArray());
         }
 
@@ -97,6 +100,41 @@ namespace RulesEngine.ExpressionBuilders
 
                 yield return ruleParam.ParameterExpression;
             }
+        }
+
+        private Expression<Func<object[],Dictionary<string,object>>> CreateDictionaryExpression(RuleParameter[] ruleParams, RuleExpressionParameter[] ruleExpParams)
+        {
+            var body = new List<Expression>();
+            var paramExp = new List<ParameterExpression>();
+            var variableExp = new List<ParameterExpression>();
+
+
+            var variableExpressions = CreateAssignedParameterExpression(ruleExpParams);
+
+            body.AddRange(variableExpressions);
+
+            var dict = Expression.Variable(typeof(Dictionary<string, object>));
+            var add = typeof(Dictionary<string, object>).GetMethod("Add", BindingFlags.Public | BindingFlags.Instance, null, new[] { typeof(string), typeof(object) }, null);
+
+            body.Add(Expression.Assign(dict, Expression.New(typeof(Dictionary<string, object>))));
+            variableExp.Add(dict);
+
+            for(var i = 0; i < ruleParams.Length; i++)
+            {
+                paramExp.Add(ruleParams[i].ParameterExpression);
+            }
+            for(var i = 0; i < ruleExpParams.Length; i++)
+            {
+                var key = Expression.Constant(ruleExpParams[i].ParameterExpression.Name);
+                var value = Expression.Convert(ruleExpParams[i].ParameterExpression, typeof(object));
+                variableExp.Add(ruleExpParams[i].ParameterExpression);
+                body.Add(Expression.Call(dict, add, key, value));
+            
+            }
+            // Return value
+            body.Add(dict);
+
+            return WrapExpression<Dictionary<string,object>>(body, paramExp.ToArray(), variableExp.ToArray());
         }
 
         private string GetCacheKey(string expression, RuleParameter[] ruleParameters, Type returnType)

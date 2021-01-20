@@ -25,12 +25,13 @@ namespace RulesEngine.Models
         public Dictionary<string, object> Properties { get; set; }
         public string Operator { get; set; }
         public string ErrorMessage { get; set; }
+        public bool Enabled { get; set; } = true;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ErrorType ErrorType { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public RuleExpressionType? RuleExpressionType { get; set; }
+        public RuleExpressionType RuleExpressionType { get; set; } = RuleExpressionType.LambdaExpression;
 
         public List<string> WorkflowRulesToInject { get; set; }
 

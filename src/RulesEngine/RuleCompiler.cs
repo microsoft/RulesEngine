@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 
 namespace RulesEngine
 {
@@ -31,7 +32,6 @@ namespace RulesEngine
         /// The logger
         /// </summary>
         private readonly ILogger _logger;
-        private readonly RuleExpressionParser _ruleExpressionParser;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuleCompiler"/> class.
@@ -41,7 +41,6 @@ namespace RulesEngine
         internal RuleCompiler(RuleExpressionBuilderFactory expressionBuilderFactory, RuleExpressionParser ruleExpressionParser, ILogger logger)
         {
             _logger = logger ?? throw new ArgumentNullException($"{nameof(logger)} can't be null.");
-            _ruleExpressionParser = ruleExpressionParser;
             _expressionBuilderFactory = expressionBuilderFactory ?? throw new ArgumentNullException($"{nameof(expressionBuilderFactory)} can't be null.");
         }
 
@@ -61,10 +60,11 @@ namespace RulesEngine
                 {
                     throw new ArgumentNullException(nameof(rule));
                 }
-                var globalParamExp = GetRuleExpressionParameters(globalParams, ruleParams, new RuleExpressionParameter[] { });
-
-                var ruleExpression = GetDelegateForRule(rule, ruleParams,globalParamExp);
-                return ruleExpression;
+                var globalParamExp = GetRuleExpressionParameters(rule.RuleExpressionType,globalParams, ruleParams);
+                var extendedRuleParams = ruleParams.Concat(globalParamExp.Select(c => new RuleParameter(c.ParameterExpression.Name,c.ParameterExpression.Type)))
+                                                   .ToArray();
+                var ruleExpression = GetDelegateForRule(rule, extendedRuleParams);
+                return GetWrappedRuleFunc(RuleExpressionType.LambdaExpression,ruleExpression,ruleParams,globalParamExp);
             }
             catch (Exception ex)
             {
@@ -82,24 +82,31 @@ namespace RulesEngine
         /// <param name="typeParameterExpressions">The type parameter expressions.</param>
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns></returns>
-        private RuleFunc<RuleResultTree> GetDelegateForRule(Rule rule, RuleParameter[] ruleParams, RuleExpressionParameter[] ruleExpParamList)
+        private RuleFunc<RuleResultTree> GetDelegateForRule(Rule rule, RuleParameter[] ruleParams)
         {
-            ruleExpParamList = ruleExpParamList.Concat(GetRuleExpressionParameters(rule?.LocalParams, ruleParams, ruleExpParamList)).ToArray();
+            var scopedParamList = GetRuleExpressionParameters(rule.RuleExpressionType, rule?.LocalParams, ruleParams);
 
+            var extendedRuleParams = ruleParams.Concat(scopedParamList.Select(c => new RuleParameter(c.ParameterExpression.Name, c.ParameterExpression.Type)))
+                                               .ToArray();
+
+            RuleFunc<RuleResultTree> ruleFn;
+            
             if (Enum.TryParse(rule.Operator, out ExpressionType nestedOperator) && nestedOperators.Contains(nestedOperator) &&
                 rule.Rules != null && rule.Rules.Any())
             {
-                return BuildNestedRuleFunc(rule, nestedOperator, ruleParams, ruleExpParamList);
+                ruleFn = BuildNestedRuleFunc(rule, nestedOperator, extendedRuleParams);
             }
             else
             {
-                return BuildRuleFunc(rule, ruleParams,ruleExpParamList);
+                ruleFn = BuildRuleFunc(rule, extendedRuleParams);
             }
+
+            return GetWrappedRuleFunc(rule.RuleExpressionType, ruleFn, ruleParams, scopedParamList);
         }
 
-        private RuleExpressionParameter[] GetRuleExpressionParameters(IEnumerable<LocalParam> localParams, RuleParameter[] ruleParams, RuleExpressionParameter[] globalParams)
+        private RuleExpressionParameter[] GetRuleExpressionParameters(RuleExpressionType ruleExpressionType,IEnumerable<LocalParam> localParams, RuleParameter[] ruleParams)
         {
-            var ruleExpParams = new List<RuleExpressionParameter>(globalParams);
+            var ruleExpParams = new List<RuleExpressionParameter>();
 
             if (localParams?.Any() == true) {
 
@@ -107,9 +114,11 @@ namespace RulesEngine
                                             .Concat(ruleExpParams.Select(c => c.ParameterExpression))
                                             .ToList();
 
+                var expressionBuilder = GetExpressionBuilder(ruleExpressionType);
+
                 foreach (var lp in localParams)
                 {
-                    var lpExpression = _ruleExpressionParser.Parse(lp.Expression, parameters.ToArray() ,null).Body;
+                    var lpExpression = expressionBuilder.Parse(lp.Expression, parameters.ToArray() ,null).Body;
                     var ruleExpParam = new RuleExpressionParameter() {
                         ParameterExpression = Expression.Parameter(lpExpression.Type, lp.Name),
                         ValueExpression = lpExpression 
@@ -131,16 +140,11 @@ namespace RulesEngine
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        private RuleFunc<RuleResultTree> BuildRuleFunc(Rule rule, RuleParameter[] ruleParams, RuleExpressionParameter[] ruleExpressionParams)
+        private RuleFunc<RuleResultTree> BuildRuleFunc(Rule rule, RuleParameter[] ruleParams)
         {
-            if (!rule.RuleExpressionType.HasValue)
-            {
-                throw new InvalidOperationException($"RuleExpressionType can not be null for leaf level expressions.");
-            }
+            var ruleExpressionBuilder = GetExpressionBuilder(rule.RuleExpressionType);
 
-            var ruleExpressionBuilder = _expressionBuilderFactory.RuleGetExpressionBuilder(rule.RuleExpressionType.Value);
-
-            var ruleFunc = ruleExpressionBuilder.BuildDelegateForRule(rule, ruleParams, ruleExpressionParams);
+            var ruleFunc = ruleExpressionBuilder.BuildDelegateForRule(rule, ruleParams);
 
             return ruleFunc;
         }
@@ -155,12 +159,12 @@ namespace RulesEngine
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns>Expression of func delegate</returns>
         /// <exception cref="InvalidCastException"></exception>
-        private RuleFunc<RuleResultTree> BuildNestedRuleFunc(Rule parentRule, ExpressionType operation, RuleParameter[] ruleParams, RuleExpressionParameter[] scopedParams)
+        private RuleFunc<RuleResultTree> BuildNestedRuleFunc(Rule parentRule, ExpressionType operation, RuleParameter[] ruleParams)
         {
             var ruleFuncList = new List<RuleFunc<RuleResultTree>>();
             foreach (var r in parentRule.Rules)
             {
-                ruleFuncList.Add(GetDelegateForRule(r, ruleParams,scopedParams));
+                ruleFuncList.Add(GetDelegateForRule(r, ruleParams));
             }
 
             return (paramArray) => {
@@ -186,6 +190,23 @@ namespace RulesEngine
                 default:
                     return false;
             }
+        }
+
+        private RuleFunc<RuleResultTree> GetWrappedRuleFunc(RuleExpressionType ruleExpressionType, RuleFunc<RuleResultTree> ruleFunc,RuleParameter[] ruleParameters,RuleExpressionParameter[] ruleExpParams)
+        {
+            var paramDelegate = GetExpressionBuilder(ruleExpressionType).CompileScopedParams(ruleParameters, ruleExpParams);
+
+            return (ruleParams) => {
+                var inputs = ruleParams.Select(c => c.Value).ToArray();
+                var scopedParams = paramDelegate(inputs);
+                var extendedInputs = ruleParams.Concat(scopedParams.Select(c => new RuleParameter(c.Key,c.Value)));
+                return ruleFunc(extendedInputs.ToArray());
+            };
+        }
+
+        private RuleExpressionBuilderBase GetExpressionBuilder(RuleExpressionType expressionType)
+        {
+            return _expressionBuilderFactory.RuleGetExpressionBuilder(expressionType);
         }
     }
 }
