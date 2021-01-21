@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.2]
+- Fixed LocalParams cache not getting cleaned up when RemoveWorkflow and ClearWorkflows are called
+
 ## [3.0.1]
 - Moved ActionResult and ActionRuleResult under RulesEngine.Models namespace
 
