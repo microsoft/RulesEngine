@@ -32,7 +32,7 @@ namespace RulesEngine
         private readonly ILogger _logger;
         private readonly ReSettings _reSettings;
         private readonly RulesCache _rulesCache = new RulesCache();
-        private readonly MemoryCache _compiledParamsCache = new MemoryCache(new MemoryCacheOptions());
+        private MemoryCache _compiledParamsCache = new MemoryCache(new MemoryCacheOptions());
         private readonly ParamCompiler _ruleParamCompiler;
         private readonly RuleExpressionParser _ruleExpressionParser;
         private readonly RuleCompiler _ruleCompiler;
@@ -179,6 +179,7 @@ namespace RulesEngine
         public void ClearWorkflows()
         {
             _rulesCache.Clear();
+            ClearCompiledParamCache();
         }
 
         /// <summary>
@@ -191,6 +192,7 @@ namespace RulesEngine
             {
                 _rulesCache.Remove(workflowName);
             }
+            ClearCompiledParamCache();
         }
 
         /// <summary>
@@ -404,6 +406,16 @@ namespace RulesEngine
 
             return errorMessage;
         }
+
+        /// <summary>
+        /// Clears all compiledParams
+        /// </summary>
+        private void ClearCompiledParamCache()
+        {
+            _compiledParamsCache.Dispose();
+            _compiledParamsCache = new MemoryCache(new MemoryCacheOptions());
+        }
+
         #endregion
     }
 }
