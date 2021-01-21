@@ -9,7 +9,7 @@ namespace RulesEngine.Models
     /// <summary>Class LocalParam.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public class LocalParam
+    public class ScopedParam
     {
 
         /// <summary>
@@ -27,4 +27,7 @@ namespace RulesEngine.Models
         [JsonProperty, JsonRequired]
         public string Expression { get; set; }
     }
+
+    [ExcludeFromCodeCoverage]
+    public class LocalParam : ScopedParam { }
 }

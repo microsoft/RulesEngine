@@ -241,7 +241,7 @@ namespace RulesEngine
                 var dictFunc = new Dictionary<string, RuleFunc<RuleResultTree>>();
                 foreach (var rule in workflowRules.Rules)
                 {
-                    dictFunc.Add(rule.RuleName, CompileRule(workflowName, ruleParams, rule));
+                    dictFunc.Add(rule.RuleName, CompileRule(rule, ruleParams, workflowRules.GlobalParams?.ToArray()));
                 }
 
                 _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, dictFunc);
@@ -257,20 +257,18 @@ namespace RulesEngine
 
         private RuleFunc<RuleResultTree> CompileRule(string workflowName, string ruleName, RuleParameter[] ruleParameters)
         {
-            var rules = _rulesCache.GetRules(workflowName);
-            var currentRule = rules?.SingleOrDefault(c => c.RuleName == ruleName);
+            var workflow = _rulesCache.GetWorkFlowRules(workflowName);
+            var currentRule = workflow.Rules?.SingleOrDefault(c => c.RuleName == ruleName);
             if (currentRule == null)
             {
                 throw new ArgumentException($"Workflow `{workflowName}` does not contain any rule named `{ruleName}`");
             }
-            return CompileRule(workflowName, ruleParameters, currentRule);
+            return CompileRule(currentRule, ruleParameters, workflow.GlobalParams?.ToArray());
         }
 
-        private RuleFunc<RuleResultTree> CompileRule(string workflowName, RuleParameter[] ruleParams, Rule rule)
+        private RuleFunc<RuleResultTree> CompileRule(Rule rule, RuleParameter[] ruleParams, ScopedParam[] scopedParams)
         {
-            //ToDo pass global params
-                return _ruleCompiler.CompileRule(rule, ruleParams, new LocalParam[] { });
-            
+            return _ruleCompiler.CompileRule(rule, ruleParams, scopedParams);
         }
 
 

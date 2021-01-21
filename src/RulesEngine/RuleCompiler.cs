@@ -52,7 +52,7 @@ namespace RulesEngine
         /// <param name="input"></param>
         /// <param name="ruleParam"></param>
         /// <returns>Compiled func delegate</returns>
-        internal RuleFunc<RuleResultTree> CompileRule(Rule rule, RuleParameter[] ruleParams, LocalParam[] globalParams)
+        internal RuleFunc<RuleResultTree> CompileRule(Rule rule, RuleParameter[] ruleParams, ScopedParam[] globalParams)
         {
             try
             {
@@ -104,7 +104,7 @@ namespace RulesEngine
             return GetWrappedRuleFunc(rule.RuleExpressionType, ruleFn, ruleParams, scopedParamList);
         }
 
-        private RuleExpressionParameter[] GetRuleExpressionParameters(RuleExpressionType ruleExpressionType,IEnumerable<LocalParam> localParams, RuleParameter[] ruleParams)
+        private RuleExpressionParameter[] GetRuleExpressionParameters(RuleExpressionType ruleExpressionType,IEnumerable<ScopedParam> localParams, RuleParameter[] ruleParams)
         {
             var ruleExpParams = new List<RuleExpressionParameter>();
 
