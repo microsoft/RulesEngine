@@ -2,11 +2,9 @@
 // Licensed under the MIT License.
 
 using RulesEngine.Models;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -23,6 +21,7 @@ namespace RulesEngine.UnitTest
         [InlineData("GlobalParamReferencedInLocalParams")]
         [InlineData("GlobalParamReferencedInNextGlobalParams")]
         [InlineData("LocalParamReferencedInNextLocalParams")]
+        [InlineData("GlobalParamAndLocalParamsInNestedRules")]
         public async Task BasicWorkflowRules_ReturnsTrue(string workflowName)
         {
             var workflows = GetWorkflowRulesList();
@@ -174,11 +173,39 @@ namespace RulesEngine.UnitTest
                 new WorkflowRules {
                     WorkflowName = "GlobalParamAndLocalParamsInNestedRules",
                     GlobalParams = new List<ScopedParam> {
-
+                        new ScopedParam {
+                            Name = "globalParam1",
+                            Expression = @"""hello"""
+                        }
                     },
                     Rules = new List<Rule> {
                         new Rule {
-                           
+                           RuleName = "NestedRuleTest",
+                           Operator = "And",
+                           LocalParams = new List<ScopedParam> {
+                                new ScopedParam {
+                                    Name = "localParam1",
+                                    Expression = @"""world"""
+                                } 
+                           },
+                           Rules =  new List<Rule>{
+                               new Rule{
+                                   RuleName = "NestedRule1",
+                                   Expression = "globalParam1 == \"hello\" && localParam1 == \"world\""
+                               },
+                               new Rule {
+                                   RuleName = "NestedRule2",
+                                   LocalParams = new List<ScopedParam> {
+                                       new ScopedParam {
+                                           Name = "nestedLocalParam1",
+                                           Expression = "globalParam1 + \" \" + localParam1"
+                                       }
+                                   },
+                                   Expression = "nestedLocalParam1 == \"hello world\""
+                               }
+
+                           }
+
                         }
                     }
                 }

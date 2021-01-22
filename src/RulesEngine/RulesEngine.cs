@@ -239,7 +239,7 @@ namespace RulesEngine
             if (workflowRules != null)
             {
                 var dictFunc = new Dictionary<string, RuleFunc<RuleResultTree>>();
-                foreach (var rule in workflowRules.Rules)
+                foreach (var rule in workflowRules.Rules.Where(c => c.Enabled))
                 {
                     dictFunc.Add(rule.RuleName, CompileRule(rule, ruleParams, workflowRules.GlobalParams?.ToArray()));
                 }
@@ -258,7 +258,11 @@ namespace RulesEngine
         private RuleFunc<RuleResultTree> CompileRule(string workflowName, string ruleName, RuleParameter[] ruleParameters)
         {
             var workflow = _rulesCache.GetWorkFlowRules(workflowName);
-            var currentRule = workflow.Rules?.SingleOrDefault(c => c.RuleName == ruleName);
+            if(workflow == null)
+            {
+                throw new ArgumentException($"Workflow `{workflowName}` is not found");
+            }
+            var currentRule = workflow.Rules?.SingleOrDefault(c => c.RuleName == ruleName && c.Enabled);
             if (currentRule == null)
             {
                 throw new ArgumentException($"Workflow `{workflowName}` does not contain any rule named `{ruleName}`");

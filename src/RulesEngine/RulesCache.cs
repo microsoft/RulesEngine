@@ -64,16 +64,6 @@ namespace RulesEngine
             _compileRules.Clear();
         }
 
-        /// <summary>Gets the rules.</summary>
-        /// <param name="workflowName">Name of the workflow.</param>
-        /// <returns>IEnumerable&lt;Rule&gt;.</returns>
-        public IEnumerable<Rule> GetRules(string workflowName)
-        {
-            if (!ContainsWorkflowRules(workflowName))
-                throw new ArgumentException($"workflow `{workflowName}` was not found");
-            return _workflowRules[workflowName].Rules;
-        }
-
         /// <summary>Gets the work flow rules.</summary>
         /// <param name="workflowName">Name of the workflow.</param>
         /// <returns>WorkflowRules.</returns>
