@@ -111,8 +111,7 @@ namespace RulesEngine
             if (localParams?.Any() == true) {
 
                 var parameters = ruleParams.Select(c => c.ParameterExpression)
-                                            .Concat(ruleExpParams.Select(c => c.ParameterExpression))
-                                            .ToList();
+                                           .ToList();
 
                 var expressionBuilder = GetExpressionBuilder(ruleExpressionType);
 
@@ -162,7 +161,7 @@ namespace RulesEngine
         private RuleFunc<RuleResultTree> BuildNestedRuleFunc(Rule parentRule, ExpressionType operation, RuleParameter[] ruleParams)
         {
             var ruleFuncList = new List<RuleFunc<RuleResultTree>>();
-            foreach (var r in parentRule.Rules)
+            foreach (var r in parentRule.Rules.Where(c => c.Enabled))
             {
                 ruleFuncList.Add(GetDelegateForRule(r, ruleParams));
             }
@@ -178,6 +177,11 @@ namespace RulesEngine
 
         private bool ApplyOperation(IEnumerable<RuleResultTree> ruleResults, ExpressionType operation)
         {
+            if (ruleResults?.Any() != true)
+            {
+                return false;
+            }
+
             switch (operation)
             {
                 case ExpressionType.And:

@@ -13,7 +13,7 @@ To install this library, please download the latest version of  [NuGet Package](
 
 ## How to use it
 
-You need to store the rules based on the [schema definition](https://github.com/microsoft/RulesEngine/blob/master/schema/workflowRules-schema.json) given and they can be stored in any store as deemed appropriate like Azure Blob Storage, Cosmos DB, Azure App Configuration, SQL Servers, file systems etc. The expressions are supposed to be a [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
+You need to store the rules based on the [schema definition](https://github.com/microsoft/RulesEngine/blob/main/schema/workflowRules-schema.json) given and they can be stored in any store as deemed appropriate like Azure Blob Storage, Cosmos DB, Azure App Configuration, SQL Servers, file systems etc. The expressions are supposed to be a [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
 
 An example rule could be - 
 ```json

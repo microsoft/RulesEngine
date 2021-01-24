@@ -62,6 +62,29 @@ namespace RulesEngine.UnitTest
             Assert.Contains(result, c => c.IsSuccess);
         }
 
+
+        [Theory]
+        [InlineData("rules2.json")]
+        public void GetAllRegisteredWorkflows_ReturnsListOfAllWorkflows(string ruleFileName)
+        {
+            var re = GetRulesEngine(ruleFileName);
+            var workflows = re.GetAllRegisteredWorkflowNames();
+         
+            Assert.NotNull(workflows);
+            Assert.Equal(2, workflows.Count);
+            Assert.Contains("inputWorkflow", workflows);
+        }
+        [Theory]
+        [InlineData("rules2.json")]
+        public void GetAllRegisteredWorkflows_NoWorkflow_ReturnsEmptyList(string ruleFileName)
+        {
+            var re = new RulesEngine();
+            var workflows = re.GetAllRegisteredWorkflowNames();
+
+            Assert.NotNull(workflows);
+            Assert.Empty(workflows);
+        }
+
         [Theory]
         [InlineData("rules2.json")]
         public async Task ExecuteRule_ManyInputs_ReturnsListOfRuleResultTree(string ruleFileName)

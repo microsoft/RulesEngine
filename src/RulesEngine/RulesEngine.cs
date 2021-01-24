@@ -305,12 +305,6 @@ namespace RulesEngine
             return key;
         }
 
-        private string GetCompiledParamsCacheKey(string workflowName, string ruleName, RuleParameter[] ruleParams)
-        {
-            var key = $"compiledparams-{workflowName}-{ruleName}" + string.Join("-", ruleParams.Select(c => c.Type.Name));
-            return key;
-        }
-
         private IDictionary<string, Func<ActionBase>> GetDefaultActionRegistry()
         {
             return new Dictionary<string, Func<ActionBase>>{
