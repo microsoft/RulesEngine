@@ -254,7 +254,6 @@ namespace RulesEngine.UnitTest
             await Assert.ThrowsAsync<ArgumentException>(async () => await re.ExecuteAllRulesAsync("inputWorkflowReference", input1, input2, input3));
         }
 
-
         [Theory]
         [InlineData("rules1.json")]
         [InlineData("rules2.json")]
@@ -439,6 +438,75 @@ namespace RulesEngine.UnitTest
             Assert.IsType<List<RuleResultTree>>(result);
             Assert.All(result, c => Assert.False(c.IsSuccess));
         }
+
+        [Fact]
+        public async Task RemoveWorkFlow_ShouldRemoveAllCompiledCache()
+        {
+            var workflow = new WorkflowRules {
+                WorkflowName = "Test",
+                Rules = new Rule[]{
+                    new Rule {
+                        RuleName = "RuleWithLocalParam",
+                        LocalParams = new LocalParam[] {
+                            new LocalParam {
+                                Name = "lp1",
+                                Expression = "true"
+                            }
+                        },
+                        RuleExpressionType = RuleExpressionType.LambdaExpression,
+                        Expression = "lp1 ==  true"
+                    }
+                }
+            };
+
+            var re = new RulesEngine();
+            re.AddWorkflow(workflow);
+
+            var result1 = await re.ExecuteAllRulesAsync("Test","hello");
+            Assert.True(result1.All(c => c.IsSuccess));
+
+            re.RemoveWorkflow("Test");
+            workflow.Rules.First().LocalParams.First().Expression = "false";
+
+            re.AddWorkflow(workflow);
+            var result2 = await re.ExecuteAllRulesAsync("Test", "hello");
+            Assert.True(result2.All(c => c.IsSuccess == false));
+        }
+
+        [Fact]
+        public async Task ClearWorkFlow_ShouldRemoveAllCompiledCache()
+        {
+            var workflow = new WorkflowRules {
+                WorkflowName = "Test",
+                Rules = new Rule[]{
+                    new Rule {
+                        RuleName = "RuleWithLocalParam",
+                        LocalParams = new LocalParam[] {
+                            new LocalParam {
+                                Name = "lp1",
+                                Expression = "true"
+                            }
+                        },
+                        RuleExpressionType = RuleExpressionType.LambdaExpression,
+                        Expression = "lp1 ==  true"
+                    }
+                }
+            };
+
+            var re = new RulesEngine();
+            re.AddWorkflow(workflow);
+
+            var result1 = await re.ExecuteAllRulesAsync("Test", "hello");
+            Assert.True(result1.All(c => c.IsSuccess));
+
+            re.ClearWorkflows();
+            workflow.Rules.First().LocalParams.First().Expression = "false";
+
+            re.AddWorkflow(workflow);
+            var result2 = await re.ExecuteAllRulesAsync("Test", "hello");
+            Assert.True(result2.All(c => c.IsSuccess == false));
+        }
+
         private RulesEngine CreateRulesEngine(WorkflowRules workflow)
         {
             var json = JsonConvert.SerializeObject(workflow);
