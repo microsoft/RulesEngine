@@ -27,6 +27,7 @@ namespace RulesEngine
         /// The expression builder factory
         /// </summary>
         private readonly RuleExpressionBuilderFactory _expressionBuilderFactory;
+        private readonly ReSettings _reSettings;
 
         /// <summary>
         /// The logger
@@ -38,10 +39,12 @@ namespace RulesEngine
         /// </summary>
         /// <param name="expressionBuilderFactory">The expression builder factory.</param>
         /// <exception cref="ArgumentNullException">expressionBuilderFactory</exception>
-        internal RuleCompiler(RuleExpressionBuilderFactory expressionBuilderFactory, RuleExpressionParser ruleExpressionParser, ILogger logger)
+        internal RuleCompiler(RuleExpressionBuilderFactory expressionBuilderFactory, ReSettings reSettings, ILogger logger)
         {
             _logger = logger ?? throw new ArgumentNullException($"{nameof(logger)} can't be null.");
+          
             _expressionBuilderFactory = expressionBuilderFactory ?? throw new ArgumentNullException($"{nameof(expressionBuilderFactory)} can't be null.");
+            _reSettings = reSettings;
         }
 
         /// <summary>
@@ -106,27 +109,31 @@ namespace RulesEngine
 
         private RuleExpressionParameter[] GetRuleExpressionParameters(RuleExpressionType ruleExpressionType,IEnumerable<ScopedParam> localParams, RuleParameter[] ruleParams)
         {
+            if(!_reSettings.EnableLocalParams)
+            {
+                return new RuleExpressionParameter[] { };
+            }
             var ruleExpParams = new List<RuleExpressionParameter>();
 
-            if (localParams?.Any() == true) {
+            if (localParams?.Any() == true)
+            {
 
                 var parameters = ruleParams.Select(c => c.ParameterExpression)
-                                           .ToList();
+                                            .ToList();
 
                 var expressionBuilder = GetExpressionBuilder(ruleExpressionType);
 
                 foreach (var lp in localParams)
                 {
-                    var lpExpression = expressionBuilder.Parse(lp.Expression, parameters.ToArray() ,null).Body;
+                    var lpExpression = expressionBuilder.Parse(lp.Expression, parameters.ToArray(), null).Body;
                     var ruleExpParam = new RuleExpressionParameter() {
                         ParameterExpression = Expression.Parameter(lpExpression.Type, lp.Name),
-                        ValueExpression = lpExpression 
+                        ValueExpression = lpExpression
                     };
                     parameters.Add(ruleExpParam.ParameterExpression);
                     ruleExpParams.Add(ruleExpParam);
                 }
             }
-
             return ruleExpParams.ToArray();
 
         }
@@ -198,6 +205,10 @@ namespace RulesEngine
 
         private RuleFunc<RuleResultTree> GetWrappedRuleFunc(RuleExpressionType ruleExpressionType, RuleFunc<RuleResultTree> ruleFunc,RuleParameter[] ruleParameters,RuleExpressionParameter[] ruleExpParams)
         {
+            if(ruleExpParams.Length == 0)
+            {
+                return ruleFunc;
+            }
             var paramDelegate = GetExpressionBuilder(ruleExpressionType).CompileScopedParams(ruleParameters, ruleExpParams);
 
             return (ruleParams) => {

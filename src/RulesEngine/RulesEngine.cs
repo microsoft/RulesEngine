@@ -55,7 +55,7 @@ namespace RulesEngine
             _logger = logger ?? new NullLogger<RulesEngine>();
             _reSettings = reSettings ?? new ReSettings();
             _ruleExpressionParser = new RuleExpressionParser(_reSettings);
-            _ruleCompiler = new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings, _ruleExpressionParser),_ruleExpressionParser, _logger);
+            _ruleCompiler = new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings, _ruleExpressionParser),_reSettings, _logger);
             _actionFactory = new ActionFactory(GetActionRegistry(_reSettings));
         }
 

@@ -69,14 +69,14 @@ namespace RulesEngine.UnitTest
         {
             var re = GetRulesEngine(ruleFileName);
             var workflows = re.GetAllRegisteredWorkflowNames();
-         
+
             Assert.NotNull(workflows);
             Assert.Equal(2, workflows.Count);
             Assert.Contains("inputWorkflow", workflows);
         }
-        [Theory]
-        [InlineData("rules2.json")]
-        public void GetAllRegisteredWorkflows_NoWorkflow_ReturnsEmptyList(string ruleFileName)
+
+        [Fact]
+        public void GetAllRegisteredWorkflows_NoWorkflow_ReturnsEmptyList()
         {
             var re = new RulesEngine();
             var workflows = re.GetAllRegisteredWorkflowNames();
