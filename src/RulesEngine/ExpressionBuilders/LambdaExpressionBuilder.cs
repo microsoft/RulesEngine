@@ -10,9 +10,6 @@ using System.Linq.Expressions;
 
 namespace RulesEngine.ExpressionBuilders
 {
-    /// <summary>
-    /// This class will build the list expression
-    /// </summary>
     internal sealed class LambdaExpressionBuilder : RuleExpressionBuilderBase
     {
         private readonly ReSettings _reSettings;
@@ -36,10 +33,13 @@ namespace RulesEngine.ExpressionBuilders
                 ex.Data.Add(nameof(rule.RuleName), rule.RuleName);
                 ex.Data.Add(nameof(rule.Expression), rule.Expression);
 
-                if (!_reSettings.EnableExceptionAsErrorMessage) throw;
-              
+                if (!_reSettings.EnableExceptionAsErrorMessage)
+                {
+                    throw;
+                }
+
                 bool func(object[] param) => false;
-                var exceptionMessage = $"Exception while parsing expression `{rule?.Expression}` - {ex.Message}";
+                var exceptionMessage = _reSettings.IgnoreException ? "" : $"Exception while parsing expression `{rule?.Expression}` - {ex.Message}";
                 return Helpers.ToResultTree(rule, null,func, exceptionMessage);
             }
         }

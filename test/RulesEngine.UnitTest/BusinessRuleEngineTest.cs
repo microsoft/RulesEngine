@@ -447,7 +447,7 @@ namespace RulesEngine.UnitTest
                 Rules = new Rule[]{
                     new Rule {
                         RuleName = "RuleWithLocalParam",
-                        LocalParams = new LocalParam[] {
+                        LocalParams = new List<LocalParam> {
                             new LocalParam {
                                 Name = "lp1",
                                 Expression = "true"

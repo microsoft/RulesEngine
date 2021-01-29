@@ -38,7 +38,7 @@ namespace RulesEngineBenchmark
 
             rulesEngine = new RulesEngine.RulesEngine(workflows.ToArray(), null, new ReSettings {
                 EnableFormattedErrorMessage = false,
-                EnableLocalParams = false
+                EnableScopedParams = false
             });
 
             ruleInput = new {

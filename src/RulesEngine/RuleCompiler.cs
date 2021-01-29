@@ -109,7 +109,7 @@ namespace RulesEngine
 
         private RuleExpressionParameter[] GetRuleExpressionParameters(RuleExpressionType ruleExpressionType,IEnumerable<ScopedParam> localParams, RuleParameter[] ruleParams)
         {
-            if(!_reSettings.EnableLocalParams)
+            if(!_reSettings.EnableScopedParams)
             {
                 return new RuleExpressionParameter[] { };
             }

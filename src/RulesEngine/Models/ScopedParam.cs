@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
 
-using Newtonsoft.Json;
 using System.Diagnostics.CodeAnalysis;
 
 namespace RulesEngine.Models
@@ -13,18 +12,16 @@ namespace RulesEngine.Models
     {
 
         /// <summary>
-        /// Gets or sets the name of the rule.
+        /// Gets or sets the name of the param.
         /// </summary>
         /// <value>
         /// The name of the rule.
-        /// </value>
-        [JsonProperty, JsonRequired]
+        /// </value>]
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or Sets the lambda expression. 
+        /// Gets or Sets the lambda expression which can be reference in Rule. 
         /// </summary>
-        [JsonProperty, JsonRequired]
         public string Expression { get; set; }
     }
 

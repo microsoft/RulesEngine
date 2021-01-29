@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using RulesEngine.HelperFunctions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -62,9 +63,10 @@ namespace RulesEngine.Models
         /// </summary>
         /// <returns>RuleResultMessage</returns>
         [ExcludeFromCodeCoverage]
+        [Obsolete("will be removed in next major version")]
         public RuleResultMessage GetMessages()
         {
-            RuleResultMessage ruleResultMessage = new RuleResultMessage();
+            var ruleResultMessage = new RuleResultMessage();
 
             Helpers.ToResultTreeMessages(this, ref ruleResultMessage);
 

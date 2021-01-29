@@ -21,6 +21,9 @@ namespace RulesEngine.Models
         /// <value>The workflow rules to inject.</value>
         public IEnumerable<string> WorkflowRulesToInject { get; set; }
 
+        /// <summary>
+        /// Gets or Sets the global params which will be applicable to all rules
+        /// </summary>
         public IEnumerable<ScopedParam> GlobalParams { get; set; }
 
         /// <summary>

@@ -325,7 +325,7 @@ namespace RulesEngine
                 foreach (var ruleResult in ruleResultList?.Where(r => !r.IsSuccess))
                 {
                     var errorMessage = ruleResult?.Rule?.ErrorMessage;
-                    if (errorMessage != null)
+                    if (string.IsNullOrWhiteSpace(ruleResult.ExceptionMessage) && errorMessage != null)
                     {
                         var errorParameters = Regex.Matches(errorMessage, ParamParseRegex);
 
