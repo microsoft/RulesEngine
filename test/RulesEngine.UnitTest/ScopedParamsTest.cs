@@ -39,6 +39,34 @@ namespace RulesEngine.UnitTest
 
         }
 
+        [Theory]
+        [InlineData("GlobalAndLocalParams")]
+        public async Task WorkflowUpdate_GlobalParam_ShouldReflect(string workflowName)
+        {
+            var workflows = GetWorkflowRulesList();
+
+            var engine = new RulesEngine(null, null);
+            engine.AddWorkflow(workflows);
+
+            var input1 = new {
+                trueValue = true,
+                falseValue = false
+            };
+
+            var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
+            Assert.True(result.All(c => c.IsSuccess));
+
+            var workflowToUpdate = workflows.Single(c => c.WorkflowName == workflowName);
+            engine.RemoveWorkflow(workflowName);
+            workflowToUpdate.GlobalParams.First().Expression = "true == false";
+            engine.AddWorkflow(workflowToUpdate);
+
+            var result2 = await engine.ExecuteAllRulesAsync(workflowName, input1);
+
+            Assert.True(result2.All(c => c.IsSuccess == false));
+        }
+
+
         private WorkflowRules[] GetWorkflowRulesList()
         {
             return new WorkflowRules[] {
@@ -97,7 +125,6 @@ namespace RulesEngine.UnitTest
                     },
                     Rules = new List<Rule> {
                         new Rule {
-
                             RuleName = "WithLocalParam",
                             LocalParams = new List<ScopedParam> {
                                 new ScopedParam {
