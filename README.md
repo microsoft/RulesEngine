@@ -1,6 +1,6 @@
 # Rules Engine
-![build](https://github.com/microsoft/RulesEngine/workflows/build/badge.svg?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/microsoft/RulesEngine/badge.svg?branch=master)](https://coveralls.io/github/microsoft/RulesEngine?branch=master)
+![build](https://github.com/microsoft/RulesEngine/workflows/build/badge.svg?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/microsoft/RulesEngine/badge.svg?branch=main)](https://coveralls.io/github/microsoft/RulesEngine?branch=main)
 [![Nuget download][download-image]][download-url]
 
 [download-image]: https://img.shields.io/nuget/dt/RulesEngine
@@ -59,13 +59,13 @@ The *response* will contain a list of [*RuleResultTree*](https://github.com/micr
 
 _Note: A detailed example showcasing how to use Rules Engine is explained in [Getting Started page](https://github.com/microsoft/RulesEngine/wiki/Getting-Started) of [Rules Engine Wiki](https://github.com/microsoft/RulesEngine/wiki)._
 
-_A demo app for the is available at [this location](https://github.com/microsoft/RulesEngine/tree/master/demo)._
+_A demo app for the is available at [this location](https://github.com/microsoft/RulesEngine/tree/main/demo)._
 
 ## How it works
 
-![](https://github.com/microsoft/RulesEngine/blob/master/assets/BlockDiagram.png)
+![](https://github.com/microsoft/RulesEngine/blob/main/assets/BlockDiagram.png)
 
-The rules can be stored in any store and be fed to the system in a structure which follows a proper [schema](https://github.com/microsoft/RulesEngine/blob/master/schema/workflowRules-schema.json) of WorkFlow model.
+The rules can be stored in any store and be fed to the system in a structure which follows a proper [schema](https://github.com/microsoft/RulesEngine/blob/main/schema/workflowRules-schema.json) of WorkFlow model.
 
 The wrapper needs to be created over the Rules Engine package, which will get the rules and input message(s) from any store that your system dictates and put it into the Engine. Also, the wrapper then needs to handle the output using appropriate means.
 
