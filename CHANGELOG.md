@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [3.1.0]
 - Added globalParams feature which can be applied to all rules
 - Enabled localParams support for nested Rules
-- Made certain files in Rule schema optional allowing users to define workflow with minimal fields
+- Made certain fields in Rule model optional allowing users to define workflow with minimal fields
 - Added option to disable Rule in workflow json
 - Added `GetAllRegisteredWorkflow` to RulesEngine to return all registeredWorkflows
 - Fixed Rule compilation exception not returned when Rule has ErrorMessage field defined - #95
