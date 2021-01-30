@@ -37,6 +37,8 @@ namespace RulesEngine.UnitTest
             var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
             Assert.True(result.All(c => c.IsSuccess));
 
+            CheckResultTreeContainsAllInputs(workflowName, result);
+
         }
 
         [Theory]
@@ -67,6 +69,70 @@ namespace RulesEngine.UnitTest
         }
 
 
+        [Theory]
+        [InlineData("GlobalParamsOnly",new []{ false })]
+        [InlineData("LocalParamsOnly", new[] { false, true })]
+        [InlineData("GlobalAndLocalParams", new[] { false })]
+        public async Task DisabledScopedParam_ShouldReflect(string workflowName, bool[] outputs)
+        {
+            var workflows = GetWorkflowRulesList();
+
+            var engine = new RulesEngine(new string[] { }, null, new ReSettings { 
+                EnableScopedParams = false
+            });
+            engine.AddWorkflow(workflows);
+
+            var input1 = new {
+                trueValue = true,
+                falseValue = false
+            };
+
+            var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
+            for(var i = 0; i < result.Count; i++)
+            {
+                Assert.Equal(result[i].IsSuccess, outputs[i]);
+                if(result[i].IsSuccess == false)
+                {
+                    Assert.StartsWith("Exception while parsing expression", result[i].ExceptionMessage);
+                }
+            }
+        }
+
+        private void CheckResultTreeContainsAllInputs(string workflowName, List<RuleResultTree> result)
+        {
+            var workflow = GetWorkflowRulesList().Single(c => c.WorkflowName == workflowName);
+            var expectedInputs = new List<string>() { "input1" };
+            expectedInputs.AddRange(workflow.GlobalParams?.Select(c => c.Name) ?? new List<string>());
+
+
+            foreach (var resultTree in result)
+            {
+                CheckInputs(expectedInputs, resultTree);
+            }
+
+        }
+
+        private static void CheckInputs(IEnumerable<string> expectedInputs, RuleResultTree resultTree)
+        {
+            Assert.All(expectedInputs, input => Assert.True(resultTree.Inputs.ContainsKey(input)));
+
+            var localParamNames = resultTree.Rule.LocalParams?.Select(c => c.Name) ?? new List<string>();
+            Assert.All(localParamNames, input => Assert.True(resultTree.Inputs.ContainsKey(input)));
+
+#pragma warning disable CS0618 // Type or member is obsolete
+            Assert.All(localParamNames, lp => Assert.Contains(resultTree.RuleEvaluatedParams, c => c.Name == lp));
+#pragma warning restore CS0618 // Type or member is obsolete
+
+            if (resultTree.ChildResults?.Any() == true)
+            {
+                foreach (var childResultTree in resultTree.ChildResults)
+                {
+                    CheckInputs(expectedInputs.Concat(localParamNames), childResultTree);
+                }
+
+            }
+
+        }
         private WorkflowRules[] GetWorkflowRulesList()
         {
             return new WorkflowRules[] {

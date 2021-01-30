@@ -56,6 +56,7 @@ namespace RulesEngine.Models
         /// <value>
         /// The rule evaluated parameters.
         /// </value>
+        [Obsolete("Use `Inputs` field to get details of all input, localParams and globalParams")]
         public IEnumerable<RuleParameter> RuleEvaluatedParams { get; set; }
 
         /// <summary>

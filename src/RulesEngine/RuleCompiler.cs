@@ -213,9 +213,19 @@ namespace RulesEngine
 
             return (ruleParams) => {
                 var inputs = ruleParams.Select(c => c.Value).ToArray();
-                var scopedParams = paramDelegate(inputs);
-                var extendedInputs = ruleParams.Concat(scopedParams.Select(c => new RuleParameter(c.Key,c.Value)));
-                return ruleFunc(extendedInputs.ToArray());
+                var scopedParamsDict = paramDelegate(inputs);
+                var scopedParams = scopedParamsDict.Select(c => new RuleParameter(c.Key, c.Value)).ToList();
+                var extendedInputs = ruleParams.Concat(scopedParams);
+                var result = ruleFunc(extendedInputs.ToArray());
+                // To be removed in next major release
+#pragma warning disable CS0618 // Type or member is obsolete
+                if(result.RuleEvaluatedParams == null)
+                {
+                    result.RuleEvaluatedParams = scopedParams;
+                }
+#pragma warning restore CS0618 // Type or member is obsolete
+
+                return result;
             };
         }
 
