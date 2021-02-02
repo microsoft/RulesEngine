@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [3.1.0]
+## [3.1.0-preview.1]
 - Added globalParams feature which can be applied to all rules
 - Enabled localParams support for nested Rules
 - Made certain fields in Rule model optional allowing users to define workflow with minimal fields
