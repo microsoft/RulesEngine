@@ -16,12 +16,13 @@ jobs:
     - name: Extract branch name
       if: github.event_name != 'pull_request'
       shell: bash
-      run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/})"
+      run: echo "BRANCH_NAME=::$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
       id: extract_branch
+      
     # extract branch name on pull request
     - name: Print branch name
       if: github.event_name == 'pull_request'
-      run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_HEAD_REF})"
+      run: echo "BRANCH_NAME=::$(echo ${GITHUB_HEAD_REF})" >> >> $GITHUB_ENV
       
     - uses: actions/checkout@v2
     - name: Setup .NET Core
@@ -52,5 +53,5 @@ jobs:
       if: ${{ github.event_name == 'pull_request' }}
     
     - name: Report coveralls
-      run: minicover coverallsreport --repo-token ${{ secrets.COVERALLS_TOKEN }} --branch $BRANCH_NAME
+      run: minicover coverallsreport --repo-token ${{ secrets.COVERALLS_TOKEN }} --branch ${{ env.BRANCH_NAME }}
       if: ${{ github.event_name == 'push' }}
