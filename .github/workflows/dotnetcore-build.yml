@@ -20,9 +20,14 @@ jobs:
       id: extract_branch
       
     # extract branch name on pull request
-    - name: Print branch name
+    - name: Extract branch name on pull request
       if: github.event_name == 'pull_request'
       run: echo "BRANCH_NAME=::$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
+      
+    # print branch name
+      - name: Get branch name
+        run: echo 'The branch name is' ${{ env.BRANCH_NAME }}
+
       
     - uses: actions/checkout@v2
     - name: Setup .NET Core
