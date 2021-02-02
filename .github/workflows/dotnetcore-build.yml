@@ -25,8 +25,8 @@ jobs:
       run: echo "BRANCH_NAME=::$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
       
     # print branch name
-      - name: Get branch name
-        run: echo 'The branch name is' ${{ env.BRANCH_NAME }}
+    - name: Get branch name
+      run: echo 'The branch name is' ${{ env.BRANCH_NAME }}
 
       
     - uses: actions/checkout@v2
