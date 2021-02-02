@@ -66,7 +66,7 @@ namespace RulesEngine.ExpressionBuilders
             return expression.CompileFast();
         }
 
-        public T Evaluate<T>(string expression, RuleParameter[] ruleParams, RuleExpressionParameter[] ruleExpParams = null)
+        public T Evaluate<T>(string expression, RuleParameter[] ruleParams)
         {
             var func = Compile<T>(expression, ruleParams);
             return func(ruleParams.Select(c => c.Value).ToArray());
