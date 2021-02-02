@@ -22,7 +22,7 @@ jobs:
     # extract branch name on pull request
     - name: Print branch name
       if: github.event_name == 'pull_request'
-      run: echo "BRANCH_NAME=::$(echo ${GITHUB_HEAD_REF})" >> >> $GITHUB_ENV
+      run: echo "BRANCH_NAME=::$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
       
     - uses: actions/checkout@v2
     - name: Setup .NET Core
