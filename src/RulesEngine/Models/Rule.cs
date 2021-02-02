@@ -4,6 +4,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using RulesEngine.Enums;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -15,6 +16,9 @@ namespace RulesEngine.Models
     [ExcludeFromCodeCoverage]
     public class Rule
     {
+        /// <summary>
+        /// Rule name for the Rule
+        /// </summary>
         public string RuleName { get; set; }
         /// <summary>	
         /// Gets or sets the custom property or tags of the rule.	
@@ -26,20 +30,21 @@ namespace RulesEngine.Models
         public string Operator { get; set; }
         public string ErrorMessage { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether the rule is enabled.
+        /// </summary>
+        public bool Enabled { get; set; } = true;
+
+        [Obsolete("will be removed in next major version")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public ErrorType ErrorType { get; set; }
+        public ErrorType ErrorType { get; set; } = ErrorType.Warning;
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public RuleExpressionType? RuleExpressionType { get; set; }
-
+        public RuleExpressionType RuleExpressionType { get; set; } = RuleExpressionType.LambdaExpression;
         public List<string> WorkflowRulesToInject { get; set; }
-
         public List<Rule> Rules { get; set; }
-
-        [JsonProperty]
-        public IEnumerable<LocalParam> LocalParams { get; set; }
+        public IEnumerable<ScopedParam> LocalParams { get; set; }
         public string Expression { get; set; }
-
         public Dictionary<ActionTriggerType, ActionInfo> Actions { get; set; }
         public string SuccessEvent { get; set; }
 

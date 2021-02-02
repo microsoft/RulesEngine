@@ -25,8 +25,28 @@ namespace RulesEngine.Interfaces
         /// <returns>List of rule results</returns>
         ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params RuleParameter[] ruleParams);
         ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters);
+
+        /// <summary>
+        /// Adds new workflows to RulesEngine
+        /// </summary>
+        /// <param name="workflowRules"></param>
         void AddWorkflow(params WorkflowRules[] workflowRules);
+
+        /// <summary>
+        /// Removes all registered workflows from RulesEngine
+        /// </summary>
         void ClearWorkflows();
+
+        /// <summary>
+        /// Removes the workflow from RulesEngine
+        /// </summary>
+        /// <param name="workflowNames"></param>
         void RemoveWorkflow(params string[] workflowNames);
+
+        /// <summary>
+        /// Returns the list of all registered workflow names
+        /// </summary>
+        /// <returns></returns>
+        List<string> GetAllRegisteredWorkflowNames();
     }
 }

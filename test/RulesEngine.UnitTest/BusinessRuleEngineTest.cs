@@ -62,6 +62,29 @@ namespace RulesEngine.UnitTest
             Assert.Contains(result, c => c.IsSuccess);
         }
 
+
+        [Theory]
+        [InlineData("rules2.json")]
+        public void GetAllRegisteredWorkflows_ReturnsListOfAllWorkflows(string ruleFileName)
+        {
+            var re = GetRulesEngine(ruleFileName);
+            var workflows = re.GetAllRegisteredWorkflowNames();
+
+            Assert.NotNull(workflows);
+            Assert.Equal(2, workflows.Count);
+            Assert.Contains("inputWorkflow", workflows);
+        }
+
+        [Fact]
+        public void GetAllRegisteredWorkflows_NoWorkflow_ReturnsEmptyList()
+        {
+            var re = new RulesEngine();
+            var workflows = re.GetAllRegisteredWorkflowNames();
+
+            Assert.NotNull(workflows);
+            Assert.Empty(workflows);
+        }
+
         [Theory]
         [InlineData("rules2.json")]
         public async Task ExecuteRule_ManyInputs_ReturnsListOfRuleResultTree(string ruleFileName)
@@ -160,6 +183,7 @@ namespace RulesEngine.UnitTest
 
         [Theory]
         [InlineData("rules2.json")]
+        [Obsolete]
         public async Task ExecuteRule_ReturnsListOfRuleResultTree_ResultMessage(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName);
@@ -400,20 +424,36 @@ namespace RulesEngine.UnitTest
 
         [Theory]
         [InlineData("rules9.json")]
-        public async Task ExecuteRule_MissingMethodInExpression_DefaultParameter(string ruleFileName)
+        public async Task ExecuteRule_CompilationException_ReturnsAsErrorMessage(string ruleFileName)
         {
-            var re = GetRulesEngine(ruleFileName);
+            var re = GetRulesEngine(ruleFileName, new ReSettings() { EnableExceptionAsErrorMessage = true });
 
             dynamic input1 = new ExpandoObject();
             input1.Data = new { TestProperty = "" };
             input1.Boolean = false;
 
             var utils = new TestInstanceUtils();
-
             var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
+
             Assert.NotNull(result);
-            Assert.IsType<List<RuleResultTree>>(result);
-            Assert.All(result, c => Assert.False(c.IsSuccess));
+            Assert.StartsWith("Exception while parsing expression", result[1].ExceptionMessage);
+        }
+
+        [Theory]
+        [InlineData("rules9.json")]
+        public async Task ExecuteRuleWithIgnoreException_CompilationException_DoesNotReturnsAsErrorMessage(string ruleFileName)
+        {
+            var re = GetRulesEngine(ruleFileName, new ReSettings() { EnableExceptionAsErrorMessage = true , IgnoreException = true});
+
+            dynamic input1 = new ExpandoObject();
+            input1.Data = new { TestProperty = "" };
+            input1.Boolean = false;
+
+            var utils = new TestInstanceUtils();
+            var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
+
+            Assert.NotNull(result);
+            Assert.False(result[1].ExceptionMessage.StartsWith("Exception while parsing expression"));
         }
 
         [Fact]
@@ -424,7 +464,7 @@ namespace RulesEngine.UnitTest
                 Rules = new Rule[]{
                     new Rule {
                         RuleName = "RuleWithLocalParam",
-                        LocalParams = new LocalParam[] {
+                        LocalParams = new List<LocalParam> {
                             new LocalParam {
                                 Name = "lp1",
                                 Expression = "true"

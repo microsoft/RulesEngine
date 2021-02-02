@@ -7,11 +7,11 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
-	  <!--<PackageReference Include="RulesEngine" Version="3.0.0-preview.2" />-->
+	<!--<PackageReference Include="RulesEngine" Version="3.0.2" />-->
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\RulesEngine\RulesEngine.csproj" />
+     <ProjectReference Include="..\..\src\RulesEngine\RulesEngine.csproj" /> 
   </ItemGroup>
 
   <ItemGroup>
