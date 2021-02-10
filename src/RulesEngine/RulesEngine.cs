@@ -7,8 +7,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RulesEngine.Actions;
+using RulesEngine.Enums;
 using RulesEngine.Exceptions;
-using RulesEngine.HelperFunctions;
+using RulesEngine.ExpressionBuilders;
 using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using RulesEngine.Validators;
@@ -16,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace RulesEngine
 {
@@ -29,8 +32,9 @@ namespace RulesEngine
         private readonly ILogger _logger;
         private readonly ReSettings _reSettings;
         private readonly RulesCache _rulesCache = new RulesCache();
-        private readonly MemoryCache _compiledParamsCache = new MemoryCache(new MemoryCacheOptions());
-        private readonly ParamCompiler ruleParamCompiler;
+        private readonly RuleExpressionParser _ruleExpressionParser;
+        private readonly RuleCompiler _ruleCompiler;
+        private readonly ActionFactory _actionFactory;
         private const string ParamParseRegex = "(\\$\\(.*?\\))";
         #endregion
 
@@ -41,16 +45,30 @@ namespace RulesEngine
             AddWorkflow(workflowRules);
         }
 
-        public RulesEngine(WorkflowRules[] workflowRules, ILogger logger, ReSettings reSettings = null) : this(logger, reSettings)
+        public RulesEngine(WorkflowRules[] workflowRules, ILogger logger = null, ReSettings reSettings = null) : this(logger, reSettings)
         {
             AddWorkflow(workflowRules);
         }
 
-        public RulesEngine(ILogger logger, ReSettings reSettings = null)
+        public RulesEngine(ILogger logger = null, ReSettings reSettings = null)
         {
             _logger = logger ?? new NullLogger<RulesEngine>();
             _reSettings = reSettings ?? new ReSettings();
-            ruleParamCompiler = new ParamCompiler(new RuleExpressionBuilderFactory(_reSettings), _logger);
+            _ruleExpressionParser = new RuleExpressionParser(_reSettings);
+            _ruleCompiler = new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings, _ruleExpressionParser),_reSettings, _logger);
+            _actionFactory = new ActionFactory(GetActionRegistry(_reSettings));
+        }
+
+        private IDictionary<string, Func<ActionBase>> GetActionRegistry(ReSettings reSettings)
+        {
+            var actionDictionary = GetDefaultActionRegistry();
+            var customActions = reSettings.CustomActions ?? new Dictionary<string, Func<ActionBase>>();
+            foreach (var customAction in customActions)
+            {
+                actionDictionary.Add(customAction);
+            }
+            return actionDictionary;
+
         }
         #endregion
 
@@ -62,19 +80,19 @@ namespace RulesEngine
         /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
         /// <param name="inputs">A variable number of inputs</param>
         /// <returns>List of rule results</returns>
-        public List<RuleResultTree> ExecuteRule(string workflowName, params object[] inputs)
+        public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params object[] inputs)
         {
-            _logger.LogTrace($"Called ExecuteRule for workflow {workflowName} and count of input {inputs.Count()}");
+            _logger.LogTrace($"Called {nameof(ExecuteAllRulesAsync)} for workflow {workflowName} and count of input {inputs.Count()}");
 
             var ruleParams = new List<RuleParameter>();
 
-            for (int i = 0; i < inputs.Length; i++)
+            for (var i = 0; i < inputs.Length; i++)
             {
                 var input = inputs[i];
                 ruleParams.Add(new RuleParameter($"input{i + 1}", input));
             }
 
-            return ExecuteRule(workflowName, ruleParams.ToArray());
+            return await ExecuteAllRulesAsync(workflowName, ruleParams.ToArray());
         }
 
         /// <summary>
@@ -83,9 +101,47 @@ namespace RulesEngine
         /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
         /// <param name="ruleParams">A variable number of rule parameters</param>
         /// <returns>List of rule results</returns>
-        public List<RuleResultTree> ExecuteRule(string workflowName, params RuleParameter[] ruleParams)
+        public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params RuleParameter[] ruleParams)
         {
-            return ValidateWorkflowAndExecuteRule(workflowName, ruleParams);
+            var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, ruleParams);
+            foreach (var ruleResult in ruleResultList)
+            {
+                var actionResult = await ExecuteActionForRuleResult(ruleResult, false);
+                ruleResult.ActionResult = new ActionResult {
+                    Output = actionResult.Output,
+                    Exception = actionResult.Exception
+                };
+            }
+            return ruleResultList;
+        }
+
+
+        public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters)
+        {
+            var compiledRule = CompileRule(workflowName, ruleName, ruleParameters);
+            var resultTree = compiledRule(ruleParameters);
+            return await ExecuteActionForRuleResult(resultTree, true);
+        }
+
+        private async ValueTask<ActionRuleResult> ExecuteActionForRuleResult(RuleResultTree resultTree, bool includeRuleResults = false)
+        {
+            var triggerType = resultTree?.IsSuccess == true ? ActionTriggerType.onSuccess : ActionTriggerType.onFailure;
+
+            if (resultTree?.Rule?.Actions != null && resultTree.Rule.Actions.ContainsKey(triggerType))
+            {
+                var actionInfo = resultTree.Rule.Actions[triggerType];
+                var action = _actionFactory.Get(actionInfo.Name);
+                var ruleParameters = resultTree.Inputs.Select(kv => new RuleParameter(kv.Key, kv.Value)).ToArray();
+                return await action.ExecuteAndReturnResultAsync(new ActionContext(actionInfo.Context, resultTree), ruleParameters, includeRuleResults);
+            }
+            else
+            {
+                //If there is no action,return output as null and return the result for rule
+                return new ActionRuleResult {
+                    Output = null,
+                    Results = includeRuleResults ? new List<RuleResultTree>() { resultTree } : null
+                };
+            }
         }
 
         #endregion
@@ -112,6 +168,11 @@ namespace RulesEngine
             {
                 throw new RuleValidationException(ex.Message, ex.Errors);
             }
+        }
+
+        public List<string> GetAllRegisteredWorkflowNames()
+        {
+            return _rulesCache.GetAllWorkflowNames();
         }
 
         /// <summary>
@@ -147,7 +208,7 @@ namespace RulesEngine
 
             if (RegisterRule(workflowName, ruleParams))
             {
-                result = ExecuteRuleByWorkflow(workflowName, ruleParams);
+                result = ExecuteAllRuleByWorkflow(workflowName, ruleParams);
             }
             else
             {
@@ -168,38 +229,22 @@ namespace RulesEngine
         /// </returns>
         private bool RegisterRule(string workflowName, params RuleParameter[] ruleParams)
         {
-            string compileRulesKey = _rulesCache.GetRulesCacheKey(workflowName);
+            var compileRulesKey = GetCompiledRulesKey(workflowName, ruleParams);
             if (_rulesCache.ContainsCompiledRules(compileRulesKey))
+            {
                 return true;
+            }
 
             var workflowRules = _rulesCache.GetWorkFlowRules(workflowName);
             if (workflowRules != null)
             {
-                var lstFunc = new List<RuleFunc<RuleResultTree>>();
-                var ruleCompiler = new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings), _logger);
-                foreach (var rule in _rulesCache.GetRules(workflowName))
+                var dictFunc = new Dictionary<string, RuleFunc<RuleResultTree>>();
+                foreach (var rule in workflowRules.Rules.Where(c => c.Enabled))
                 {
-                    var compiledParamsKey = GetCompiledParamsCacheKey(workflowName, rule);
-                    CompiledRuleParam compiledRuleParam = _compiledParamsCache.GetOrCreate(compiledParamsKey, (entry) => ruleParamCompiler.CompileParamsExpression(rule, ruleParams));
-
-                    var updatedRuleParams = compiledRuleParam != null ? ruleParams?.Concat(compiledRuleParam?.RuleParameters) : ruleParams;
-                    var compiledRule = ruleCompiler.CompileRule(rule, updatedRuleParams?.ToArray());
-                    
-                    RuleFunc<RuleResultTree> updatedRule = (object[] paramList) => {
-                        var inputs = paramList.AsEnumerable();
-                        IEnumerable<CompiledParam> localParams = compiledRuleParam?.CompiledParameters ?? new List<CompiledParam>();
-                        foreach(var localParam in localParams){
-                            var evaluatedLocalParam = ruleParamCompiler.EvaluateCompiledParam(localParam.Name,localParam.Value,inputs);
-                            inputs = inputs.Append(evaluatedLocalParam.Value);
-                        }
-                        var result = compiledRule(inputs.ToArray());
-                        result.RuleEvaluatedParams = compiledRuleParam?.RuleParameters;
-                        return result;
-                    };
-                    lstFunc.Add(updatedRule);
+                    dictFunc.Add(rule.RuleName, CompileRule(rule, ruleParams, workflowRules.GlobalParams?.ToArray()));
                 }
 
-                _rulesCache.AddOrUpdateCompiledRule(compileRulesKey,lstFunc );
+                _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, dictFunc);
                 _logger.LogTrace($"Rules has been compiled for the {workflowName} workflow and added to dictionary");
                 return true;
             }
@@ -209,83 +254,106 @@ namespace RulesEngine
             }
         }
 
+
+        private RuleFunc<RuleResultTree> CompileRule(string workflowName, string ruleName, RuleParameter[] ruleParameters)
+        {
+            var workflow = _rulesCache.GetWorkFlowRules(workflowName);
+            if(workflow == null)
+            {
+                throw new ArgumentException($"Workflow `{workflowName}` is not found");
+            }
+            var currentRule = workflow.Rules?.SingleOrDefault(c => c.RuleName == ruleName && c.Enabled);
+            if (currentRule == null)
+            {
+                throw new ArgumentException($"Workflow `{workflowName}` does not contain any rule named `{ruleName}`");
+            }
+            return CompileRule(currentRule, ruleParameters, workflow.GlobalParams?.ToArray());
+        }
+
+        private RuleFunc<RuleResultTree> CompileRule(Rule rule, RuleParameter[] ruleParams, ScopedParam[] scopedParams)
+        {
+            return _ruleCompiler.CompileRule(rule, ruleParams, scopedParams);
+        }
+
+
+
         /// <summary>
         /// This will execute the compiled rules 
         /// </summary>
         /// <param name="workflowName"></param>
         /// <param name="ruleParams"></param>
         /// <returns>list of rule result set</returns>
-
-        // TODO: Cleanup and fix this
-        private List<RuleResultTree> ExecuteRuleByWorkflow(string workflowName, RuleParameter[] ruleParameters)
+        private List<RuleResultTree> ExecuteAllRuleByWorkflow(string workflowName, RuleParameter[] ruleParameters)
         {
             _logger.LogTrace($"Compiled rules found for {workflowName} workflow and executed");
 
-            List<RuleResultTree> result = new List<RuleResultTree>();
-            string compiledRulesCacheKey = _rulesCache.GetRulesCacheKey(workflowName);
-            foreach (var compiledRule in _rulesCache.GetCompiledRules(compiledRulesCacheKey))
+            var result = new List<RuleResultTree>();
+            var compiledRulesCacheKey = GetCompiledRulesKey(workflowName, ruleParameters);
+            foreach (var compiledRule in _rulesCache.GetCompiledRules(compiledRulesCacheKey)?.Values)
             {
-                var inputs = ruleParameters.Select(c => c.Value).ToArray();
-                var resultTree = compiledRule(inputs);
+                var resultTree = compiledRule(ruleParameters);
                 result.Add(resultTree);
             }
 
-            FormatErrorMessages(result?.Where(r => !r.IsSuccess));
+            FormatErrorMessages(result);
             return result;
         }
 
-        private string GetCompiledParamsCacheKey(string workflowName, Rule rule)
+        private string GetCompiledRulesKey(string workflowName, RuleParameter[] ruleParams)
         {
-            if (rule == null)
-            {
-                return string.Empty;
-            }
-            else
-            {
-                if (rule?.LocalParams == null)
-                {
-                    return $"Compiled_{workflowName}_{rule.RuleName}";
-                }
+            var key = $"{workflowName}-" + string.Join("-", ruleParams.Select(c => c.Type.Name));
+            return key;
+        }
 
-                return $"Compiled_{workflowName}_{rule.RuleName}_{string.Join("_", rule?.LocalParams.Select(r => r?.Name))}";
-            }
+        private IDictionary<string, Func<ActionBase>> GetDefaultActionRegistry()
+        {
+            return new Dictionary<string, Func<ActionBase>>{
+                {"OutputExpression",() => new OutputExpressionAction(_ruleExpressionParser) },
+                {"EvaluateRule", () => new EvaluateRuleAction(this) }
+            };
         }
 
         /// <summary>
         /// The result
         /// </summary>
-        /// <param name="result">The result.</param>
+        /// <param name="ruleResultList">The result.</param>
         /// <returns>Updated error message.</returns>
-        private IEnumerable<RuleResultTree> FormatErrorMessages(IEnumerable<RuleResultTree> result)
+        private IEnumerable<RuleResultTree> FormatErrorMessages(IEnumerable<RuleResultTree> ruleResultList)
         {
-            foreach (var error in result)
+            if (_reSettings.EnableFormattedErrorMessage)
             {
-                var errorParameters = Regex.Matches(error?.Rule?.ErrorMessage, ParamParseRegex);
-                var errorMessage = error?.Rule?.ErrorMessage;
-                var evaluatedParams = error?.RuleEvaluatedParams;
-                foreach (var param in errorParameters)
+                foreach (var ruleResult in ruleResultList?.Where(r => !r.IsSuccess))
                 {
-                    var paramVal = param?.ToString();
-                    var property = paramVal?.Substring(2, paramVal.Length - 3);
-                    if (property?.Split('.')?.Count() > 1)
+                    var errorMessage = ruleResult?.Rule?.ErrorMessage;
+                    if (string.IsNullOrWhiteSpace(ruleResult.ExceptionMessage) && errorMessage != null)
                     {
-                        var typeName = property?.Split('.')?[0];
-                        var propertyName = property?.Split('.')?[1];
-                        errorMessage = UpdateErrorMessage(errorMessage, evaluatedParams, property, typeName, propertyName);
+                        var errorParameters = Regex.Matches(errorMessage, ParamParseRegex);
+
+                        var inputs = ruleResult.Inputs;
+                        foreach (var param in errorParameters)
+                        {
+                            var paramVal = param?.ToString();
+                            var property = paramVal?.Substring(2, paramVal.Length - 3);
+                            if (property?.Split('.')?.Count() > 1)
+                            {
+                                var typeName = property?.Split('.')?[0];
+                                var propertyName = property?.Split('.')?[1];
+                                errorMessage = UpdateErrorMessage(errorMessage, inputs, property, typeName, propertyName);
+                            }
+                            else
+                            {
+                                var arrParams = inputs?.Select(c => new { Name = c.Key, c.Value });
+                                var model = arrParams?.Where(a => string.Equals(a.Name, property))?.FirstOrDefault();
+                                var value = model?.Value != null ? JsonConvert.SerializeObject(model?.Value) : null;
+                                errorMessage = errorMessage?.Replace($"$({property})", value ?? $"$({property})");
+                            }
+                        }
+                        ruleResult.ExceptionMessage = errorMessage;
                     }
-                    else
-                    {
-                        var arrParams = evaluatedParams?.Select(c => new { c.Name, c.Value });
-                        var model = arrParams?.Where(a => string.Equals(a.Name, property))?.FirstOrDefault();
-                        var value = model?.Value != null ? JsonConvert.SerializeObject(model?.Value) : null;
-                        errorMessage = errorMessage?.Replace($"$({property})", value ?? $"$({property})");
-                    }
+
                 }
-
-                error.Rule.ErrorMessage = errorMessage;
             }
-
-            return result;
+            return ruleResultList;
         }
 
         /// <summary>
@@ -297,9 +365,9 @@ namespace RulesEngine
         /// <param name="typeName">Name of the type.</param>
         /// <param name="propertyName">Name of the property.</param>
         /// <returns>Updated error message.</returns>
-        private static string UpdateErrorMessage(string errorMessage, IEnumerable<RuleParameter> evaluatedParams, string property, string typeName, string propertyName)
+        private static string UpdateErrorMessage(string errorMessage, IDictionary<string, object> inputs, string property, string typeName, string propertyName)
         {
-            var arrParams = evaluatedParams?.Select(c => new { c.Name, c.Value });
+            var arrParams = inputs?.Select(c => new { Name = c.Key, c.Value });
             var model = arrParams?.Where(a => string.Equals(a.Name, typeName))?.FirstOrDefault();
             if (model != null)
             {

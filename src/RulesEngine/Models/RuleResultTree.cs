@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using RulesEngine.HelperFunctions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -40,7 +41,9 @@ namespace RulesEngine.Models
         /// <summary>
         /// Gets or sets the input object
         /// </summary>
-        public object Input { get; set; }
+        public Dictionary<string, object> Inputs { get; set; }
+
+        public ActionResult ActionResult { get; set; }
 
         /// <summary>
         /// Gets the exception message in case an error is thrown during rules calculation.
@@ -53,6 +56,7 @@ namespace RulesEngine.Models
         /// <value>
         /// The rule evaluated parameters.
         /// </value>
+        [Obsolete("Use `Inputs` field to get details of all input, localParams and globalParams")]
         public IEnumerable<RuleParameter> RuleEvaluatedParams { get; set; }
 
         /// <summary>
@@ -60,9 +64,10 @@ namespace RulesEngine.Models
         /// </summary>
         /// <returns>RuleResultMessage</returns>
         [ExcludeFromCodeCoverage]
+        [Obsolete("will be removed in next major version")]
         public RuleResultMessage GetMessages()
         {
-            RuleResultMessage ruleResultMessage = new RuleResultMessage();
+            var ruleResultMessage = new RuleResultMessage();
 
             Helpers.ToResultTreeMessages(this, ref ruleResultMessage);
 

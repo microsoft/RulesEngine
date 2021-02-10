@@ -2,12 +2,14 @@
 // Licensed under the MIT License.
 
 using Microsoft.Extensions.Logging;
+using RulesEngine.ExpressionBuilders;
 using RulesEngine.HelperFunctions;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 
 namespace RulesEngine
 {
@@ -25,6 +27,7 @@ namespace RulesEngine
         /// The expression builder factory
         /// </summary>
         private readonly RuleExpressionBuilderFactory _expressionBuilderFactory;
+        private readonly ReSettings _reSettings;
 
         /// <summary>
         /// The logger
@@ -36,20 +39,12 @@ namespace RulesEngine
         /// </summary>
         /// <param name="expressionBuilderFactory">The expression builder factory.</param>
         /// <exception cref="ArgumentNullException">expressionBuilderFactory</exception>
-        internal RuleCompiler(RuleExpressionBuilderFactory expressionBuilderFactory, ILogger logger)
+        internal RuleCompiler(RuleExpressionBuilderFactory expressionBuilderFactory, ReSettings reSettings, ILogger logger)
         {
-            if (expressionBuilderFactory == null)
-            {
-                throw new ArgumentNullException($"{nameof(expressionBuilderFactory)} can't be null.");
-            }
-
-            if (logger == null)
-            {
-                throw new ArgumentNullException($"{nameof(logger)} can't be null.");
-            }
-
-            _logger = logger;
-            _expressionBuilderFactory = expressionBuilderFactory;
+            _logger = logger ?? throw new ArgumentNullException($"{nameof(logger)} can't be null.");
+          
+            _expressionBuilderFactory = expressionBuilderFactory ?? throw new ArgumentNullException($"{nameof(expressionBuilderFactory)} can't be null.");
+            _reSettings = reSettings;
         }
 
         /// <summary>
@@ -60,14 +55,19 @@ namespace RulesEngine
         /// <param name="input"></param>
         /// <param name="ruleParam"></param>
         /// <returns>Compiled func delegate</returns>
-        public RuleFunc<RuleResultTree> CompileRule(Rule rule,params RuleParameter[] ruleParams)
+        internal RuleFunc<RuleResultTree> CompileRule(Rule rule, RuleParameter[] ruleParams, ScopedParam[] globalParams)
         {
             try
             {
-                IEnumerable<ParameterExpression> typeParameterExpressions = GetParameterExpression(ruleParams).ToList();
-                RuleFunc<RuleResultTree> ruleExpression = GetExpressionForRule(rule, typeParameterExpressions,ruleParams);
-
-                return ruleExpression;
+                if (rule == null)
+                {
+                    throw new ArgumentNullException(nameof(rule));
+                }
+                var globalParamExp = GetRuleExpressionParameters(rule.RuleExpressionType,globalParams, ruleParams);
+                var extendedRuleParams = ruleParams.Concat(globalParamExp.Select(c => new RuleParameter(c.ParameterExpression.Name,c.ParameterExpression.Type)))
+                                                   .ToArray();
+                var ruleExpression = GetDelegateForRule(rule, extendedRuleParams);
+                return GetWrappedRuleFunc(RuleExpressionType.LambdaExpression,ruleExpression,ruleParams,globalParamExp);
             }
             catch (Exception ex)
             {
@@ -76,33 +76,7 @@ namespace RulesEngine
             }
         }
 
-        // <summary>
-        /// Gets the parameter expression.
-        /// </summary>
-        /// <param name="ruleParams">The types.</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException">
-        /// types
-        /// or
-        /// type
-        /// </exception>
-        private IEnumerable<ParameterExpression> GetParameterExpression(params RuleParameter[] ruleParams)
-        {
-            if (ruleParams == null || !ruleParams.Any())
-            {
-                throw new ArgumentException($"{nameof(ruleParams)} can't be null/empty.");
-            }
 
-            foreach (var ruleParam in ruleParams)
-            {
-                if (ruleParam == null)
-                {
-                    throw new ArgumentException($"{nameof(ruleParam)} can't be null.");
-                }
-
-                yield return Expression.Parameter(ruleParam.Type, ruleParam.Name);
-            }
-        }
 
         /// <summary>
         /// Gets the expression for rule.
@@ -111,19 +85,57 @@ namespace RulesEngine
         /// <param name="typeParameterExpressions">The type parameter expressions.</param>
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns></returns>
-        private RuleFunc<RuleResultTree> GetExpressionForRule(Rule rule, IEnumerable<ParameterExpression> typeParameterExpressions, RuleParameter[] ruleParams)
+        private RuleFunc<RuleResultTree> GetDelegateForRule(Rule rule, RuleParameter[] ruleParams)
         {
-            ExpressionType nestedOperator;
+            var scopedParamList = GetRuleExpressionParameters(rule.RuleExpressionType, rule?.LocalParams, ruleParams);
 
-            if (Enum.TryParse(rule.Operator, out nestedOperator) && nestedOperators.Contains(nestedOperator) &&
+            var extendedRuleParams = ruleParams.Concat(scopedParamList.Select(c => new RuleParameter(c.ParameterExpression.Name, c.ParameterExpression.Type)))
+                                               .ToArray();
+
+            RuleFunc<RuleResultTree> ruleFn;
+            
+            if (Enum.TryParse(rule.Operator, out ExpressionType nestedOperator) && nestedOperators.Contains(nestedOperator) &&
                 rule.Rules != null && rule.Rules.Any())
             {
-                return BuildNestedExpression(rule, nestedOperator, typeParameterExpressions, ruleParams);
+                ruleFn = BuildNestedRuleFunc(rule, nestedOperator, extendedRuleParams);
             }
             else
             {
-                return BuildExpression(rule, typeParameterExpressions,ruleParams);
+                ruleFn = BuildRuleFunc(rule, extendedRuleParams);
             }
+
+            return GetWrappedRuleFunc(rule.RuleExpressionType, ruleFn, ruleParams, scopedParamList);
+        }
+
+        private RuleExpressionParameter[] GetRuleExpressionParameters(RuleExpressionType ruleExpressionType,IEnumerable<ScopedParam> localParams, RuleParameter[] ruleParams)
+        {
+            if(!_reSettings.EnableScopedParams)
+            {
+                return new RuleExpressionParameter[] { };
+            }
+            var ruleExpParams = new List<RuleExpressionParameter>();
+
+            if (localParams?.Any() == true)
+            {
+
+                var parameters = ruleParams.Select(c => c.ParameterExpression)
+                                            .ToList();
+
+                var expressionBuilder = GetExpressionBuilder(ruleExpressionType);
+
+                foreach (var lp in localParams)
+                {
+                    var lpExpression = expressionBuilder.Parse(lp.Expression, parameters.ToArray(), null).Body;
+                    var ruleExpParam = new RuleExpressionParameter() {
+                        ParameterExpression = Expression.Parameter(lpExpression.Type, lp.Name),
+                        ValueExpression = lpExpression
+                    };
+                    parameters.Add(ruleExpParam.ParameterExpression);
+                    ruleExpParams.Add(ruleExpParam);
+                }
+            }
+            return ruleExpParams.ToArray();
+
         }
 
         /// <summary>
@@ -134,18 +146,13 @@ namespace RulesEngine
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        private RuleFunc<RuleResultTree> BuildExpression(Rule rule, IEnumerable<ParameterExpression> typeParameterExpressions, RuleParameter[] ruleParams)
+        private RuleFunc<RuleResultTree> BuildRuleFunc(Rule rule, RuleParameter[] ruleParams)
         {
-            if (!rule.RuleExpressionType.HasValue)
-            {
-                throw new InvalidOperationException($"RuleExpressionType can not be null for leaf level expressions.");
-            }
+            var ruleExpressionBuilder = GetExpressionBuilder(rule.RuleExpressionType);
 
-            var ruleExpressionBuilder = _expressionBuilderFactory.RuleGetExpressionBuilder(rule.RuleExpressionType.Value);
+            var ruleFunc = ruleExpressionBuilder.BuildDelegateForRule(rule, ruleParams);
 
-            var expression = ruleExpressionBuilder.BuildExpressionForRule(rule, typeParameterExpressions);
-
-            return expression;
+            return ruleFunc;
         }
 
         /// <summary>
@@ -158,26 +165,30 @@ namespace RulesEngine
         /// <param name="ruleInputExp">The rule input exp.</param>
         /// <returns>Expression of func delegate</returns>
         /// <exception cref="InvalidCastException"></exception>
-        private RuleFunc<RuleResultTree> BuildNestedExpression(Rule parentRule, ExpressionType operation, IEnumerable<ParameterExpression> typeParameterExpressions, RuleParameter[] ruleParams)
+        private RuleFunc<RuleResultTree> BuildNestedRuleFunc(Rule parentRule, ExpressionType operation, RuleParameter[] ruleParams)
         {
-            var expressions = new List<RuleFunc<RuleResultTree>>();
-            foreach (var r in parentRule.Rules)
+            var ruleFuncList = new List<RuleFunc<RuleResultTree>>();
+            foreach (var r in parentRule.Rules.Where(c => c.Enabled))
             {
-                expressions.Add(GetExpressionForRule(r, typeParameterExpressions, ruleParams));
+                ruleFuncList.Add(GetDelegateForRule(r, ruleParams));
             }
 
-            return (paramArray) =>
-             {
-                 var resultList = expressions.Select(fn => fn(paramArray));
-                 RuleFunc<bool> isSuccess = (p) => ApplyOperation(resultList, operation);
-                 RuleFunc<RuleResultTree> result =  Helpers.ToResultTree(parentRule, resultList,isSuccess);
-                 return result(paramArray);
-             };
+            return (paramArray) => {
+                var resultList = ruleFuncList.Select(fn => fn(paramArray)).ToList();
+                Func<object[], bool> isSuccess = (p) => ApplyOperation(resultList, operation);
+                var result = Helpers.ToResultTree(parentRule, resultList, isSuccess);
+                return result(paramArray);
+            };
         }
 
 
         private bool ApplyOperation(IEnumerable<RuleResultTree> ruleResults, ExpressionType operation)
         {
+            if (ruleResults?.Any() != true)
+            {
+                return false;
+            }
+
             switch (operation)
             {
                 case ExpressionType.And:
@@ -190,6 +201,37 @@ namespace RulesEngine
                 default:
                     return false;
             }
+        }
+
+        private RuleFunc<RuleResultTree> GetWrappedRuleFunc(RuleExpressionType ruleExpressionType, RuleFunc<RuleResultTree> ruleFunc,RuleParameter[] ruleParameters,RuleExpressionParameter[] ruleExpParams)
+        {
+            if(ruleExpParams.Length == 0)
+            {
+                return ruleFunc;
+            }
+            var paramDelegate = GetExpressionBuilder(ruleExpressionType).CompileScopedParams(ruleParameters, ruleExpParams);
+
+            return (ruleParams) => {
+                var inputs = ruleParams.Select(c => c.Value).ToArray();
+                var scopedParamsDict = paramDelegate(inputs);
+                var scopedParams = scopedParamsDict.Select(c => new RuleParameter(c.Key, c.Value)).ToList();
+                var extendedInputs = ruleParams.Concat(scopedParams);
+                var result = ruleFunc(extendedInputs.ToArray());
+                // To be removed in next major release
+#pragma warning disable CS0618 // Type or member is obsolete
+                if(result.RuleEvaluatedParams == null)
+                {
+                    result.RuleEvaluatedParams = scopedParams;
+                }
+#pragma warning restore CS0618 // Type or member is obsolete
+
+                return result;
+            };
+        }
+
+        private RuleExpressionBuilderBase GetExpressionBuilder(RuleExpressionType expressionType)
+        {
+            return _expressionBuilderFactory.RuleGetExpressionBuilder(expressionType);
         }
     }
 }

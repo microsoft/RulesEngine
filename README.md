@@ -1,6 +1,6 @@
 # Rules Engine
-![build](https://github.com/microsoft/RulesEngine/workflows/build/badge.svg?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/microsoft/RulesEngine/badge.svg?branch=master)](https://coveralls.io/github/microsoft/RulesEngine?branch=master)
+![build](https://github.com/microsoft/RulesEngine/workflows/build/badge.svg?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/microsoft/RulesEngine/badge.svg?branch=main)](https://coveralls.io/github/microsoft/RulesEngine?branch=main)
 [![Nuget download][download-image]][download-url]
 
 [download-image]: https://img.shields.io/nuget/dt/RulesEngine
@@ -13,7 +13,7 @@ To install this library, please download the latest version of  [NuGet Package](
 
 ## How to use it
 
-You need to store the rules based on the [schema definition](https://github.com/microsoft/RulesEngine/blob/master/schema/workflowRules-schema.json) given and they can be stored in any store as deemed appropriate like Azure Blob Storage, Cosmos DB, Azure App Configuration, SQL Servers, file systems etc. The expressions are supposed to be a [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
+You need to store the rules based on the [schema definition](https://github.com/microsoft/RulesEngine/blob/main/schema/workflowRules-schema.json) given and they can be stored in any store as deemed appropriate like Azure Blob Storage, Cosmos DB, Azure App Configuration, SQL Servers, file systems etc. The expressions are supposed to be a [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
 
 An example rule could be - 
 ```json
@@ -48,9 +48,9 @@ var rulesEngine = new RulesEngine(workflowRules, logger);
 ```
 Here, *workflowRules* is a list of deserialized object based out of the schema explained above and *logger* is a custom logger instance made out of an [ILogger](https://github.com/microsoft/RulesEngine/wiki/Getting-Started#logger) instance.
 
-Once done, the Rules Engine needs to execute the rules for a given input. It can be done by calling the method ExecuteRule as shown below - 
+Once done, the Rules Engine needs to execute the rules for a given input. It can be done by calling the method ExecuteAllRulesAsync as shown below - 
 ```c#
-List<RuleResultTree> response = rulesEngine.ExecuteRule(workflowName, input);
+List<RuleResultTree> response = await rulesEngine.ExecuteAllRulesAsync(workflowName, input);
 ```
 Here, *workflowName* is the name of the workflow, which is *Discount* in the above mentioned example. And *input* is the object which needs to be checked against the rules.
 
@@ -59,13 +59,13 @@ The *response* will contain a list of [*RuleResultTree*](https://github.com/micr
 
 _Note: A detailed example showcasing how to use Rules Engine is explained in [Getting Started page](https://github.com/microsoft/RulesEngine/wiki/Getting-Started) of [Rules Engine Wiki](https://github.com/microsoft/RulesEngine/wiki)._
 
-_A demo app for the is available at [this location](https://github.com/microsoft/RulesEngine/tree/master/demo)._
+_A demo app for the is available at [this location](https://github.com/microsoft/RulesEngine/tree/main/demo)._
 
 ## How it works
 
-![](https://github.com/microsoft/RulesEngine/blob/master/assets/BlockDiagram.png)
+![](https://github.com/microsoft/RulesEngine/blob/main/assets/BlockDiagram.png)
 
-The rules can be stored in any store and be fed to the system in a structure which follows a proper [schema](https://github.com/microsoft/RulesEngine/blob/master/schema/workflowRules-schema.json) of WorkFlow model.
+The rules can be stored in any store and be fed to the system in a structure which follows a proper [schema](https://github.com/microsoft/RulesEngine/blob/main/schema/workflowRules-schema.json) of WorkFlow model.
 
 The wrapper needs to be created over the Rules Engine package, which will get the rules and input message(s) from any store that your system dictates and put it into the Engine. Also, the wrapper then needs to handle the output using appropriate means.
 

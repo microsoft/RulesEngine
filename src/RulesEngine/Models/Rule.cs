@@ -3,9 +3,10 @@
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using RulesEngine.Enums;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace RulesEngine.Models
 {
@@ -16,81 +17,35 @@ namespace RulesEngine.Models
     public class Rule
     {
         /// <summary>
-        /// Gets or sets the name of the rule.
+        /// Rule name for the Rule
         /// </summary>
-        /// <value>
-        /// The name of the rule.
-        /// </value>
         public string RuleName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the operator.
-        /// </summary>
-        /// <value>
-        /// The operator.
-        /// </value>
+        /// <summary>	
+        /// Gets or sets the custom property or tags of the rule.	
+        /// </summary>	
+        /// <value>	
+        /// The properties of the rule.	
+        /// </value>	
+        public Dictionary<string, object> Properties { get; set; }
         public string Operator { get; set; }
-
-        /// <summary>
-        /// Gets or sets the error message.
-        /// </summary>
-        /// <value>
-        /// The error message.
-        /// </value>
         public string ErrorMessage { get; set; }
 
         /// <summary>
-        /// Gets or sets the type of the error.
+        /// Gets or sets whether the rule is enabled.
         /// </summary>
-        /// <value>
-        /// The type of the error.
-        /// </value>
+        public bool Enabled { get; set; } = true;
+
+        [Obsolete("will be removed in next major version")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public ErrorType ErrorType { get; set; }
+        public ErrorType ErrorType { get; set; } = ErrorType.Warning;
 
-        /// <summary>
-        /// Gets or sets the type of the rule expression.
-        /// </summary>
-        /// <value>
-        /// The type of the rule expression.
-        /// </value>
         [JsonConverter(typeof(StringEnumConverter))]
-        public RuleExpressionType? RuleExpressionType { get; set; }
-
-
-        /// <summary>
-        /// Gets or sets the names of common workflows
-        /// </summary>
+        public RuleExpressionType RuleExpressionType { get; set; } = RuleExpressionType.LambdaExpression;
         public List<string> WorkflowRulesToInject { get; set; }
-
-        /// <summary>
-        /// Gets or sets the rules.
-        /// </summary>
-        /// <value>
-        /// The rules.
-        /// </value>
         public List<Rule> Rules { get; set; }
-
-        /// <summary>
-        /// Gets the parameters.
-        /// </summary>
-        /// <value>
-        /// The parameters.
-        /// </value>
-        [JsonProperty]
-        public IEnumerable<LocalParam> LocalParams { get; private set; }
-
-        /// <summary>
-        /// Gets or Sets the lambda expression. 
-        /// </summary>
+        public IEnumerable<ScopedParam> LocalParams { get; set; }
         public string Expression { get; set; }
-
-        /// <summary>
-        /// Gets or sets the success event.
-        /// </summary>
-        /// <value>
-        /// The success event.
-        /// </value>
+        public Dictionary<ActionTriggerType, ActionInfo> Actions { get; set; }
         public string SuccessEvent { get; set; }
 
     }

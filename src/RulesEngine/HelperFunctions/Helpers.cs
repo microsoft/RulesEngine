@@ -5,7 +5,6 @@ using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace RulesEngine.HelperFunctions
 {
@@ -14,13 +13,12 @@ namespace RulesEngine.HelperFunctions
     /// </summary>
     internal static class Helpers
     {
-        internal static RuleFunc<RuleResultTree> ToResultTree(Rule rule, IEnumerable<RuleResultTree> childRuleResults, RuleFunc<bool> isSuccessFunc, string exceptionMessage = "")
+        internal static RuleFunc<RuleResultTree> ToResultTree(Rule rule, IEnumerable<RuleResultTree> childRuleResults, Func<object[], bool> isSuccessFunc, string exceptionMessage = "")
         {
-            return (inputs) => new RuleResultTree
-            {
+            return (inputs) => new RuleResultTree {
                 Rule = rule,
-                Input = inputs.FirstOrDefault(),
-                IsSuccess = isSuccessFunc(inputs),
+                Inputs = inputs.ToDictionary(c => c.Name, c => c.Value),
+                IsSuccess = isSuccessFunc(inputs.Select(c => c.Value).ToArray()),
                 ChildResults = childRuleResults,
                 ExceptionMessage = exceptionMessage
             };
@@ -31,6 +29,7 @@ namespace RulesEngine.HelperFunctions
         /// </summary>
         /// <param name="ruleResultTree">ruleResultTree</param>
         /// <param name="ruleResultMessage">ruleResultMessage</param>
+        [Obsolete]
         internal static void ToResultTreeMessages(RuleResultTree ruleResultTree, ref RuleResultMessage ruleResultMessage)
         {
             if (ruleResultTree.ChildResults != null)
@@ -42,7 +41,7 @@ namespace RulesEngine.HelperFunctions
                 if (!ruleResultTree.IsSuccess)
                 {
                     string errMsg = ruleResultTree.Rule.ErrorMessage;
-                    errMsg = string.IsNullOrEmpty(errMsg) ? $"Error message does not configured for {ruleResultTree.Rule.RuleName}" : errMsg;
+                    errMsg = string.IsNullOrEmpty(errMsg) ? $"Error message is not configured for {ruleResultTree.Rule.RuleName}" : errMsg;
 
                     if (ruleResultTree.Rule.ErrorType == ErrorType.Error && !ruleResultMessage.ErrorMessages.Contains(errMsg))
                     {
@@ -61,6 +60,7 @@ namespace RulesEngine.HelperFunctions
         /// </summary>
         /// <param name="childResultTree">childResultTree</param>
         /// <param name="ruleResultMessage">ruleResultMessage</param>
+        [Obsolete]
         private static void GetChildRuleMessages(IEnumerable<RuleResultTree> childResultTree, ref RuleResultMessage ruleResultMessage)
         {
             foreach (var item in childResultTree)

@@ -14,7 +14,7 @@ namespace RulesEngine.HelperFunctions
     {
         public static object GetTypedObject(dynamic input)
         {
-            if(input is ExpandoObject)
+            if (input is ExpandoObject)
             {
                 Type type = CreateAbstractClassType(input);
                 return CreateObject(type, input);
@@ -28,11 +28,11 @@ namespace RulesEngine.HelperFunctions
         {
             List<DynamicProperty> props = new List<DynamicProperty>();
 
-            if(input == null)
+            if (input == null)
             {
                 return typeof(object);
             }
-            if(!(input is ExpandoObject))
+            if (!(input is ExpandoObject))
             {
                 return input.GetType();
             }
@@ -51,7 +51,7 @@ namespace RulesEngine.HelperFunctions
                             var internalType = CreateAbstractClassType(((IList)expando.Value)[0]);
                             value = new List<object>().Cast(internalType).ToList(internalType).GetType();
                         }
-                       
+
                     }
                     else
                     {
@@ -73,36 +73,38 @@ namespace RulesEngine.HelperFunctions
             }
             object obj = Activator.CreateInstance(type);
 
+            var typeProps = type.GetProperties().ToDictionary(c => c.Name);
+
             foreach (var expando in (IDictionary<string, object>)input)
             {
-                if (type.GetProperties().Any(c => c.Name == expando.Key) &&
+                if (typeProps.ContainsKey(expando.Key) &&
                     expando.Value != null && (expando.Value.GetType().Name != "DBNull" || expando.Value != DBNull.Value))
                 {
                     object val;
+                    var propInfo = typeProps[expando.Key];
                     if (expando.Value is ExpandoObject)
                     {
-                        var propType = type.GetProperty(expando.Key).PropertyType;
+                        var propType = propInfo.PropertyType;
                         val = CreateObject(propType, expando.Value);
                     }
                     else if (expando.Value is IList)
                     {
-                        var internalType = type.GetProperty(expando.Key).PropertyType.GenericTypeArguments.FirstOrDefault()??typeof(object);
+                        var internalType = propInfo.PropertyType.GenericTypeArguments.FirstOrDefault() ?? typeof(object);
                         var temp = (IList)expando.Value;
-                        var newList = new List<object>();
+                        var newList = new List<object>().Cast(internalType).ToList(internalType);
                         for (int i = 0; i < temp.Count; i++)
                         {
                             var child = CreateObject(internalType, temp[i]);
                             newList.Add(child);
                         };
-                        val = newList.Cast(internalType).ToList(internalType);
+                        val = newList;
                     }
                     else
                     {
                         val = expando.Value;
                     }
-                    type.GetProperty(expando.Key).SetValue(obj, val, null);
+                    propInfo.SetValue(obj, val, null);
                 }
-
             }
 
             return obj;
@@ -123,5 +125,5 @@ namespace RulesEngine.HelperFunctions
         }
     }
 
-   
+
 }

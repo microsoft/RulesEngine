@@ -13,6 +13,13 @@ namespace RulesEngine.Extensions
         public delegate void OnSuccessFunc(string eventName);
         public delegate void OnFailureFunc();
 
+
+        /// <summary>
+        /// Calls the Success Func for the first rule which succeeded among the the ruleReults
+        /// </summary>
+        /// <param name="ruleResultTrees"></param>
+        /// <param name="onSuccessFunc"></param>
+        /// <returns></returns>
         public static List<RuleResultTree> OnSuccess(this List<RuleResultTree> ruleResultTrees, OnSuccessFunc onSuccessFunc)
         {
             var successfulRuleResult = ruleResultTrees.FirstOrDefault(ruleResult => ruleResult.IsSuccess == true);
@@ -25,6 +32,12 @@ namespace RulesEngine.Extensions
             return ruleResultTrees;
         }
 
+        /// <summary>
+        /// Calls the Failure Func if all rules failed in the ruleReults
+        /// </summary>
+        /// <param name="ruleResultTrees"></param>
+        /// <param name="onSuccessFunc"></param>
+        /// <returns></returns>
         public static List<RuleResultTree> OnFail(this List<RuleResultTree> ruleResultTrees, OnFailureFunc onFailureFunc)
         {
             bool allFailure = ruleResultTrees.All(ruleResult => ruleResult.IsSuccess == false);

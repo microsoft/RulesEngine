@@ -2,9 +2,9 @@ name: build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main, develop ]
 
 jobs:
   build:
@@ -12,26 +12,51 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+   # extract branch name
+    - name: Extract branch name
+      if: github.event_name != 'pull_request'
+      shell: bash
+      run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+      id: extract_branch
+      
+    # extract branch name on pull request
+    - name: Extract branch name on pull request
+      if: github.event_name == 'pull_request'
+      run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
+      
+    # print branch name
+    - name: Get branch name
+      run: echo "The branch name is ${{ env.BRANCH_NAME }}"
+
+      
     - uses: actions/checkout@v2
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1
+      
     - name: Install minicover
       run: dotnet tool install --global minicover --version 3.0.6
+    
     - name: Install dependencies
       run: dotnet restore RulesEngine.sln
+    
     - name: Build
       run: dotnet build RulesEngine.sln --configuration Release --no-restore
+    
     - name: Instrument
       run: minicover instrument
+    
     - name: Test
       run: dotnet test RulesEngine.sln --no-build --configuration Release --verbosity m
+    
     - name: Uninstrument
       run: minicover uninstrument
+    
     - name: Report
       run: minicover report --threshold 95
       if: ${{ github.event_name == 'pull_request' }}
+    
     - name: Report coveralls
-      run: minicover coverallsreport --repo-token ${{ secrets.COVERALLS_TOKEN }} --branch master
+      run: minicover coverallsreport --repo-token ${{ secrets.COVERALLS_TOKEN }} --branch ${{ env.BRANCH_NAME }}
       if: ${{ github.event_name == 'push' }}
