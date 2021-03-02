@@ -456,6 +456,88 @@ namespace RulesEngine.UnitTest
             Assert.False(result[1].ExceptionMessage.StartsWith("Exception while parsing expression"));
         }
 
+
+        [Fact]
+        public async Task ExecuteRule_RuntimeError_ShouldReturnAsErrorMessage()
+        {
+
+            var workflow = new WorkflowRules {
+                WorkflowName = "TestWorkflow",
+                Rules = new[] {
+                    new Rule {
+                        RuleName = "ruleWithRuntimeError",
+                        Expression = "input1.Country.ToLower() == \"india\""
+                    }
+                }
+            };
+
+            var re = new RulesEngine(new[] { workflow }, null, null);
+            var input = new RuleTestClass {
+                Country = null
+            };
+
+            var result = await re.ExecuteAllRulesAsync("TestWorkflow", input);
+
+            Assert.NotNull(result);
+            Assert.All(result, rule => Assert.False(rule.IsSuccess));
+            Assert.All(result, rule => Assert.StartsWith("Error while executing rule :", rule.ExceptionMessage));
+        }
+
+
+        [Fact]
+        public async Task ExecuteRule_RuntimeError_ThrowsException()
+        {
+
+            var workflow = new WorkflowRules {
+                WorkflowName = "TestWorkflow",
+                Rules = new[] {
+                    new Rule {
+                        RuleName = "ruleWithRuntimeError",
+                        Expression = "input1.Country.ToLower() == \"india\""
+                    }
+                }
+            };
+
+            var re = new RulesEngine(new[] { workflow }, null, new ReSettings {
+                EnableExceptionAsErrorMessage = false
+            });
+            var input = new RuleTestClass {
+                Country = null
+            };
+
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(async () => await re.ExecuteAllRulesAsync("TestWorkflow", input));
+            
+        }
+
+        [Fact]
+        public async Task ExecuteRule_RuntimeError_IgnoreException_DoesNotReturnException()
+        {
+
+            var workflow = new WorkflowRules {
+                WorkflowName = "TestWorkflow",
+                Rules = new[] {
+                    new Rule {
+                        RuleName = "ruleWithRuntimeError",
+                        Expression = "input1.Country.ToLower() == \"india\""
+                    }
+                }
+            };
+
+            var re = new RulesEngine(new[] { workflow }, null, new ReSettings {
+                IgnoreException = true
+            });
+            var input = new RuleTestClass {
+                Country = null
+            };
+
+            var result = await re.ExecuteAllRulesAsync("TestWorkflow", input);
+
+            Assert.NotNull(result);
+            Assert.All(result, rule => Assert.False(rule.IsSuccess));
+            Assert.All(result, rule => Assert.Empty(rule.ExceptionMessage));
+        }
+
+
         [Fact]
         public async Task RemoveWorkFlow_ShouldRemoveAllCompiledCache()
         {

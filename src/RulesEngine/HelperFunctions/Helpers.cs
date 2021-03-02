@@ -13,15 +13,59 @@ namespace RulesEngine.HelperFunctions
     /// </summary>
     internal static class Helpers
     {
-        internal static RuleFunc<RuleResultTree> ToResultTree(Rule rule, IEnumerable<RuleResultTree> childRuleResults, Func<object[], bool> isSuccessFunc, string exceptionMessage = "")
+        internal static RuleFunc<RuleResultTree> ToResultTree(ReSettings reSettings, Rule rule, IEnumerable<RuleResultTree> childRuleResults, Func<object[], bool> isSuccessFunc, string exceptionMessage = "")
         {
-            return (inputs) => new RuleResultTree {
-                Rule = rule,
-                Inputs = inputs.ToDictionary(c => c.Name, c => c.Value),
-                IsSuccess = isSuccessFunc(inputs.Select(c => c.Value).ToArray()),
-                ChildResults = childRuleResults,
-                ExceptionMessage = exceptionMessage
+            return (inputs) => {
+
+                var isSuccess = false;
+                var inputsDict = new Dictionary<string, object>();
+                try
+                {
+                    inputsDict = inputs.ToDictionary(c => c.Name, c => c.Value);
+                    isSuccess = isSuccessFunc(inputs.Select(c => c.Value).ToArray());
+                }
+                catch (Exception ex)
+                {
+                    HandleRuleException(ex, rule, reSettings);
+                    isSuccess = false;
+                    exceptionMessage = GetExceptionMessage($"Error while executing rule : {rule?.RuleName} - {ex.Message}", reSettings);
+                }
+
+                return new RuleResultTree {
+                    Rule = rule,
+                    Inputs = inputsDict,
+                    IsSuccess = isSuccess,
+                    ChildResults = childRuleResults,
+                    ExceptionMessage = exceptionMessage
+                };
+
             };
+            
+        }
+
+
+        internal static void HandleRuleException(Exception ex, Rule rule, ReSettings reSettings)
+        {
+            ex.Data.Add(nameof(rule.RuleName), rule.RuleName);
+            ex.Data.Add(nameof(rule.Expression), rule.Expression);
+
+            if (!reSettings.EnableExceptionAsErrorMessage)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <param name="message"></param>
+        /// <param name="rule"></param>
+        /// <param name="reSettings"></param>
+        /// <returns></returns>
+        internal static string GetExceptionMessage(string message,ReSettings reSettings)
+        {
+            return reSettings.IgnoreException ? "" : message;
         }
 
         /// <summary>

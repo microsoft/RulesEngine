@@ -26,21 +26,18 @@ namespace RulesEngine.ExpressionBuilders
             try
             {
                 var ruleDelegate = _ruleExpressionParser.Compile<bool>(rule.Expression, ruleParams);
-                return Helpers.ToResultTree(rule, null, ruleDelegate);
+                return Helpers.ToResultTree(_reSettings, rule, null, ruleDelegate);
             }
             catch (Exception ex)
             {
-                ex.Data.Add(nameof(rule.RuleName), rule.RuleName);
-                ex.Data.Add(nameof(rule.Expression), rule.Expression);
+                Helpers.HandleRuleException(ex,rule,_reSettings);
 
-                if (!_reSettings.EnableExceptionAsErrorMessage)
-                {
-                    throw;
-                }
+                var exceptionMessage = Helpers.GetExceptionMessage($"Exception while parsing expression `{rule?.Expression}` - {ex.Message}",
+                                                                    _reSettings);
 
                 bool func(object[] param) => false;
-                var exceptionMessage = _reSettings.IgnoreException ? "" : $"Exception while parsing expression `{rule?.Expression}` - {ex.Message}";
-                return Helpers.ToResultTree(rule, null,func, exceptionMessage);
+                
+                return Helpers.ToResultTree(_reSettings, rule, null,func, exceptionMessage);
             }
         }
 
