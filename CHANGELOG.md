@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.0-preview.3]
+- Fixed scoped parameters runtime errors not logging as errorMessage
+
 ## [3.1.0-preview.2]
 - Runtime errors for expressions will now be logged as errorMessage instead of throwing Exceptions by default
 

@@ -17,15 +17,23 @@ namespace RulesEngine.ExpressionBuilders
     {
         private readonly ReSettings _reSettings;
         private static IMemoryCache _memoryCache;
+        private readonly IDictionary<string, MethodInfo> _methodInfo;
 
         public RuleExpressionParser(ReSettings reSettings)
         {
             _reSettings = reSettings;
-            _memoryCache = new MemoryCache(new MemoryCacheOptions {
+            _memoryCache = _memoryCache ?? new MemoryCache(new MemoryCacheOptions {
                 SizeLimit = 1000
             });
+            _methodInfo = new Dictionary<string, MethodInfo>();
+            PopulateMethodInfo();
         }
 
+        private void PopulateMethodInfo()
+        {
+            var dict_add = typeof(Dictionary<string, object>).GetMethod("Add", BindingFlags.Public | BindingFlags.Instance, null, new[] { typeof(string), typeof(object) }, null);
+            _methodInfo.Add("dict_add", dict_add);
+        }
         public LambdaExpression Parse(string expression, ParameterExpression[] parameters, Type returnType)
         {
             var config = new ParsingConfig { CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes) };
@@ -114,7 +122,7 @@ namespace RulesEngine.ExpressionBuilders
             body.AddRange(variableExpressions);
 
             var dict = Expression.Variable(typeof(Dictionary<string, object>));
-            var add = typeof(Dictionary<string, object>).GetMethod("Add", BindingFlags.Public | BindingFlags.Instance, null, new[] { typeof(string), typeof(object) }, null);
+            var add = _methodInfo["dict_add"];
 
             body.Add(Expression.Assign(dict, Expression.New(typeof(Dictionary<string, object>))));
             variableExp.Add(dict);
@@ -139,7 +147,7 @@ namespace RulesEngine.ExpressionBuilders
 
         private string GetCacheKey(string expression, RuleParameter[] ruleParameters, Type returnType)
         {
-            var paramKey = string.Join("|", ruleParameters.Select(c => c.Type.ToString()));
+            var paramKey = string.Join("|", ruleParameters.Select(c => c.Name + "_" + c.Type.ToString()));
             var returnTypeKey = returnType?.ToString() ?? "null";
             var combined = $"Expression:{expression}-Params:{paramKey}-ReturnType:{returnTypeKey}";
             return combined;
