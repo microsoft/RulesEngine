@@ -14,7 +14,7 @@ namespace RulesEngine.Models
         public RuleParameter(string name, object value)
         {
             Value = Utils.GetTypedObject(value);
-            Init(name, Value.GetType());
+            Init(name, Value?.GetType());
         }
 
         internal RuleParameter(string name, Type type)
@@ -29,7 +29,7 @@ namespace RulesEngine.Models
         private void Init(string name, Type type)
         {
             Name = name;
-            Type = type;
+            Type = type ?? typeof(object);
             ParameterExpression = Expression.Parameter(Type, Name);
         }
 

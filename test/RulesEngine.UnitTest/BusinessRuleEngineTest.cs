@@ -279,7 +279,6 @@ namespace RulesEngine.UnitTest
             Assert.Contains(result, c => c.IsSuccess);
         }
 
-
         [Theory]
         [InlineData("rules4.json")]
         public async Task RulesEngine_Execute_Rule_For_Nested_Rule_Params_Returns_Success(string ruleFileName)
@@ -604,6 +603,40 @@ namespace RulesEngine.UnitTest
             re.AddWorkflow(workflow);
             var result2 = await re.ExecuteAllRulesAsync("Test", "hello");
             Assert.True(result2.All(c => c.IsSuccess == false));
+        }
+
+        [Fact]
+        public async Task ExecuteRule_WithNullInput_ShouldNotThrowException()
+        {
+            var workflow = new WorkflowRules {
+                WorkflowName = "Test",
+                Rules = new Rule[]{
+                    new Rule {
+                        RuleName = "RuleWithLocalParam",
+
+                        RuleExpressionType = RuleExpressionType.LambdaExpression,
+                        Expression = "input1 == null || input1.hello.world = \"wow\""
+                    }
+                }
+            };
+
+            var re = new RulesEngine();
+            re.AddWorkflow(workflow);
+
+            var result1 = await re.ExecuteAllRulesAsync("Test", new RuleParameter("input1", value:null));
+            Assert.True(result1.All(c => c.IsSuccess));
+
+
+            var result2 = await re.ExecuteAllRulesAsync("Test",new object[] { null });
+            Assert.True(result2.All(c => c.IsSuccess));
+
+            dynamic input1 = new ExpandoObject();
+            input1.hello = new ExpandoObject();
+            input1.hello.world = "wow";
+
+            List<RuleResultTree> result3 = await re.ExecuteAllRulesAsync("Test", input1);
+            Assert.True(result3.All(c => c.IsSuccess));
+
         }
 
         private RulesEngine CreateRulesEngine(WorkflowRules workflow)
