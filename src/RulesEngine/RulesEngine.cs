@@ -39,7 +39,7 @@ namespace RulesEngine
         #endregion
 
         #region Constructor
-        public RulesEngine(string[] jsonConfig, ILogger logger, ReSettings reSettings = null) : this(logger, reSettings)
+        public RulesEngine(string[] jsonConfig, ILogger logger = null, ReSettings reSettings = null) : this(logger, reSettings)
         {
             var workflowRules = jsonConfig.Select(item => JsonConvert.DeserializeObject<WorkflowRules>(item)).ToArray();
             AddWorkflow(workflowRules);

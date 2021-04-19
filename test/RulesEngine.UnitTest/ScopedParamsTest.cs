@@ -98,6 +98,23 @@ namespace RulesEngine.UnitTest
             }
         }
 
+        [Theory]
+        [InlineData("GlobalParamsOnly")]
+        [InlineData("LocalParamsOnly")]
+        public async Task ErrorInScopedParam_ShouldAppearAsErrorMessage(string workflowName)
+        {
+            var workflows = GetWorkflowRulesList();
+
+            var engine = new RulesEngine(new string[] { }, null);
+            engine.AddWorkflow(workflows);
+
+            var input = new { };
+            var result = await engine.ExecuteAllRulesAsync(workflowName, input);
+
+            Assert.All(result, c => Assert.False(c.IsSuccess));
+
+        }
+
         private void CheckResultTreeContainsAllInputs(string workflowName, List<RuleResultTree> result)
         {
             var workflow = GetWorkflowRulesList().Single(c => c.WorkflowName == workflowName);

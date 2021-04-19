@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using RulesEngine.Exceptions;
 using RulesEngine.HelperFunctions;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Expressions;
 
 namespace RulesEngine.ExpressionBuilders
@@ -43,7 +45,15 @@ namespace RulesEngine.ExpressionBuilders
 
         internal override LambdaExpression Parse(string expression, ParameterExpression[] parameters, Type returnType)
         {
-            return _ruleExpressionParser.Parse(expression, parameters, returnType);
+            try
+            {
+                return _ruleExpressionParser.Parse(expression, parameters, returnType);
+            }
+            catch(ParseException ex)
+            {
+                throw new ExpressionParserException(ex.Message, expression);
+            }
+            
         }
 
         internal override Func<object[],Dictionary<string,object>> CompileScopedParams(RuleParameter[] ruleParameters, RuleExpressionParameter[] scopedParameters)
