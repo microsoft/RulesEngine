@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using RulesEngine.Exceptions;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -27,9 +28,9 @@ namespace RulesEngine.HelperFunctions
                 }
                 catch (Exception ex)
                 {
-                    HandleRuleException(ex, rule, reSettings);
-                    isSuccess = false;
                     exceptionMessage = GetExceptionMessage($"Error while executing rule : {rule?.RuleName} - {ex.Message}", reSettings);
+                    HandleRuleException(new RuleException(exceptionMessage,ex), rule, reSettings);
+                    isSuccess = false;
                 }
 
                 return new RuleResultTree {
@@ -44,6 +45,11 @@ namespace RulesEngine.HelperFunctions
             
         }
 
+        internal static RuleFunc<RuleResultTree> ToRuleExceptionResult(ReSettings reSettings, Rule rule,Exception ex)
+        {
+            HandleRuleException(ex, rule, reSettings);
+            return ToResultTree(reSettings, rule, null, (args) => false, ex.Message);
+        }
 
         internal static void HandleRuleException(Exception ex, Rule rule, ReSettings reSettings)
         {

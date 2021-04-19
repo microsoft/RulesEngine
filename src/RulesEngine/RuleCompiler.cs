@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Microsoft.Extensions.Logging;
+using RulesEngine.Exceptions;
 using RulesEngine.ExpressionBuilders;
 using RulesEngine.HelperFunctions;
 using RulesEngine.Models;
@@ -57,12 +58,14 @@ namespace RulesEngine
         /// <returns>Compiled func delegate</returns>
         internal RuleFunc<RuleResultTree> CompileRule(Rule rule, RuleParameter[] ruleParams, ScopedParam[] globalParams)
         {
+            if (rule == null)
+            {
+                var ex =  new ArgumentNullException(nameof(rule));
+                _logger.LogError(ex.Message);
+                throw ex;
+            }
             try
             {
-                if (rule == null)
-                {
-                    throw new ArgumentNullException(nameof(rule));
-                }
                 var globalParamExp = GetRuleExpressionParameters(rule.RuleExpressionType,globalParams, ruleParams);
                 var extendedRuleParams = ruleParams.Concat(globalParamExp.Select(c => new RuleParameter(c.ParameterExpression.Name,c.ParameterExpression.Type)))
                                                    .ToArray();
@@ -71,8 +74,9 @@ namespace RulesEngine
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-                throw;
+                var message = $"Error while compiling rule `{rule.RuleName}`: {ex.Message}";
+                _logger.LogError(message);
+                return Helpers.ToRuleExceptionResult(_reSettings, rule, new RuleException(message, ex));
             }
         }
 
@@ -125,13 +129,21 @@ namespace RulesEngine
 
                 foreach (var lp in localParams)
                 {
-                    var lpExpression = expressionBuilder.Parse(lp.Expression, parameters.ToArray(), null).Body;
-                    var ruleExpParam = new RuleExpressionParameter() {
-                        ParameterExpression = Expression.Parameter(lpExpression.Type, lp.Name),
-                        ValueExpression = lpExpression
-                    };
-                    parameters.Add(ruleExpParam.ParameterExpression);
-                    ruleExpParams.Add(ruleExpParam);
+                    try
+                    {
+                        var lpExpression = expressionBuilder.Parse(lp.Expression, parameters.ToArray(), null).Body;
+                        var ruleExpParam = new RuleExpressionParameter() {
+                            ParameterExpression = Expression.Parameter(lpExpression.Type, lp.Name),
+                            ValueExpression = lpExpression
+                        };
+                        parameters.Add(ruleExpParam.ParameterExpression);
+                        ruleExpParams.Add(ruleExpParam);
+                    }
+                    catch(Exception ex)
+                    {
+                        var message = $"{ex.Message}, in ScopedParam: {lp.Name}";
+                        throw new RuleException(message);
+                    }
                 }
             }
             return ruleExpParams.ToArray();

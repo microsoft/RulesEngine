@@ -416,7 +416,7 @@ namespace RulesEngine.UnitTest
 
             var utils = new TestInstanceUtils();
 
-            await Assert.ThrowsAsync<System.Linq.Dynamic.Core.Exceptions.ParseException>(async () => {
+            await Assert.ThrowsAsync<RuleException>(async () => {
                 var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
             });
         }
@@ -504,7 +504,7 @@ namespace RulesEngine.UnitTest
                 Country = null
             };
 
-            _ = await Assert.ThrowsAsync<ArgumentNullException>(async () => await re.ExecuteAllRulesAsync("TestWorkflow", input));
+            _ = await Assert.ThrowsAsync<RuleException>(async () => await re.ExecuteAllRulesAsync("TestWorkflow", input));
             
         }
 
@@ -638,6 +638,37 @@ namespace RulesEngine.UnitTest
             Assert.True(result3.All(c => c.IsSuccess));
 
         }
+
+        [Fact]
+        public async Task ExecuteRule_SpecialCharInWorkflowName_RunsSuccessfully()
+        {
+            var workflow = new WorkflowRules {
+                WorkflowName = "Exámple",
+                Rules = new Rule[]{
+                    new Rule {
+                        RuleName = "RuleWithLocalParam",
+
+                        RuleExpressionType = RuleExpressionType.LambdaExpression,
+                        Expression = "input1 == null || input1.hello.world = \"wow\""
+                    }
+                }
+            };
+
+            var workflowStr = "{\"WorkflowName\":\"Exámple\",\"WorkflowRulesToInject\":null,\"GlobalParams\":null,\"Rules\":[{\"RuleName\":\"RuleWithLocalParam\",\"Properties\":null,\"Operator\":null,\"ErrorMessage\":null,\"Enabled\":true,\"ErrorType\":\"Warning\",\"RuleExpressionType\":\"LambdaExpression\",\"WorkflowRulesToInject\":null,\"Rules\":null,\"LocalParams\":null,\"Expression\":\"input1 == null || input1.hello.world = \\\"wow\\\"\",\"Actions\":null,\"SuccessEvent\":null}]}";
+
+            var re = new RulesEngine(new string[] { workflowStr },null,null);
+           // re.AddWorkflow(workflowStr);
+
+            dynamic input1 = new ExpandoObject();
+            input1.hello = new ExpandoObject();
+            input1.hello.world = "wow";
+
+            List<RuleResultTree> result3 = await re.ExecuteAllRulesAsync("Exámple", input1);
+            Assert.True(result3.All(c => c.IsSuccess));
+
+        }
+
+
 
         private RulesEngine CreateRulesEngine(WorkflowRules workflow)
         {
