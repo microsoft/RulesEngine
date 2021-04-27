@@ -70,14 +70,14 @@ namespace RulesEngine.UnitTest
 
 
         [Theory]
-        [InlineData("GlobalParamsOnly",new []{ false })]
+        [InlineData("GlobalParamsOnly", new[] { false })]
         [InlineData("LocalParamsOnly", new[] { false, true })]
         [InlineData("GlobalAndLocalParams", new[] { false })]
         public async Task DisabledScopedParam_ShouldReflect(string workflowName, bool[] outputs)
         {
             var workflows = GetWorkflowRulesList();
 
-            var engine = new RulesEngine(new string[] { }, null, new ReSettings { 
+            var engine = new RulesEngine(new string[] { }, null, new ReSettings {
                 EnableScopedParams = false
             });
             engine.AddWorkflow(workflows);
@@ -88,10 +88,10 @@ namespace RulesEngine.UnitTest
             };
 
             var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
-            for(var i = 0; i < result.Count; i++)
+            for (var i = 0; i < result.Count; i++)
             {
                 Assert.Equal(result[i].IsSuccess, outputs[i]);
-                if(result[i].IsSuccess == false)
+                if (result[i].IsSuccess == false)
                 {
                     Assert.StartsWith("Exception while parsing expression", result[i].ExceptionMessage);
                 }
@@ -100,7 +100,7 @@ namespace RulesEngine.UnitTest
 
         [Theory]
         [InlineData("GlobalParamsOnly")]
-        [InlineData("LocalParamsOnly")]
+        [InlineData("LocalParamsOnly2")]
         public async Task ErrorInScopedParam_ShouldAppearAsErrorMessage(string workflowName)
         {
             var workflows = GetWorkflowRulesList();
@@ -111,7 +111,33 @@ namespace RulesEngine.UnitTest
             var input = new { };
             var result = await engine.ExecuteAllRulesAsync(workflowName, input);
 
-            Assert.All(result, c => Assert.False(c.IsSuccess));
+            Assert.All(result, c => { 
+                Assert.False(c.IsSuccess);
+                Assert.StartsWith("Error while compiling rule", c.ExceptionMessage);
+            });
+
+        }
+
+        [Theory]
+        [InlineData("GlobalParamsOnlyWithComplexInput")]
+        [InlineData("LocalParamsOnlyWithComplexInput")]
+        public async Task RuntimeErrorInScopedParam_ShouldAppearAsErrorMessage(string workflowName)
+        {
+            var workflows = GetWorkflowRulesList();
+
+            var engine = new RulesEngine(new string[] { }, null);
+            engine.AddWorkflow(workflows);
+
+
+
+            var input = new RuleTestClass();
+            var result = await engine.ExecuteAllRulesAsync(workflowName, input);
+
+            Assert.All(result, c => {
+                Assert.False(c.IsSuccess);
+                Assert.StartsWith("Error while executing scoped params for rule", c.ExceptionMessage);
+            });
+
 
         }
 
@@ -183,6 +209,23 @@ namespace RulesEngine.UnitTest
                         },
                     }
                 },
+                new WorkflowRules {
+                    WorkflowName = "LocalParamsOnly2",
+                    Rules = new List<Rule> {
+                        new Rule {
+
+                            RuleName = "WithLocalParam",
+                            LocalParams = new List<ScopedParam> {
+                                new ScopedParam {
+                                    Name = "localParam1",
+                                    Expression = "input1.trueValue"
+                                }
+                            },
+                            Expression = "localParam1 == true"
+                        }
+                    }
+                },
+
                 new WorkflowRules {
                     WorkflowName = "GlobalParamsOnly",
                     GlobalParams = new List<ScopedParam> {
@@ -296,7 +339,7 @@ namespace RulesEngine.UnitTest
                                 new ScopedParam {
                                     Name = "localParam1",
                                     Expression = @"""world"""
-                                } 
+                                }
                            },
                            Rules =  new List<Rule>{
                                new Rule{
@@ -318,7 +361,38 @@ namespace RulesEngine.UnitTest
 
                         }
                     }
-                }
+                },
+                new WorkflowRules {
+                    WorkflowName = "LocalParamsOnlyWithComplexInput",
+                    Rules = new List<Rule> {
+                        new Rule {
+
+                            RuleName = "WithLocalParam",
+                            LocalParams = new List<ScopedParam> {
+                                new ScopedParam {
+                                    Name = "localParam1",
+                                    Expression = "input1.Country.ToLower()"
+                                }
+                            },
+                            Expression = "localParam1 == \"hello\""
+                        }
+                    }
+                },
+                new WorkflowRules {
+                    WorkflowName = "GlobalParamsOnlyWithComplexInput",
+                    GlobalParams = new List<ScopedParam> {
+                        new ScopedParam {
+                            Name = "globalParam1",
+                            Expression = "input1.Country.ToLower()"
+                        }
+                    },
+                    Rules = new List<Rule> {
+                        new Rule {
+                            RuleName = "TrueTest",
+                            Expression = "globalParam1 == \"hello\""
+                        }
+                    }
+                },
             };
         }
     }

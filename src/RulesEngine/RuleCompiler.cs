@@ -255,8 +255,9 @@ namespace RulesEngine
                     scopedParams = scopedParamsDict.Select(c => new RuleParameter(c.Key, c.Value));
                 }
                 catch(Exception ex)
-                { 
-                    var resultFn = Helpers.ToResultTree(_reSettings, rule, null, (args) => false, $"Error while executing scoped params for rule `{rule.RuleName}` - {ex}");
+                {
+                    var message = $"Error while executing scoped params for rule `{rule.RuleName}` - {ex}";
+                    var resultFn = Helpers.ToRuleExceptionResult(_reSettings, rule, new RuleException(message, ex));
                     return resultFn(ruleParams);
                 }
                
