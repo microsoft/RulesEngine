@@ -2,19 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-## [3.1.0-preview.3]
-- Fixed scoped parameters runtime errors not logging as errorMessage
-
-## [3.1.0-preview.2]
-- Runtime errors for expressions will now be logged as errorMessage instead of throwing Exceptions by default
-
-## [3.1.0-preview.1]
+## [3.1.0]
 - Added globalParams feature which can be applied to all rules
 - Enabled localParams support for nested Rules
 - Made certain fields in Rule model optional allowing users to define workflow with minimal fields
 - Added option to disable Rule in workflow json
 - Added `GetAllRegisteredWorkflow` to RulesEngine to return all registeredWorkflows
-- Fixed Rule compilation exception not returned when Rule has ErrorMessage field defined - #95
+- Runtime errors for expressions will now be logged as errorMessage instead of throwing Exceptions by default
+- Fixed RuleParameter passed as null
 
 ## [3.0.2]
 - Fixed LocalParams cache not getting cleaned up when RemoveWorkflow and ClearWorkflows are called

@@ -45,6 +45,11 @@ namespace RulesEngine.Models
         public bool EnableScopedParams { get; set; } = true;
 
         /// <summary>
+        /// Sets the mode for Nested rule execution, Default: All
+        /// </summary>
+        public NestedRuleExecutionMode NestedRuleExecutionMode { get; set; } = NestedRuleExecutionMode.All;
+
+        /// <summary>
         /// Enables Local params for rules
         /// </summary>
         [Obsolete("Use 'EnableScopedParams' instead. This will be removed in next major version")]
@@ -52,5 +57,17 @@ namespace RulesEngine.Models
             get { return EnableScopedParams; }
             set { EnableScopedParams = value; }
         }
+    }
+
+    public enum NestedRuleExecutionMode
+    {
+        /// <summary>
+        /// Excutes all nested rules
+        /// </summary>
+        All,
+        /// <summary>
+        /// Skips nested rules whose execution does not impact parent rule's result
+        /// </summary>
+        Performance
     }
 }

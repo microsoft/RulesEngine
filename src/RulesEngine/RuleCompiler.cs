@@ -186,33 +186,56 @@ namespace RulesEngine
             }
 
             return (paramArray) => {
-                var resultList = ruleFuncList.Select(fn => fn(paramArray)).ToList();
-                Func<object[], bool> isSuccess = (p) => ApplyOperation(resultList, operation);
-                var result = Helpers.ToResultTree(_reSettings, parentRule, resultList, isSuccess);
+                var (isSuccess, resultList) = ApplyOperation(paramArray, ruleFuncList, operation);
+                Func<object[], bool> isSuccessFn = (p) => isSuccess;
+                var result = Helpers.ToResultTree(_reSettings, parentRule, resultList, isSuccessFn);
                 return result(paramArray);
             };
         }
 
 
-        private bool ApplyOperation(IEnumerable<RuleResultTree> ruleResults, ExpressionType operation)
+        private (bool isSuccess ,IEnumerable<RuleResultTree> result) ApplyOperation(RuleParameter[] paramArray,IEnumerable<RuleFunc<RuleResultTree>> ruleFuncList, ExpressionType operation)
         {
-            if (ruleResults?.Any() != true)
+            if (ruleFuncList?.Any() != true)
             {
-                return false;
+                return (false,new List<RuleResultTree>());
             }
 
-            switch (operation)
-            {
-                case ExpressionType.And:
-                case ExpressionType.AndAlso:
-                    return ruleResults.All(r => r.IsSuccess);
+            var resultList = new List<RuleResultTree>();
+            var isSuccess = false;
 
-                case ExpressionType.Or:
-                case ExpressionType.OrElse:
-                    return ruleResults.Any(r => r.IsSuccess);
-                default:
-                    return false;
+            if(operation == ExpressionType.And || operation == ExpressionType.AndAlso)
+            {
+                isSuccess = true;
             }
+
+            foreach(var ruleFunc in ruleFuncList)
+            {
+                var ruleResult = ruleFunc(paramArray);
+                resultList.Add(ruleResult);
+                switch (operation)
+                {
+                    case ExpressionType.And:
+                    case ExpressionType.AndAlso:
+                        isSuccess = isSuccess && ruleResult.IsSuccess;
+                        if(_reSettings.NestedRuleExecutionMode ==  NestedRuleExecutionMode.Performance && isSuccess == false)
+                        {
+                            return (isSuccess, resultList);
+                        }
+                        break;
+
+                    case ExpressionType.Or:
+                    case ExpressionType.OrElse:
+                        isSuccess = isSuccess || ruleResult.IsSuccess;
+                        if (_reSettings.NestedRuleExecutionMode == NestedRuleExecutionMode.Performance && isSuccess == true)
+                        {
+                            return (isSuccess, resultList);
+                        }
+                        break;
+                }
+                
+            }
+            return (isSuccess, resultList);
         }
 
         private RuleFunc<RuleResultTree> GetWrappedRuleFunc(Rule rule, RuleFunc<RuleResultTree> ruleFunc,RuleParameter[] ruleParameters,RuleExpressionParameter[] ruleExpParams)
@@ -232,8 +255,9 @@ namespace RulesEngine
                     scopedParams = scopedParamsDict.Select(c => new RuleParameter(c.Key, c.Value));
                 }
                 catch(Exception ex)
-                { 
-                    var resultFn = Helpers.ToResultTree(_reSettings, rule, null, (args) => false, $"Error while executing scoped params for rule `{rule.RuleName}` - {ex}");
+                {
+                    var message = $"Error while executing scoped params for rule `{rule.RuleName}` - {ex}";
+                    var resultFn = Helpers.ToRuleExceptionResult(_reSettings, rule, new RuleException(message, ex));
                     return resultFn(ruleParams);
                 }
                

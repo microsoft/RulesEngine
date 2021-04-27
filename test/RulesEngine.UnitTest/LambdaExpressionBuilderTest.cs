@@ -5,6 +5,7 @@ using RulesEngine.ExpressionBuilders;
 using RulesEngine.Models;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Xunit;
 
 namespace RulesEngine.UnitTest
@@ -39,7 +40,7 @@ namespace RulesEngine.UnitTest
                 Expression = "RequestType == \"vod\""
             };
 
-            mainRule.Rules.Add(dummyRule);
+            mainRule.Rules = mainRule.Rules.Append(dummyRule);
             var func = builder.BuildDelegateForRule(dummyRule, ruleParameters);
 
             Assert.NotNull(func);

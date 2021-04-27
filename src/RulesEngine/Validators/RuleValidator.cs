@@ -43,7 +43,7 @@ namespace RulesEngine.Validators
             });
         }
 
-        private bool BeValidRulesList(List<Rule> rules)
+        private bool BeValidRulesList(IEnumerable<Rule> rules)
         {
             if (rules?.Any() != true) return false;
             var validator = new RuleValidator();
