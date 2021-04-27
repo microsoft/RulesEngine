@@ -45,6 +45,11 @@ namespace RulesEngine.Models
         public bool EnableScopedParams { get; set; } = true;
 
         /// <summary>
+        /// 
+        /// </summary>
+        public NestedRuleExecutionMode NestedRuleExectionMode { get; set; } = NestedRuleExecutionMode.All;
+
+        /// <summary>
         /// Enables Local params for rules
         /// </summary>
         [Obsolete("Use 'EnableScopedParams' instead. This will be removed in next major version")]
@@ -52,5 +57,11 @@ namespace RulesEngine.Models
             get { return EnableScopedParams; }
             set { EnableScopedParams = value; }
         }
+    }
+
+    public enum NestedRuleExecutionMode
+    {
+        All,
+        Performance
     }
 }

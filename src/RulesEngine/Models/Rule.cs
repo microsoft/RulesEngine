@@ -41,8 +41,8 @@ namespace RulesEngine.Models
 
         [JsonConverter(typeof(StringEnumConverter))]
         public RuleExpressionType RuleExpressionType { get; set; } = RuleExpressionType.LambdaExpression;
-        public List<string> WorkflowRulesToInject { get; set; }
-        public List<Rule> Rules { get; set; }
+        public IEnumerable<string> WorkflowRulesToInject { get; set; }
+        public IEnumerable<Rule> Rules { get; set; }
         public IEnumerable<ScopedParam> LocalParams { get; set; }
         public string Expression { get; set; }
         public Dictionary<ActionTriggerType, ActionInfo> Actions { get; set; }
