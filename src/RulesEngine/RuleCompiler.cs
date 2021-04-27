@@ -218,7 +218,7 @@ namespace RulesEngine
                     case ExpressionType.And:
                     case ExpressionType.AndAlso:
                         isSuccess = isSuccess && ruleResult.IsSuccess;
-                        if(_reSettings.NestedRuleExectionMode ==  NestedRuleExecutionMode.Performance && isSuccess == false)
+                        if(_reSettings.NestedRuleExecutionMode ==  NestedRuleExecutionMode.Performance && isSuccess == false)
                         {
                             return (isSuccess, resultList);
                         }
@@ -227,7 +227,7 @@ namespace RulesEngine
                     case ExpressionType.Or:
                     case ExpressionType.OrElse:
                         isSuccess = isSuccess || ruleResult.IsSuccess;
-                        if (_reSettings.NestedRuleExectionMode == NestedRuleExecutionMode.Performance && isSuccess == true)
+                        if (_reSettings.NestedRuleExecutionMode == NestedRuleExecutionMode.Performance && isSuccess == true)
                         {
                             return (isSuccess, resultList);
                         }

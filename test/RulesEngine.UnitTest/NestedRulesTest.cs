@@ -21,7 +21,7 @@ namespace RulesEngine.UnitTest
         public async Task NestedRulesShouldFollowExecutionMode(NestedRuleExecutionMode mode)
         {
             var workflows = GetWorkflows();
-            var reSettings = new ReSettings { NestedRuleExectionMode = mode};
+            var reSettings = new ReSettings { NestedRuleExecutionMode = mode};
             var rulesEngine = new RulesEngine(workflows, reSettings:reSettings);
             dynamic input1 = new ExpandoObject();
             input1.trueValue = true;
