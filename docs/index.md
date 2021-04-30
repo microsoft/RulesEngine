@@ -383,3 +383,6 @@ Actions can have async code as well
   ]
 }
 ```
+
+
+_For more details please check out [Rules Engine Wiki](https://github.com/microsoft/RulesEngine/wiki)._
