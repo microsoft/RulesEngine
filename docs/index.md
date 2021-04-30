@@ -263,7 +263,7 @@ These rules when executed with the below input will return success
     hello = "HELLO"
   });
 
-  var resultList  = await re.ExecuteAllRulesAsync("workflowWithGlobalParam",rp);
+  var resultList  = await re.ExecuteAllRulesAsync("workflowWithReferencedRule",rp);
 
 
 ```
