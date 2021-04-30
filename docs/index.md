@@ -272,7 +272,7 @@ These rules when executed with the below input will return success
 As a part of v3, Actions have been introduced to allow custom code execution on rule result. This can be achieved by calling `ExecuteAllRulesAsync` method of RulesEngine
 
 ### Inbuilt Actions
-RulesEngine provides two actions inbuilt which cover major scenarios related to rule execution
+RulesEngine provides inbuilt action which cover major scenarios related to rule execution
 
 #### OutputExpression
 This action evaluates an expression based on the RuleParameters and returns its value as Output
