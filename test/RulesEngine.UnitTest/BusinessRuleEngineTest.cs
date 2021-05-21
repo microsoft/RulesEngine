@@ -750,7 +750,7 @@ namespace RulesEngine.UnitTest
         {
             public bool CheckExists(string str)
             {
-                if (str != null && str.Length > 0)
+                if (!string.IsNullOrEmpty(str))
                 {
                     return true;
                 }
