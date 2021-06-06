@@ -158,11 +158,11 @@ namespace RulesEngine
             try
             {
                 foreach (var workflowRule in workflowRules)
-                {
+                {                    
+                    var validator = new WorkflowRulesValidator();
+                    validator.ValidateAndThrow(workflowRule);
                     if (!_rulesCache.ContainsWorkflowRules(workflowRule.WorkflowName))
                     {
-                        var validator = new WorkflowRulesValidator();
-                        validator.ValidateAndThrow(workflowRule);
                         _rulesCache.AddOrUpdateWorkflowRules(workflowRule.WorkflowName, workflowRule);
                     }
                 }
