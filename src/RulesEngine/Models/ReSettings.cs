@@ -62,7 +62,7 @@ namespace RulesEngine.Models
     public enum NestedRuleExecutionMode
     {
         /// <summary>
-        /// Excutes all nested rules
+        /// Executes all nested rules
         /// </summary>
         All,
         /// <summary>

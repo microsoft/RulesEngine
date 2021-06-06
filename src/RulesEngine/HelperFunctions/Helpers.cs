@@ -107,7 +107,7 @@ namespace RulesEngine.HelperFunctions
         }
 
         /// <summary>
-        /// To get the child error message recersivly
+        /// To get the child error message recursively
         /// </summary>
         /// <param name="childResultTree">childResultTree</param>
         /// <param name="ruleResultMessage">ruleResultMessage</param>

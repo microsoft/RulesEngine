@@ -15,7 +15,7 @@ namespace RulesEngine.Extensions
 
 
         /// <summary>
-        /// Calls the Success Func for the first rule which succeeded among the the ruleReults
+        /// Calls the Success Func for the first rule which succeeded among the ruleResults
         /// </summary>
         /// <param name="ruleResultTrees"></param>
         /// <param name="onSuccessFunc"></param>

@@ -57,7 +57,7 @@ namespace DemoApp
                 var resultList = bre.ExecuteAllRulesAsync(workflow.WorkflowName, nestedInput).Result;
 
                 resultList.OnSuccess((eventName) => {
-                    Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in succees - {eventName}");
+                    Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in success - {eventName}");
                 }).OnFail(() => {
                     Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in failure");
                 });
