@@ -86,12 +86,12 @@ namespace RulesEngine.UnitTest
             List<RuleResultTree> result2 = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
             Assert.NotNull(result2);
             Assert.IsType<List<RuleResultTree>>(result2);
-            Assert.Contains(result1, c => c.IsSuccess);
+            Assert.Contains(result2, c => c.IsSuccess);
 
             // New execution should have same result than previous execution as workflow rules are not updated.
-            var expected = result1.Select(c => new { c.Rule.RuleName, c.IsSuccess });
-            var actual = result2.Select(c => new { c.Rule.RuleName, c.IsSuccess });
-            Assert.Equal(expected, actual);
+            var previousResults = result1.Select(c => new { c.Rule.RuleName, c.IsSuccess });
+            var newResults = result2.Select(c => new { c.Rule.RuleName, c.IsSuccess });
+            Assert.Equal(previousResults, newResults);
         }
 
         [Theory]
@@ -121,9 +121,9 @@ namespace RulesEngine.UnitTest
             Assert.DoesNotContain(result2, c => c.IsSuccess);
 
             // New execution should have different result than previous execution.
-            var expected = result1.Select(c => new { c.Rule.RuleName, c.IsSuccess });
-            var actual = result2.Select(c => new { c.Rule.RuleName, c.IsSuccess });
-            Assert.NotEqual(expected, actual);
+            var previousResults = result1.Select(c => new { c.Rule.RuleName, c.IsSuccess });
+            var newResults = result2.Select(c => new { c.Rule.RuleName, c.IsSuccess });
+            Assert.NotEqual(previousResults, newResults);
         }
 
         [Theory]
