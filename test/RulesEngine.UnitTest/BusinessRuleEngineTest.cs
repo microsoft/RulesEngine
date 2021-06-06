@@ -62,6 +62,69 @@ namespace RulesEngine.UnitTest
             Assert.Contains(result, c => c.IsSuccess);
         }
 
+        [Theory]
+        [InlineData("rules1.json", "rules6.json")]
+        public async Task ExecuteRule_AddWorkflowWithSameName_ExecutesExistingRules(string previousWorkflowFile, string newWorkflowFile)
+        {
+            var re = GetRulesEngine(previousWorkflowFile);
+
+            dynamic input1 = GetInput1();
+            dynamic input2 = GetInput2();
+            dynamic input3 = GetInput3();
+
+            // Run previous rules.
+            List<RuleResultTree> result1 = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
+            Assert.NotNull(result1);
+            Assert.IsType<List<RuleResultTree>>(result1);
+            Assert.Contains(result1, c => c.IsSuccess);
+
+            // Fetch and add new rules.
+            WorkflowRules newWorkflowRules = ParseAsWorkflowRules(newWorkflowFile);
+            re.AddWorkflow(newWorkflowRules);
+
+            // Run new rules.
+            List<RuleResultTree> result2 = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
+            Assert.NotNull(result2);
+            Assert.IsType<List<RuleResultTree>>(result2);
+            Assert.Contains(result1, c => c.IsSuccess);
+
+            // New execution should have same result than previous execution as workflow rules are not updated.
+            var expected = result1.Select(c => new { c.Rule.RuleName, c.IsSuccess });
+            var actual = result2.Select(c => new { c.Rule.RuleName, c.IsSuccess });
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData("rules1.json", "rules6.json")]
+        public async Task ExecuteRule_AddOrUpdateWorkflow_ExecutesUpdatedRules(string previousWorkflowFile, string newWorkflowFile)
+        {
+            var re = GetRulesEngine(previousWorkflowFile);
+
+            dynamic input1 = GetInput1();
+            dynamic input2 = GetInput2();
+            dynamic input3 = GetInput3();
+
+            // Run previous rules.
+            List<RuleResultTree> result1 = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
+            Assert.NotNull(result1);
+            Assert.IsType<List<RuleResultTree>>(result1);
+            Assert.Contains(result1, c => c.IsSuccess);
+
+            // Fetch and update new rules.
+            WorkflowRules newWorkflowRules = ParseAsWorkflowRules(newWorkflowFile);
+            re.AddOrUpdateWorkflow(newWorkflowRules);
+
+            // Run new rules.
+            List<RuleResultTree> result2 = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
+            Assert.NotNull(result2);
+            Assert.IsType<List<RuleResultTree>>(result2);
+            Assert.DoesNotContain(result2, c => c.IsSuccess);
+
+            // New execution should have different result than previous execution.
+            var expected = result1.Select(c => new { c.Rule.RuleName, c.IsSuccess });
+            var actual = result2.Select(c => new { c.Rule.RuleName, c.IsSuccess });
+            Assert.NotEqual(expected, actual);
+        }
 
         [Theory]
         [InlineData("rules2.json")]
@@ -678,8 +741,7 @@ namespace RulesEngine.UnitTest
 
         private RulesEngine GetRulesEngine(string filename, ReSettings reSettings = null)
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory() as string, "TestData", filename);
-            var data = File.ReadAllText(filePath);
+            var data = GetFileContent(filename);
 
             var injectWorkflow = new WorkflowRules {
                 WorkflowName = "inputWorkflowReference",
@@ -691,6 +753,17 @@ namespace RulesEngine.UnitTest
             return new RulesEngine(new string[] { data, injectWorkflowStr }, mockLogger.Object, reSettings);
         }
 
+        private string GetFileContent(string filename)
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory() as string, "TestData", filename);
+            return File.ReadAllText(filePath);
+        }
+
+        private WorkflowRules ParseAsWorkflowRules(string workflowRulesFileName)
+        {
+            string content = GetFileContent(workflowRulesFileName);
+            return JsonConvert.DeserializeObject<WorkflowRules>(content);
+        }
 
         private dynamic GetInput1()
         {

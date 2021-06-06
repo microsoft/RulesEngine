@@ -59,12 +59,12 @@ namespace RulesEngine
             _compileRules.AddOrUpdate(compiledRuleKey, (compiledRule, ticks), (k, v) => (compiledRule, ticks));
         }
 
-        /// <summary>Checks if the compiled rules is up-to-date.</summary>
+        /// <summary>Checks if the compiled rules are up-to-date.</summary>
         /// <param name="compiledRuleKey">The compiled rule key.</param>
         /// <param name="workflowName">The workflow name.</param>
          /// <returns>
         ///   <c>true</c> if [compiled rules] is newer than the [workflow rules]; otherwise, <c>false</c>.</returns>
-        public bool IsCompiledRulesUpToDate(string compiledRuleKey, string workflowName)
+        public bool AreCompiledRulesUpToDate(string compiledRuleKey, string workflowName)
         {
             if (_compileRules.TryGetValue(compiledRuleKey, out (IDictionary<string, RuleFunc<RuleResultTree>> rules, Int64 tick) compiledRulesObj))
             {
