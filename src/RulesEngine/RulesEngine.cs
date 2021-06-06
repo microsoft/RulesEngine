@@ -230,7 +230,7 @@ namespace RulesEngine
         private bool RegisterRule(string workflowName, params RuleParameter[] ruleParams)
         {
             var compileRulesKey = GetCompiledRulesKey(workflowName, ruleParams);
-            if (_rulesCache.ContainsCompiledRules(compileRulesKey))
+            if (_rulesCache.IsCompiledRulesUpToDate(compileRulesKey, workflowName))
             {
                 return true;
             }
