@@ -82,7 +82,7 @@ namespace RulesEngine.Models
     public class RuleResultMessage
     {
         /// <summary>
-        /// Constructor will innitilaze the List 
+        /// Constructor will initialize the List 
         /// </summary>
         public RuleResultMessage()
         {
