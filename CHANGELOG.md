@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.2.0]
+- Added AddOrUpdateWorkflow method to update workflows atomically (by AshishPrasad)
+- Updated dependencies to latest
+
 ## [3.1.0]
 - Added globalParams feature which can be applied to all rules
 - Enabled localParams support for nested Rules
