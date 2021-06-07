@@ -149,11 +149,37 @@ namespace RulesEngine
         #region Private Methods
 
         /// <summary>
-        /// Adds the workflow.
+        /// Adds the workflow if the workflow name is not already added. Ignores the rest.
         /// </summary>
         /// <param name="workflowRules">The workflow rules.</param>
         /// <exception cref="RuleValidationException"></exception>
         public void AddWorkflow(params WorkflowRules[] workflowRules)
+        {
+            try
+            {
+                foreach (var workflowRule in workflowRules)
+                {                    
+                    var validator = new WorkflowRulesValidator();
+                    validator.ValidateAndThrow(workflowRule);
+                    if (!_rulesCache.ContainsWorkflowRules(workflowRule.WorkflowName))
+                    {
+                        _rulesCache.AddOrUpdateWorkflowRules(workflowRule.WorkflowName, workflowRule);
+                    }
+                }
+            }
+            catch (ValidationException ex)
+            {
+                throw new RuleValidationException(ex.Message, ex.Errors);
+            }
+        }
+
+        /// <summary>
+        /// Adds new workflow rules if not previously added.
+        /// Or updates the rules for an existing workflow.
+        /// </summary>
+        /// <param name="workflowRules">The workflow rules.</param>
+        /// <exception cref="RuleValidationException"></exception>
+        public void AddOrUpdateWorkflow(params WorkflowRules[] workflowRules)
         {
             try
             {
@@ -230,7 +256,7 @@ namespace RulesEngine
         private bool RegisterRule(string workflowName, params RuleParameter[] ruleParams)
         {
             var compileRulesKey = GetCompiledRulesKey(workflowName, ruleParams);
-            if (_rulesCache.ContainsCompiledRules(compileRulesKey))
+            if (_rulesCache.AreCompiledRulesUpToDate(compileRulesKey, workflowName))
             {
                 return true;
             }
