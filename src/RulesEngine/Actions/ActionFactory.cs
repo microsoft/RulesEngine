@@ -13,7 +13,6 @@ namespace RulesEngine.Actions
         internal ActionFactory()
         {
             _actionRegistry = new Dictionary<string, Func<ActionBase>>(StringComparer.OrdinalIgnoreCase);
-
         }
         internal ActionFactory(IDictionary<string, Func<ActionBase>> actionRegistry) : this()
         {
@@ -29,7 +28,7 @@ namespace RulesEngine.Actions
             {
                 return _actionRegistry[name]();
             }
-            throw new KeyNotFoundException($"Action with name:{name} does not exist");
+            throw new KeyNotFoundException($"Action with name: {name} does not exist");
         }
     }
 }
