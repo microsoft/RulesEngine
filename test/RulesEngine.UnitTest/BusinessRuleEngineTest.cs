@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using RulesEngine.Exceptions;
 using RulesEngine.HelperFunctions;
+using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -729,6 +731,22 @@ namespace RulesEngine.UnitTest
             List<RuleResultTree> result3 = await re.ExecuteAllRulesAsync("Exámple", input1);
             Assert.True(result3.All(c => c.IsSuccess));
 
+        }
+
+
+        [Theory]
+        [InlineData(typeof(RulesEngine),typeof(IRulesEngine))]
+        public void Class_PublicMethods_ArePartOfInterface(Type classType, Type interfaceType)
+        {
+            var classMethods = classType.GetMethods(BindingFlags.DeclaredOnly |
+                        BindingFlags.Public |
+                        BindingFlags.Instance);
+
+
+            var interfaceMethods = interfaceType.GetMethods();
+                                       
+
+            Assert.Equal(interfaceMethods.Count(), classMethods.Count());
         }
 
 
