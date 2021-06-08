@@ -66,7 +66,7 @@ namespace RulesEngine.UnitTest
 
         [Theory]
         [InlineData("rules1.json", "rules6.json")]
-        public async Task ExecuteRule_AddWorkflowWithSameName_ExecutesExistingRules(string previousWorkflowFile, string newWorkflowFile)
+        public async Task ExecuteRule_AddWorkflowWithSameName_ThrowsValidationException(string previousWorkflowFile, string newWorkflowFile)
         {
             var re = GetRulesEngine(previousWorkflowFile);
 
@@ -81,19 +81,9 @@ namespace RulesEngine.UnitTest
             Assert.Contains(result1, c => c.IsSuccess);
 
             // Fetch and add new rules.
-            WorkflowRules newWorkflowRules = ParseAsWorkflowRules(newWorkflowFile);
-            re.AddWorkflow(newWorkflowRules);
+            var newWorkflowRules = ParseAsWorkflowRules(newWorkflowFile);
 
-            // Run new rules.
-            List<RuleResultTree> result2 = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
-            Assert.NotNull(result2);
-            Assert.IsType<List<RuleResultTree>>(result2);
-            Assert.Contains(result2, c => c.IsSuccess);
-
-            // New execution should have same result than previous execution as workflow rules are not updated.
-            var previousResults = result1.Select(c => new { c.Rule.RuleName, c.IsSuccess });
-            var newResults = result2.Select(c => new { c.Rule.RuleName, c.IsSuccess });
-            Assert.Equal(previousResults, newResults);
+            Assert.Throws<RuleValidationException>(() => re.AddWorkflow(newWorkflowRules));
         }
 
         [Theory]

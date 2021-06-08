@@ -165,6 +165,10 @@ namespace RulesEngine
                     {
                         _rulesCache.AddOrUpdateWorkflowRules(workflowRule.WorkflowName, workflowRule);
                     }
+                    else
+                    {
+                        throw new ValidationException($"Cannot add workflow `{workflowRule.WorkflowName}` as it already exists. Use `AddOrUpdateWorkflow` to update existing workflow");
+                    }
                 }
             }
             catch (ValidationException ex)

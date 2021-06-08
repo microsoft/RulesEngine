@@ -3,8 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 ## [3.2.0]
-- Added AddOrUpdateWorkflow method to update workflows atomically (by AshishPrasad)
+- Added AddOrUpdateWorkflow method to update workflows atomically (by @AshishPrasad)
 - Updated dependencies to latest
+
+Breaking Change:
+  - `AddWorkflow` now throws exception if you try to add a workflow which already exists.
+  Use `AddOrUpdateWorkflow` to update existing workflow
 
 ## [3.1.0]
 - Added globalParams feature which can be applied to all rules
