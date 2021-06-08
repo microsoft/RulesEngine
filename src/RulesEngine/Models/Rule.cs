@@ -29,6 +29,7 @@ namespace RulesEngine.Models
         public Dictionary<string, object> Properties { get; set; }
         public string Operator { get; set; }
         public string ErrorMessage { get; set; }
+        public string ErrorCode { get; set; }
 
         /// <summary>
         /// Gets or sets whether the rule is enabled.
