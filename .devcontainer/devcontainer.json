@@ -1,6 +1,6 @@
 {
 	"name": "RulesEngine Codespace",
-	"image": "mcr.microsoft.com/vscode/devcontainers/dotnet:3.1",
+	"image": "mcr.microsoft.com/vscode/devcontainers/dotnet:0.201.7-3.1",
 	"settings": {
 		"terminal.integrated.defaultProfile.linux": "pwsh"
 	},
