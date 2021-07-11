@@ -53,8 +53,7 @@
       "type": "object",
       "required": [
         "RuleName",
-        "Expression",
-        "RuleExpressionType"
+        "Expression"
       ],
       "properties": {
         "RuleName": {

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine.Enums;
 using RulesEngine.Models;
 using RulesEngine.UnitTest.ActionTests.MockClass;
 using System.Collections.Generic;
@@ -37,8 +36,8 @@ namespace RulesEngine.UnitTest.ActionTests
                         new Rule {
                             RuleName = "trueRule",
                             Expression = "input1 == true",
-                            Actions = new Dictionary<ActionTriggerType, ActionInfo>() {
-                                { ActionTriggerType.onSuccess, new ActionInfo {
+                            Actions = new RuleActions() {
+                                OnSuccess = new ActionInfo {
                                     Name = "ReturnContext",
                                     Context =  new Dictionary<string, object> {
                                         {"stringContext", "hello"},
@@ -50,11 +49,11 @@ namespace RulesEngine.UnitTest.ActionTests
                             }
 
                         },
-
+                        
 
                     }
                 }
-            }
+
             };
         }
 

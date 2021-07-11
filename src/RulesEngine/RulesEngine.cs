@@ -2,13 +2,11 @@
 // Licensed under the MIT License.
 
 using FluentValidation;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RulesEngine.Actions;
-using RulesEngine.Enums;
 using RulesEngine.Exceptions;
 using RulesEngine.ExpressionBuilders;
 using RulesEngine.Interfaces;
@@ -133,11 +131,11 @@ namespace RulesEngine
 
         private async ValueTask<ActionRuleResult> ExecuteActionForRuleResult(RuleResultTree resultTree, bool includeRuleResults = false)
         {
-            var triggerType = resultTree?.IsSuccess == true ? ActionTriggerType.onSuccess : ActionTriggerType.onFailure;
+            var ruleActions = resultTree?.Rule?.Actions;
+            ActionInfo actionInfo = resultTree?.IsSuccess == true ? ruleActions.OnSuccess : ruleActions.OnFailure;
 
-            if (resultTree?.Rule?.Actions != null && resultTree.Rule.Actions.ContainsKey(triggerType))
+            if (actionInfo != null)
             {
-                var actionInfo = resultTree.Rule.Actions[triggerType];
                 var action = _actionFactory.Get(actionInfo.Name);
                 var ruleParameters = resultTree.Inputs.Select(kv => new RuleParameter(kv.Key, kv.Value)).ToArray();
                 return await action.ExecuteAndReturnResultAsync(new ActionContext(actionInfo.Context, resultTree), ruleParameters, includeRuleResults);
