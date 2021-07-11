@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
 Breaking Change:
   - Type of Action has been changed from `Dictionary<ActionTriggerType, ActionInfo>` to `RuleActions`
     - No impact if you are serializing workflow from json
-    - For workflow objects created in code, refer - [link](https://github.com/microsoft/RulesEngine/blob/c873243c17a1c44e3d6d76a1f03e9fa1583c5509/test/RulesEngine.UnitTest/ActionTests/CustomActionTest.cs)
+    - For workflow objects created in code, refer - [link](https://github.com/microsoft/RulesEngine/pull/182/files#diff-a5093dda2dcc1e4958ce3533edb607bb61406e1f0a9071eca4e317bdd987c0d3)
 
 ## [3.2.0]
 - Added AddOrUpdateWorkflow method to update workflows atomically (by @AshishPrasad)
