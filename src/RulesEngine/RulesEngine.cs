@@ -104,17 +104,25 @@ namespace RulesEngine
         public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params RuleParameter[] ruleParams)
         {
             var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, ruleParams);
+            await ExecuteActionAsync(ruleResultList);
+            return ruleResultList;
+        }
+
+        private async ValueTask ExecuteActionAsync(IEnumerable<RuleResultTree> ruleResultList)
+        {
             foreach (var ruleResult in ruleResultList)
             {
+                if(ruleResult.ChildResults !=  null)
+                {
+                    await ExecuteActionAsync(ruleResult.ChildResults);
+                }
                 var actionResult = await ExecuteActionForRuleResult(ruleResult, false);
                 ruleResult.ActionResult = new ActionResult {
                     Output = actionResult.Output,
                     Exception = actionResult.Exception
                 };
             }
-            return ruleResultList;
         }
-
 
         public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters)
         {
