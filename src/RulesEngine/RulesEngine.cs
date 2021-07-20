@@ -132,7 +132,7 @@ namespace RulesEngine
         private async ValueTask<ActionRuleResult> ExecuteActionForRuleResult(RuleResultTree resultTree, bool includeRuleResults = false)
         {
             var ruleActions = resultTree?.Rule?.Actions;
-            ActionInfo actionInfo = resultTree?.IsSuccess == true ? ruleActions?.OnSuccess : ruleActions?.OnFailure;
+            var actionInfo = resultTree?.IsSuccess == true ? ruleActions?.OnSuccess : ruleActions?.OnFailure;
 
             if (actionInfo != null)
             {

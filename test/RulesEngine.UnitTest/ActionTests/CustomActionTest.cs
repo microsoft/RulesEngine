@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Newtonsoft.Json;
 using RulesEngine.Models;
 using RulesEngine.UnitTest.ActionTests.MockClass;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -23,6 +25,28 @@ namespace RulesEngine.UnitTest.ActionTests
                     { "ReturnContext", () => new ReturnContextAction() }
                 }
             });
+
+            var result = await re.ExecuteAllRulesAsync("successReturnContextAction", true);
+        }
+
+
+        [Fact]
+        public async Task CustomAction_WithSystemTextJsobOnRuleMustHaveContextValues()
+        {
+            var workflows = GetWorkflowRules();
+            var workflowStr = JsonConvert.SerializeObject(workflows);
+            var serializationOptions = new System.Text.Json.JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
+            var workflowViaTextJson = System.Text.Json.JsonSerializer.Deserialize<WorkflowRules[]>(workflowStr,serializationOptions);
+
+
+            var re = new RulesEngine(workflows, null, reSettings: new ReSettings {
+                CustomActions = new Dictionary<string, System.Func<Actions.ActionBase>> {
+
+                    { "ReturnContext", () => new ReturnContextAction() }
+                }
+            });
+
+
 
             var result = await re.ExecuteAllRulesAsync("successReturnContextAction", true);
         }
