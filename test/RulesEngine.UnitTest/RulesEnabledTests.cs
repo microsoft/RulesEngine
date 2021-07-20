@@ -23,7 +23,7 @@ namespace RulesEngine.UnitTest
         public async Task RulesEngine_ShouldOnlyExecuteEnabledRules(string workflowName, bool[] expectedRuleResults)
         {
             var workflows = GetWorkflows();
-            var rulesEngine = new RulesEngine(workflows);
+            var rulesEngine = new RulesEngine(workflows, reSettings: new ReSettings() { EnableExceptionAsErrorMessage = false });
             var input1 = new {
                 TrueValue = true
             };
@@ -45,7 +45,7 @@ namespace RulesEngine.UnitTest
         public async Task WorkflowUpdatedRuleEnabled_ShouldReflect(string workflowName, bool[] expectedRuleResults)
         {
             var workflow = GetWorkflows().Single(c => c.WorkflowName == workflowName);
-            var rulesEngine = new RulesEngine();
+            var rulesEngine = new RulesEngine(reSettings: new ReSettings() { EnableExceptionAsErrorMessage = false});
             rulesEngine.AddWorkflow(workflow);
             var input1 = new {
                 TrueValue = true
