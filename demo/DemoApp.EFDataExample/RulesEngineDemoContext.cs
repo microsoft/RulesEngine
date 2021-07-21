@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using RulesEngine.Models;
 
-namespace DemoApp
+namespace DemoApp.EFDataExample
 {
     public class RulesEngineDemoContext : DbContext
     {

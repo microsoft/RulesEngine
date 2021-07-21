@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
 
-using Microsoft.EntityFrameworkCore;
+using DemoApp.EFDataExample;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using RulesEngine.Models;
@@ -11,6 +11,7 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
+using Microsoft.EntityFrameworkCore;
 
 namespace DemoApp
 {
