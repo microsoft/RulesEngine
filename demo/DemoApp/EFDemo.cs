@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
 
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using RulesEngine.Models;
@@ -13,57 +14,59 @@ using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
 
 namespace DemoApp
 {
-  public class EFDemo
-  {
-    public void Run()
+    public class EFDemo
     {
-      Console.WriteLine($"Running {nameof(EFDemo)}....");
-      var basicInfo = "{\"name\": \"hello\",\"email\": \"abcy@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyalityFactor\": 3,\"totalPurchasesToDate\": 10000}";
-      var orderInfo = "{\"totalOrders\": 5,\"recurringItems\": 2}";
-      var telemetryInfo = "{\"noOfVisitsPerMonth\": 10,\"percentageOfBuyingToVisit\": 15}";
+        public void Run()
+        {
+            Console.WriteLine($"Running {nameof(EFDemo)}....");
+            var basicInfo = "{\"name\": \"hello\",\"email\": \"abcy@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyalityFactor\": 3,\"totalPurchasesToDate\": 10000}";
+            var orderInfo = "{\"totalOrders\": 5,\"recurringItems\": 2}";
+            var telemetryInfo = "{\"noOfVisitsPerMonth\": 10,\"percentageOfBuyingToVisit\": 15}";
 
-      var converter = new ExpandoObjectConverter();
+            var converter = new ExpandoObjectConverter();
 
-      dynamic input1 = JsonConvert.DeserializeObject<ExpandoObject>(basicInfo, converter);
-      dynamic input2 = JsonConvert.DeserializeObject<ExpandoObject>(orderInfo, converter);
-      dynamic input3 = JsonConvert.DeserializeObject<ExpandoObject>(telemetryInfo, converter);
+            dynamic input1 = JsonConvert.DeserializeObject<ExpandoObject>(basicInfo, converter);
+            dynamic input2 = JsonConvert.DeserializeObject<ExpandoObject>(orderInfo, converter);
+            dynamic input3 = JsonConvert.DeserializeObject<ExpandoObject>(telemetryInfo, converter);
 
-      var inputs = new dynamic[]
-          {
+            var inputs = new dynamic[]
+                {
                     input1,
                     input2,
                     input3
-          };
+                };
 
-      var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "Discount.json", SearchOption.AllDirectories);
-      if (files == null || files.Length == 0)
-        throw new Exception("Rules not found.");
+            var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "Discount.json", SearchOption.AllDirectories);
+            if (files == null || files.Length == 0)
+                throw new Exception("Rules not found.");
 
-      var fileData = File.ReadAllText(files[0]);
-      var workflowRules = JsonConvert.DeserializeObject<List<WorkflowRules>>(fileData);
+            var fileData = File.ReadAllText(files[0]);
+            var workflowRules = JsonConvert.DeserializeObject<List<WorkflowRules>>(fileData);
 
-      RulesEngineDemoContext db = new RulesEngineDemoContext();
-      if (db.Database.EnsureCreated())
-      {
-        db.WorkflowRules.AddRange(workflowRules);
-        db.SaveChanges();
-      }
+            RulesEngineDemoContext db = new RulesEngineDemoContext();
+            if (db.Database.EnsureCreated())
+            {
+                db.WorkflowRules.AddRange(workflowRules);
+                db.SaveChanges();
+            }
 
-      var bre = new RulesEngine.RulesEngine(db.WorkflowRules.ToArray(), null);
+            var wfr = db.WorkflowRules.Include(i => i.Rules).ThenInclude(i => i.Rules).ToArray();
 
-      string discountOffered = "No discount offered.";
+            var bre = new RulesEngine.RulesEngine(wfr, null);
 
-      List<RuleResultTree> resultList = bre.ExecuteAllRulesAsync("Discount", inputs).Result;
+            string discountOffered = "No discount offered.";
 
-      resultList.OnSuccess((eventName) => {
-        discountOffered = $"Discount offered is {eventName} % over MRP.";
-      });
+            List<RuleResultTree> resultList = bre.ExecuteAllRulesAsync("Discount", inputs).Result;
 
-      resultList.OnFail(() => {
-        discountOffered = "The user is not eligible for any discount.";
-      });
+            resultList.OnSuccess((eventName) => {
+                discountOffered = $"Discount offered is {eventName} % over MRP.";
+            });
 
-      Console.WriteLine(discountOffered);
+            resultList.OnFail(() => {
+                discountOffered = "The user is not eligible for any discount.";
+            });
+
+            Console.WriteLine(discountOffered);
+        }
     }
-  }
 }
