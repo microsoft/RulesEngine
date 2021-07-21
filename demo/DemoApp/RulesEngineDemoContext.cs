@@ -55,15 +55,6 @@ namespace DemoApp
 
             modelBuilder.Entity<Rule>(entity => {
                 entity.HasKey(k => k.RuleName);
-
-                //EF translates an empty IEnumerable to a new Object with Count of 0 not a null (like JSON)
-                //Using HasConversion has nesting issues
-                // Message=The property 'Rule.Rules' is of type 'IEnumerable<Rule>' which is not supported by the current database provider. Either change the property CLR type, or ignore the property using the '[NotMapped]' attribute or by using 'EntityTypeBuilder.Ignore' in 'OnModelCreating'.
-                //
-                //entity.Property(b => b.Rules)
-                //.HasConversion(
-                //    v => v,
-                //    v => v.Count() == 0 ? null : v);
                
                 entity.Property(b => b.Properties)
                 .HasConversion(
