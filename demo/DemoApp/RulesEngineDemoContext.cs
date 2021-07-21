@@ -44,11 +44,20 @@ namespace DemoApp
               .HasKey(k => k.Name);
 
             modelBuilder.Entity<WorkflowRules>(entity => {
-                entity.HasKey(k => k.WorkflowName);
-               // entity.Property(b => b.Rules)
-               //.HasConversion(
-               //   v => v,
-               //   v => ((List<Rule>)v).Count == 0 ? null : v);
+                entity.HasKey(k => k.WorkflowName); 
+           //     entity.Property(b => b.Rules)
+           //    .HasConversion(
+           //     v => JsonConvert.SerializeObject(v),
+           //     v => JsonConvert.DeserializeObject<IEnumerable<Rule>>(v.Length == 0 ? null : v),
+           //      new ValueComparer<IEnumerable<Rule>>(
+           //(c1, c2) => c1.SequenceEqual(c2),
+           //c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+           //c => (IEnumerable<Rule>)c.AsEnumerable()));
+               
+                // entity.Property(b => b.Rules)
+                //.HasConversion(
+                //   v => v,
+                //   v => ((List<Rule>)v).Count == 0 ? null : v);
             });
 
 
@@ -80,10 +89,18 @@ namespace DemoApp
                 //    .HasConversion(
                 //    r => r, 
                 //    r => r);
+
+                // Message=The property 'Rule.Rules' is of type 'IEnumerable<Rule>' which is not supported by the current database provider. Either change the property CLR type, or ignore the property using the '[NotMapped]' attribute or by using 'EntityTypeBuilder.Ignore' in 'OnModelCreating'.
                 //entity.Property(b => b.Rules)
                 //.HasConversion(
-                // v => v,
-                // v => ((List<Rule>)v).Count == 0 ? null : v);
+                //    v => v,
+                //    v => v.Count() == 0 ? null : v);
+                //     v => JsonConvert.SerializeObject(v),
+                //     v => JsonConvert.DeserializeObject<IEnumerable<Rule>>(v.Length == 0 ? null : v),
+                //      new ValueComparer<IEnumerable<Rule>>(
+                //(c1, c2) => c1.SequenceEqual(c2),
+                //c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                //c => (IEnumerable<Rule>)c.AsEnumerable()));
 
                 entity.Property(b => b.Properties)
                 .HasConversion(
