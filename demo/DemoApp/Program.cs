@@ -9,6 +9,7 @@ namespace DemoApp
         {
             new BasicDemo().Run();
             new NestedInputDemo().Run();
+            new EFDemo().Run();
         }
     }
 }

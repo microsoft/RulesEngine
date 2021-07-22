@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <ProjectReference Include="../../src/RulesEngine/RulesEngine.csproj" />
+    <ProjectReference Include="..\DemoApp.EFDataExample\DemoApp.EFDataExample.csproj" />
   </ItemGroup>
   
   <ItemGroup>
