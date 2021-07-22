@@ -37,9 +37,9 @@ namespace RulesEngine.Validators
 
         private void RegisterExpressionTypeRules()
         {
-            When(c => c.Operator == null && (c.Rules == null ? true : c.Rules.Count() != 0) && c.RuleExpressionType == RuleExpressionType.LambdaExpression, () => {
+            When(c => c.Operator == null && c.RuleExpressionType == RuleExpressionType.LambdaExpression, () => {
                 RuleFor(c => c.Expression).NotEmpty().WithMessage(Constants.LAMBDA_EXPRESSION_EXPRESSION_NULL_ERRMSG);
-                RuleFor(c => c.Rules).Null().WithMessage(Constants.LAMBDA_EXPRESSION_RULES_ERRMSG);
+                RuleFor(c => c.Rules).Empty().WithMessage(Constants.LAMBDA_EXPRESSION_RULES_ERRMSG);
             });
         }
 
