@@ -10,7 +10,7 @@ namespace RulesEngine.Models
     /// Workflow rules class for deserialization  the json config file
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public class WorkflowRules
+    public class WorkflowRule
     {
         /// <summary>
         /// Gets the workflow name.

@@ -9,10 +9,10 @@ namespace DemoApp.EFDataExample
 {
     public class RulesEngineDemoContext : DbContext
     {
-        public DbSet<WorkflowRules> WorkflowRules { get; set; }
+        public DbSet<WorkflowRule> WorkflowRules { get; set; }
         public DbSet<ActionInfo> ActionInfos { get; set; }
 
-        public DbSet<RuleActions> RuleActions { get; set; }
+        public DbSet<RuleAction> RuleActions { get; set; }
         public DbSet<Rule> Rules { get; set; }
         public DbSet<ScopedParam> ScopedParams { get; set; }
 
@@ -43,11 +43,11 @@ namespace DemoApp.EFDataExample
             modelBuilder.Entity<ScopedParam>()
               .HasKey(k => k.Name);
 
-            modelBuilder.Entity<WorkflowRules>(entity => {
+            modelBuilder.Entity<WorkflowRule>(entity => {
                 entity.HasKey(k => k.WorkflowName); 
             });
 
-            modelBuilder.Entity<RuleActions>(entity => {
+            modelBuilder.Entity<RuleAction>(entity => {
                 entity.HasNoKey();
                 entity.HasOne(o => o.OnSuccess).WithMany();
                 entity.HasOne(o => o.OnFailure).WithMany();
@@ -63,7 +63,7 @@ namespace DemoApp.EFDataExample
                 entity.Ignore(e => e.Actions);
             });
 
-            modelBuilder.Entity<WorkflowRules>()
+            modelBuilder.Entity<WorkflowRule>()
                .Ignore(b => b.WorkflowRulesToInject);
 
             modelBuilder.Entity<Rule>()

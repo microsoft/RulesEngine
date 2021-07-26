@@ -53,9 +53,9 @@ namespace RulesEngine.UnitTest
         }
 
 
-        private WorkflowRules[] GetWorkflowRulesWithoutActions()
+        private WorkflowRule[] GetWorkflowRulesWithoutActions()
         {
-            var workflow1 = new WorkflowRules {
+            var workflow1 = new WorkflowRule {
                 WorkflowName = "NoActionWorkflow",
                 Rules = new List<Rule>{
                     new Rule{
@@ -69,17 +69,17 @@ namespace RulesEngine.UnitTest
             return new[] { workflow1 };
         }
 
-        private WorkflowRules[] GetWorkflowWithActions()
+        private WorkflowRule[] GetWorkflowWithActions()
         {
 
-            var workflow1 = new WorkflowRules {
+            var workflow1 = new WorkflowRule {
                 WorkflowName = "ActionWorkflow",
                 Rules = new List<Rule>{
                     new Rule{
                         RuleName = "ExpressionOutputRuleTest",
                         RuleExpressionType = RuleExpressionType.LambdaExpression,
                         Expression = "1 == 1",
-                        Actions = new RuleActions{
+                        Actions = new RuleAction{
                             OnSuccess = new ActionInfo{
                                 Name = "OutputExpression",
                                 Context = new Dictionary<string, object>{
@@ -92,7 +92,7 @@ namespace RulesEngine.UnitTest
                         RuleName = "EvaluateRuleTest",
                         RuleExpressionType = RuleExpressionType.LambdaExpression,
                         Expression = "1 == 1",
-                        Actions = new RuleActions{
+                        Actions = new RuleAction{
                             OnSuccess = new ActionInfo{
                                 Name = "EvaluateRule",
                                 Context = new Dictionary<string, object>{

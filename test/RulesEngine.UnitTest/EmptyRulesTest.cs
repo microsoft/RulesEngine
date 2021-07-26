@@ -21,7 +21,7 @@ namespace RulesEngine.UnitTest
         private async Task EmptyRules_ReturnsExepectedResults()
         {
             var workflows = GetEmptyWorkflows();
-            var reSettings = new ReSettings { };
+            var reSettings = new ReSetting { };
             RulesEngine rulesEngine = new RulesEngine();
 
             Func<Task> action = () => {
@@ -37,7 +37,7 @@ namespace RulesEngine.UnitTest
         private async Task NestedRulesWithEmptyNestedActions_ReturnsExepectedResults()
         {
             var workflows = GetEmptyNestedWorkflows();
-            var reSettings = new ReSettings { };
+            var reSettings = new ReSetting { };
             RulesEngine rulesEngine = new RulesEngine();
 
             Func<Task> action = () => {
@@ -50,10 +50,10 @@ namespace RulesEngine.UnitTest
             Assert.Contains("Atleast one of Rules or WorkflowRulesToInject must be not empty", ex.Message);
         }
 
-        private WorkflowRules[] GetEmptyWorkflows()
+        private WorkflowRule[] GetEmptyWorkflows()
         {
             return new[] {
-                new WorkflowRules {
+                new WorkflowRule {
                     WorkflowName = "EmptyRulesTest",
                     Rules = new Rule[] {
                     }
@@ -61,10 +61,10 @@ namespace RulesEngine.UnitTest
             };
         }
 
-        private WorkflowRules[] GetEmptyNestedWorkflows()
+        private WorkflowRule[] GetEmptyNestedWorkflows()
         {
             return new[] {
-                new WorkflowRules {
+                new WorkflowRule {
                     WorkflowName = "EmptyNestedRulesTest",
                     Rules = new Rule[] {
                         new Rule {
@@ -129,7 +129,7 @@ namespace RulesEngine.UnitTest
                          }
                     }
                 },
-                new WorkflowRules {
+                new WorkflowRule {
                     WorkflowName = "EmptyNestedRulesActionsTest",
                     Rules = new Rule[] {
                         new Rule {
@@ -138,7 +138,7 @@ namespace RulesEngine.UnitTest
                             Rules = new Rule[] {
 
                             },
-                            Actions =  new RuleActions {
+                            Actions =  new RuleAction {
                                         OnFailure = new ActionInfo{
                                             Name = "OutputExpression",
                                             Context = new Dictionary<string, object> {

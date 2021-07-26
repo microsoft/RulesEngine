@@ -23,7 +23,7 @@ namespace RulesEngine.UnitTest
         public async Task NestedRulesShouldFollowExecutionMode(NestedRuleExecutionMode mode)
         {
             var workflows = GetWorkflows();
-            var reSettings = new ReSettings { NestedRuleExecutionMode = mode };
+            var reSettings = new ReSetting { NestedRuleExecutionMode = mode };
             var rulesEngine = new RulesEngine(workflows, reSettings: reSettings);
             dynamic input1 = new ExpandoObject();
             input1.trueValue = true;
@@ -69,7 +69,7 @@ namespace RulesEngine.UnitTest
         private async Task NestedRulesWithNestedActions_ReturnsCorrectResults()
         {
             var workflows = GetWorkflows();
-            var reSettings = new ReSettings { };
+            var reSettings = new ReSetting { };
             var rulesEngine = new RulesEngine(workflows, reSettings: reSettings);
             dynamic input1 = new ExpandoObject();
             input1.trueValue = true;
@@ -90,9 +90,9 @@ namespace RulesEngine.UnitTest
             var serializationOptions = new System.Text.Json.JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
 
 
-            var workflowsViaTextJson = System.Text.Json.JsonSerializer.Deserialize<WorkflowRules[]>(workflowStr, serializationOptions);
+            var workflowsViaTextJson = System.Text.Json.JsonSerializer.Deserialize<WorkflowRule[]>(workflowStr, serializationOptions);
 
-            var reSettings = new ReSettings { };
+            var reSettings = new ReSetting { };
             var rulesEngine = new RulesEngine(workflowsViaTextJson, reSettings: reSettings);
             dynamic input1 = new ExpandoObject();
             input1.trueValue = true;
@@ -108,10 +108,10 @@ namespace RulesEngine.UnitTest
 
 
 
-        private WorkflowRules[] GetWorkflows()
+        private WorkflowRule[] GetWorkflows()
         {
             return new[] {
-                new WorkflowRules {
+                new WorkflowRule {
                     WorkflowName = "NestedRulesTest",
                     Rules = new Rule[] {
                         new Rule {
@@ -176,7 +176,7 @@ namespace RulesEngine.UnitTest
                          }
                     }
                 },
-                new WorkflowRules {
+                new WorkflowRule {
                     WorkflowName = "NestedRulesActionsTest",
                     Rules = new Rule[] {
                         new Rule {
@@ -186,7 +186,7 @@ namespace RulesEngine.UnitTest
                                 new Rule{
                                     RuleName = "trueRule1",
                                     Expression = "input1.TrueValue == true",
-                                    Actions =  new RuleActions {
+                                    Actions =  new RuleAction {
                                         OnSuccess = new ActionInfo{
                                             Name = "OutputExpression",
                                             Context = new Dictionary<string, object> {
@@ -198,7 +198,7 @@ namespace RulesEngine.UnitTest
                                 new Rule {
                                     RuleName = "falseRule1",
                                     Expression = "input1.TrueValue == false",
-                                    Actions =  new RuleActions {
+                                    Actions =  new RuleAction {
                                         OnFailure = new ActionInfo{
                                             Name = "OutputExpression",
                                             Context = new Dictionary<string, object> {
@@ -208,7 +208,7 @@ namespace RulesEngine.UnitTest
                                     }
                                 }
                             },
-                            Actions =  new RuleActions {
+                            Actions =  new RuleAction {
                                         OnFailure = new ActionInfo{
                                             Name = "OutputExpression",
                                             Context = new Dictionary<string, object> {

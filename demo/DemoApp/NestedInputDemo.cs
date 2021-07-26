@@ -49,7 +49,7 @@ namespace DemoApp
             }
 
             var fileData = File.ReadAllText(files[0]);
-            var workflowRules = JsonConvert.DeserializeObject<List<WorkflowRules>>(fileData);
+            var workflowRules = JsonConvert.DeserializeObject<List<WorkflowRule>>(fileData);
 
             var bre = new RulesEngine.RulesEngine(workflowRules.ToArray(), null);
             foreach (var workflow in workflowRules)

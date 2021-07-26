@@ -14,10 +14,10 @@ namespace RulesEngine.ExpressionBuilders
 {
     internal sealed class LambdaExpressionBuilder : RuleExpressionBuilderBase
     {
-        private readonly ReSettings _reSettings;
+        private readonly ReSetting _reSettings;
         private readonly RuleExpressionParser _ruleExpressionParser;
 
-        internal LambdaExpressionBuilder(ReSettings reSettings, RuleExpressionParser ruleExpressionParser)
+        internal LambdaExpressionBuilder(ReSetting reSettings, RuleExpressionParser ruleExpressionParser)
         {
             _reSettings = reSettings;
             _ruleExpressionParser = ruleExpressionParser;

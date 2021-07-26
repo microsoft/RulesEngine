@@ -15,7 +15,7 @@ namespace RulesEngine.HelperFunctions
     /// </summary>
     internal static class Helpers
     {
-        internal static RuleFunc<RuleResultTree> ToResultTree(ReSettings reSettings, Rule rule, IEnumerable<RuleResultTree> childRuleResults, Func<object[], bool> isSuccessFunc, string exceptionMessage = "")
+        internal static RuleFunc<RuleResultTree> ToResultTree(ReSetting reSettings, Rule rule, IEnumerable<RuleResultTree> childRuleResults, Func<object[], bool> isSuccessFunc, string exceptionMessage = "")
         {
             return (inputs) => {
 
@@ -45,13 +45,13 @@ namespace RulesEngine.HelperFunctions
             
         }
 
-        internal static RuleFunc<RuleResultTree> ToRuleExceptionResult(ReSettings reSettings, Rule rule,Exception ex)
+        internal static RuleFunc<RuleResultTree> ToRuleExceptionResult(ReSetting reSettings, Rule rule,Exception ex)
         {
             HandleRuleException(ex, rule, reSettings);
             return ToResultTree(reSettings, rule, null, (args) => false, ex.Message);
         }
 
-        internal static void HandleRuleException(Exception ex, Rule rule, ReSettings reSettings)
+        internal static void HandleRuleException(Exception ex, Rule rule, ReSetting reSettings)
         {
             ex.Data.Add(nameof(rule.RuleName), rule.RuleName);
             ex.Data.Add(nameof(rule.Expression), rule.Expression);
@@ -70,7 +70,7 @@ namespace RulesEngine.HelperFunctions
         /// <param name="rule"></param>
         /// <param name="reSettings"></param>
         /// <returns></returns>
-        internal static string GetExceptionMessage(string message,ReSettings reSettings)
+        internal static string GetExceptionMessage(string message,ReSetting reSettings)
         {
             return reSettings.IgnoreException ? "" : message;
         }

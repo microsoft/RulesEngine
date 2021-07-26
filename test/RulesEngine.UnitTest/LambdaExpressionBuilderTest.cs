@@ -17,7 +17,7 @@ namespace RulesEngine.UnitTest
         [Fact]
         public void BuildExpressionForRuleTest()
         {
-            var reSettings = new ReSettings();
+            var reSettings = new ReSetting();
             var objBuilderFactory = new RuleExpressionBuilderFactory(reSettings, new RuleExpressionParser(reSettings));
             var builder = objBuilderFactory.RuleGetExpressionBuilder(RuleExpressionType.LambdaExpression);
 

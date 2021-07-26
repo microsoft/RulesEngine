@@ -19,7 +19,7 @@ namespace RulesEngine.UnitTest.ActionTests
         public async Task CustomActionOnRuleMustHaveContextValues()
         {
             var workflows = GetWorkflowRules();
-            var re = new RulesEngine(workflows, null, reSettings: new ReSettings {
+            var re = new RulesEngine(workflows, null, reSettings: new ReSetting {
                 CustomActions = new Dictionary<string, System.Func<Actions.ActionBase>> {
 
                     { "ReturnContext", () => new ReturnContextAction() }
@@ -36,10 +36,10 @@ namespace RulesEngine.UnitTest.ActionTests
             var workflows = GetWorkflowRules();
             var workflowStr = JsonConvert.SerializeObject(workflows);
             var serializationOptions = new System.Text.Json.JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
-            var workflowViaTextJson = System.Text.Json.JsonSerializer.Deserialize<WorkflowRules[]>(workflowStr,serializationOptions);
+            var workflowViaTextJson = System.Text.Json.JsonSerializer.Deserialize<WorkflowRule[]>(workflowStr,serializationOptions);
 
 
-            var re = new RulesEngine(workflows, null, reSettings: new ReSettings {
+            var re = new RulesEngine(workflows, null, reSettings: new ReSetting {
                 CustomActions = new Dictionary<string, System.Func<Actions.ActionBase>> {
 
                     { "ReturnContext", () => new ReturnContextAction() }
@@ -51,16 +51,16 @@ namespace RulesEngine.UnitTest.ActionTests
             var result = await re.ExecuteAllRulesAsync("successReturnContextAction", true);
         }
 
-        private WorkflowRules[] GetWorkflowRules()
+        private WorkflowRule[] GetWorkflowRules()
         {
-            return new WorkflowRules[] {
-                new WorkflowRules {
+            return new WorkflowRule[] {
+                new WorkflowRule {
                     WorkflowName = "successReturnContextAction",
                     Rules = new Rule[] {
                         new Rule {
                             RuleName = "trueRule",
                             Expression = "input1 == true",
-                            Actions = new RuleActions() {
+                            Actions = new RuleAction() {
                                 OnSuccess = new ActionInfo {
                                     Name = "ReturnContext",
                                     Context =  new Dictionary<string, object> {

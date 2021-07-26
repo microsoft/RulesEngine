@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace RulesEngine.Validators
 {
-    internal class WorkflowRulesValidator : AbstractValidator<WorkflowRules>
+    internal class WorkflowRulesValidator : AbstractValidator<WorkflowRule>
     {
         public WorkflowRulesValidator()
         {
