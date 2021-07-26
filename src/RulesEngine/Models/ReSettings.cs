@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace RulesEngine.Models
 {
     [ExcludeFromCodeCoverage]
-    public class ReSetting
+    public class ReSettings
     {
         /// <summary>
         /// Get/Set the custom types to be used in Rule expressions

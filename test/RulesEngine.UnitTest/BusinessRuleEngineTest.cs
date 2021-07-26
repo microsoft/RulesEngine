@@ -463,7 +463,7 @@ namespace RulesEngine.UnitTest
         [InlineData("rules9.json")]
         public async Task ExecuteRule_MissingMethodInExpression_ReturnsException(string ruleFileName)
         {
-            var re = GetRulesEngine(ruleFileName, new ReSetting() { EnableExceptionAsErrorMessage = false });
+            var re = GetRulesEngine(ruleFileName, new ReSettings() { EnableExceptionAsErrorMessage = false });
 
             dynamic input1 = new ExpandoObject();
             input1.Data = new { TestProperty = "" };
@@ -480,7 +480,7 @@ namespace RulesEngine.UnitTest
         [InlineData("rules9.json")]
         public async Task ExecuteRule_CompilationException_ReturnsAsErrorMessage(string ruleFileName)
         {
-            var re = GetRulesEngine(ruleFileName, new ReSetting() { EnableExceptionAsErrorMessage = true });
+            var re = GetRulesEngine(ruleFileName, new ReSettings() { EnableExceptionAsErrorMessage = true });
 
             dynamic input1 = new ExpandoObject();
             input1.Data = new { TestProperty = "" };
@@ -497,7 +497,7 @@ namespace RulesEngine.UnitTest
         [InlineData("rules9.json")]
         public async Task ExecuteRuleWithIgnoreException_CompilationException_DoesNotReturnsAsErrorMessage(string ruleFileName)
         {
-            var re = GetRulesEngine(ruleFileName, new ReSetting() { EnableExceptionAsErrorMessage = true , IgnoreException = true});
+            var re = GetRulesEngine(ruleFileName, new ReSettings() { EnableExceptionAsErrorMessage = true , IgnoreException = true});
 
             dynamic input1 = new ExpandoObject();
             input1.Data = new { TestProperty = "" };
@@ -552,7 +552,7 @@ namespace RulesEngine.UnitTest
                 }
             };
 
-            var re = new RulesEngine(new[] { workflow }, null, new ReSetting {
+            var re = new RulesEngine(new[] { workflow }, null, new ReSettings {
                 EnableExceptionAsErrorMessage = false
             });
             var input = new RuleTestClass {
@@ -577,7 +577,7 @@ namespace RulesEngine.UnitTest
                 }
             };
 
-            var re = new RulesEngine(new[] { workflow }, null, new ReSetting {
+            var re = new RulesEngine(new[] { workflow }, null, new ReSettings {
                 IgnoreException = true
             });
             var input = new RuleTestClass {
@@ -746,7 +746,7 @@ namespace RulesEngine.UnitTest
             return new RulesEngine(new string[] { json }, null);
         }
 
-        private RulesEngine GetRulesEngine(string filename, ReSetting reSettings = null)
+        private RulesEngine GetRulesEngine(string filename, ReSettings reSettings = null)
         {
             var data = GetFileContent(filename);
 

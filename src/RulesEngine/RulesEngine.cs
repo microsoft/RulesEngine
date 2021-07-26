@@ -28,7 +28,7 @@ namespace RulesEngine
     {
         #region Variables
         private readonly ILogger _logger;
-        private readonly ReSetting _reSettings;
+        private readonly ReSettings _reSettings;
         private readonly RulesCache _rulesCache = new RulesCache();
         private readonly RuleExpressionParser _ruleExpressionParser;
         private readonly RuleCompiler _ruleCompiler;
@@ -37,27 +37,27 @@ namespace RulesEngine
         #endregion
 
         #region Constructor
-        public RulesEngine(string[] jsonConfig, ILogger logger = null, ReSetting reSettings = null) : this(logger, reSettings)
+        public RulesEngine(string[] jsonConfig, ILogger logger = null, ReSettings reSettings = null) : this(logger, reSettings)
         {
             var workflowRules = jsonConfig.Select(item => JsonConvert.DeserializeObject<WorkflowRule>(item)).ToArray();
             AddWorkflow(workflowRules);
         }
 
-        public RulesEngine(WorkflowRule[] workflowRules, ILogger logger = null, ReSetting reSettings = null) : this(logger, reSettings)
+        public RulesEngine(WorkflowRule[] workflowRules, ILogger logger = null, ReSettings reSettings = null) : this(logger, reSettings)
         {
             AddWorkflow(workflowRules);
         }
 
-        public RulesEngine(ILogger logger = null, ReSetting reSettings = null)
+        public RulesEngine(ILogger logger = null, ReSettings reSettings = null)
         {
             _logger = logger ?? new NullLogger<RulesEngine>();
-            _reSettings = reSettings ?? new ReSetting();
+            _reSettings = reSettings ?? new ReSettings();
             _ruleExpressionParser = new RuleExpressionParser(_reSettings);
             _ruleCompiler = new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings, _ruleExpressionParser),_reSettings, _logger);
             _actionFactory = new ActionFactory(GetActionRegistry(_reSettings));
         }
 
-        private IDictionary<string, Func<ActionBase>> GetActionRegistry(ReSetting reSettings)
+        private IDictionary<string, Func<ActionBase>> GetActionRegistry(ReSettings reSettings)
         {
             var actionDictionary = GetDefaultActionRegistry();
             var customActions = reSettings.CustomActions ?? new Dictionary<string, Func<ActionBase>>();

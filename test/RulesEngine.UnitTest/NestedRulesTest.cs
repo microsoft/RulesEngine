@@ -23,7 +23,7 @@ namespace RulesEngine.UnitTest
         public async Task NestedRulesShouldFollowExecutionMode(NestedRuleExecutionMode mode)
         {
             var workflows = GetWorkflows();
-            var reSettings = new ReSetting { NestedRuleExecutionMode = mode };
+            var reSettings = new ReSettings { NestedRuleExecutionMode = mode };
             var rulesEngine = new RulesEngine(workflows, reSettings: reSettings);
             dynamic input1 = new ExpandoObject();
             input1.trueValue = true;
@@ -69,7 +69,7 @@ namespace RulesEngine.UnitTest
         private async Task NestedRulesWithNestedActions_ReturnsCorrectResults()
         {
             var workflows = GetWorkflows();
-            var reSettings = new ReSetting { };
+            var reSettings = new ReSettings { };
             var rulesEngine = new RulesEngine(workflows, reSettings: reSettings);
             dynamic input1 = new ExpandoObject();
             input1.trueValue = true;
@@ -92,7 +92,7 @@ namespace RulesEngine.UnitTest
 
             var workflowsViaTextJson = System.Text.Json.JsonSerializer.Deserialize<WorkflowRule[]>(workflowStr, serializationOptions);
 
-            var reSettings = new ReSetting { };
+            var reSettings = new ReSettings { };
             var rulesEngine = new RulesEngine(workflowsViaTextJson, reSettings: reSettings);
             dynamic input1 = new ExpandoObject();
             input1.trueValue = true;

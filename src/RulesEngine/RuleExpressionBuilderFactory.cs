@@ -9,9 +9,9 @@ namespace RulesEngine
 {
     internal class RuleExpressionBuilderFactory
     {
-        private readonly ReSetting _reSettings;
+        private readonly ReSettings _reSettings;
         private readonly LambdaExpressionBuilder _lambdaExpressionBuilder;
-        public RuleExpressionBuilderFactory(ReSetting reSettings, RuleExpressionParser expressionParser)
+        public RuleExpressionBuilderFactory(ReSettings reSettings, RuleExpressionParser expressionParser)
         {
             _reSettings = reSettings;
             _lambdaExpressionBuilder = new LambdaExpressionBuilder(_reSettings, expressionParser);

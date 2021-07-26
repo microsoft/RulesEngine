@@ -18,7 +18,7 @@ namespace RulesEngine.UnitTest
         public void RuleCompiler_NullCheck()
         {
             Assert.Throws<ArgumentNullException>(() => new RuleCompiler(null, null,null));
-            var reSettings = new ReSetting();
+            var reSettings = new ReSettings();
             var parser = new RuleExpressionParser(reSettings);
             Assert.Throws<ArgumentNullException>(() => new RuleCompiler(new RuleExpressionBuilderFactory(reSettings, parser), null,null));
         }
@@ -26,7 +26,7 @@ namespace RulesEngine.UnitTest
         [Fact]
         public void RuleCompiler_CompileRule_ThrowsException()
         {
-            var reSettings = new ReSetting();
+            var reSettings = new ReSettings();
             var parser = new RuleExpressionParser(reSettings);
             var compiler = new RuleCompiler(new RuleExpressionBuilderFactory(reSettings, parser),null, new NullLogger<RuleCompiler>());
             Assert.Throws<ArgumentNullException>(() => compiler.CompileRule(null, null,null));

@@ -36,7 +36,7 @@ namespace RulesEngineBenchmark
             var fileData = File.ReadAllText(files[0]);
             workflows = JsonConvert.DeserializeObject<List<WorkflowRule>>(fileData);
 
-            rulesEngine = new RulesEngine.RulesEngine(workflows.ToArray(), null, new ReSetting {
+            rulesEngine = new RulesEngine.RulesEngine(workflows.ToArray(), null, new ReSettings {
                 EnableFormattedErrorMessage = false,
                 EnableScopedParams = false
             });

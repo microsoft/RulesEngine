@@ -28,7 +28,7 @@ namespace RulesEngine
         /// The expression builder factory
         /// </summary>
         private readonly RuleExpressionBuilderFactory _expressionBuilderFactory;
-        private readonly ReSetting _reSettings;
+        private readonly ReSettings _reSettings;
 
         /// <summary>
         /// The logger
@@ -40,7 +40,7 @@ namespace RulesEngine
         /// </summary>
         /// <param name="expressionBuilderFactory">The expression builder factory.</param>
         /// <exception cref="ArgumentNullException">expressionBuilderFactory</exception>
-        internal RuleCompiler(RuleExpressionBuilderFactory expressionBuilderFactory, ReSetting reSettings, ILogger logger)
+        internal RuleCompiler(RuleExpressionBuilderFactory expressionBuilderFactory, ReSettings reSettings, ILogger logger)
         {
             _logger = logger ?? throw new ArgumentNullException($"{nameof(logger)} can't be null.");
           

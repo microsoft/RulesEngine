@@ -77,7 +77,7 @@ namespace RulesEngine.UnitTest
         {
             var workflows = GetWorkflowRulesList();
 
-            var engine = new RulesEngine(new string[] { }, null, new ReSetting {
+            var engine = new RulesEngine(new string[] { }, null, new ReSettings {
                 EnableScopedParams = false
             });
             engine.AddWorkflow(workflows);

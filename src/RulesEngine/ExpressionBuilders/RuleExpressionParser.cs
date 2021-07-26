@@ -15,11 +15,11 @@ namespace RulesEngine.ExpressionBuilders
 {
     public class RuleExpressionParser
     {
-        private readonly ReSetting _reSettings;
+        private readonly ReSettings _reSettings;
         private static IMemoryCache _memoryCache;
         private readonly IDictionary<string, MethodInfo> _methodInfo;
 
-        public RuleExpressionParser(ReSetting reSettings)
+        public RuleExpressionParser(ReSettings reSettings)
         {
             _reSettings = reSettings;
             _memoryCache = _memoryCache ?? new MemoryCache(new MemoryCacheOptions {

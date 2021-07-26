@@ -21,7 +21,7 @@ namespace RulesEngine.UnitTest
         private async Task EmptyRules_ReturnsExepectedResults()
         {
             var workflows = GetEmptyWorkflows();
-            var reSettings = new ReSetting { };
+            var reSettings = new ReSettings { };
             RulesEngine rulesEngine = new RulesEngine();
 
             Func<Task> action = () => {
@@ -37,7 +37,7 @@ namespace RulesEngine.UnitTest
         private async Task NestedRulesWithEmptyNestedActions_ReturnsExepectedResults()
         {
             var workflows = GetEmptyNestedWorkflows();
-            var reSettings = new ReSetting { };
+            var reSettings = new ReSettings { };
             RulesEngine rulesEngine = new RulesEngine();
 
             Func<Task> action = () => {
