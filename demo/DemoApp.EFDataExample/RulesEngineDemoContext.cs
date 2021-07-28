@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using RulesEngine.Models;
 
 namespace DemoApp.EFDataExample
@@ -34,8 +33,8 @@ namespace DemoApp.EFDataExample
             modelBuilder.Entity<ActionInfo>()
                 .Property(b => b.Context)
                 .HasConversion(
-                   v => JsonConvert.SerializeObject(v),
-                   v => JsonConvert.DeserializeObject<Dictionary<string, object>>(v));
+                   v => JsonSerializer.Serialize(v, null),
+                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null));
 
             modelBuilder.Entity<ActionInfo>()
               .HasKey(k => k.Name);
@@ -44,7 +43,7 @@ namespace DemoApp.EFDataExample
               .HasKey(k => k.Name);
 
             modelBuilder.Entity<WorkflowRules>(entity => {
-                entity.HasKey(k => k.WorkflowName); 
+                entity.HasKey(k => k.WorkflowName);
             });
 
             modelBuilder.Entity<RuleActions>(entity => {
@@ -55,11 +54,11 @@ namespace DemoApp.EFDataExample
 
             modelBuilder.Entity<Rule>(entity => {
                 entity.HasKey(k => k.RuleName);
-               
+
                 entity.Property(b => b.Properties)
                 .HasConversion(
-                   v => JsonConvert.SerializeObject(v),
-                   v => JsonConvert.DeserializeObject<Dictionary<string, object>>(v));
+                   v => JsonSerializer.Serialize(v, null),
+                   v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null));
                 entity.Ignore(e => e.Actions);
             });
 
