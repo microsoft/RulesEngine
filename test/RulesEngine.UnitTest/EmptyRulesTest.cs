@@ -138,7 +138,7 @@ namespace RulesEngine.UnitTest
                             Rules = new Rule[] {
 
                             },
-                            Actions =  new RuleAction {
+                            Actions =  new RuleActions {
                                         OnFailure = new ActionInfo{
                                             Name = "OutputExpression",
                                             Context = new Dictionary<string, object> {

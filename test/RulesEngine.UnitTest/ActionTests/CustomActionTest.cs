@@ -60,7 +60,7 @@ namespace RulesEngine.UnitTest.ActionTests
                         new Rule {
                             RuleName = "trueRule",
                             Expression = "input1 == true",
-                            Actions = new RuleAction() {
+                            Actions = new RuleActions() {
                                 OnSuccess = new ActionInfo {
                                     Name = "ReturnContext",
                                     Context =  new Dictionary<string, object> {

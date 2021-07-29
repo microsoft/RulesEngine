@@ -11,7 +11,7 @@ namespace RulesEngine.Data
         public DbSet<Workflow> Workflows { get; set; }
         public DbSet<ActionInfo> ActionInfos { get; set; }
 
-        public DbSet<RuleAction> RuleActions { get; set; }
+        public DbSet<RuleActions> RuleActions { get; set; }
         public DbSet<Rule> Rules { get; set; }
         public DbSet<ScopedParam> ScopedParams { get; set; }
 
@@ -21,7 +21,7 @@ namespace RulesEngine.Data
 
             modelBuilder.Ignore<ActionInfo>();
             modelBuilder.Ignore<ScopedParam>();
-            modelBuilder.Ignore<RuleAction>();
+            modelBuilder.Ignore<RuleActions>();
 
             modelBuilder.Entity<Workflow>(entity => {
                 entity.HasKey(k => k.Id);
@@ -42,7 +42,7 @@ namespace RulesEngine.Data
                 entity.Property(p => p.Actions)
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<RuleAction>(v, null));
+                   v => JsonSerializer.Deserialize<RuleActions>(v, null));
 
                 entity.Ignore(b => b.WorkflowsToInject);
             });

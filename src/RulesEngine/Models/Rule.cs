@@ -49,7 +49,7 @@ namespace RulesEngine.Models
         public IEnumerable<Rule> Rules { get; set; }
         public IEnumerable<ScopedParam> LocalParams { get; set; }
         public string Expression { get; set; }
-        public RuleAction Actions { get; set; }
+        public RuleActions Actions { get; set; }
         public string SuccessEvent { get; set; }
 
     }

@@ -79,7 +79,7 @@ namespace RulesEngine.UnitTest
                         RuleName = "ExpressionOutputRuleTest",
                         RuleExpressionType = RuleExpressionType.LambdaExpression,
                         Expression = "1 == 1",
-                        Actions = new RuleAction{
+                        Actions = new RuleActions{
                             OnSuccess = new ActionInfo{
                                 Name = "OutputExpression",
                                 Context = new Dictionary<string, object>{
@@ -92,7 +92,7 @@ namespace RulesEngine.UnitTest
                         RuleName = "EvaluateRuleTest",
                         RuleExpressionType = RuleExpressionType.LambdaExpression,
                         Expression = "1 == 1",
-                        Actions = new RuleAction{
+                        Actions = new RuleActions{
                             OnSuccess = new ActionInfo{
                                 Name = "EvaluateRule",
                                 Context = new Dictionary<string, object>{

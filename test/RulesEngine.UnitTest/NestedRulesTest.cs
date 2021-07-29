@@ -186,7 +186,7 @@ namespace RulesEngine.UnitTest
                                 new Rule{
                                     RuleName = "trueRule1",
                                     Expression = "input1.TrueValue == true",
-                                    Actions =  new RuleAction {
+                                    Actions =  new RuleActions {
                                         OnSuccess = new ActionInfo{
                                             Name = "OutputExpression",
                                             Context = new Dictionary<string, object> {
@@ -198,7 +198,7 @@ namespace RulesEngine.UnitTest
                                 new Rule {
                                     RuleName = "falseRule1",
                                     Expression = "input1.TrueValue == false",
-                                    Actions =  new RuleAction {
+                                    Actions =  new RuleActions {
                                         OnFailure = new ActionInfo{
                                             Name = "OutputExpression",
                                             Context = new Dictionary<string, object> {
@@ -208,7 +208,7 @@ namespace RulesEngine.UnitTest
                                     }
                                 }
                             },
-                            Actions =  new RuleAction {
+                            Actions =  new RuleActions {
                                         OnFailure = new ActionInfo{
                                             Name = "OutputExpression",
                                             Context = new Dictionary<string, object> {
