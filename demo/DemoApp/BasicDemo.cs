@@ -14,7 +14,7 @@ namespace DemoApp
         public void Run()
         {
             Console.WriteLine($"Running {nameof(BasicDemo)}....");
-            List<Workflow> Workflow = new List<Workflow>();
+            List<Workflow> workflows = new List<Workflow>();
             Workflow workflow = new Workflow();
             workflow.WorkflowName = "Test Workflow Rule 1";
 
@@ -31,9 +31,9 @@ namespace DemoApp
 
             workflow.Rules = rules;
 
-            Workflow.Add(workflow);
+            workflows.Add(workflow);
 
-            var bre = new RulesEngine.RulesEngine(Workflow.ToArray(), null);
+            var bre = new RulesEngine.RulesEngine(workflows.ToArray(), null);
 
             dynamic datas = new ExpandoObject();
             datas.count = 1;
