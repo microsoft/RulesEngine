@@ -9,7 +9,7 @@ namespace RulesEngine.Models
 {
     [Obsolete("Workflow is now Workflow - Workflow will be removed in next major version")]
     [ExcludeFromCodeCoverage]
-    public class WorkflowRule : Workflow {
+    public class WorkflowRules : Workflow {
     }
 
     /// <summary>
