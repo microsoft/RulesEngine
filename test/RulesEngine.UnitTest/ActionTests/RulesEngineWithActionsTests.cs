@@ -46,16 +46,16 @@ namespace RulesEngine.UnitTest
         public async Task ExecuteActionWorkflowAsync_CalledWithNoActionsInWorkflow_ExecutesSuccessfully()
         {
 
-            var engine = new RulesEngine(GetWorkflowRulesWithoutActions());
+            var engine = new RulesEngine(GetWorkflowsWithoutActions());
             var result = await engine.ExecuteActionWorkflowAsync("NoActionWorkflow", "NoActionTest", new RuleParameter[0]);
             Assert.NotNull(result);
             Assert.Null(result.Output);
         }
 
 
-        private WorkflowRule[] GetWorkflowRulesWithoutActions()
+        private Workflow[] GetWorkflowsWithoutActions()
         {
-            var workflow1 = new WorkflowRule {
+            var workflow1 = new Workflow {
                 WorkflowName = "NoActionWorkflow",
                 Rules = new List<Rule>{
                     new Rule{
@@ -69,10 +69,10 @@ namespace RulesEngine.UnitTest
             return new[] { workflow1 };
         }
 
-        private WorkflowRule[] GetWorkflowWithActions()
+        private Workflow[] GetWorkflowWithActions()
         {
 
-            var workflow1 = new WorkflowRule {
+            var workflow1 = new Workflow {
                 WorkflowName = "ActionWorkflow",
                 Rules = new List<Rule>{
                     new Rule{

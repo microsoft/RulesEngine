@@ -31,7 +31,7 @@ namespace RulesEngine.UnitTest
 
             Exception ex = await Assert.ThrowsAsync<Exceptions.RuleValidationException>(action);
 
-            Assert.Contains("Atleast one of Rules or WorkflowRulesToInject must be not empty", ex.Message);
+            Assert.Contains("Atleast one of Rules or WorkflowsToInject must be not empty", ex.Message);
         }
         [Fact]
         private async Task NestedRulesWithEmptyNestedActions_ReturnsExepectedResults()
@@ -47,13 +47,13 @@ namespace RulesEngine.UnitTest
 
             Exception ex = await Assert.ThrowsAsync<Exceptions.RuleValidationException>(action);
 
-            Assert.Contains("Atleast one of Rules or WorkflowRulesToInject must be not empty", ex.Message);
+            Assert.Contains("Atleast one of Rules or WorkflowsToInject must be not empty", ex.Message);
         }
 
-        private WorkflowRule[] GetEmptyWorkflows()
+        private Workflow[] GetEmptyWorkflows()
         {
             return new[] {
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "EmptyRulesTest",
                     Rules = new Rule[] {
                     }
@@ -61,10 +61,10 @@ namespace RulesEngine.UnitTest
             };
         }
 
-        private WorkflowRule[] GetEmptyNestedWorkflows()
+        private Workflow[] GetEmptyNestedWorkflows()
         {
             return new[] {
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "EmptyNestedRulesTest",
                     Rules = new Rule[] {
                         new Rule {
@@ -129,7 +129,7 @@ namespace RulesEngine.UnitTest
                          }
                     }
                 },
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "EmptyNestedRulesActionsTest",
                     Rules = new Rule[] {
                         new Rule {

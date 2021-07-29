@@ -16,7 +16,7 @@ namespace RulesEngineBenchmark
     {
         private readonly RulesEngine.RulesEngine rulesEngine;
         private readonly object ruleInput;
-        private readonly List<WorkflowRule> workflows;
+        private readonly List<Workflow> workflows;
 
         private class ListItem
         {
@@ -34,7 +34,7 @@ namespace RulesEngineBenchmark
             }
 
             var fileData = File.ReadAllText(files[0]);
-            workflows = JsonConvert.DeserializeObject<List<WorkflowRule>>(fileData);
+            workflows = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
             rulesEngine = new RulesEngine.RulesEngine(workflows.ToArray(), null, new ReSettings {
                 EnableFormattedErrorMessage = false,

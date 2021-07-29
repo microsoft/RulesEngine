@@ -90,7 +90,7 @@ namespace RulesEngine.UnitTest
             var serializationOptions = new System.Text.Json.JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
 
 
-            var workflowsViaTextJson = System.Text.Json.JsonSerializer.Deserialize<WorkflowRule[]>(workflowStr, serializationOptions);
+            var workflowsViaTextJson = System.Text.Json.JsonSerializer.Deserialize<Workflow[]>(workflowStr, serializationOptions);
 
             var reSettings = new ReSettings { };
             var rulesEngine = new RulesEngine(workflowsViaTextJson, reSettings: reSettings);
@@ -108,10 +108,10 @@ namespace RulesEngine.UnitTest
 
 
 
-        private WorkflowRule[] GetWorkflows()
+        private Workflow[] GetWorkflows()
         {
             return new[] {
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "NestedRulesTest",
                     Rules = new Rule[] {
                         new Rule {
@@ -176,7 +176,7 @@ namespace RulesEngine.UnitTest
                          }
                     }
                 },
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "NestedRulesActionsTest",
                     Rules = new Rule[] {
                         new Rule {

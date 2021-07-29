@@ -22,9 +22,9 @@ namespace RulesEngine.UnitTest
         [InlineData("GlobalParamReferencedInNextGlobalParams")]
         [InlineData("LocalParamReferencedInNextLocalParams")]
         [InlineData("GlobalParamAndLocalParamsInNestedRules")]
-        public async Task BasicWorkflowRules_ReturnsTrue(string workflowName)
+        public async Task BasicWorkflows_ReturnsTrue(string workflowName)
         {
-            var workflows = GetWorkflowRulesList();
+            var workflows = GetWorkflowsList();
 
             var engine = new RulesEngine(null, null);
             engine.AddWorkflow(workflows);
@@ -45,7 +45,7 @@ namespace RulesEngine.UnitTest
         [InlineData("GlobalAndLocalParams")]
         public async Task WorkflowUpdate_GlobalParam_ShouldReflect(string workflowName)
         {
-            var workflows = GetWorkflowRulesList();
+            var workflows = GetWorkflowsList();
 
             var engine = new RulesEngine(null, null);
             engine.AddWorkflow(workflows);
@@ -75,7 +75,7 @@ namespace RulesEngine.UnitTest
         [InlineData("GlobalAndLocalParams", new[] { false })]
         public async Task DisabledScopedParam_ShouldReflect(string workflowName, bool[] outputs)
         {
-            var workflows = GetWorkflowRulesList();
+            var workflows = GetWorkflowsList();
 
             var engine = new RulesEngine(new string[] { }, null, new ReSettings {
                 EnableScopedParams = false
@@ -103,7 +103,7 @@ namespace RulesEngine.UnitTest
         [InlineData("LocalParamsOnly2")]
         public async Task ErrorInScopedParam_ShouldAppearAsErrorMessage(string workflowName)
         {
-            var workflows = GetWorkflowRulesList();
+            var workflows = GetWorkflowsList();
 
             var engine = new RulesEngine(new string[] { }, null);
             engine.AddWorkflow(workflows);
@@ -123,7 +123,7 @@ namespace RulesEngine.UnitTest
         [InlineData("LocalParamsOnlyWithComplexInput")]
         public async Task RuntimeErrorInScopedParam_ShouldAppearAsErrorMessage(string workflowName)
         {
-            var workflows = GetWorkflowRulesList();
+            var workflows = GetWorkflowsList();
 
             var engine = new RulesEngine(new string[] { }, null);
             engine.AddWorkflow(workflows);
@@ -143,7 +143,7 @@ namespace RulesEngine.UnitTest
 
         private void CheckResultTreeContainsAllInputs(string workflowName, List<RuleResultTree> result)
         {
-            var workflow = GetWorkflowRulesList().Single(c => c.WorkflowName == workflowName);
+            var workflow = GetWorkflowsList().Single(c => c.WorkflowName == workflowName);
             var expectedInputs = new List<string>() { "input1" };
             expectedInputs.AddRange(workflow.GlobalParams?.Select(c => c.Name) ?? new List<string>());
 
@@ -176,10 +176,10 @@ namespace RulesEngine.UnitTest
             }
 
         }
-        private WorkflowRule[] GetWorkflowRulesList()
+        private Workflow[] GetWorkflowsList()
         {
-            return new WorkflowRule[] {
-                new WorkflowRule {
+            return new Workflow[] {
+                new Workflow {
                     WorkflowName = "NoLocalAndGlobalParams",
                     Rules = new List<Rule> {
                         new Rule {
@@ -188,7 +188,7 @@ namespace RulesEngine.UnitTest
                         }
                     }
                 },
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "LocalParamsOnly",
                     Rules = new List<Rule> {
                         new Rule {
@@ -209,7 +209,7 @@ namespace RulesEngine.UnitTest
                         },
                     }
                 },
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "LocalParamsOnly2",
                     Rules = new List<Rule> {
                         new Rule {
@@ -226,7 +226,7 @@ namespace RulesEngine.UnitTest
                     }
                 },
 
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "GlobalParamsOnly",
                     GlobalParams = new List<ScopedParam> {
                         new ScopedParam {
@@ -241,7 +241,7 @@ namespace RulesEngine.UnitTest
                         }
                     }
                 },
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "GlobalAndLocalParams",
                     GlobalParams = new List<ScopedParam> {
                         new ScopedParam {
@@ -263,7 +263,7 @@ namespace RulesEngine.UnitTest
                     }
 
                 },
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "GlobalParamReferencedInLocalParams",
                     GlobalParams = new List<ScopedParam> {
                         new ScopedParam {
@@ -285,7 +285,7 @@ namespace RulesEngine.UnitTest
                         },
                     }
                 },
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "GlobalParamReferencedInNextGlobalParams",
                     GlobalParams = new List<ScopedParam> {
                         new ScopedParam {
@@ -304,7 +304,7 @@ namespace RulesEngine.UnitTest
                         },
                     }
                 },
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "LocalParamReferencedInNextLocalParams",
                     Rules = new List<Rule> {
                         new Rule {
@@ -323,7 +323,7 @@ namespace RulesEngine.UnitTest
                         },
                     }
                 },
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "GlobalParamAndLocalParamsInNestedRules",
                     GlobalParams = new List<ScopedParam> {
                         new ScopedParam {
@@ -362,7 +362,7 @@ namespace RulesEngine.UnitTest
                         }
                     }
                 },
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "LocalParamsOnlyWithComplexInput",
                     Rules = new List<Rule> {
                         new Rule {
@@ -378,7 +378,7 @@ namespace RulesEngine.UnitTest
                         }
                     }
                 },
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "GlobalParamsOnlyWithComplexInput",
                     GlobalParams = new List<ScopedParam> {
                         new ScopedParam {

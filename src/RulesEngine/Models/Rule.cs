@@ -16,6 +16,11 @@ namespace RulesEngine.Models
     public class Rule
     {
         /// <summary>
+        /// Gets the Rule Id.
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
         /// Rule name for the Rule
         /// </summary>
         public string RuleName { get; set; }
@@ -40,7 +45,7 @@ namespace RulesEngine.Models
 
         [JsonConverter(typeof(StringEnumConverter))]
         public RuleExpressionType RuleExpressionType { get; set; } = RuleExpressionType.LambdaExpression;
-        public IEnumerable<string> WorkflowRulesToInject { get; set; }
+        public IEnumerable<string> WorkflowsToInject { get; set; }
         public IEnumerable<Rule> Rules { get; set; }
         public IEnumerable<ScopedParam> LocalParams { get; set; }
         public string Expression { get; set; }

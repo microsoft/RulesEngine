@@ -95,10 +95,10 @@ namespace RulesEngine.UnitTest
             return areAllRulesEnabled;
         }
 
-        private WorkflowRule[] GetWorkflows()
+        private Workflow[] GetWorkflows()
         {
             return new[] {
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "RuleEnabledFeatureTest",
                     Rules = new List<Rule> {
                         new Rule {
@@ -118,7 +118,7 @@ namespace RulesEngine.UnitTest
 
                     }
                 },
-                new WorkflowRule {
+                new Workflow {
                     WorkflowName = "RuleEnabledNestedFeatureTest",
                     Rules = new List<Rule> {
                         new Rule {
