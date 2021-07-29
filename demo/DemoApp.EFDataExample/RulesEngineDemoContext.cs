@@ -43,7 +43,8 @@ namespace DemoApp.EFDataExample
               .HasKey(k => k.Name);
 
             modelBuilder.Entity<WorkflowRules>(entity => {
-                entity.HasKey(k => k.WorkflowName);
+                entity.HasKey(k => k.Id);
+                entity.Property(p => p.Id).ValueGeneratedOnAdd();
             });
 
             modelBuilder.Entity<RuleActions>(entity => {
@@ -53,7 +54,8 @@ namespace DemoApp.EFDataExample
             });
 
             modelBuilder.Entity<Rule>(entity => {
-                entity.HasKey(k => k.RuleName);
+                entity.HasKey(k => k.Id);
+                entity.Property(p => p.Id).ValueGeneratedOnAdd();
 
                 entity.Property(b => b.Properties)
                 .HasConversion(
