@@ -42,12 +42,12 @@ namespace DemoApp
                 throw new Exception("Rules not found.");
 
             var fileData = File.ReadAllText(files[0]);
-            var Workflows = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
+            var workflow = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
             RulesEngineDemoContext db = new RulesEngineDemoContext();
             if (db.Database.EnsureCreated())
             {
-                db.Workflows.AddRange(Workflows);
+                db.Workflows.AddRange(workflow);
                 db.SaveChanges();
             }
 

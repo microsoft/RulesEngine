@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace RulesEngine.Models
 {
-    [Obsolete("Workflow is now Workflow - Workflow will be removed in next major version")]
+    [Obsolete("WorkflowRules class is deprecated. Use Workflow class instead.")]
     [ExcludeFromCodeCoverage]
     public class WorkflowRules : Workflow {
     }
@@ -28,9 +28,14 @@ namespace RulesEngine.Models
         /// </summary>
         public string WorkflowName { get; set; }
 
-        /// <summary>Gets or sets the workflow rules to inject.</summary>
-        /// <value>The workflow rules to inject.</value>
-        public IEnumerable<string> WorkflowsToInject { get; set; }
+    /// <summary>Gets or sets the workflow rules to inject.</summary>
+    /// <value>The workflow rules to inject.</value>
+    [Obsolete("WorkflowRulesToInject is deprecated. Use WorkflowsToInject instead.")]
+    public IEnumerable<string> WorkflowRulesToInject {
+      get { return WorkflowsToInject; }
+      set { WorkflowsToInject = value; }
+    }
+    public IEnumerable<string> WorkflowsToInject { get; set; }
 
         /// <summary>
         /// Gets or Sets the global params which will be applicable to all rules

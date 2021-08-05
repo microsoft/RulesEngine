@@ -20,12 +20,12 @@ namespace RulesEngine.UnitTest
         [Fact]
         private async Task EmptyRules_ReturnsExepectedResults()
         {
-            var workflows = GetEmptyWorkflows();
+            var workflow = GetEmptyWorkflow();
             var reSettings = new ReSettings { };
             RulesEngine rulesEngine = new RulesEngine();
 
             Func<Task> action = () => {
-                new RulesEngine(workflows, reSettings: reSettings);
+                new RulesEngine(workflow, reSettings: reSettings);
                 return Task.CompletedTask;
             };
 
@@ -36,12 +36,12 @@ namespace RulesEngine.UnitTest
         [Fact]
         private async Task NestedRulesWithEmptyNestedActions_ReturnsExepectedResults()
         {
-            var workflows = GetEmptyNestedWorkflows();
+            var workflow = GetEmptyNestedWorkflows();
             var reSettings = new ReSettings { };
             RulesEngine rulesEngine = new RulesEngine();
 
             Func<Task> action = () => {
-                new RulesEngine(workflows, reSettings: reSettings);
+                new RulesEngine(workflow, reSettings: reSettings);
                 return Task.CompletedTask;
             };
 
@@ -50,7 +50,7 @@ namespace RulesEngine.UnitTest
             Assert.Contains("Atleast one of Rules or WorkflowsToInject must be not empty", ex.Message);
         }
 
-        private Workflow[] GetEmptyWorkflows()
+        private Workflow[] GetEmptyWorkflow()
         {
             return new[] {
                 new Workflow {

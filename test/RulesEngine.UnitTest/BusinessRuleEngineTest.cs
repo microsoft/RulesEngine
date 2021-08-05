@@ -81,9 +81,9 @@ namespace RulesEngine.UnitTest
             Assert.Contains(result1, c => c.IsSuccess);
 
             // Fetch and add new rules.
-            var newWorkflows = ParseAsWorkflows(newWorkflowFile);
+            var newWorkflow = ParseAsWorkflow(newWorkflowFile);
 
-            Assert.Throws<RuleValidationException>(() => re.AddWorkflow(newWorkflows));
+            Assert.Throws<RuleValidationException>(() => re.AddWorkflows(newWorkflow));
         }
 
         [Theory]
@@ -103,8 +103,8 @@ namespace RulesEngine.UnitTest
             Assert.Contains(result1, c => c.IsSuccess);
 
             // Fetch and update new rules.
-            Workflow newWorkflows = ParseAsWorkflows(newWorkflowFile);
-            re.AddOrUpdateWorkflow(newWorkflows);
+            Workflow newWorkflow = ParseAsWorkflow(newWorkflowFile);
+            re.AddOrUpdateWorkflow(newWorkflow);
 
             // Run new rules.
             List<RuleResultTree> result2 = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
@@ -123,21 +123,21 @@ namespace RulesEngine.UnitTest
         public void GetAllRegisteredWorkflows_ReturnsListOfAllWorkflows(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName);
-            var workflows = re.GetAllRegisteredWorkflowNames();
+            var workflow = re.GetAllRegisteredWorkflowNames();
 
-            Assert.NotNull(workflows);
-            Assert.Equal(2, workflows.Count);
-            Assert.Contains("inputWorkflow", workflows);
+            Assert.NotNull(workflow);
+            Assert.Equal(2, workflow.Count);
+            Assert.Contains("inputWorkflow", workflow);
         }
 
         [Fact]
         public void GetAllRegisteredWorkflows_NoWorkflow_ReturnsEmptyList()
         {
             var re = new RulesEngine();
-            var workflows = re.GetAllRegisteredWorkflowNames();
+            var workflow = re.GetAllRegisteredWorkflowNames();
 
-            Assert.NotNull(workflows);
-            Assert.Empty(workflows);
+            Assert.NotNull(workflow);
+            Assert.Empty(workflow);
         }
 
         [Theory]
@@ -289,7 +289,7 @@ namespace RulesEngine.UnitTest
 
             var result = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
             Assert.NotNull(result);
-            re.RemoveWorkflow("inputWorkflow");
+            re.RemoveWorkflows("inputWorkflow");
 
             await Assert.ThrowsAsync<ArgumentException>(async () => await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3));
         }
@@ -300,7 +300,7 @@ namespace RulesEngine.UnitTest
         public async Task ClearWorkflow_RemovesAllWorkflow(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName);
-            re.ClearWorkflows();
+            re.ClearWorkflow();
 
             dynamic input1 = GetInput1();
             dynamic input2 = GetInput2();
@@ -613,15 +613,15 @@ namespace RulesEngine.UnitTest
             };
 
             var re = new RulesEngine();
-            re.AddWorkflow(workflow);
+            re.AddWorkflows(workflow);
 
             var result1 = await re.ExecuteAllRulesAsync("Test","hello");
             Assert.True(result1.All(c => c.IsSuccess));
 
-            re.RemoveWorkflow("Test");
+            re.RemoveWorkflows("Test");
             workflow.Rules.First().LocalParams.First().Expression = "false";
 
-            re.AddWorkflow(workflow);
+            re.AddWorkflows(workflow);
             var result2 = await re.ExecuteAllRulesAsync("Test", "hello");
             Assert.True(result2.All(c => c.IsSuccess == false));
         }
@@ -647,15 +647,15 @@ namespace RulesEngine.UnitTest
             };
 
             var re = new RulesEngine();
-            re.AddWorkflow(workflow);
+            re.AddWorkflows(workflow);
 
             var result1 = await re.ExecuteAllRulesAsync("Test", "hello");
             Assert.True(result1.All(c => c.IsSuccess));
 
-            re.ClearWorkflows();
+            re.ClearWorkflow();
             workflow.Rules.First().LocalParams.First().Expression = "false";
 
-            re.AddWorkflow(workflow);
+            re.AddWorkflows(workflow);
             var result2 = await re.ExecuteAllRulesAsync("Test", "hello");
             Assert.True(result2.All(c => c.IsSuccess == false));
         }
@@ -676,7 +676,7 @@ namespace RulesEngine.UnitTest
             };
 
             var re = new RulesEngine();
-            re.AddWorkflow(workflow);
+            re.AddWorkflows(workflow);
 
             var result1 = await re.ExecuteAllRulesAsync("Test", new RuleParameter("input1", value:null));
             Assert.True(result1.All(c => c.IsSuccess));
@@ -766,7 +766,7 @@ namespace RulesEngine.UnitTest
             return File.ReadAllText(filePath);
         }
 
-        private Workflow ParseAsWorkflows(string WorkflowsFileName)
+        private Workflow ParseAsWorkflow(string WorkflowsFileName)
         {
             string content = GetFileContent(WorkflowsFileName);
             return JsonConvert.DeserializeObject<Workflow>(content);

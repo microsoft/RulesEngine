@@ -39,13 +39,13 @@ namespace RulesEngine
         #region Constructor
         public RulesEngine(string[] jsonConfig, ILogger logger = null, ReSettings reSettings = null) : this(logger, reSettings)
         {
-            var Workflows = jsonConfig.Select(item => JsonConvert.DeserializeObject<Workflow>(item)).ToArray();
-            AddWorkflow(Workflows);
+            var workflow = jsonConfig.Select(item => JsonConvert.DeserializeObject<Workflow>(item)).ToArray();
+            AddWorkflows(workflow);
         }
 
         public RulesEngine(Workflow[] Workflows, ILogger logger = null, ReSettings reSettings = null) : this(logger, reSettings)
         {
-            AddWorkflow(Workflows);
+            AddWorkflows(Workflows);
         }
 
         public RulesEngine(ILogger logger = null, ReSettings reSettings = null)
@@ -159,21 +159,21 @@ namespace RulesEngine
         /// </summary>
         /// <param name="Workflows">The workflow rules.</param>
         /// <exception cref="RuleValidationException"></exception>
-        public void AddWorkflow(params Workflow[] Workflows)
+        public void AddWorkflows(params Workflow[] Workflows)
         {
             try
             {
-                foreach (var Workflow in Workflows)
+                foreach (var workflow in Workflows)
                 {                    
                     var validator = new WorkflowsValidator();
-                    validator.ValidateAndThrow(Workflow);
-                    if (!_rulesCache.ContainsWorkflows(Workflow.WorkflowName))
+                    validator.ValidateAndThrow(workflow);
+                    if (!_rulesCache.ContainsWorkflows(workflow.WorkflowName))
                     {
-                        _rulesCache.AddOrUpdateWorkflows(Workflow.WorkflowName, Workflow);
+                        _rulesCache.AddOrUpdateWorkflows(workflow.WorkflowName, workflow);
                     }
                     else
                     {
-                        throw new ValidationException($"Cannot add workflow `{Workflow.WorkflowName}` as it already exists. Use `AddOrUpdateWorkflow` to update existing workflow");
+                        throw new ValidationException($"Cannot add workflow `{workflow.WorkflowName}` as it already exists. Use `AddOrUpdateWorkflow` to update existing workflow");
                     }
                 }
             }
@@ -193,11 +193,11 @@ namespace RulesEngine
         {
             try
             {
-                foreach (var Workflow in Workflows)
+                foreach (var workflow in Workflows)
                 {
                     var validator = new WorkflowsValidator();
-                    validator.ValidateAndThrow(Workflow);
-                    _rulesCache.AddOrUpdateWorkflows(Workflow.WorkflowName, Workflow);
+                    validator.ValidateAndThrow(workflow);
+                    _rulesCache.AddOrUpdateWorkflows(workflow.WorkflowName, workflow);
                 }
             }
             catch (ValidationException ex)
@@ -212,18 +212,18 @@ namespace RulesEngine
         }
 
         /// <summary>
-        /// Clears the workflows.
+        /// Clears the workflow.
         /// </summary>
-        public void ClearWorkflows()
+        public void ClearWorkflow()
         {
             _rulesCache.Clear();
         }
 
         /// <summary>
-        /// Removes the workflow.
+        /// Removes the workflows.
         /// </summary>
         /// <param name="workflowNames">The workflow names.</param>
-        public void RemoveWorkflow(params string[] workflowNames)
+        public void RemoveWorkflows(params string[] workflowNames)
         {
             foreach (var workflowName in workflowNames)
             {
@@ -271,13 +271,13 @@ namespace RulesEngine
                 return true;
             }
 
-            var Workflows = _rulesCache.GetWorkflows(workflowName);
-            if (Workflows != null)
+            var workflow = _rulesCache.GetWorkflow(workflowName);
+            if (workflow != null)
             {
                 var dictFunc = new Dictionary<string, RuleFunc<RuleResultTree>>();
-                foreach (var rule in Workflows.Rules.Where(c => c.Enabled))
+                foreach (var rule in workflow.Rules.Where(c => c.Enabled))
                 {
-                    dictFunc.Add(rule.RuleName, CompileRule(rule, ruleParams, Workflows.GlobalParams?.ToArray()));
+                    dictFunc.Add(rule.RuleName, CompileRule(rule, ruleParams, workflow.GlobalParams?.ToArray()));
                 }
 
                 _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, dictFunc);
@@ -293,7 +293,7 @@ namespace RulesEngine
 
         private RuleFunc<RuleResultTree> CompileRule(string workflowName, string ruleName, RuleParameter[] ruleParameters)
         {
-            var workflow = _rulesCache.GetWorkflows(workflowName);
+            var workflow = _rulesCache.GetWorkflow(workflowName);
             if(workflow == null)
             {
                 throw new ArgumentException($"Workflow `{workflowName}` is not found");

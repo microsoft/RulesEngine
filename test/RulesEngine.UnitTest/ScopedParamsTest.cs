@@ -24,10 +24,10 @@ namespace RulesEngine.UnitTest
         [InlineData("GlobalParamAndLocalParamsInNestedRules")]
         public async Task BasicWorkflows_ReturnsTrue(string workflowName)
         {
-            var workflows = GetWorkflowsList();
+            var workflow = GetWorkflowList();
 
             var engine = new RulesEngine(null, null);
-            engine.AddWorkflow(workflows);
+            engine.AddWorkflows(workflow);
 
             var input1 = new {
                 trueValue = true,
@@ -45,10 +45,10 @@ namespace RulesEngine.UnitTest
         [InlineData("GlobalAndLocalParams")]
         public async Task WorkflowUpdate_GlobalParam_ShouldReflect(string workflowName)
         {
-            var workflows = GetWorkflowsList();
+            var workflow = GetWorkflowList();
 
             var engine = new RulesEngine(null, null);
-            engine.AddWorkflow(workflows);
+            engine.AddWorkflows(workflow);
 
             var input1 = new {
                 trueValue = true,
@@ -58,10 +58,10 @@ namespace RulesEngine.UnitTest
             var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
             Assert.True(result.All(c => c.IsSuccess));
 
-            var workflowToUpdate = workflows.Single(c => c.WorkflowName == workflowName);
-            engine.RemoveWorkflow(workflowName);
+            var workflowToUpdate = workflow.Single(c => c.WorkflowName == workflowName);
+            engine.RemoveWorkflows(workflowName);
             workflowToUpdate.GlobalParams.First().Expression = "true == false";
-            engine.AddWorkflow(workflowToUpdate);
+            engine.AddWorkflows(workflowToUpdate);
 
             var result2 = await engine.ExecuteAllRulesAsync(workflowName, input1);
 
@@ -75,12 +75,12 @@ namespace RulesEngine.UnitTest
         [InlineData("GlobalAndLocalParams", new[] { false })]
         public async Task DisabledScopedParam_ShouldReflect(string workflowName, bool[] outputs)
         {
-            var workflows = GetWorkflowsList();
+            var workflow = GetWorkflowList();
 
             var engine = new RulesEngine(new string[] { }, null, new ReSettings {
                 EnableScopedParams = false
             });
-            engine.AddWorkflow(workflows);
+            engine.AddWorkflows(workflow);
 
             var input1 = new {
                 trueValue = true,
@@ -103,10 +103,10 @@ namespace RulesEngine.UnitTest
         [InlineData("LocalParamsOnly2")]
         public async Task ErrorInScopedParam_ShouldAppearAsErrorMessage(string workflowName)
         {
-            var workflows = GetWorkflowsList();
+            var workflow = GetWorkflowList();
 
             var engine = new RulesEngine(new string[] { }, null);
-            engine.AddWorkflow(workflows);
+            engine.AddWorkflows(workflow);
 
             var input = new { };
             var result = await engine.ExecuteAllRulesAsync(workflowName, input);
@@ -123,10 +123,10 @@ namespace RulesEngine.UnitTest
         [InlineData("LocalParamsOnlyWithComplexInput")]
         public async Task RuntimeErrorInScopedParam_ShouldAppearAsErrorMessage(string workflowName)
         {
-            var workflows = GetWorkflowsList();
+            var workflow = GetWorkflowList();
 
             var engine = new RulesEngine(new string[] { }, null);
-            engine.AddWorkflow(workflows);
+            engine.AddWorkflows(workflow);
 
 
 
@@ -143,7 +143,7 @@ namespace RulesEngine.UnitTest
 
         private void CheckResultTreeContainsAllInputs(string workflowName, List<RuleResultTree> result)
         {
-            var workflow = GetWorkflowsList().Single(c => c.WorkflowName == workflowName);
+            var workflow = GetWorkflowList().Single(c => c.WorkflowName == workflowName);
             var expectedInputs = new List<string>() { "input1" };
             expectedInputs.AddRange(workflow.GlobalParams?.Select(c => c.Name) ?? new List<string>());
 
@@ -176,7 +176,7 @@ namespace RulesEngine.UnitTest
             }
 
         }
-        private Workflow[] GetWorkflowsList()
+        private Workflow[] GetWorkflowList()
         {
             return new Workflow[] {
                 new Workflow {

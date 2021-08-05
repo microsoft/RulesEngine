@@ -22,8 +22,8 @@ namespace RulesEngine.UnitTest
         [InlineData("RuleEnabledNestedFeatureTest", new bool[] { true, true, false })]
         public async Task RulesEngine_ShouldOnlyExecuteEnabledRules(string workflowName, bool[] expectedRuleResults)
         {
-            var workflows = GetWorkflows();
-            var rulesEngine = new RulesEngine(workflows, reSettings: new ReSettings() { EnableExceptionAsErrorMessage = false });
+            var workflow = GetWorkflows();
+            var rulesEngine = new RulesEngine(workflow, reSettings: new ReSettings() { EnableExceptionAsErrorMessage = false });
             var input1 = new {
                 TrueValue = true
             };
@@ -46,7 +46,7 @@ namespace RulesEngine.UnitTest
         {
             var workflow = GetWorkflows().Single(c => c.WorkflowName == workflowName);
             var rulesEngine = new RulesEngine(reSettings: new ReSettings() { EnableExceptionAsErrorMessage = false});
-            rulesEngine.AddWorkflow(workflow);
+            rulesEngine.AddWorkflows(workflow);
             var input1 = new {
                 TrueValue = true
             };
@@ -60,12 +60,12 @@ namespace RulesEngine.UnitTest
                 Assert.Equal(expectedRuleResults[i], result[i].IsSuccess);
             }
 
-            rulesEngine.RemoveWorkflow(workflowName);
+            rulesEngine.RemoveWorkflows(workflowName);
 
             var firstRule = workflow.Rules.First();
 
             firstRule.Enabled = false;
-            rulesEngine.AddWorkflow(workflow);
+            rulesEngine.AddWorkflows(workflow);
 
             var expectedLength = workflow.Rules.Count(c => c.Enabled);
 
