@@ -29,19 +29,19 @@ namespace RulesEngine.Interfaces
         /// <summary>
         /// Adds new workflows to RulesEngine
         /// </summary>
-        /// <param name="Workflows"></param>
-        void AddWorkflows(params Workflow[] Workflows);
+        /// <param name="workflow"></param>
+        void AddWorkflow(params Workflow[] Workflows);
 
         /// <summary>
-        /// Removes registered workflow from RulesEngine
+        /// Removes all registered workflows from RulesEngine
         /// </summary>
-        void ClearWorkflow();
+        void ClearWorkflows();
 
         /// <summary>
-        /// Removes the workflows from RulesEngine
+        /// Removes the workflow from RulesEngine
         /// </summary>
         /// <param name="workflowNames"></param>
-        void RemoveWorkflows(params string[] workflowNames);
+        void RemoveWorkflow(params string[] workflowNames);
 
         /// <summary>
         /// Returns the list of all registered workflow names

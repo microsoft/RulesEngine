@@ -40,12 +40,12 @@ namespace RulesEngine
         public RulesEngine(string[] jsonConfig, ILogger logger = null, ReSettings reSettings = null) : this(logger, reSettings)
         {
             var workflow = jsonConfig.Select(item => JsonConvert.DeserializeObject<Workflow>(item)).ToArray();
-            AddWorkflows(workflow);
+            AddWorkflow(workflow);
         }
 
         public RulesEngine(Workflow[] Workflows, ILogger logger = null, ReSettings reSettings = null) : this(logger, reSettings)
         {
-            AddWorkflows(Workflows);
+            AddWorkflow(Workflows);
         }
 
         public RulesEngine(ILogger logger = null, ReSettings reSettings = null)
@@ -159,7 +159,7 @@ namespace RulesEngine
         /// </summary>
         /// <param name="Workflows">The workflow rules.</param>
         /// <exception cref="RuleValidationException"></exception>
-        public void AddWorkflows(params Workflow[] Workflows)
+        public void AddWorkflow(params Workflow[] Workflows)
         {
             try
             {
@@ -214,7 +214,7 @@ namespace RulesEngine
         /// <summary>
         /// Clears the workflow.
         /// </summary>
-        public void ClearWorkflow()
+        public void ClearWorkflows()
         {
             _rulesCache.Clear();
         }
@@ -223,7 +223,7 @@ namespace RulesEngine
         /// Removes the workflows.
         /// </summary>
         /// <param name="workflowNames">The workflow names.</param>
-        public void RemoveWorkflows(params string[] workflowNames)
+        public void RemoveWorkflow(params string[] workflowNames)
         {
             foreach (var workflowName in workflowNames)
             {

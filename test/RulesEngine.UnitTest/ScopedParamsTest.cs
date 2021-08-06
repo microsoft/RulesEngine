@@ -27,7 +27,7 @@ namespace RulesEngine.UnitTest
             var workflow = GetWorkflowList();
 
             var engine = new RulesEngine(null, null);
-            engine.AddWorkflows(workflow);
+            engine.AddWorkflow(workflow);
 
             var input1 = new {
                 trueValue = true,
@@ -48,7 +48,7 @@ namespace RulesEngine.UnitTest
             var workflow = GetWorkflowList();
 
             var engine = new RulesEngine(null, null);
-            engine.AddWorkflows(workflow);
+            engine.AddWorkflow(workflow);
 
             var input1 = new {
                 trueValue = true,
@@ -59,9 +59,9 @@ namespace RulesEngine.UnitTest
             Assert.True(result.All(c => c.IsSuccess));
 
             var workflowToUpdate = workflow.Single(c => c.WorkflowName == workflowName);
-            engine.RemoveWorkflows(workflowName);
+            engine.RemoveWorkflow(workflowName);
             workflowToUpdate.GlobalParams.First().Expression = "true == false";
-            engine.AddWorkflows(workflowToUpdate);
+            engine.AddWorkflow(workflowToUpdate);
 
             var result2 = await engine.ExecuteAllRulesAsync(workflowName, input1);
 
@@ -80,7 +80,7 @@ namespace RulesEngine.UnitTest
             var engine = new RulesEngine(new string[] { }, null, new ReSettings {
                 EnableScopedParams = false
             });
-            engine.AddWorkflows(workflow);
+            engine.AddWorkflow(workflow);
 
             var input1 = new {
                 trueValue = true,
@@ -106,7 +106,7 @@ namespace RulesEngine.UnitTest
             var workflow = GetWorkflowList();
 
             var engine = new RulesEngine(new string[] { }, null);
-            engine.AddWorkflows(workflow);
+            engine.AddWorkflow(workflow);
 
             var input = new { };
             var result = await engine.ExecuteAllRulesAsync(workflowName, input);
@@ -126,7 +126,7 @@ namespace RulesEngine.UnitTest
             var workflow = GetWorkflowList();
 
             var engine = new RulesEngine(new string[] { }, null);
-            engine.AddWorkflows(workflow);
+            engine.AddWorkflow(workflow);
 
 
 

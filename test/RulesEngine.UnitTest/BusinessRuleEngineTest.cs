@@ -83,7 +83,7 @@ namespace RulesEngine.UnitTest
             // Fetch and add new rules.
             var newWorkflow = ParseAsWorkflow(newWorkflowFile);
 
-            Assert.Throws<RuleValidationException>(() => re.AddWorkflows(newWorkflow));
+            Assert.Throws<RuleValidationException>(() => re.AddWorkflow(newWorkflow));
         }
 
         [Theory]
@@ -289,7 +289,7 @@ namespace RulesEngine.UnitTest
 
             var result = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
             Assert.NotNull(result);
-            re.RemoveWorkflows("inputWorkflow");
+            re.RemoveWorkflow("inputWorkflow");
 
             await Assert.ThrowsAsync<ArgumentException>(async () => await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3));
         }
@@ -300,7 +300,7 @@ namespace RulesEngine.UnitTest
         public async Task ClearWorkflow_RemovesAllWorkflow(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName);
-            re.ClearWorkflow();
+            re.ClearWorkflows();
 
             dynamic input1 = GetInput1();
             dynamic input2 = GetInput2();
@@ -613,15 +613,15 @@ namespace RulesEngine.UnitTest
             };
 
             var re = new RulesEngine();
-            re.AddWorkflows(workflow);
+            re.AddWorkflow(workflow);
 
             var result1 = await re.ExecuteAllRulesAsync("Test","hello");
             Assert.True(result1.All(c => c.IsSuccess));
 
-            re.RemoveWorkflows("Test");
+            re.RemoveWorkflow("Test");
             workflow.Rules.First().LocalParams.First().Expression = "false";
 
-            re.AddWorkflows(workflow);
+            re.AddWorkflow(workflow);
             var result2 = await re.ExecuteAllRulesAsync("Test", "hello");
             Assert.True(result2.All(c => c.IsSuccess == false));
         }
@@ -647,15 +647,15 @@ namespace RulesEngine.UnitTest
             };
 
             var re = new RulesEngine();
-            re.AddWorkflows(workflow);
+            re.AddWorkflow(workflow);
 
             var result1 = await re.ExecuteAllRulesAsync("Test", "hello");
             Assert.True(result1.All(c => c.IsSuccess));
 
-            re.ClearWorkflow();
+            re.ClearWorkflows();
             workflow.Rules.First().LocalParams.First().Expression = "false";
 
-            re.AddWorkflows(workflow);
+            re.AddWorkflow(workflow);
             var result2 = await re.ExecuteAllRulesAsync("Test", "hello");
             Assert.True(result2.All(c => c.IsSuccess == false));
         }
@@ -676,7 +676,7 @@ namespace RulesEngine.UnitTest
             };
 
             var re = new RulesEngine();
-            re.AddWorkflows(workflow);
+            re.AddWorkflow(workflow);
 
             var result1 = await re.ExecuteAllRulesAsync("Test", new RuleParameter("input1", value:null));
             Assert.True(result1.All(c => c.IsSuccess));
