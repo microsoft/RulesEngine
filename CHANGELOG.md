@@ -2,9 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.3.0]
+- Added support for actions in nested rules
+- Improved serialization support for System.Text.Json for workflow model
+  
+Breaking Change:
+  - Type of Action has been changed from `Dictionary<ActionTriggerType, ActionInfo>` to `RuleActions`
+    - No impact if you are serializing workflow from json
+    - For workflow objects created in code, refer - [link](https://github.com/microsoft/RulesEngine/pull/182/files#diff-a5093dda2dcc1e4958ce3533edb607bb61406e1f0a9071eca4e317bdd987c0d3)
+
 ## [3.2.0]
-- Added AddOrUpdateWorkflow method to update workflows atomically (by AshishPrasad)
+- Added AddOrUpdateWorkflow method to update workflows atomically (by @AshishPrasad)
 - Updated dependencies to latest
+
+Breaking Change:
+  - `AddWorkflow` now throws exception if you try to add a workflow which already exists.
+  Use `AddOrUpdateWorkflow` to update existing workflow
 
 ## [3.1.0]
 - Added globalParams feature which can be applied to all rules
