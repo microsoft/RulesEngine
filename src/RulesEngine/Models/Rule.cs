@@ -16,7 +16,7 @@ namespace RulesEngine.Models
     public class Rule
     {
         /// <summary>
-        /// Gets the Rule Id.
+        /// Gets the Rule Id. (OPTIONAL)
         /// </summary>
         public int Id { get; set; }
 

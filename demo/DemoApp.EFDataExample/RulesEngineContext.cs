@@ -9,11 +9,8 @@ namespace RulesEngine.Data
     public class RulesEngineContext : DbContext
     {
         public DbSet<Workflow> Workflows { get; set; }
-        public DbSet<ActionInfo> ActionInfos { get; set; }
 
-        public DbSet<RuleActions> RuleActions { get; set; }
         public DbSet<Rule> Rules { get; set; }
-        public DbSet<ScopedParam> ScopedParams { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,6 +24,7 @@ namespace RulesEngine.Data
                 entity.HasKey(k => k.Id);
                 entity.Property(p => p.Id).ValueGeneratedOnAdd();
 
+                entity.Ignore(b => b.WorkflowRulesToInject);
                 entity.Ignore(b => b.WorkflowsToInject);
             });
 
@@ -44,6 +42,7 @@ namespace RulesEngine.Data
                     v => JsonSerializer.Serialize(v, null),
                    v => JsonSerializer.Deserialize<RuleActions>(v, null));
 
+                entity.Ignore(b => b.WorkflowRulesToInject);
                 entity.Ignore(b => b.WorkflowsToInject);
             });
         }

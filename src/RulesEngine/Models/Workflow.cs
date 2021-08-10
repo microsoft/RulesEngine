@@ -19,7 +19,7 @@ namespace RulesEngine.Models
     public class Workflow
     {
         /// <summary>
-        /// Gets the workflow Id.
+        /// Gets the workflow Id. (OPTIONAL)
         /// </summary>
         public int Id { get; set; }
 
