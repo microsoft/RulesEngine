@@ -157,13 +157,13 @@ namespace RulesEngine
         /// <summary>
         /// Adds the workflow if the workflow name is not already added. Ignores the rest.
         /// </summary>
-        /// <param name="Workflows">The workflow rules.</param>
+        /// <param name="workflows">The workflow rules.</param>
         /// <exception cref="RuleValidationException"></exception>
-        public void AddWorkflow(params Workflow[] Workflows)
+        public void AddWorkflow(params Workflow[] workflows)
         {
             try
             {
-                foreach (var workflow in Workflows)
+                foreach (var workflow in workflows)
                 {                    
                     var validator = new WorkflowsValidator();
                     validator.ValidateAndThrow(workflow);
@@ -187,13 +187,13 @@ namespace RulesEngine
         /// Adds new workflow rules if not previously added.
         /// Or updates the rules for an existing workflow.
         /// </summary>
-        /// <param name="Workflows">The workflow rules.</param>
+        /// <param name="workflows">The workflow rules.</param>
         /// <exception cref="RuleValidationException"></exception>
-        public void AddOrUpdateWorkflow(params Workflow[] Workflows)
+        public void AddOrUpdateWorkflow(params Workflow[] workflows)
         {
             try
             {
-                foreach (var workflow in Workflows)
+                foreach (var workflow in workflows)
                 {
                     var validator = new WorkflowsValidator();
                     validator.ValidateAndThrow(workflow);
