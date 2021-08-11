@@ -16,21 +16,17 @@ namespace RulesEngine.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Ignore<ActionInfo>();
-            modelBuilder.Ignore<ScopedParam>();
-            modelBuilder.Ignore<RuleActions>();
+            modelBuilder.Entity<ScopedParam>()
+              .HasKey(k => k.Name);
 
             modelBuilder.Entity<Workflow>(entity => {
-                entity.HasKey(k => k.Id);
-                entity.Property(p => p.Id).ValueGeneratedOnAdd();
-
+                entity.HasKey(k => k.WorkflowName);
                 entity.Ignore(b => b.WorkflowRulesToInject);
                 entity.Ignore(b => b.WorkflowsToInject);
             });
 
             modelBuilder.Entity<Rule>(entity => {
-                entity.HasKey(k => k.Id);
-                entity.Property(p => p.Id).ValueGeneratedOnAdd();
+                entity.HasKey(k => k.RuleName);
 
                 entity.Property(b => b.Properties)
                 .HasConversion(
