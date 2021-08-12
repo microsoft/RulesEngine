@@ -2,13 +2,11 @@
 // Licensed under the MIT License.
 
 using FluentValidation;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RulesEngine.Actions;
-using RulesEngine.Enums;
 using RulesEngine.Exceptions;
 using RulesEngine.ExpressionBuilders;
 using RulesEngine.Interfaces;
@@ -104,17 +102,25 @@ namespace RulesEngine
         public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params RuleParameter[] ruleParams)
         {
             var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, ruleParams);
+            await ExecuteActionAsync(ruleResultList);
+            return ruleResultList;
+        }
+
+        private async ValueTask ExecuteActionAsync(IEnumerable<RuleResultTree> ruleResultList)
+        {
             foreach (var ruleResult in ruleResultList)
             {
+                if(ruleResult.ChildResults !=  null)
+                {
+                    await ExecuteActionAsync(ruleResult.ChildResults);
+                }
                 var actionResult = await ExecuteActionForRuleResult(ruleResult, false);
                 ruleResult.ActionResult = new ActionResult {
                     Output = actionResult.Output,
                     Exception = actionResult.Exception
                 };
             }
-            return ruleResultList;
         }
-
 
         public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters)
         {
@@ -125,11 +131,11 @@ namespace RulesEngine
 
         private async ValueTask<ActionRuleResult> ExecuteActionForRuleResult(RuleResultTree resultTree, bool includeRuleResults = false)
         {
-            var triggerType = resultTree?.IsSuccess == true ? ActionTriggerType.onSuccess : ActionTriggerType.onFailure;
+            var ruleActions = resultTree?.Rule?.Actions;
+            var actionInfo = resultTree?.IsSuccess == true ? ruleActions?.OnSuccess : ruleActions?.OnFailure;
 
-            if (resultTree?.Rule?.Actions != null && resultTree.Rule.Actions.ContainsKey(triggerType))
+            if (actionInfo != null)
             {
-                var actionInfo = resultTree.Rule.Actions[triggerType];
                 var action = _actionFactory.Get(actionInfo.Name);
                 var ruleParameters = resultTree.Inputs.Select(kv => new RuleParameter(kv.Key, kv.Value)).ToArray();
                 return await action.ExecuteAndReturnResultAsync(new ActionContext(actionInfo.Context, resultTree), ruleParameters, includeRuleResults);

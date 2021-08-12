@@ -12,8 +12,9 @@ Rules Engine is a library/NuGet package for abstracting business logic/rules/pol
 To install this library, please download the latest version of  [NuGet Package](https://www.nuget.org/packages/RulesEngine/) from [nuget.org](https://www.nuget.org/) and refer it into your project.  
 
 ## How to use it
+There are several ways to populate workflows for the Rules Engine as listed below.
 
-You need to store the rules based on the [schema definition](https://github.com/microsoft/RulesEngine/blob/main/schema/workflowRules-schema.json) given and they can be stored in any store as deemed appropriate like Azure Blob Storage, Cosmos DB, Azure App Configuration, SQL Servers, file systems etc. The expressions are supposed to be a [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
+You need to store the rules based on the [schema definition](https://github.com/microsoft/RulesEngine/blob/main/schema/workflowRules-schema.json) given and they can be stored in any store as deemed appropriate like Azure Blob Storage, Cosmos DB, Azure App Configuration, [Entity Framework](https://github.com/microsoft/RulesEngine#entity-framework), SQL Servers, file systems etc. The expressions are supposed to be a [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
 
 An example rule could be - 
 ```json
@@ -52,7 +53,7 @@ Once done, the Rules Engine needs to execute the rules for a given input. It can
 ```c#
 List<RuleResultTree> response = await rulesEngine.ExecuteAllRulesAsync(workflowName, input);
 ```
-Here, *workflowName* is the name of the workflow, which is *Discount* in the above mentioned example. And *input* is the object which needs to be checked against the rules.
+Here, *workflowName* is the name of the workflow, which is *Discount* in the above mentioned example. And *input* is the object which needs to be checked against the rules,  which itself may consist of a list of class instances.
 
 The *response* will contain a list of [*RuleResultTree*](https://github.com/microsoft/RulesEngine/wiki/Getting-Started#ruleresulttree) which gives information if a particular rule passed or failed. 
 
@@ -60,6 +61,36 @@ The *response* will contain a list of [*RuleResultTree*](https://github.com/micr
 _Note: A detailed example showcasing how to use Rules Engine is explained in [Getting Started page](https://github.com/microsoft/RulesEngine/wiki/Getting-Started) of [Rules Engine Wiki](https://github.com/microsoft/RulesEngine/wiki)._
 
 _A demo app for the is available at [this location](https://github.com/microsoft/RulesEngine/tree/main/demo)._
+
+### Basic
+A simple example via code only is as follows:
+```c#
+List<Rule> rules = new List<Rule>();
+
+Rule rule = new Rule();
+rule.RuleName = "Test Rule";
+rule.SuccessEvent = "Count is within tolerance.";
+rule.ErrorMessage = "Over expected.";
+rule.Expression = "count < 3";
+rule.RuleExpressionType = RuleExpressionType.LambdaExpression;
+
+rules.Add(rule);
+
+workflowRule.Rules = rules;
+
+workFlowRules.Add(workflowRule);
+
+var bre = new RulesEngine.RulesEngine(workFlowRules.ToArray(), null);
+```
+
+
+### Entity Framework
+Consuming Entity Framework and populating the Rules Engine is shown in the [EFDemo class](https://github.com/microsoft/RulesEngine/blob/main/demo/DemoApp/EFDemo.cs) with Workflow rules populating the array and passed to the Rules Engine, The Demo App includes an example [RulesEngineDemoContext](https://github.com/microsoft/RulesEngine/blob/main/demo/DemoApp.EFDataExample/RulesEngineDemoContext.cs) using SQLite and could be swapped out for another provider.
+```c#
+var wfr = db.WorkflowRules.Include(i => i.Rules).ThenInclude(i => i.Rules).ToArray();
+var bre = new RulesEngine.RulesEngine(wfr, null);
+```
+*Note: For each level of nested rules expected, a ThenInclude query appended will be needed as shown above.*
 
 ## How it works
 

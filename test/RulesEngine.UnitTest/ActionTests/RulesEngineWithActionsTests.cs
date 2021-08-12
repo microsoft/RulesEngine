@@ -1,7 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
-
-using RulesEngine.Enums;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -81,27 +79,27 @@ namespace RulesEngine.UnitTest
                         RuleName = "ExpressionOutputRuleTest",
                         RuleExpressionType = RuleExpressionType.LambdaExpression,
                         Expression = "1 == 1",
-                        Actions = new Dictionary<ActionTriggerType, ActionInfo>{
-                            { ActionTriggerType.onSuccess, new ActionInfo{
+                        Actions = new RuleActions{
+                            OnSuccess = new ActionInfo{
                                 Name = "OutputExpression",
                                 Context = new Dictionary<string, object>{
                                     {"expression", "2*2"}
                                 }
-                            }}
+                            }
                         }
                     },
                     new Rule{
                         RuleName = "EvaluateRuleTest",
                         RuleExpressionType = RuleExpressionType.LambdaExpression,
                         Expression = "1 == 1",
-                        Actions = new Dictionary<ActionTriggerType, ActionInfo>{
-                            { ActionTriggerType.onSuccess, new ActionInfo{
+                        Actions = new RuleActions{
+                            OnSuccess = new ActionInfo{
                                 Name = "EvaluateRule",
                                 Context = new Dictionary<string, object>{
                                     {"workflowName", "ActionWorkflow"},
                                     {"ruleName","ExpressionOutputRuleTest"}
                                 }
-                            }}
+                            }
                         }
                     }
 

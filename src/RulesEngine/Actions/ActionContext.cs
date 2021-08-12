@@ -19,7 +19,18 @@ namespace RulesEngine.Actions
             foreach (var kv in context)
             {
                 string key = kv.Key;
-                string value = kv.Value is string ? kv.Value.ToString() : JsonConvert.SerializeObject(kv.Value);
+                string value;
+                switch (kv.Value.GetType().Name)
+                {
+                    case "String":
+                    case "JsonElement":
+                        value =  kv.Value.ToString();
+                        break;
+                    default:
+                        value = JsonConvert.SerializeObject(kv.Value);
+                        break;
+
+                }
                 _context.Add(key, value);
             }
             _parentResult = parentResult;
