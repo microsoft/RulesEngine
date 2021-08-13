@@ -81,9 +81,9 @@ namespace RulesEngine.UnitTest
             Assert.Contains(result1, c => c.IsSuccess);
 
             // Fetch and add new rules.
-            var newWorkflowRules = ParseAsWorkflowRules(newWorkflowFile);
+            var newWorkflow = ParseAsWorkflow(newWorkflowFile);
 
-            Assert.Throws<RuleValidationException>(() => re.AddWorkflow(newWorkflowRules));
+            Assert.Throws<RuleValidationException>(() => re.AddWorkflow(newWorkflow));
         }
 
         [Theory]
@@ -103,8 +103,8 @@ namespace RulesEngine.UnitTest
             Assert.Contains(result1, c => c.IsSuccess);
 
             // Fetch and update new rules.
-            WorkflowRules newWorkflowRules = ParseAsWorkflowRules(newWorkflowFile);
-            re.AddOrUpdateWorkflow(newWorkflowRules);
+            Workflow newWorkflow = ParseAsWorkflow(newWorkflowFile);
+            re.AddOrUpdateWorkflow(newWorkflow);
 
             // Run new rules.
             List<RuleResultTree> result2 = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
@@ -123,21 +123,21 @@ namespace RulesEngine.UnitTest
         public void GetAllRegisteredWorkflows_ReturnsListOfAllWorkflows(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName);
-            var workflows = re.GetAllRegisteredWorkflowNames();
+            var workflow = re.GetAllRegisteredWorkflowNames();
 
-            Assert.NotNull(workflows);
-            Assert.Equal(2, workflows.Count);
-            Assert.Contains("inputWorkflow", workflows);
+            Assert.NotNull(workflow);
+            Assert.Equal(2, workflow.Count);
+            Assert.Contains("inputWorkflow", workflow);
         }
 
         [Fact]
         public void GetAllRegisteredWorkflows_NoWorkflow_ReturnsEmptyList()
         {
             var re = new RulesEngine();
-            var workflows = re.GetAllRegisteredWorkflowNames();
+            var workflow = re.GetAllRegisteredWorkflowNames();
 
-            Assert.NotNull(workflows);
-            Assert.Empty(workflows);
+            Assert.NotNull(workflow);
+            Assert.Empty(workflow);
         }
 
         [Theory]
@@ -257,12 +257,12 @@ namespace RulesEngine.UnitTest
         public void RulesEngine_New_IncorrectJSON_ThrowsException()
         {
             Assert.Throws<RuleValidationException>(() => {
-                var workflow = new WorkflowRules();
+                var workflow = new Workflow();
                 var re = CreateRulesEngine(workflow);
             });
 
             Assert.Throws<RuleValidationException>(() => {
-                var workflow = new WorkflowRules() { WorkflowName = "test" };
+                var workflow = new Workflow() { WorkflowName = "test" };
                 var re = CreateRulesEngine(workflow);
             });
         }
@@ -356,7 +356,7 @@ namespace RulesEngine.UnitTest
             }
 
             var fileData = File.ReadAllText(files[0]);
-            var bre = new RulesEngine(JsonConvert.DeserializeObject<WorkflowRules[]>(fileData), null);
+            var bre = new RulesEngine(JsonConvert.DeserializeObject<Workflow[]>(fileData), null);
             var result = await bre.ExecuteAllRulesAsync("inputWorkflow", ruleParams?.ToArray());
             var ruleResult = result?.FirstOrDefault(r => string.Equals(r.Rule.RuleName, "GiveDiscount10", StringComparison.OrdinalIgnoreCase));
             Assert.True(ruleResult.IsSuccess);
@@ -515,7 +515,7 @@ namespace RulesEngine.UnitTest
         public async Task ExecuteRule_RuntimeError_ShouldReturnAsErrorMessage()
         {
 
-            var workflow = new WorkflowRules {
+            var workflow = new Workflow {
                 WorkflowName = "TestWorkflow",
                 Rules = new[] {
                     new Rule {
@@ -542,7 +542,7 @@ namespace RulesEngine.UnitTest
         public async Task ExecuteRule_RuntimeError_ThrowsException()
         {
 
-            var workflow = new WorkflowRules {
+            var workflow = new Workflow {
                 WorkflowName = "TestWorkflow",
                 Rules = new[] {
                     new Rule {
@@ -567,7 +567,7 @@ namespace RulesEngine.UnitTest
         public async Task ExecuteRule_RuntimeError_IgnoreException_DoesNotReturnException()
         {
 
-            var workflow = new WorkflowRules {
+            var workflow = new Workflow {
                 WorkflowName = "TestWorkflow",
                 Rules = new[] {
                     new Rule {
@@ -595,7 +595,7 @@ namespace RulesEngine.UnitTest
         [Fact]
         public async Task RemoveWorkFlow_ShouldRemoveAllCompiledCache()
         {
-            var workflow = new WorkflowRules {
+            var workflow = new Workflow {
                 WorkflowName = "Test",
                 Rules = new Rule[]{
                     new Rule {
@@ -629,7 +629,7 @@ namespace RulesEngine.UnitTest
         [Fact]
         public async Task ClearWorkFlow_ShouldRemoveAllCompiledCache()
         {
-            var workflow = new WorkflowRules {
+            var workflow = new Workflow {
                 WorkflowName = "Test",
                 Rules = new Rule[]{
                     new Rule {
@@ -663,7 +663,7 @@ namespace RulesEngine.UnitTest
         [Fact]
         public async Task ExecuteRule_WithNullInput_ShouldNotThrowException()
         {
-            var workflow = new WorkflowRules {
+            var workflow = new Workflow {
                 WorkflowName = "Test",
                 Rules = new Rule[]{
                     new Rule {
@@ -697,7 +697,7 @@ namespace RulesEngine.UnitTest
         [Fact]
         public async Task ExecuteRule_SpecialCharInWorkflowName_RunsSuccessfully()
         {
-            var workflow = new WorkflowRules {
+            var workflow = new Workflow {
                 WorkflowName = "Exámple",
                 Rules = new Rule[]{
                     new Rule {
@@ -709,7 +709,7 @@ namespace RulesEngine.UnitTest
                 }
             };
 
-            var workflowStr = "{\"WorkflowName\":\"Exámple\",\"WorkflowRulesToInject\":null,\"GlobalParams\":null,\"Rules\":[{\"RuleName\":\"RuleWithLocalParam\",\"Properties\":null,\"Operator\":null,\"ErrorMessage\":null,\"Enabled\":true,\"ErrorType\":\"Warning\",\"RuleExpressionType\":\"LambdaExpression\",\"WorkflowRulesToInject\":null,\"Rules\":null,\"LocalParams\":null,\"Expression\":\"input1 == null || input1.hello.world = \\\"wow\\\"\",\"Actions\":null,\"SuccessEvent\":null}]}";
+            var workflowStr = "{\"WorkflowName\":\"Exámple\",\"WorkflowsToInject\":null,\"GlobalParams\":null,\"Rules\":[{\"RuleName\":\"RuleWithLocalParam\",\"Properties\":null,\"Operator\":null,\"ErrorMessage\":null,\"Enabled\":true,\"ErrorType\":\"Warning\",\"RuleExpressionType\":\"LambdaExpression\",\"WorkflowsToInject\":null,\"Rules\":null,\"LocalParams\":null,\"Expression\":\"input1 == null || input1.hello.world = \\\"wow\\\"\",\"Actions\":null,\"SuccessEvent\":null}]}";
 
             var re = new RulesEngine(new string[] { workflowStr },null,null);
 
@@ -740,7 +740,7 @@ namespace RulesEngine.UnitTest
 
 
 
-        private RulesEngine CreateRulesEngine(WorkflowRules workflow)
+        private RulesEngine CreateRulesEngine(Workflow workflow)
         {
             var json = JsonConvert.SerializeObject(workflow);
             return new RulesEngine(new string[] { json }, null);
@@ -750,9 +750,9 @@ namespace RulesEngine.UnitTest
         {
             var data = GetFileContent(filename);
 
-            var injectWorkflow = new WorkflowRules {
+            var injectWorkflow = new Workflow {
                 WorkflowName = "inputWorkflowReference",
-                WorkflowRulesToInject = new List<string> { "inputWorkflow" }
+                WorkflowsToInject = new List<string> { "inputWorkflow" }
             };
 
             var injectWorkflowStr = JsonConvert.SerializeObject(injectWorkflow);
@@ -766,10 +766,10 @@ namespace RulesEngine.UnitTest
             return File.ReadAllText(filePath);
         }
 
-        private WorkflowRules ParseAsWorkflowRules(string workflowRulesFileName)
+        private Workflow ParseAsWorkflow(string WorkflowsFileName)
         {
-            string content = GetFileContent(workflowRulesFileName);
-            return JsonConvert.DeserializeObject<WorkflowRules>(content);
+            string content = GetFileContent(WorkflowsFileName);
+            return JsonConvert.DeserializeObject<Workflow>(content);
         }
 
         private dynamic GetInput1()

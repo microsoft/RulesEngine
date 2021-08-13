@@ -22,9 +22,9 @@ namespace RulesEngine.UnitTest
         [InlineData(NestedRuleExecutionMode.Performance)]
         public async Task NestedRulesShouldFollowExecutionMode(NestedRuleExecutionMode mode)
         {
-            var workflows = GetWorkflows();
+            var workflow = GetWorkflow();
             var reSettings = new ReSettings { NestedRuleExecutionMode = mode };
-            var rulesEngine = new RulesEngine(workflows, reSettings: reSettings);
+            var rulesEngine = new RulesEngine(workflow, reSettings: reSettings);
             dynamic input1 = new ExpandoObject();
             input1.trueValue = true;
 
@@ -68,9 +68,9 @@ namespace RulesEngine.UnitTest
         [Fact]
         private async Task NestedRulesWithNestedActions_ReturnsCorrectResults()
         {
-            var workflows = GetWorkflows();
+            var workflow = GetWorkflow();
             var reSettings = new ReSettings { };
-            var rulesEngine = new RulesEngine(workflows, reSettings: reSettings);
+            var rulesEngine = new RulesEngine(workflow, reSettings: reSettings);
             dynamic input1 = new ExpandoObject();
             input1.trueValue = true;
 
@@ -84,16 +84,16 @@ namespace RulesEngine.UnitTest
         [Fact]
         private async Task NestedRulesWithNestedActions_WorkflowParsedWithSystemTextJson_ReturnsCorrectResults()
         {
-            var workflows = GetWorkflows();
-            var workflowStr = JsonConvert.SerializeObject(workflows);
+            var workflow = GetWorkflow();
+            var workflowStr = JsonConvert.SerializeObject(workflow);
 
             var serializationOptions = new System.Text.Json.JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
 
 
-            var workflowsViaTextJson = System.Text.Json.JsonSerializer.Deserialize<WorkflowRules[]>(workflowStr, serializationOptions);
+            var workflowViaTextJson = System.Text.Json.JsonSerializer.Deserialize<Workflow[]>(workflowStr, serializationOptions);
 
             var reSettings = new ReSettings { };
-            var rulesEngine = new RulesEngine(workflowsViaTextJson, reSettings: reSettings);
+            var rulesEngine = new RulesEngine(workflowViaTextJson, reSettings: reSettings);
             dynamic input1 = new ExpandoObject();
             input1.trueValue = true;
 
@@ -108,10 +108,10 @@ namespace RulesEngine.UnitTest
 
 
 
-        private WorkflowRules[] GetWorkflows()
+        private Workflow[] GetWorkflow()
         {
             return new[] {
-                new WorkflowRules {
+                new Workflow {
                     WorkflowName = "NestedRulesTest",
                     Rules = new Rule[] {
                         new Rule {
@@ -176,7 +176,7 @@ namespace RulesEngine.UnitTest
                          }
                     }
                 },
-                new WorkflowRules {
+                new Workflow {
                     WorkflowName = "NestedRulesActionsTest",
                     Rules = new Rule[] {
                         new Rule {

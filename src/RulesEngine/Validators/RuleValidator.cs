@@ -26,7 +26,7 @@ namespace RulesEngine.Validators
                    .WithMessage(Constants.OPERATOR_INCORRECT_ERRMSG);
 
                 When(c => c.Rules?.Any() != true, () => {
-                    RuleFor(c => c.WorkflowRulesToInject).NotEmpty().WithMessage(Constants.INJECT_WORKFLOW_RULES_ERRMSG);
+                    RuleFor(c => c.WorkflowsToInject).NotEmpty().WithMessage(Constants.INJECT_WORKFLOW_RULES_ERRMSG);
                 })
                 .Otherwise(() => {
                     RuleFor(c => c.Rules).Must(BeValidRulesList);

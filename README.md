@@ -45,9 +45,9 @@ An example rule could be -
 
 You can inject the rules into the Rules Engine by initiating an instance by using the following code - 
 ```c#
-var rulesEngine = new RulesEngine(workflowRules, logger);
+var rulesEngine = new RulesEngine(workflow, logger);
 ```
-Here, *workflowRules* is a list of deserialized object based out of the schema explained above and *logger* is a custom logger instance made out of an [ILogger](https://github.com/microsoft/RulesEngine/wiki/Getting-Started#logger) instance.
+Here, *workflow* is a list of deserialized object based out of the schema explained above and *logger* is a custom logger instance made out of an [ILogger](https://github.com/microsoft/RulesEngine/wiki/Getting-Started#logger) instance.
 
 Once done, the Rules Engine needs to execute the rules for a given input. It can be done by calling the method ExecuteAllRulesAsync as shown below - 
 ```c#
@@ -73,21 +73,21 @@ rule.SuccessEvent = "Count is within tolerance.";
 rule.ErrorMessage = "Over expected.";
 rule.Expression = "count < 3";
 rule.RuleExpressionType = RuleExpressionType.LambdaExpression;
-
 rules.Add(rule);
 
-workflowRule.Rules = rules;
+Workflow workflow = new Workflow();
+workflow.WorkflowName = "Example Workflow";
+workflow.Rules = rules;
+workflow.Add(workflowRule);
 
-workFlowRules.Add(workflowRule);
-
-var bre = new RulesEngine.RulesEngine(workFlowRules.ToArray(), null);
+var bre = new RulesEngine.RulesEngine(workflow.ToArray(), null);
 ```
 
 
 ### Entity Framework
 Consuming Entity Framework and populating the Rules Engine is shown in the [EFDemo class](https://github.com/microsoft/RulesEngine/blob/main/demo/DemoApp/EFDemo.cs) with Workflow rules populating the array and passed to the Rules Engine, The Demo App includes an example [RulesEngineDemoContext](https://github.com/microsoft/RulesEngine/blob/main/demo/DemoApp.EFDataExample/RulesEngineDemoContext.cs) using SQLite and could be swapped out for another provider.
 ```c#
-var wfr = db.WorkflowRules.Include(i => i.Rules).ThenInclude(i => i.Rules).ToArray();
+var wfr = db.Workflows.Include(i => i.Rules).ThenInclude(i => i.Rules).ToArray();
 var bre = new RulesEngine.RulesEngine(wfr, null);
 ```
 *Note: For each level of nested rules expected, a ThenInclude query appended will be needed as shown above.*
