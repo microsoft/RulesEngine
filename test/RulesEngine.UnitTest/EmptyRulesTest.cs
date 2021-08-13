@@ -20,40 +20,40 @@ namespace RulesEngine.UnitTest
         [Fact]
         private async Task EmptyRules_ReturnsExepectedResults()
         {
-            var workflows = GetEmptyWorkflows();
+            var workflow = GetEmptyWorkflow();
             var reSettings = new ReSettings { };
             RulesEngine rulesEngine = new RulesEngine();
 
             Func<Task> action = () => {
-                new RulesEngine(workflows, reSettings: reSettings);
+                new RulesEngine(workflow, reSettings: reSettings);
                 return Task.CompletedTask;
             };
 
             Exception ex = await Assert.ThrowsAsync<Exceptions.RuleValidationException>(action);
 
-            Assert.Contains("Atleast one of Rules or WorkflowRulesToInject must be not empty", ex.Message);
+            Assert.Contains("Atleast one of Rules or WorkflowsToInject must be not empty", ex.Message);
         }
         [Fact]
         private async Task NestedRulesWithEmptyNestedActions_ReturnsExepectedResults()
         {
-            var workflows = GetEmptyNestedWorkflows();
+            var workflow = GetEmptyNestedWorkflows();
             var reSettings = new ReSettings { };
             RulesEngine rulesEngine = new RulesEngine();
 
             Func<Task> action = () => {
-                new RulesEngine(workflows, reSettings: reSettings);
+                new RulesEngine(workflow, reSettings: reSettings);
                 return Task.CompletedTask;
             };
 
             Exception ex = await Assert.ThrowsAsync<Exceptions.RuleValidationException>(action);
 
-            Assert.Contains("Atleast one of Rules or WorkflowRulesToInject must be not empty", ex.Message);
+            Assert.Contains("Atleast one of Rules or WorkflowsToInject must be not empty", ex.Message);
         }
 
-        private WorkflowRules[] GetEmptyWorkflows()
+        private Workflow[] GetEmptyWorkflow()
         {
             return new[] {
-                new WorkflowRules {
+                new Workflow {
                     WorkflowName = "EmptyRulesTest",
                     Rules = new Rule[] {
                     }
@@ -61,10 +61,10 @@ namespace RulesEngine.UnitTest
             };
         }
 
-        private WorkflowRules[] GetEmptyNestedWorkflows()
+        private Workflow[] GetEmptyNestedWorkflows()
         {
             return new[] {
-                new WorkflowRules {
+                new Workflow {
                     WorkflowName = "EmptyNestedRulesTest",
                     Rules = new Rule[] {
                         new Rule {
@@ -129,7 +129,7 @@ namespace RulesEngine.UnitTest
                          }
                     }
                 },
-                new WorkflowRules {
+                new Workflow {
                     WorkflowName = "EmptyNestedRulesActionsTest",
                     Rules = new Rule[] {
                         new Rule {

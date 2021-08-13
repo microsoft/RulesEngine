@@ -39,9 +39,9 @@ namespace DemoApp
                 throw new Exception("Rules not found.");
 
             var fileData = File.ReadAllText(files[0]);
-            var workflowRules = JsonConvert.DeserializeObject<List<WorkflowRules>>(fileData);
+            var workflow = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
-            var bre = new RulesEngine.RulesEngine(workflowRules.ToArray(), null);
+            var bre = new RulesEngine.RulesEngine(workflow.ToArray(), null);
 
             string discountOffered = "No discount offered.";
 

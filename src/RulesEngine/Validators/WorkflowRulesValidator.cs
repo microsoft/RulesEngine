@@ -8,13 +8,13 @@ using System.Linq;
 
 namespace RulesEngine.Validators
 {
-    internal class WorkflowRulesValidator : AbstractValidator<WorkflowRules>
+    internal class WorkflowsValidator : AbstractValidator<Workflow>
     {
-        public WorkflowRulesValidator()
+        public WorkflowsValidator()
         {
             RuleFor(c => c.WorkflowName).NotEmpty().WithMessage(Constants.WORKFLOW_NAME_NULL_ERRMSG);
             When(c => c.Rules?.Any() != true, () => {
-                RuleFor(c => c.WorkflowRulesToInject).NotEmpty().WithMessage(Constants.INJECT_WORKFLOW_RULES_ERRMSG);
+                RuleFor(c => c.WorkflowsToInject).NotEmpty().WithMessage(Constants.INJECT_WORKFLOW_RULES_ERRMSG);
             }).Otherwise(() => {
                 var ruleValidator = new RuleValidator();
                 RuleForEach(c => c.Rules).SetValidator(ruleValidator);
