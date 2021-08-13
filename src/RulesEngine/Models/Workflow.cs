@@ -23,6 +23,16 @@ namespace RulesEngine.Models
         /// </summary>
         public string WorkflowName { get; set; }
 
+        /// <summary>
+        /// Gets the input alias. (Optional - defaults to Input1, Input2, etc.)
+        /// </summary>
+        /// <remarks>
+        /// When set, passing 1 input parameter, uses exact input alias (e.g. MyAlias.InputProperty1)
+        /// When passing 2 or more input parameters, uses input alias plus increment (e.g. MyAlias1.InputProperty1, MyAlias2.InputProperty1)
+        /// </remarks>
+
+        public string InputAlias { get; set; }
+
     /// <summary>Gets or sets the workflow rules to inject.</summary>
     /// <value>The workflow rules to inject.</value>
     [Obsolete("WorkflowRulesToInject is deprecated. Use WorkflowsToInject instead.")]

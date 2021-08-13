@@ -176,6 +176,44 @@ namespace RulesEngine.UnitTest
             }
 
         }
+
+        [Theory]
+        [InlineData("GlobalAlternateParams")]
+        public async Task WorkflowUpdate_GlobalAlternateParams_ShouldReflect(string workflowName)
+        {
+            var workflow = GetWorkflowList();
+
+            var engine = new RulesEngine(null, null);
+            engine.AddWorkflow(workflow);
+
+            var input1 = new {
+                trueValue = true,
+                falseValue = false
+            };
+
+            var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
+            Assert.True(result.All(c => c.IsSuccess));
+        }
+
+
+        [Theory]
+        [InlineData("LocalAlternateParams")]
+        public async Task WorkflowUpdate_LocalAlternateParams_ShouldReflect(string workflowName)
+        {
+            var workflow = GetWorkflowList();
+
+            var engine = new RulesEngine(null, null);
+            engine.AddWorkflow(workflow);
+
+            var input1 = new {
+                trueValue = true,
+                falseValue = false
+            };
+
+            var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
+            Assert.True(result.All(c => c.IsSuccess));
+        }
+
         private Workflow[] GetWorkflowList()
         {
             return new Workflow[] {
@@ -390,6 +428,38 @@ namespace RulesEngine.UnitTest
                         new Rule {
                             RuleName = "TrueTest",
                             Expression = "globalParam1 == \"hello\""
+                        }
+                    }
+                },
+                new Workflow {
+                    WorkflowName = "GlobalAlternateParams",
+                    InputAlias = "MyAlias",
+                    GlobalParams = new List<ScopedParam> {
+                        new ScopedParam {
+                            Name = "globalParam1",
+                            Expression = "MyAlias.falseValue == false"
+                        }
+                    },
+                    Rules = new List<Rule> {
+                        new Rule {
+                            RuleName = "TrueTest",
+                            Expression = "globalParam1 == true && MyAlias.trueValue == true"
+                        }
+                    }
+                },
+                new Workflow {
+                    WorkflowName = "LocalAlternateParams",
+                    InputAlias = "MyAlias",
+                    Rules = new List<Rule> {
+                        new Rule {
+                            RuleName = "TrueTest",
+                            LocalParams = new List<ScopedParam> {
+                                new ScopedParam {
+                                    Name = "localParam1",
+                                    Expression = "MyAlias.falseValue == false"
+                                }
+                            },
+                            Expression = "localParam1 == true && MyAlias.trueValue == true"
                         }
                     }
                 },
