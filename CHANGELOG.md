@@ -24,12 +24,12 @@ Breaking Change:
 - Enabled localParams support for nested Rules
 - Made certain fields in Rule model optional allowing users to define workflow with minimal fields
 - Added option to disable Rule in workflow json
-- Added `GetAllRegisteredWorkflow` to RulesEngine to return all registeredWorkflows
+- Added `GetAllRegisteredWorkflow` to RulesEngine to return all registered workflows
 - Runtime errors for expressions will now be logged as errorMessage instead of throwing Exceptions by default
 - Fixed RuleParameter passed as null
 
 ## [3.0.2]
-- Fixed LocalParams cache not getting cleaned up when RemoveWorkflow and ClearWorkflows are called
+- Fixed LocalParams cache not getting cleaned up when RemoveWorkflows and ClearWorkflows are called
 
 ## [3.0.1]
 - Moved ActionResult and ActionRuleResult under RulesEngine.Models namespace

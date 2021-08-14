@@ -1,0 +1,23 @@
+{
+	"name": "RulesEngine Codespace",
+	"image": "mcr.microsoft.com/vscode/devcontainers/dotnet:0.201.7-3.1",
+	"settings": {
+		"terminal.integrated.defaultProfile.linux": "pwsh"
+	},
+	"extensions": [
+		"eamodio.gitlens",
+		"ms-dotnettools.csharp",
+		"VisualStudioExptTeam.vscodeintellicode",
+		"ms-vscode.powershell",
+		"cschleiden.vscode-github-actions",
+		"redhat.vscode-yaml",
+		"bierner.markdown-preview-github-styles",
+		"ban.spellright",
+		"jmrog.vscode-nuget-package-manager",
+		"coenraads.bracket-pair-colorizer",
+		"vscode-icons-team.vscode-icons",
+		"editorconfig.editorconfig"
+	],
+	"postCreateCommand": "dotnet restore RulesEngine.sln && dotnet build RulesEngine.sln --configuration Release --no-restore && dotnet test RulesEngine.sln --configuration Release --no-build --verbosity minimal",
+}
+// Built with ❤ by [Pipeline Foundation](https://pipeline.foundation)

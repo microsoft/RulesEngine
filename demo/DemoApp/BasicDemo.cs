@@ -1,13 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.IO;
 using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
 
 namespace DemoApp
@@ -17,9 +14,9 @@ namespace DemoApp
         public void Run()
         {
             Console.WriteLine($"Running {nameof(BasicDemo)}....");
-            List<WorkflowRules> workFlowRules = new List<WorkflowRules>();
-            WorkflowRules workflowRule = new WorkflowRules();
-            workflowRule.WorkflowName = "Test Workflow Rule 1";
+            List<Workflow> workflows = new List<Workflow>();
+            Workflow workflow = new Workflow();
+            workflow.WorkflowName = "Test Workflow Rule 1";
 
             List<Rule> rules = new List<Rule>();
 
@@ -32,11 +29,11 @@ namespace DemoApp
 
             rules.Add(rule);
 
-            workflowRule.Rules = rules;
+            workflow.Rules = rules;
 
-            workFlowRules.Add(workflowRule);
+            workflows.Add(workflow);
 
-            var bre = new RulesEngine.RulesEngine(workFlowRules.ToArray(), null);
+            var bre = new RulesEngine.RulesEngine(workflows.ToArray(), null);
 
             dynamic datas = new ExpandoObject();
             datas.count = 1;
