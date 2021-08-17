@@ -19,11 +19,6 @@ namespace RulesEngine.Models
     public class Workflow
     {
         /// <summary>
-        /// Gets the workflow Id.
-        /// </summary>
-        public int Id { get; set; }
-
-        /// <summary>
         /// Gets the workflow name.
         /// </summary>
         public string WorkflowName { get; set; }
