@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
 using Microsoft.EntityFrameworkCore;
+using RulesEngine.Data;
 
 namespace DemoApp
 {
@@ -42,18 +43,17 @@ namespace DemoApp
                 throw new Exception("Rules not found.");
 
             var fileData = File.ReadAllText(files[0]);
-            var workflow = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
+            var workflows = JsonConvert.DeserializeObject<List<WorkflowData>>(fileData);
 
             RulesEngineDemoContext db = new RulesEngineDemoContext();
             if (db.Database.EnsureCreated())
             {
-                db.Workflows.AddRange(workflow);
+                db.Workflows.AddRange(workflows);
                 db.SaveChanges();
             }
 
-            var wfr = db.Workflows.Include(i => i.Rules).ThenInclude(i => i.Rules).ToArray();
-
-            var bre = new RulesEngine.RulesEngine(wfr, null);
+            var wfr = db.Workflows.Include(i => i.Rules).ThenInclude(i => i.Rules).ThenInclude(i => i.LocalParams).Include(i => i.GlobalParams).ToList();
+            var bre = new RulesEngine.RulesEngine(db.GetWorkflows(wfr), null);
 
             string discountOffered = "No discount offered.";
 
