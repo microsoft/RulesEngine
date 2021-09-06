@@ -39,7 +39,9 @@ namespace RulesEngine.Validators
         {
             When(c => c.Operator == null && c.RuleExpressionType == RuleExpressionType.LambdaExpression, () => {
                 RuleFor(c => c.Expression).NotEmpty().WithMessage(Constants.LAMBDA_EXPRESSION_EXPRESSION_NULL_ERRMSG);
-                RuleFor(c => c.Rules).Empty().WithMessage(Constants.LAMBDA_EXPRESSION_RULES_ERRMSG);
+                When(c => c.Operator == null, () => RuleFor(c => c.Rules).Empty().WithMessage(Constants.OPERATOR_RULES_ERRMSG)).Otherwise(() => {
+                    RuleFor(c => c.Rules).Empty().WithMessage(Constants.LAMBDA_EXPRESSION_RULES_ERRMSG);
+                });
             });
         }
 
