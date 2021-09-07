@@ -17,6 +17,7 @@ namespace RulesEngine.HelperFunctions
         public const string OPERATOR_NULL_ERRMSG = "Operator can not be null";
         public const string OPERATOR_INCORRECT_ERRMSG = "Operator {PropertyValue} is not allowed";
         public const string RULE_NAME_NULL_ERRMSG = "Rule Name can not be null";
+        public const string OPERATOR_RULES_ERRMSG = "Cannot use Rules field when Operator is null";
         public const string LAMBDA_EXPRESSION_EXPRESSION_NULL_ERRMSG = "Expression cannot be null or empty when RuleExpressionType is LambdaExpression";
         public const string LAMBDA_EXPRESSION_OPERATOR_ERRMSG = "Cannot use Operator field when RuleExpressionType is LambdaExpression";
         public const string LAMBDA_EXPRESSION_RULES_ERRMSG = "Cannot use Rules field when RuleExpressionType is LambdaExpression";
