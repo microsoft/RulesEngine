@@ -116,9 +116,9 @@ var resultList  = await re.ExecuteAllRulesAsync("DiscountWithCustomInputNames",r
 ## C# Expression support
 The lambda expression allows you to use most of C# constructs and along with some of linq features.
 
-For more details on supported expression language refer - https://dynamic-linq.net/expression-language
+For more details on supported expression language refer - [expression language](https://dynamic-linq.net/expression-language)
 
-For supported linq operations refer - https://dynamic-linq.net/expression-language#sequence-operators
+For supported linq operations refer - [sequence operators](https://dynamic-linq.net/expression-language#sequence-operators)
 
 
 ## ScopedParams
