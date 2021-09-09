@@ -16,20 +16,20 @@ namespace RulesEngine
         private ConcurrentDictionary<string, (IDictionary<string, RuleFunc<RuleResultTree>>, Int64)> _compileRules = new ConcurrentDictionary<string,  (IDictionary<string, RuleFunc<RuleResultTree>>, Int64)>();
 
         /// <summary>The workflow rules</summary>
-        private ConcurrentDictionary<string, (WorkflowRules, Int64)> _workflowRules = new ConcurrentDictionary<string, (WorkflowRules, Int64)>();
+        private ConcurrentDictionary<string, (Workflow, Int64)> _workflow = new ConcurrentDictionary<string, (Workflow, Int64)>();
 
         /// <summary>Determines whether [contains workflow rules] [the specified workflow name].</summary>
         /// <param name="workflowName">Name of the workflow.</param>
         /// <returns>
         ///   <c>true</c> if [contains workflow rules] [the specified workflow name]; otherwise, <c>false</c>.</returns>
-        public bool ContainsWorkflowRules(string workflowName)
+        public bool ContainsWorkflows(string workflowName)
         {
-            return _workflowRules.ContainsKey(workflowName);
+            return _workflow.ContainsKey(workflowName);
         }
 
         public List<string> GetAllWorkflowNames()
         {
-            return _workflowRules.Keys.ToList();
+            return _workflow.Keys.ToList();
         }
 
         /// <summary>Determines whether [contains compiled rules] [the specified workflow name].</summary>
@@ -44,10 +44,10 @@ namespace RulesEngine
         /// <summary>Adds the or update workflow rules.</summary>
         /// <param name="workflowName">Name of the workflow.</param>
         /// <param name="rules">The rules.</param>
-        public void AddOrUpdateWorkflowRules(string workflowName, WorkflowRules rules)
+        public void AddOrUpdateWorkflows(string workflowName, Workflow rules)
         {
             Int64 ticks = DateTime.UtcNow.Ticks;
-            _workflowRules.AddOrUpdate(workflowName, (rules, ticks), (k, v) => (rules, ticks));
+            _workflow.AddOrUpdate(workflowName, (rules, ticks), (k, v) => (rules, ticks));
         }
 
         /// <summary>Adds the or update compiled rule.</summary>
@@ -68,9 +68,9 @@ namespace RulesEngine
         {
             if (_compileRules.TryGetValue(compiledRuleKey, out (IDictionary<string, RuleFunc<RuleResultTree>> rules, Int64 tick) compiledRulesObj))
             {
-                if (_workflowRules.TryGetValue(workflowName, out (WorkflowRules rules, Int64 tick) workflowRulesObj))
+                if (_workflow.TryGetValue(workflowName, out (Workflow rules, Int64 tick) WorkflowsObj))
                 {
-                    return compiledRulesObj.tick >= workflowRulesObj.tick;
+                    return compiledRulesObj.tick >= WorkflowsObj.tick;
                 }
             }
 
@@ -80,38 +80,38 @@ namespace RulesEngine
         /// <summary>Clears this instance.</summary>
         public void Clear()
         {
-            _workflowRules.Clear();
+            _workflow.Clear();
             _compileRules.Clear();
         }
 
         /// <summary>Gets the work flow rules.</summary>
         /// <param name="workflowName">Name of the workflow.</param>
-        /// <returns>WorkflowRules.</returns>
+        /// <returns>Workflows.</returns>
         /// <exception cref="Exception">Could not find injected Workflow: {wfname}</exception>
-        public WorkflowRules GetWorkFlowRules(string workflowName)
+        public Workflow GetWorkflow(string workflowName)
         {
-            if (_workflowRules.TryGetValue(workflowName, out (WorkflowRules rules, Int64 tick) workflowRulesObj))
+            if (_workflow.TryGetValue(workflowName, out (Workflow rules, Int64 tick) WorkflowsObj))
             {
-                var workflowRules = workflowRulesObj.rules;
-                if (workflowRules.WorkflowRulesToInject?.Any() == true)
+                var workflow = WorkflowsObj.rules;
+                if (workflow.WorkflowsToInject?.Any() == true)
                 {
-                    if (workflowRules.Rules == null)
+                    if (workflow.Rules == null)
                     {
-                        workflowRules.Rules = new List<Rule>();
+                        workflow.Rules = new List<Rule>();
                     }
-                    foreach (string wfname in workflowRules.WorkflowRulesToInject)
+                    foreach (string wfname in workflow.WorkflowsToInject)
                     {
-                        var injectedWorkflow = GetWorkFlowRules(wfname);
+                        var injectedWorkflow = GetWorkflow(wfname);
                         if (injectedWorkflow == null)
                         {
                             throw new Exception($"Could not find injected Workflow: {wfname}");
                         }
 
-                        workflowRules.Rules.ToList().AddRange(injectedWorkflow.Rules);
+                        workflow.Rules.ToList().AddRange(injectedWorkflow.Rules);
                     }
                 }
 
-                return workflowRules;
+                return workflow;
             }
             else
             {
@@ -132,7 +132,7 @@ namespace RulesEngine
         /// <param name="workflowName">Name of the workflow.</param>
         public void Remove(string workflowName)
         {
-            if (_workflowRules.TryRemove(workflowName, out (WorkflowRules, Int64) workflowObj))
+            if (_workflow.TryRemove(workflowName, out (Workflow, Int64) workflowObj))
             {
                 var compiledKeysToRemove = _compileRules.Keys.Where(key => key.StartsWith(workflowName));
                 foreach (var key in compiledKeysToRemove)

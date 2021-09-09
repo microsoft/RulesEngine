@@ -40,7 +40,14 @@ namespace RulesEngine.Models
 
         [JsonConverter(typeof(StringEnumConverter))]
         public RuleExpressionType RuleExpressionType { get; set; } = RuleExpressionType.LambdaExpression;
-        public IEnumerable<string> WorkflowRulesToInject { get; set; }
+
+        [Obsolete("WorkflowRulesToInject is deprecated. Use WorkflowsToInject instead.")]
+        public IEnumerable<string> WorkflowRulesToInject {
+          get { return WorkflowsToInject; }
+          set { WorkflowsToInject = value; }
+        }
+        public IEnumerable<string> WorkflowsToInject { get; set; }
+        
         public IEnumerable<Rule> Rules { get; set; }
         public IEnumerable<ScopedParam> LocalParams { get; set; }
         public string Expression { get; set; }
