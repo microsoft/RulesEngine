@@ -17,6 +17,7 @@ RulesEngine is a highly extensible library to build rule based system using C# e
   - [Initialise RulesEngine with the workflow:](#initialise-rulesengine-with-the-workflow)
   - [Execute the workflow rules with input:](#execute-the-workflow-rules-with-input)
   - [Using custom names for inputs](#using-custom-names-for-inputs)
+- [C# Expression support](#c-expression-support)
 - [ScopedParams](#scopedparams)
   - [GlobalParams](#globalparams)
     - [Example](#example)
@@ -111,6 +112,13 @@ var rp3 = new RuleParameter("telemetryInfo",input3);
 var resultList  = await re.ExecuteAllRulesAsync("DiscountWithCustomInputNames",rp1,rp2,rp3);
 
 ```
+
+## C# Expression support
+The lambda expression allows you to use most of C# constructs and along with some of linq features.
+
+For more details on supported expression language refer - https://dynamic-linq.net/expression-language
+
+For supported linq operations refer - https://dynamic-linq.net/expression-language#sequence-operators
 
 
 ## ScopedParams
