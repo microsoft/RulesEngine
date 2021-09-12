@@ -33,7 +33,7 @@ An example rule:
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
-        "Expression": "input1.country == \"india\" AND input1.loyalityFactor <= 2 AND input1.totalPurchasesToDate >= 5000"
+        "Expression": "input1.country == \"india\" AND input1.loyaltyFactor <= 2 AND input1.totalPurchasesToDate >= 5000"
       },
       {
         "RuleName": "GiveDiscount20",
@@ -41,7 +41,7 @@ An example rule:
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
-        "Expression": "input1.country == \"india\" AND input1.loyalityFactor >= 3 AND input1.totalPurchasesToDate >= 10000"
+        "Expression": "input1.country == \"india\" AND input1.loyaltyFactor >= 3 AND input1.totalPurchasesToDate >= 10000"
       }
     ]
   }
