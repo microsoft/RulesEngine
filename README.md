@@ -102,6 +102,16 @@ var bre = new RulesEngine.RulesEngine(wfr, null);
 
 *Note: For each level of nested rules expected, a ThenInclude query appended will be needed as shown above.*
 
+### Editor
+There is an editor library with it's own [NuGet Package](https://www.nuget.org/packages/RulesEngineEditor/) written in Blazor, more information is in it's repo https://github.com/alexreich/RulesEngineEditor. 
+
+#### Live Demo
+https://alexreich.github.io/RulesEngineEditor  
+> This can also be installed as a standalone PWA and used offline.
+
+#### With Sample Data
+https://alexreich.github.io/RulesEngineEditor/demo
+
 ## How it works
 
 ![](https://github.com/microsoft/RulesEngine/blob/main/assets/BlockDiagram.png)
