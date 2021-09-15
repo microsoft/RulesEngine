@@ -775,7 +775,7 @@ namespace RulesEngine.UnitTest
         private dynamic GetInput1()
         {
             var converter = new ExpandoObjectConverter();
-            var basicInfo = "{\"name\": \"Dishant\",\"email\": \"abc@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyalityFactor\": 3,\"totalPurchasesToDate\": 10000}";
+            var basicInfo = "{\"name\": \"Dishant\",\"email\": \"abc@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyaltyFactor\": 3,\"totalPurchasesToDate\": 10000}";
             return JsonConvert.DeserializeObject<ExpandoObject>(basicInfo, converter);
         }
 
@@ -801,10 +801,10 @@ namespace RulesEngine.UnitTest
         /// </returns>
         private static dynamic[] GetInputs4()
         {
-            var basicInfo = "{\"name\": \"Dishant\",\"email\": \"abc@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyalityFactor\": 3,\"totalPurchasesToDate\": 70000}";
+            var basicInfo = "{\"name\": \"Dishant\",\"email\": \"abc@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyaltyFactor\": 3,\"totalPurchasesToDate\": 70000}";
             var orderInfo = "{\"totalOrders\": 50,\"recurringItems\": 2}";
             var telemetryInfo = "{\"noOfVisitsPerMonth\": 10,\"percentageOfBuyingToVisit\": 15}";
-            var laborCategoriesInput = "[{\"country\": \"india\", \"loyalityFactor\": 2, \"totalPurchasesToDate\": 20000}]";
+            var laborCategoriesInput = "[{\"country\": \"india\", \"loyaltyFactor\": 2, \"totalPurchasesToDate\": 20000}]";
             var currentLaborCategoryInput = "{\"CurrentLaborCategoryProp\":\"TestVal2\"}";
 
             dynamic input1 = JsonConvert.DeserializeObject<List<RuleTestClass>>(laborCategoriesInput);

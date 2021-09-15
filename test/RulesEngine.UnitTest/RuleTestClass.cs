@@ -12,8 +12,8 @@ namespace RulesEngine.UnitTest
         [JsonProperty("country")]
         public string Country { get; set; }
 
-        [JsonProperty("loyalityFactor")]
-        public int LoyalityFactor { get; set; }
+        [JsonProperty("loyaltyFactor")]
+        public int loyaltyFactor { get; set; }
         public int TotalPurchasesToDate { get; set; }
     }
 }
