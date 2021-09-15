@@ -102,16 +102,6 @@ var bre = new RulesEngine.RulesEngine(wfr, null);
 
 *Note: For each level of nested rules expected, a ThenInclude query appended will be needed as shown above.*
 
-### Editor
-There is an editor library with it's own [NuGet Package](https://www.nuget.org/packages/RulesEngineEditor/) written in Blazor, more information is in it's repo https://github.com/alexreich/RulesEngineEditor. 
-
-#### Live Demo
-https://alexreich.github.io/RulesEngineEditor  
-> This can also be installed as a standalone PWA and used offline.
-
-#### With Sample Data
-https://alexreich.github.io/RulesEngineEditor/demo
-
 ## How it works
 
 ![](https://github.com/microsoft/RulesEngine/blob/main/assets/BlockDiagram.png)
@@ -121,6 +111,16 @@ The rules can be stored in any store and be fed to the system in a structure whi
 A wrapper needs to be created over the Rules Engine package, which will get the rules and input message(s) from any store that your system dictates and put it into the Engine. The wrapper then handles the output using appropriate means.
 
 _Note: To know in detail of the workings of Rules Engine, please visit [How it works section](https://github.com/microsoft/RulesEngine/wiki/Introduction#how-it-works) in [Rules Engine Wiki](https://github.com/microsoft/RulesEngine/wiki)._
+
+### 3rd Party Tools
+There is an editor library with it's own [NuGet Package](https://www.nuget.org/packages/RulesEngineEditor/) written in Blazor, more information is in it's repo https://github.com/alexreich/RulesEngineEditor. 
+
+#### Live Demo
+https://alexreich.github.io/RulesEngineEditor  
+> This can also be installed as a standalone PWA and used offline.
+
+#### With Sample Data
+https://alexreich.github.io/RulesEngineEditor/demo
 
 ## Contributing
 
