@@ -7,7 +7,7 @@
       "ErrorMessage": "One or more adjust rules failed.",
       "ErrorType": "Error",
       "RuleExpressionType": "LambdaExpression",
-      "Expression": "input1.country == \"canada\" AND input1.loyalityFactor <= 4"
+      "Expression": "input1.country == \"canada\" AND input1.loyaltyFactor <= 4"
     }
   ]
 }

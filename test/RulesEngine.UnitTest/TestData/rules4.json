@@ -5,7 +5,7 @@
       {
         "RuleName": "GiveDiscount10",
         "SuccessEvent": "10",
-        "ErrorMessage": "One or more adjust rules failed, with loyalityFactor : $(model1.loyalityFactor), country : $(model1.country), totalPurchasesToDate : $(model1.totalPurchasesToDate), model2 : $(model2)",
+        "ErrorMessage": "One or more adjust rules failed, with loyaltyFactor : $(model1.loyaltyFactor), country : $(model1.country), totalPurchasesToDate : $(model1.totalPurchasesToDate), model2 : $(model2)",
         "ErrorType": "Error",
         "localParams": [
           {
@@ -18,7 +18,7 @@
           }
         ],
         "RuleExpressionType": "LambdaExpression",
-        "Expression": "model1.country == \"india\" AND model1.loyalityFactor <= 2 AND model1.totalPurchasesToDate >= 5000 AND model2"
+        "Expression": "model1.country == \"india\" AND model1.loyaltyFactor <= 2 AND model1.totalPurchasesToDate >= 5000 AND model2"
       },
       {
         "RuleName": "GiveDiscount100",
@@ -35,12 +35,12 @@
           }
         ],
         "RuleExpressionType": "LambdaExpression",
-        "Expression": "model1.country == \"india\" AND model1.loyalityFactor < 0 AND model1.totalPurchasesToDate >= 5000 AND model2"
+        "Expression": "model1.country == \"india\" AND model1.loyaltyFactor < 0 AND model1.totalPurchasesToDate >= 5000 AND model2"
       },
       {
         "RuleName": "GiveDiscount25",
         "SuccessEvent": "25",
-        "ErrorMessage": "One or more adjust rules failed, country : $(input4.country), loyalityFactor : $(input4.loyalityFactor), totalPurchasesToDate : $(input4.totalPurchasesToDate), totalOrders : $(input5.totalOrders), noOfVisitsPerMonth : $(input30.noOfVisitsPerMonth)",
+        "ErrorMessage": "One or more adjust rules failed, country : $(input4.country), loyaltyFactor : $(input4.loyaltyFactor), totalPurchasesToDate : $(input4.totalPurchasesToDate), totalOrders : $(input5.totalOrders), noOfVisitsPerMonth : $(input30.noOfVisitsPerMonth)",
         "ErrorType": "Error",
         "localParams": [
           {
@@ -53,7 +53,7 @@
           }
         ],
         "RuleExpressionType": "LambdaExpression",
-        "Expression": "input4.country == \"india\" AND input4.loyalityFactor >= 2 AND input4.totalPurchasesToDate <= 10 AND input5.totalOrders > 2 AND input3.noOfVisitsPerMonth > 5"
+        "Expression": "input4.country == \"india\" AND input4.loyaltyFactor >= 2 AND input4.totalPurchasesToDate <= 10 AND input5.totalOrders > 2 AND input3.noOfVisitsPerMonth > 5"
       },
       {
         "RuleName": "GiveDiscount30",
@@ -61,7 +61,7 @@
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
-        "Expression": "input4.loyalityFactor > 30 AND input4.totalPurchasesToDate >= 50000 AND input4.totalPurchasesToDate <= 100000 AND input5.totalOrders > 5 AND input3.noOfVisitsPerMonth > 15"
+        "Expression": "input4.loyaltyFactor > 30 AND input4.totalPurchasesToDate >= 50000 AND input4.totalPurchasesToDate <= 100000 AND input5.totalOrders > 5 AND input3.noOfVisitsPerMonth > 15"
       },
       {
         "RuleName": "GiveDiscount35",
@@ -69,7 +69,7 @@
         "ErrorMessage": "One or more adjust rules failed, totalPurchasesToDate : $(input4.totalPurchasesToDate), totalOrders : $(input5.totalOrders)",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
-        "Expression": "input4.loyalityFactor > 30 AND input4.totalPurchasesToDate >= 100000 AND input5.totalOrders > 15 AND input3.noOfVisitsPerMonth > 25"
+        "Expression": "input4.loyaltyFactor > 30 AND input4.totalPurchasesToDate >= 100000 AND input5.totalOrders > 15 AND input3.noOfVisitsPerMonth > 25"
       }
     ]
   }
