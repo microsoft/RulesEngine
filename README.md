@@ -112,6 +112,16 @@ A wrapper needs to be created over the Rules Engine package, which will get the 
 
 _Note: To know in detail of the workings of Rules Engine, please visit [How it works section](https://github.com/microsoft/RulesEngine/wiki/Introduction#how-it-works) in [Rules Engine Wiki](https://github.com/microsoft/RulesEngine/wiki)._
 
+### 3rd Party Tools
+There is an editor library with it's own [NuGet Package](https://www.nuget.org/packages/RulesEngineEditor/) written in Blazor, more information is in it's repo https://github.com/alexreich/RulesEngineEditor. 
+
+#### Live Demo
+https://alexreich.github.io/RulesEngineEditor  
+> This can also be installed as a standalone PWA and used offline.
+
+#### With Sample Data
+https://alexreich.github.io/RulesEngineEditor/demo
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
