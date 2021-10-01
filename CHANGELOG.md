@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+
+## [3.4.0]
+- Made RulesEngine Strong Name and Authenticode signed
+- Renamed few models to streamline names (by @alexrich)
+	- `WorkflowRules` is renamed to `Workflow`
+	- `WorkflowRulesToInject` is renamed to `WorkflowsToInject`
+	- `RuleAction` is renamed to `RuleActions`
+	*Note* The old models are still supported but will be deprecated with version 4.0.0
+
+
 ## [3.3.0]
 - Added support for actions in nested rules
 - Improved serialization support for System.Text.Json for workflow model
