@@ -9,7 +9,8 @@ All notable changes to this project will be documented in this file.
 	- `WorkflowRules` is renamed to `Workflow`
 	- `WorkflowRulesToInject` is renamed to `WorkflowsToInject`
 	- `RuleAction` is renamed to `RuleActions`
-	*Note* The old models are still supported but will be deprecated with version 4.0.0
+	
+	**Note**: The old models are still supported but will be removed with version 4.0.0
 
 
 ## [3.3.0]
