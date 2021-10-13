@@ -8,7 +8,7 @@ As with any library/package there are public interfaces with which we interact w
 The rules used in this system is mostly comprising of [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions). Anything that can be defined in a lambda expression can be used as a rule in this library.
 
 #### Rules Schema
-Rules schema is available in the [schema file](https://github.com/microsoft/RulesEngine/blob/master/schema/workflowRules-schema.json). The workflow rules are how we store the rules in the system. In our system, the name of the model typed in the library is [WorkflowRules](https://github.com/microsoft/RulesEngine/blob/master/src/RulesEngine/RulesEngine/Models/WorkflowRules.cs). An example json would be – 
+Rules schema is available in the [schema file](https://github.com/microsoft/RulesEngine/blob/master/schema/workflowRules-schema.json). The workflow rules are how we store the rules in the system. In our system, the name of the model typed in the library is [Workflow](https://github.com/microsoft/RulesEngine/blob/main/src/RulesEngine/Models/Workflow.cs). An example json would be – 
 
 ```json
 [
