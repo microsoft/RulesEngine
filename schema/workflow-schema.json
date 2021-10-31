@@ -94,7 +94,7 @@
       }
     },
     "ActionInfo": {
-      "propeties": {
+      "properties": {
         "Name": {
           "type": "string"
         },

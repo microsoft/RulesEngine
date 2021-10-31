@@ -18,7 +18,7 @@ To install this library, download the latest version of [NuGet Package](https://
 
 There are several ways to populate workflows for the Rules Engine as listed below.
 
-You need to store the rules based on the [schema definition](https://github.com/microsoft/RulesEngine/blob/main/schema/workflowRules-schema.json) given and they can be stored in any store as deemed appropriate like Azure Blob Storage, Cosmos DB, Azure App Configuration, [Entity Framework](https://github.com/microsoft/RulesEngine#entity-framework), SQL Servers, file systems etc. For RuleExpressionType `LamdaExpression`, the rule is written as a [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
+You need to store the rules based on the [schema definition](https://github.com/microsoft/RulesEngine/blob/main/schema/workflow-schema.json) given and they can be stored in any store as deemed appropriate like Azure Blob Storage, Cosmos DB, Azure App Configuration, [Entity Framework](https://github.com/microsoft/RulesEngine#entity-framework), SQL Servers, file systems etc. For RuleExpressionType `LamdaExpression`, the rule is written as a [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
 
 An example rule:
 
@@ -33,7 +33,7 @@ An example rule:
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
-        "Expression": "input1.country == \"india\" AND input1.loyalityFactor <= 2 AND input1.totalPurchasesToDate >= 5000"
+        "Expression": "input1.country == \"india\" AND input1.loyaltyFactor <= 2 AND input1.totalPurchasesToDate >= 5000"
       },
       {
         "RuleName": "GiveDiscount20",
@@ -41,7 +41,7 @@ An example rule:
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
-        "Expression": "input1.country == \"india\" AND input1.loyalityFactor >= 3 AND input1.totalPurchasesToDate >= 10000"
+        "Expression": "input1.country == \"india\" AND input1.loyaltyFactor >= 3 AND input1.totalPurchasesToDate >= 10000"
       }
     ]
   }
@@ -106,11 +106,23 @@ var bre = new RulesEngine.RulesEngine(wfr, null);
 
 ![](https://github.com/microsoft/RulesEngine/blob/main/assets/BlockDiagram.png)
 
-The rules can be stored in any store and be fed to the system in a structure which adheres to the [schema](https://github.com/microsoft/RulesEngine/blob/main/schema/workflowRules-schema.json) of WorkFlow model.
+The rules can be stored in any store and be fed to the system in a structure which adheres to the [schema](https://github.com/microsoft/RulesEngine/blob/main/schema/workflow-schema.json) of WorkFlow model.
 
 A wrapper needs to be created over the Rules Engine package, which will get the rules and input message(s) from any store that your system dictates and put it into the Engine. The wrapper then handles the output using appropriate means.
 
 _Note: To know in detail of the workings of Rules Engine, please visit [How it works section](https://github.com/microsoft/RulesEngine/wiki/Introduction#how-it-works) in [Rules Engine Wiki](https://github.com/microsoft/RulesEngine/wiki)._
+
+## 3rd Party Tools
+
+### RulesEngine Editor
+There is an editor library with it's own [NuGet Package](https://www.nuget.org/packages/RulesEngineEditor/) written in Blazor, more information is in it's repo https://github.com/alexreich/RulesEngineEditor. 
+
+#### Live Demo
+https://alexreich.github.io/RulesEngineEditor  
+> This can also be installed as a standalone PWA and used offline.
+
+#### With Sample Data
+https://alexreich.github.io/RulesEngineEditor/demo
 
 ## Contributing
 

@@ -8,7 +8,7 @@ These all features make this library highly configurable and extensible as shown
 
 ### How it works
 
-[[https://github.com/microsoft/RulesEngine/blob/master/assets/BlockDiagram.png|alt=octocat]]
+![](https://github.com/microsoft/RulesEngine/blob/main/assets/BlockDiagram.png)
 
 Here. there are multiple actors/component involved.
 ##### Rules Engine
