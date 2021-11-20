@@ -2,7 +2,9 @@
 //  Licensed under the MIT License.
 
 using RulesEngine.Models;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RulesEngine.Actions
@@ -23,11 +25,11 @@ namespace RulesEngine.Actions
             List<RuleResultTree> resultList = null;
             if (includeRuleResults)
             {
-                resultList = new List<RuleResultTree>(output.Results);
+                resultList = new List<RuleResultTree>(output?.Results ?? new List<RuleResultTree>() { });
                 resultList.AddRange(innerResult.Results);
             }
             return new ActionRuleResult {
-                Output = output.Output,
+                Output = output?.Output,
                 Exception = innerResult.Exception,
                 Results = resultList
             };
@@ -37,7 +39,13 @@ namespace RulesEngine.Actions
         {
             var workflowName = context.GetContext<string>("workflowName");
             var ruleName = context.GetContext<string>("ruleName");
-            var ruleResult = await _ruleEngine.ExecuteActionWorkflowAsync(workflowName, ruleName, ruleParameters);
+            var filteredRuleParameters = ruleParameters;
+            if(context.TryGetContext<List<string>>("inputFilter",out var inputFilter))
+            {
+                filteredRuleParameters = ruleParameters.Where(c => inputFilter.Contains(c.Name)).ToArray();
+            }
+          
+            var ruleResult = await _ruleEngine.ExecuteActionWorkflowAsync(workflowName, ruleName, filteredRuleParameters);
             return ruleResult;
         }
     }

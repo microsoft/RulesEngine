@@ -27,7 +27,6 @@ namespace RulesEngine.Models
     /// <value>The workflow rules to inject.</value>
     [Obsolete("WorkflowRulesToInject is deprecated. Use WorkflowsToInject instead.")]
     public IEnumerable<string> WorkflowRulesToInject {
-      get { return WorkflowsToInject; }
       set { WorkflowsToInject = value; }
     }
     public IEnumerable<string> WorkflowsToInject { get; set; }
