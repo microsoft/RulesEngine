@@ -63,6 +63,15 @@ namespace RulesEngine.UnitTest
             Assert.Null(result.Output);
         }
 
+        [Fact]
+        public async Task ExecuteActionWorkflowAsync_SelfReferencingAction_WithFilter_ExecutesSuccessfully()
+        {
+
+            var engine = new RulesEngine(GetWorkflowWithActions());
+            var result = await engine.ExecuteActionWorkflowAsync("WorkflowWithGlobalsAndSelfRefActions", "RuleReferencingSameWorkflowWithInputFilter", new RuleParameter[0]);
+            Assert.NotNull(result);
+            Assert.Equal(4,result.Output);
+        }
 
         private Workflow[] GetWorkflowsWithoutActions()
         {
@@ -150,7 +159,14 @@ namespace RulesEngine.UnitTest
                                 Context = new Dictionary<string, object>{
                                     {"workflowName", "WorkflowWithGlobalsAndSelfRefActions"},
                                     {"ruleName","OtherRule"},
-                                    {"inputFilter",new string[] { } }
+                                    {"inputFilter",new string[] { } },
+                                    {"additionalInputs", new [] { 
+                                        new ScopedParam(){
+                                            Name = "additionalValue",
+                                            Expression = "1"
+                                        }
+
+                                    } }
                                 }
 
                             }
@@ -160,7 +176,7 @@ namespace RulesEngine.UnitTest
 
                     , new Rule{
                         RuleName = "OtherRule",
-                        Expression = "1 == 1",
+                        Expression = "additionalValue == 1",
                         Actions = new RuleActions {
                              OnSuccess = new ActionInfo{
                                 Name = "OutputExpression",
