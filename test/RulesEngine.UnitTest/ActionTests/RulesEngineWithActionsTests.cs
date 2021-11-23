@@ -53,6 +53,26 @@ namespace RulesEngine.UnitTest
         }
 
 
+        [Fact]
+        public async Task ExecuteActionWorkflowAsync_SelfReferencingAction_NoFilter_ExecutesSuccessfully()
+        {
+
+            var engine = new RulesEngine(GetWorkflowWithActions());
+            var result = await engine.ExecuteActionWorkflowAsync("WorkflowWithGlobalsAndSelfRefActions", "RuleReferencingSameWorkflow", new RuleParameter[0]);
+            Assert.NotNull(result);
+            Assert.Null(result.Output);
+        }
+
+        [Fact]
+        public async Task ExecuteActionWorkflowAsync_SelfReferencingAction_WithFilter_ExecutesSuccessfully()
+        {
+
+            var engine = new RulesEngine(GetWorkflowWithActions());
+            var result = await engine.ExecuteActionWorkflowAsync("WorkflowWithGlobalsAndSelfRefActions", "RuleReferencingSameWorkflowWithInputFilter", new RuleParameter[0]);
+            Assert.NotNull(result);
+            Assert.Equal(4,result.Output);
+        }
+
         private Workflow[] GetWorkflowsWithoutActions()
         {
             var workflow1 = new Workflow {
@@ -104,8 +124,74 @@ namespace RulesEngine.UnitTest
                     }
 
                 }
+
+              
             };
-            return new[] { workflow1 };
+
+            var workflow2 = new Workflow {
+                WorkflowName = "WorkflowWithGlobalsAndSelfRefActions",
+                GlobalParams = new[] {
+                    new ScopedParam {
+                        Name = "global1",
+                        Expression = "\"Hello\""
+                    }
+                },
+                Rules = new[] {
+
+                    new Rule{
+                        RuleName = "RuleReferencingSameWorkflow",
+                        Expression = "1 == 1",
+                        Actions = new RuleActions {
+                            OnSuccess = new ActionInfo{
+                                Name = "EvaluateRule",
+                                Context = new Dictionary<string, object>{
+                                    {"workflowName", "WorkflowWithGlobalsAndSelfRefActions"},
+                                    {"ruleName","OtherRule"}
+                                }
+                            }
+                        }
+                    },new Rule{
+                        RuleName = "RuleReferencingSameWorkflowWithInputFilter",
+                        Expression = "1 == 1",
+                        Actions = new RuleActions {
+                            OnSuccess = new ActionInfo{
+                                Name = "EvaluateRule",
+                                Context = new Dictionary<string, object>{
+                                    {"workflowName", "WorkflowWithGlobalsAndSelfRefActions"},
+                                    {"ruleName","OtherRule"},
+                                    {"inputFilter",new string[] { } },
+                                    {"additionalInputs", new [] { 
+                                        new ScopedParam(){
+                                            Name = "additionalValue",
+                                            Expression = "1"
+                                        }
+
+                                    } }
+                                }
+
+                            }
+                        }
+                    }
+
+
+                    , new Rule{
+                        RuleName = "OtherRule",
+                        Expression = "additionalValue == 1",
+                        Actions = new RuleActions {
+                             OnSuccess = new ActionInfo{
+                                Name = "OutputExpression",
+                                Context = new Dictionary<string, object>{
+                                    {"expression", "2*2"}
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+
+            };
+            return new[] { workflow1, workflow2 };
         }
     }
 }

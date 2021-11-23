@@ -35,7 +35,7 @@ namespace RulesEngine.UnitTest
 
         [Theory]
         [InlineData("rules2.json")]
-        public async Task RulesEngine_InjectedRules_ReturnsListOfRuleResultTree(string ruleFileName)
+        public async Task RulesEngine_InjectedRules_ContainsInjectedRules(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName);
 
@@ -43,9 +43,9 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            var result = await re.ExecuteAllRulesAsync("inputWorkflowReference", input1, input2, input3);
+            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflowReference", input1, input2, input3);
             Assert.NotNull(result);
-            Assert.IsType<List<RuleResultTree>>(result);
+            Assert.True(result.Any());
         }
 
         [Theory]

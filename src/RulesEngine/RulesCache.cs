@@ -107,7 +107,7 @@ namespace RulesEngine
                             throw new Exception($"Could not find injected Workflow: {wfname}");
                         }
 
-                        workflow.Rules.ToList().AddRange(injectedWorkflow.Rules);
+                        workflow.Rules = workflow.Rules.Concat(injectedWorkflow.Rules).ToList();
                     }
                 }
 

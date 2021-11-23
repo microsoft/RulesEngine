@@ -40,6 +40,21 @@ namespace RulesEngine.Actions
         {
             return _parentResult;
         }
+
+        public bool TryGetContext<T>(string name,out T output)
+        {
+            try
+            {
+                output =  GetContext<T>(name);
+                return true;
+            }
+            catch(ArgumentException)
+            {
+                output = default(T);
+                return false;
+            }
+        }
+
         public T GetContext<T>(string name)
         {
             try

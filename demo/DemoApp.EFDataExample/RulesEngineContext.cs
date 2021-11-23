@@ -21,7 +21,6 @@ namespace RulesEngine.Data
 
             modelBuilder.Entity<Workflow>(entity => {
                 entity.HasKey(k => k.WorkflowName);
-                entity.Ignore(b => b.WorkflowRulesToInject);
                 entity.Ignore(b => b.WorkflowsToInject);
             });
 
