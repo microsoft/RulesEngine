@@ -44,6 +44,13 @@ namespace RulesEngine.Interfaces
         void RemoveWorkflow(params string[] workflowNames);
 
         /// <summary>
+        /// Checks is workflow exist.
+        /// </summary>
+        /// <param name="workflowName">The workflow name.</param>
+        /// <returns> <c>true</c> if contains the specified workflow name; otherwise, <c>false</c>.</returns>
+        bool ContainsWorkflow(string workflowName);
+
+        /// <summary>
         /// Returns the list of all registered workflow names
         /// </summary>
         /// <returns></returns>
