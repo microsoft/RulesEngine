@@ -212,6 +212,16 @@ namespace RulesEngine
         }
 
         /// <summary>
+        /// Checks is workflow exist.
+        /// </summary>
+        /// <param name="workflowName">The workflow name.</param>
+        /// <returns> <c>true</c> if contains the specified workflow name; otherwise, <c>false</c>.</returns>
+        public bool ContainsWorkflow(string workflowName)
+        {
+            return _rulesCache.ContainsWorkflows(workflowName);
+        }
+
+        /// <summary>
         /// Clears the workflow.
         /// </summary>
         public void ClearWorkflows()

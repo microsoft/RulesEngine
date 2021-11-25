@@ -722,6 +722,29 @@ namespace RulesEngine.UnitTest
 
         }
 
+        [Fact]
+        public void ContainsWorkFlowName_ShouldReturn()
+        {
+            const string ExistedWorkflowName = "ExistedWorkflowName";
+            const string NotExistedWorkflowName = "NotExistedWorkflowName";
+
+            var workflow = new Workflow {
+                WorkflowName = ExistedWorkflowName,
+                Rules = new Rule[]{
+                    new Rule {
+                        RuleName = "Rule",
+                        RuleExpressionType = RuleExpressionType.LambdaExpression,
+                        Expression = "1==1"
+                    }
+                }
+            };
+
+            var re = new RulesEngine();
+            re.AddWorkflow(workflow);
+
+            Assert.True(re.ContainsWorkflow(ExistedWorkflowName));
+            Assert.False(re.ContainsWorkflow(NotExistedWorkflowName));
+        }
 
         [Theory]
         [InlineData(typeof(RulesEngine),typeof(IRulesEngine))]
