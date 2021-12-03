@@ -48,8 +48,18 @@ namespace RulesEngine.HelperFunctions
                             value = typeof(List<object>);
                         else
                         {
-                            var internalType = CreateAbstractClassType(((IList)expando.Value)[0]);
-                            value = new List<object>().Cast(internalType).ToList(internalType).GetType();
+                            if (((IList)expando.Value)[0] is ExpandoObject)
+                            {
+                                var listDictionary = ((IList)expando.Value).Cast<IDictionary<string, object>>();
+                                var listValue = Combine(listDictionary);
+                                var internalType = CreateAbstractClassType(listValue);
+                                value = new List<object>().Cast(internalType).ToList(internalType).GetType();
+                            }
+                            else
+                            {
+                                var internalType = CreateAbstractClassType(((IList)expando.Value)[0]);
+                                value = new List<object>().Cast(internalType).ToList(internalType).GetType();
+                            }
                         }
 
                     }
@@ -123,7 +133,23 @@ namespace RulesEngine.HelperFunctions
             var genericMethod = methodInfo.MakeGenericMethod(innerType);
             return genericMethod.Invoke(null, new[] { self }) as IList;
         }
+
+        private static ExpandoObject Combine(IEnumerable<IDictionary<string, object>> expandoObjects)
+        {
+            var result = new ExpandoObject();
+            var resultDictionary = result as IDictionary<string, object>;
+            foreach (var expandoObject in expandoObjects)
+            {
+                foreach (var pair in expandoObject)
+                {
+                    if (!resultDictionary.ContainsKey(pair.Key))
+                    {
+                        resultDictionary[pair.Key] = pair.Value;
+                    }
+                }
+            }
+
+            return result;
+        }
     }
-
-
 }

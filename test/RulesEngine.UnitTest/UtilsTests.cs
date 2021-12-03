@@ -85,9 +85,40 @@ namespace RulesEngine.UnitTest
             Type type = Utils.CreateAbstractClassType(obj);
             Assert.NotEqual(typeof(ExpandoObject), type);
             Assert.NotNull(type.GetProperty("Test"));
-
         }
 
+        [Fact]
+        public void CreateAbstractType_ListOfDynamicObjects()
+        {
+            dynamic exp1 = new ExpandoObject();
+            exp1.Name = "EXP1";
+            dynamic exp2 = new ExpandoObject();
+            exp2.Name = "EXP2";
+            exp2.Date = DateTime.Now;
 
+            dynamic listWrapper = new ExpandoObject();
+            listWrapper.list = new List<ExpandoObject>
+            {
+                exp1,
+                exp2
+            };
+
+            dynamic reversedListWrapper = new ExpandoObject();
+            reversedListWrapper.list = new List<ExpandoObject>
+            {
+                exp2,
+                exp1
+            };
+
+
+            Type type1 = Utils.CreateAbstractClassType(listWrapper);
+            Type type2 = Utils.CreateAbstractClassType(reversedListWrapper);
+            var listPropertyType = type1.GetProperties()[0].PropertyType.GetGenericArguments()[0].GetProperties();
+            var reversedListPropertyType = type2.GetProperties()[0].PropertyType.GetGenericArguments()[0].GetProperties();
+            Assert.Contains(listPropertyType, info => info.Name == "Name");
+            Assert.Contains(listPropertyType, info => info.Name == "Date");
+            Assert.Contains(reversedListPropertyType, info => info.Name == "Name");
+            Assert.Contains(reversedListPropertyType, info => info.Name == "Date");
+        }
     }
 }
