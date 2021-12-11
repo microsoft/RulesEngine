@@ -2,17 +2,45 @@
 
 All notable changes to this project will be documented in this file.
 
+
+## [3.4.0]
+- Made RulesEngine Strong Name and Authenticode signed
+- Renamed few models to streamline names (by @alexrich)
+	- `WorkflowRules` is renamed to `Workflow`
+	- `WorkflowRulesToInject` is renamed to `WorkflowsToInject`
+	- `RuleAction` is renamed to `RuleActions`
+	
+	**Note**: The old models are still supported but will be removed with version 4.0.0
+
+
+## [3.3.0]
+- Added support for actions in nested rules
+- Improved serialization support for System.Text.Json for workflow model
+  
+Breaking Change:
+  - Type of Action has been changed from `Dictionary<ActionTriggerType, ActionInfo>` to `RuleActions`
+    - No impact if you are serializing workflow from json
+    - For workflow objects created in code, refer - [link](https://github.com/microsoft/RulesEngine/pull/182/files#diff-a5093dda2dcc1e4958ce3533edb607bb61406e1f0a9071eca4e317bdd987c0d3)
+
+## [3.2.0]
+- Added AddOrUpdateWorkflow method to update workflows atomically (by @AshishPrasad)
+- Updated dependencies to latest
+
+Breaking Change:
+  - `AddWorkflow` now throws exception if you try to add a workflow which already exists.
+  Use `AddOrUpdateWorkflow` to update existing workflow
+
 ## [3.1.0]
 - Added globalParams feature which can be applied to all rules
 - Enabled localParams support for nested Rules
 - Made certain fields in Rule model optional allowing users to define workflow with minimal fields
 - Added option to disable Rule in workflow json
-- Added `GetAllRegisteredWorkflow` to RulesEngine to return all registeredWorkflows
+- Added `GetAllRegisteredWorkflow` to RulesEngine to return all registered workflows
 - Runtime errors for expressions will now be logged as errorMessage instead of throwing Exceptions by default
 - Fixed RuleParameter passed as null
 
 ## [3.0.2]
-- Fixed LocalParams cache not getting cleaned up when RemoveWorkflow and ClearWorkflows are called
+- Fixed LocalParams cache not getting cleaned up when RemoveWorkflows and ClearWorkflows are called
 
 ## [3.0.1]
 - Moved ActionResult and ActionRuleResult under RulesEngine.Models namespace

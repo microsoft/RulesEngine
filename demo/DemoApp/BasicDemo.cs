@@ -1,13 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.IO;
 using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
 
 namespace DemoApp
@@ -17,45 +14,51 @@ namespace DemoApp
         public void Run()
         {
             Console.WriteLine($"Running {nameof(BasicDemo)}....");
-            var basicInfo = "{\"name\": \"hello\",\"email\": \"abcy@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyalityFactor\": 3,\"totalPurchasesToDate\": 10000}";
-            var orderInfo = "{\"totalOrders\": 5,\"recurringItems\": 2}";
-            var telemetryInfo = "{\"noOfVisitsPerMonth\": 10,\"percentageOfBuyingToVisit\": 15}";
+            List<Workflow> workflows = new List<Workflow>();
+            Workflow workflow = new Workflow();
+            workflow.WorkflowName = "Test Workflow Rule 1";
 
-            var converter = new ExpandoObjectConverter();
+            List<Rule> rules = new List<Rule>();
 
-            dynamic input1 = JsonConvert.DeserializeObject<ExpandoObject>(basicInfo, converter);
-            dynamic input2 = JsonConvert.DeserializeObject<ExpandoObject>(orderInfo, converter);
-            dynamic input3 = JsonConvert.DeserializeObject<ExpandoObject>(telemetryInfo, converter);
+            Rule rule = new Rule();
+            rule.RuleName = "Test Rule";
+            rule.SuccessEvent = "Count is within tolerance.";
+            rule.ErrorMessage = "Over expected.";
+            rule.Expression = "count < 3";
+            rule.RuleExpressionType = RuleExpressionType.LambdaExpression;
 
+            rules.Add(rule);
+
+            workflow.Rules = rules;
+
+            workflows.Add(workflow);
+
+            var bre = new RulesEngine.RulesEngine(workflows.ToArray(), null);
+
+            dynamic datas = new ExpandoObject();
+            datas.count = 1;
             var inputs = new dynamic[]
-                {
-                    input1,
-                    input2,
-                    input3
-                };
+              {
+                    datas
+              };
 
-            var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "Discount.json", SearchOption.AllDirectories);
-            if (files == null || files.Length == 0)
-                throw new Exception("Rules not found.");
+            List<RuleResultTree> resultList = bre.ExecuteAllRulesAsync("Test Workflow Rule 1", inputs).Result;
 
-            var fileData = File.ReadAllText(files[0]);
-            var workflowRules = JsonConvert.DeserializeObject<List<WorkflowRules>>(fileData);
+            bool outcome = false;
 
-            var bre = new RulesEngine.RulesEngine(workflowRules.ToArray(), null);
-
-            string discountOffered = "No discount offered.";
-
-            List<RuleResultTree> resultList = bre.ExecuteAllRulesAsync("Discount", inputs).Result;
+            //Different ways to show test results:
+            outcome = resultList.TrueForAll(r => r.IsSuccess);
 
             resultList.OnSuccess((eventName) => {
-                discountOffered = $"Discount offered is {eventName} % over MRP.";
+                Console.WriteLine($"Result '{eventName}' is as expected.");
+                outcome = true;
             });
 
             resultList.OnFail(() => {
-                discountOffered = "The user is not eligible for any discount.";
+                outcome = false;
             });
 
-            Console.WriteLine(discountOffered);
+            Console.WriteLine($"Test outcome: {outcome}.");
         }
     }
 }

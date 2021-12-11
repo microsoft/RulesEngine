@@ -39,6 +39,12 @@
               }
             ]
           }
+        },
+        "Properties": {
+          "type": "object"
+        },
+        "Actions": {
+          "$ref": "#/definitions/RuleActions"
         }
       },
       "required": [
@@ -53,8 +59,7 @@
       "type": "object",
       "required": [
         "RuleName",
-        "Expression",
-        "RuleExpressionType"
+        "Expression"
       ],
       "properties": {
         "RuleName": {
@@ -79,6 +84,35 @@
         },
         "SuccessEvent": {
           "type": "string"
+        },
+        "Properties": {
+          "type": "object"
+        },
+        "Actions": {
+          "$ref": "#/definitions/RuleActions"
+        }
+      }
+    },
+    "ActionInfo": {
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Context": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "Name"
+      ]
+    },
+    "RuleActions": {
+      "properties": {
+        "OnSuccess": {
+          "$ref": "#/definitions/ActionInfo"
+        },
+        "OnFailure": {
+          "$ref": "#/definitions/ActionInfo"
         }
       }
     }

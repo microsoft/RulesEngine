@@ -26,7 +26,7 @@ namespace RulesEngine.Validators
                    .WithMessage(Constants.OPERATOR_INCORRECT_ERRMSG);
 
                 When(c => c.Rules?.Any() != true, () => {
-                    RuleFor(c => c.WorkflowRulesToInject).NotEmpty().WithMessage(Constants.INJECT_WORKFLOW_RULES_ERRMSG);
+                    RuleFor(c => c.WorkflowsToInject).NotEmpty().WithMessage(Constants.INJECT_WORKFLOW_RULES_ERRMSG);
                 })
                 .Otherwise(() => {
                     RuleFor(c => c.Rules).Must(BeValidRulesList);
@@ -39,7 +39,7 @@ namespace RulesEngine.Validators
         {
             When(c => c.Operator == null && c.RuleExpressionType == RuleExpressionType.LambdaExpression, () => {
                 RuleFor(c => c.Expression).NotEmpty().WithMessage(Constants.LAMBDA_EXPRESSION_EXPRESSION_NULL_ERRMSG);
-                RuleFor(c => c.Rules).Null().WithMessage(Constants.LAMBDA_EXPRESSION_RULES_ERRMSG);
+                RuleFor(c => c.Rules).Empty().WithMessage(Constants.OPERATOR_RULES_ERRMSG);
             });
         }
 

@@ -1,7 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
-
-using RulesEngine.Enums;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -48,16 +46,36 @@ namespace RulesEngine.UnitTest
         public async Task ExecuteActionWorkflowAsync_CalledWithNoActionsInWorkflow_ExecutesSuccessfully()
         {
 
-            var engine = new RulesEngine(GetWorkflowRulesWithoutActions());
+            var engine = new RulesEngine(GetWorkflowsWithoutActions());
             var result = await engine.ExecuteActionWorkflowAsync("NoActionWorkflow", "NoActionTest", new RuleParameter[0]);
             Assert.NotNull(result);
             Assert.Null(result.Output);
         }
 
 
-        private WorkflowRules[] GetWorkflowRulesWithoutActions()
+        [Fact]
+        public async Task ExecuteActionWorkflowAsync_SelfReferencingAction_NoFilter_ExecutesSuccessfully()
         {
-            var workflow1 = new WorkflowRules {
+
+            var engine = new RulesEngine(GetWorkflowWithActions());
+            var result = await engine.ExecuteActionWorkflowAsync("WorkflowWithGlobalsAndSelfRefActions", "RuleReferencingSameWorkflow", new RuleParameter[0]);
+            Assert.NotNull(result);
+            Assert.Null(result.Output);
+        }
+
+        [Fact]
+        public async Task ExecuteActionWorkflowAsync_SelfReferencingAction_WithFilter_ExecutesSuccessfully()
+        {
+
+            var engine = new RulesEngine(GetWorkflowWithActions());
+            var result = await engine.ExecuteActionWorkflowAsync("WorkflowWithGlobalsAndSelfRefActions", "RuleReferencingSameWorkflowWithInputFilter", new RuleParameter[0]);
+            Assert.NotNull(result);
+            Assert.Equal(4,result.Output);
+        }
+
+        private Workflow[] GetWorkflowsWithoutActions()
+        {
+            var workflow1 = new Workflow {
                 WorkflowName = "NoActionWorkflow",
                 Rules = new List<Rule>{
                     new Rule{
@@ -71,43 +89,109 @@ namespace RulesEngine.UnitTest
             return new[] { workflow1 };
         }
 
-        private WorkflowRules[] GetWorkflowWithActions()
+        private Workflow[] GetWorkflowWithActions()
         {
 
-            var workflow1 = new WorkflowRules {
+            var workflow1 = new Workflow {
                 WorkflowName = "ActionWorkflow",
                 Rules = new List<Rule>{
                     new Rule{
                         RuleName = "ExpressionOutputRuleTest",
                         RuleExpressionType = RuleExpressionType.LambdaExpression,
                         Expression = "1 == 1",
-                        Actions = new Dictionary<ActionTriggerType, ActionInfo>{
-                            { ActionTriggerType.onSuccess, new ActionInfo{
+                        Actions = new RuleActions{
+                            OnSuccess = new ActionInfo{
                                 Name = "OutputExpression",
                                 Context = new Dictionary<string, object>{
                                     {"expression", "2*2"}
                                 }
-                            }}
+                            }
                         }
                     },
                     new Rule{
                         RuleName = "EvaluateRuleTest",
                         RuleExpressionType = RuleExpressionType.LambdaExpression,
                         Expression = "1 == 1",
-                        Actions = new Dictionary<ActionTriggerType, ActionInfo>{
-                            { ActionTriggerType.onSuccess, new ActionInfo{
+                        Actions = new RuleActions{
+                            OnSuccess = new ActionInfo{
                                 Name = "EvaluateRule",
                                 Context = new Dictionary<string, object>{
                                     {"workflowName", "ActionWorkflow"},
                                     {"ruleName","ExpressionOutputRuleTest"}
                                 }
-                            }}
+                            }
                         }
                     }
 
                 }
+
+              
             };
-            return new[] { workflow1 };
+
+            var workflow2 = new Workflow {
+                WorkflowName = "WorkflowWithGlobalsAndSelfRefActions",
+                GlobalParams = new[] {
+                    new ScopedParam {
+                        Name = "global1",
+                        Expression = "\"Hello\""
+                    }
+                },
+                Rules = new[] {
+
+                    new Rule{
+                        RuleName = "RuleReferencingSameWorkflow",
+                        Expression = "1 == 1",
+                        Actions = new RuleActions {
+                            OnSuccess = new ActionInfo{
+                                Name = "EvaluateRule",
+                                Context = new Dictionary<string, object>{
+                                    {"workflowName", "WorkflowWithGlobalsAndSelfRefActions"},
+                                    {"ruleName","OtherRule"}
+                                }
+                            }
+                        }
+                    },new Rule{
+                        RuleName = "RuleReferencingSameWorkflowWithInputFilter",
+                        Expression = "1 == 1",
+                        Actions = new RuleActions {
+                            OnSuccess = new ActionInfo{
+                                Name = "EvaluateRule",
+                                Context = new Dictionary<string, object>{
+                                    {"workflowName", "WorkflowWithGlobalsAndSelfRefActions"},
+                                    {"ruleName","OtherRule"},
+                                    {"inputFilter",new string[] { } },
+                                    {"additionalInputs", new [] { 
+                                        new ScopedParam(){
+                                            Name = "additionalValue",
+                                            Expression = "1"
+                                        }
+
+                                    } }
+                                }
+
+                            }
+                        }
+                    }
+
+
+                    , new Rule{
+                        RuleName = "OtherRule",
+                        Expression = "additionalValue == 1",
+                        Actions = new RuleActions {
+                             OnSuccess = new ActionInfo{
+                                Name = "OutputExpression",
+                                Context = new Dictionary<string, object>{
+                                    {"expression", "2*2"}
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+
+            };
+            return new[] { workflow1, workflow2 };
         }
     }
 }

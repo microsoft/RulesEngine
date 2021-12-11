@@ -49,15 +49,15 @@ namespace DemoApp
             }
 
             var fileData = File.ReadAllText(files[0]);
-            var workflowRules = JsonConvert.DeserializeObject<List<WorkflowRules>>(fileData);
+            var Workflows = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
-            var bre = new RulesEngine.RulesEngine(workflowRules.ToArray(), null);
-            foreach (var workflow in workflowRules)
+            var bre = new RulesEngine.RulesEngine(Workflows.ToArray(), null);
+            foreach (var workflow in Workflows)
             {
                 var resultList = bre.ExecuteAllRulesAsync(workflow.WorkflowName, nestedInput).Result;
 
                 resultList.OnSuccess((eventName) => {
-                    Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in succees - {eventName}");
+                    Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in success - {eventName}");
                 }).OnFail(() => {
                     Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in failure");
                 });

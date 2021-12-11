@@ -16,7 +16,7 @@ namespace RulesEngineBenchmark
     {
         private readonly RulesEngine.RulesEngine rulesEngine;
         private readonly object ruleInput;
-        private readonly List<WorkflowRules> workflows;
+        private readonly List<Workflow> workflow;
 
         private class ListItem
         {
@@ -34,9 +34,9 @@ namespace RulesEngineBenchmark
             }
 
             var fileData = File.ReadAllText(files[0]);
-            workflows = JsonConvert.DeserializeObject<List<WorkflowRules>>(fileData);
+            workflow = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
-            rulesEngine = new RulesEngine.RulesEngine(workflows.ToArray(), null, new ReSettings {
+            rulesEngine = new RulesEngine.RulesEngine(workflow.ToArray(), null, new ReSettings {
                 EnableFormattedErrorMessage = false,
                 EnableScopedParams = false
             });
@@ -69,7 +69,7 @@ namespace RulesEngineBenchmark
         [Benchmark]
         public void RuleExecutionDefault()
         {
-            foreach (var workflow in workflows)
+            foreach (var workflow in workflow)
             {
                 _ = rulesEngine.ExecuteAllRulesAsync(workflow.WorkflowName, ruleInput).Result;
             }

@@ -19,7 +19,18 @@ namespace RulesEngine.Actions
             foreach (var kv in context)
             {
                 string key = kv.Key;
-                string value = kv.Value is string ? kv.Value.ToString() : JsonConvert.SerializeObject(kv.Value);
+                string value;
+                switch (kv.Value.GetType().Name)
+                {
+                    case "String":
+                    case "JsonElement":
+                        value =  kv.Value.ToString();
+                        break;
+                    default:
+                        value = JsonConvert.SerializeObject(kv.Value);
+                        break;
+
+                }
                 _context.Add(key, value);
             }
             _parentResult = parentResult;
@@ -29,6 +40,21 @@ namespace RulesEngine.Actions
         {
             return _parentResult;
         }
+
+        public bool TryGetContext<T>(string name,out T output)
+        {
+            try
+            {
+                output =  GetContext<T>(name);
+                return true;
+            }
+            catch(ArgumentException)
+            {
+                output = default(T);
+                return false;
+            }
+        }
+
         public T GetContext<T>(string name)
         {
             try

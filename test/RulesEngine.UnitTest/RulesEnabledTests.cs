@@ -22,8 +22,8 @@ namespace RulesEngine.UnitTest
         [InlineData("RuleEnabledNestedFeatureTest", new bool[] { true, true, false })]
         public async Task RulesEngine_ShouldOnlyExecuteEnabledRules(string workflowName, bool[] expectedRuleResults)
         {
-            var workflows = GetWorkflows();
-            var rulesEngine = new RulesEngine(workflows);
+            var workflow = GetWorkflows();
+            var rulesEngine = new RulesEngine(workflow, reSettings: new ReSettings() { EnableExceptionAsErrorMessage = false });
             var input1 = new {
                 TrueValue = true
             };
@@ -45,7 +45,7 @@ namespace RulesEngine.UnitTest
         public async Task WorkflowUpdatedRuleEnabled_ShouldReflect(string workflowName, bool[] expectedRuleResults)
         {
             var workflow = GetWorkflows().Single(c => c.WorkflowName == workflowName);
-            var rulesEngine = new RulesEngine();
+            var rulesEngine = new RulesEngine(reSettings: new ReSettings() { EnableExceptionAsErrorMessage = false});
             rulesEngine.AddWorkflow(workflow);
             var input1 = new {
                 TrueValue = true
@@ -95,10 +95,10 @@ namespace RulesEngine.UnitTest
             return areAllRulesEnabled;
         }
 
-        private WorkflowRules[] GetWorkflows()
+        private Workflow[] GetWorkflows()
         {
             return new[] {
-                new WorkflowRules {
+                new Workflow {
                     WorkflowName = "RuleEnabledFeatureTest",
                     Rules = new List<Rule> {
                         new Rule {
@@ -118,7 +118,7 @@ namespace RulesEngine.UnitTest
 
                     }
                 },
-                new WorkflowRules {
+                new Workflow {
                     WorkflowName = "RuleEnabledNestedFeatureTest",
                     Rules = new List<Rule> {
                         new Rule {

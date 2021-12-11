@@ -8,7 +8,7 @@ As with any library/package there are public interfaces with which we interact w
 The rules used in this system is mostly comprising of [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions). Anything that can be defined in a lambda expression can be used as a rule in this library.
 
 #### Rules Schema
-Rules schema is available in the [schema file](https://github.com/microsoft/RulesEngine/blob/master/schema/workflowRules-schema.json). The workflow rules are how we store the rules in the system. In our system, the name of the model typed in the library is [WorkflowRules](https://github.com/microsoft/RulesEngine/blob/master/src/RulesEngine/RulesEngine/Models/WorkflowRules.cs). An example json would be – 
+Rules schema is available in the [schema file](https://github.com/microsoft/RulesEngine/blob/main/schema/workflow-schema.json). The workflow rules are how we store the rules in the system. In our system, the name of the model typed in the library is [Workflow](https://github.com/microsoft/RulesEngine/blob/main/src/RulesEngine/Models/Workflow.cs). An example json would be – 
 
 ```json
 [
@@ -61,7 +61,7 @@ Rules schema is available in the [schema file](https://github.com/microsoft/Rule
 ```
 
 This workflow rules showcased in the above json is of a sample [Use Case](https://github.com/microsoft/RulesEngine/wiki/Use-Case) which is going to be used to explain the library. 
-Demo App for the given use case is available at [this location](https://github.com/microsoft/RulesEngine/tree/master/demo).
+Demo App for the given use case is available at [this location](https://github.com/microsoft/RulesEngine/tree/main/demo).
 #### Logger
 Another public interface for custom logging is ILogger. This interface is not implemented and looks for custom implementation of the user who wants to use it. The methods available for this interface are – 
 ```c# 
@@ -112,7 +112,7 @@ new RulesEngine.RulesEngine(workflowRules.ToArray(), null, reSettingsWithCustomT
 ```
 
 #### RuleParameter
-This is a model class for custom inputs which can be seen in the [RuleParameter Class](https://github.com/microsoft/RulesEngine/blob/master/src/RulesEngine/RulesEngine/Models/RuleParameter.cs). This type is present to add another layer of customization to the rules. 
+This is a model class for custom inputs which can be seen in the [RuleParameter Class](https://github.com/microsoft/RulesEngine/blob/main/src/RulesEngine/Models/RuleParameter.cs). This type is present to add another layer of customization to the rules. 
 
 For example, the rules present in the example mentioned in the [Rules Schema](#rules-schema) section are using 3 different inputs for each run. The inputs are of different types as mentioned in the [Use Case]((https://github.com/microsoft/RulesEngine/wiki/Use-Case)) and is coming from different sources. Now, in rules we had to use input1, input2 and input3 to target data coming from the basic info, order info and telemetry info, respectively. 
 
@@ -150,7 +150,7 @@ Below is an example of a complex rule which can be authored easily using logical
 
 
 #### RuleResultTree
-[This model](https://github.com/microsoft/RulesEngine/blob/master/src/RulesEngine/RulesEngine/Models/RuleResultTree.cs) is the output of the Rules Engine. Once the execution of the Rules Engine is completed and the Engine has gone through all the rules, a list of this type is returned. What this model include is – 
+[This model](https://github.com/microsoft/RulesEngine/blob/main/src/RulesEngine/Models/RuleResultTree.cs) is the output of the Rules Engine. Once the execution of the Rules Engine is completed and the Engine has gone through all the rules, a list of this type is returned. What this model include is – 
 ##### Rule
 This is the rule that is currently being referred. It is of a custom model type and has information of that rule which ran on the input. 
 ##### IsSuccess

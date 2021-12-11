@@ -29,8 +29,8 @@ namespace RulesEngine.Interfaces
         /// <summary>
         /// Adds new workflows to RulesEngine
         /// </summary>
-        /// <param name="workflowRules"></param>
-        void AddWorkflow(params WorkflowRules[] workflowRules);
+        /// <param name="workflow"></param>
+        void AddWorkflow(params Workflow[] Workflows);
 
         /// <summary>
         /// Removes all registered workflows from RulesEngine
@@ -44,9 +44,17 @@ namespace RulesEngine.Interfaces
         void RemoveWorkflow(params string[] workflowNames);
 
         /// <summary>
+        /// Checks is workflow exist.
+        /// </summary>
+        /// <param name="workflowName">The workflow name.</param>
+        /// <returns> <c>true</c> if contains the specified workflow name; otherwise, <c>false</c>.</returns>
+        bool ContainsWorkflow(string workflowName);
+
+        /// <summary>
         /// Returns the list of all registered workflow names
         /// </summary>
         /// <returns></returns>
         List<string> GetAllRegisteredWorkflowNames();
+        void AddOrUpdateWorkflow(params Workflow[] Workflows);
     }
 }

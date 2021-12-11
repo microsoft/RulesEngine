@@ -2,13 +2,11 @@
 // Licensed under the MIT License.
 
 using FluentValidation;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RulesEngine.Actions;
-using RulesEngine.Enums;
 using RulesEngine.Exceptions;
 using RulesEngine.ExpressionBuilders;
 using RulesEngine.Interfaces;
@@ -41,13 +39,13 @@ namespace RulesEngine
         #region Constructor
         public RulesEngine(string[] jsonConfig, ILogger logger = null, ReSettings reSettings = null) : this(logger, reSettings)
         {
-            var workflowRules = jsonConfig.Select(item => JsonConvert.DeserializeObject<WorkflowRules>(item)).ToArray();
-            AddWorkflow(workflowRules);
+            var workflow = jsonConfig.Select(item => JsonConvert.DeserializeObject<Workflow>(item)).ToArray();
+            AddWorkflow(workflow);
         }
 
-        public RulesEngine(WorkflowRules[] workflowRules, ILogger logger = null, ReSettings reSettings = null) : this(logger, reSettings)
+        public RulesEngine(Workflow[] Workflows, ILogger logger = null, ReSettings reSettings = null) : this(logger, reSettings)
         {
-            AddWorkflow(workflowRules);
+            AddWorkflow(Workflows);
         }
 
         public RulesEngine(ILogger logger = null, ReSettings reSettings = null)
@@ -104,17 +102,25 @@ namespace RulesEngine
         public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params RuleParameter[] ruleParams)
         {
             var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, ruleParams);
+            await ExecuteActionAsync(ruleResultList);
+            return ruleResultList;
+        }
+
+        private async ValueTask ExecuteActionAsync(IEnumerable<RuleResultTree> ruleResultList)
+        {
             foreach (var ruleResult in ruleResultList)
             {
+                if(ruleResult.ChildResults !=  null)
+                {
+                    await ExecuteActionAsync(ruleResult.ChildResults);
+                }
                 var actionResult = await ExecuteActionForRuleResult(ruleResult, false);
                 ruleResult.ActionResult = new ActionResult {
                     Output = actionResult.Output,
                     Exception = actionResult.Exception
                 };
             }
-            return ruleResultList;
         }
-
 
         public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters)
         {
@@ -125,11 +131,11 @@ namespace RulesEngine
 
         private async ValueTask<ActionRuleResult> ExecuteActionForRuleResult(RuleResultTree resultTree, bool includeRuleResults = false)
         {
-            var triggerType = resultTree?.IsSuccess == true ? ActionTriggerType.onSuccess : ActionTriggerType.onFailure;
+            var ruleActions = resultTree?.Rule?.Actions;
+            var actionInfo = resultTree?.IsSuccess == true ? ruleActions?.OnSuccess : ruleActions?.OnFailure;
 
-            if (resultTree?.Rule?.Actions != null && resultTree.Rule.Actions.ContainsKey(triggerType))
+            if (actionInfo != null)
             {
-                var actionInfo = resultTree.Rule.Actions[triggerType];
                 var action = _actionFactory.Get(actionInfo.Name);
                 var ruleParameters = resultTree.Inputs.Select(kv => new RuleParameter(kv.Key, kv.Value)).ToArray();
                 return await action.ExecuteAndReturnResultAsync(new ActionContext(actionInfo.Context, resultTree), ruleParameters, includeRuleResults);
@@ -149,19 +155,49 @@ namespace RulesEngine
         #region Private Methods
 
         /// <summary>
-        /// Adds the workflow.
+        /// Adds the workflow if the workflow name is not already added. Ignores the rest.
         /// </summary>
-        /// <param name="workflowRules">The workflow rules.</param>
+        /// <param name="workflows">The workflow rules.</param>
         /// <exception cref="RuleValidationException"></exception>
-        public void AddWorkflow(params WorkflowRules[] workflowRules)
+        public void AddWorkflow(params Workflow[] workflows)
         {
             try
             {
-                foreach (var workflowRule in workflowRules)
+                foreach (var workflow in workflows)
+                {                    
+                    var validator = new WorkflowsValidator();
+                    validator.ValidateAndThrow(workflow);
+                    if (!_rulesCache.ContainsWorkflows(workflow.WorkflowName))
+                    {
+                        _rulesCache.AddOrUpdateWorkflows(workflow.WorkflowName, workflow);
+                    }
+                    else
+                    {
+                        throw new ValidationException($"Cannot add workflow `{workflow.WorkflowName}` as it already exists. Use `AddOrUpdateWorkflow` to update existing workflow");
+                    }
+                }
+            }
+            catch (ValidationException ex)
+            {
+                throw new RuleValidationException(ex.Message, ex.Errors);
+            }
+        }
+
+        /// <summary>
+        /// Adds new workflow rules if not previously added.
+        /// Or updates the rules for an existing workflow.
+        /// </summary>
+        /// <param name="workflows">The workflow rules.</param>
+        /// <exception cref="RuleValidationException"></exception>
+        public void AddOrUpdateWorkflow(params Workflow[] workflows)
+        {
+            try
+            {
+                foreach (var workflow in workflows)
                 {
-                    var validator = new WorkflowRulesValidator();
-                    validator.ValidateAndThrow(workflowRule);
-                    _rulesCache.AddOrUpdateWorkflowRules(workflowRule.WorkflowName, workflowRule);
+                    var validator = new WorkflowsValidator();
+                    validator.ValidateAndThrow(workflow);
+                    _rulesCache.AddOrUpdateWorkflows(workflow.WorkflowName, workflow);
                 }
             }
             catch (ValidationException ex)
@@ -176,7 +212,17 @@ namespace RulesEngine
         }
 
         /// <summary>
-        /// Clears the workflows.
+        /// Checks is workflow exist.
+        /// </summary>
+        /// <param name="workflowName">The workflow name.</param>
+        /// <returns> <c>true</c> if contains the specified workflow name; otherwise, <c>false</c>.</returns>
+        public bool ContainsWorkflow(string workflowName)
+        {
+            return _rulesCache.ContainsWorkflows(workflowName);
+        }
+
+        /// <summary>
+        /// Clears the workflow.
         /// </summary>
         public void ClearWorkflows()
         {
@@ -184,7 +230,7 @@ namespace RulesEngine
         }
 
         /// <summary>
-        /// Removes the workflow.
+        /// Removes the workflows.
         /// </summary>
         /// <param name="workflowNames">The workflow names.</param>
         public void RemoveWorkflow(params string[] workflowNames)
@@ -230,18 +276,18 @@ namespace RulesEngine
         private bool RegisterRule(string workflowName, params RuleParameter[] ruleParams)
         {
             var compileRulesKey = GetCompiledRulesKey(workflowName, ruleParams);
-            if (_rulesCache.ContainsCompiledRules(compileRulesKey))
+            if (_rulesCache.AreCompiledRulesUpToDate(compileRulesKey, workflowName))
             {
                 return true;
             }
 
-            var workflowRules = _rulesCache.GetWorkFlowRules(workflowName);
-            if (workflowRules != null)
+            var workflow = _rulesCache.GetWorkflow(workflowName);
+            if (workflow != null)
             {
                 var dictFunc = new Dictionary<string, RuleFunc<RuleResultTree>>();
-                foreach (var rule in workflowRules.Rules.Where(c => c.Enabled))
+                foreach (var rule in workflow.Rules.Where(c => c.Enabled))
                 {
-                    dictFunc.Add(rule.RuleName, CompileRule(rule, ruleParams, workflowRules.GlobalParams?.ToArray()));
+                    dictFunc.Add(rule.RuleName, CompileRule(rule, ruleParams, workflow.GlobalParams?.ToArray()));
                 }
 
                 _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, dictFunc);
@@ -257,7 +303,7 @@ namespace RulesEngine
 
         private RuleFunc<RuleResultTree> CompileRule(string workflowName, string ruleName, RuleParameter[] ruleParameters)
         {
-            var workflow = _rulesCache.GetWorkFlowRules(workflowName);
+            var workflow = _rulesCache.GetWorkflow(workflowName);
             if(workflow == null)
             {
                 throw new ArgumentException($"Workflow `{workflowName}` is not found");
@@ -309,7 +355,7 @@ namespace RulesEngine
         {
             return new Dictionary<string, Func<ActionBase>>{
                 {"OutputExpression",() => new OutputExpressionAction(_ruleExpressionParser) },
-                {"EvaluateRule", () => new EvaluateRuleAction(this) }
+                {"EvaluateRule", () => new EvaluateRuleAction(this,_ruleExpressionParser) }
             };
         }
 
