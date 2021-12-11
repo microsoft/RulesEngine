@@ -28,6 +28,8 @@ RulesEngine is a highly extensible library to build rule based system using C# e
   - [Inbuilt Actions](#inbuilt-actions)
     - [OutputExpression](#outputexpression)
       - [Usage](#usage)
+    - [EvaluateRule](#evaluaterule)
+      - [Usage](#usage-1)
   - [Custom Actions](#custom-actions)
     - [Steps to use a custom Action](#steps-to-use-a-custom-action)
 
