@@ -37,7 +37,6 @@ namespace RulesEngine.Data
                     v => JsonSerializer.Serialize(v, null),
                    v => JsonSerializer.Deserialize<RuleActions>(v, null));
 
-                entity.Ignore(b => b.WorkflowRulesToInject);
                 entity.Ignore(b => b.WorkflowsToInject);
             });
         }
