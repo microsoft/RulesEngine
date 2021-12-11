@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.5.0]
+- `EvaluateRule` action now support custom inputs and filtered inputs
+- Added `ContainsWorkflow` method in RulesEngine (by @okolobaxa)
+- Fixed minor bugs (#258 & #259)
 
 ## [3.4.0]
 - Made RulesEngine Strong Name and Authenticode signed

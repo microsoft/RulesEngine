@@ -28,6 +28,8 @@ RulesEngine is a highly extensible library to build rule based system using C# e
   - [Inbuilt Actions](#inbuilt-actions)
     - [OutputExpression](#outputexpression)
       - [Usage](#usage)
+    - [EvaluateRule](#evaluaterule)
+      - [Usage](#usage-1)
   - [Custom Actions](#custom-actions)
     - [Steps to use a custom Action](#steps-to-use-a-custom-action)
 
@@ -319,6 +321,83 @@ Call `ExecuteAllRulesAsync` with the workflowName, ruleName and ruleParameters
    }
    
 ```
+
+#### EvaluateRule
+This action allows chaining of rules along with their actions. It also supports filtering inputs provided to chained rule as well as providing custom inputs
+
+##### Usage
+Define OnSuccess or OnFailure Action for your Rule:
+```jsonc
+{
+  "WorkflowName": "inputWorkflow",
+  "Rules": [
+    {
+        "RuleName": "GiveDiscount20Percent",
+        "Expression": "input1.couy == \"india\" AND input1.loyalityFactor <= 5 AND input1.totalPurchasesToDate >= 20000",
+        "Actions": {
+           "OnSuccess": {
+              "Name": "OutputExpression",  //Name of action you want to call
+              "Context": {  //This is passed to the action as action context
+                 "Expression": "input1.TotalBilled * 0.8"
+              }
+           },
+           "OnFailure": { // This will execute if the Rule evaluates to failure
+               "Name": "EvaluateRule",
+               "Context": {
+                   "WorkflowName": "inputWorkflow",
+                   "ruleName": "GiveDiscount10Percent"
+               }
+           }
+        }
+    },
+    {
+      "RuleName": "GiveDiscount10Percent",
+      "SuccessEvent": "10",
+      "ErrorMessage": "One or more adjust rules failed.",
+      "ErrorType": "Error",
+      "RuleExpressionType": "LambdaExpression",
+      "Expression": "input1.couy == \"india\" AND input1.loyalityFactor <= 2 AND input1.totalPurchasesToDate >= 5000 AND input2.totalOrders > 2 AND input2.noOfVisitsPerMonth > 2",
+      "Actions": {
+         "OnSuccess": {
+            "Name": "OutputExpression",  //Name of action you want to call
+            "Context": {  //This is passed to the action as action context
+               "Expression": "input1.TotalBilled * 0.9"
+            }
+         }
+      }
+    }
+  ]
+}
+```
+Call `ExecuteActionWorkflowAsync` with the workflowName, ruleName and ruleParameters
+```c#
+   var result = await rulesEngine.ExecuteActionWorkflowAsync("inputWorkflow","GiveDiscount20Percent",ruleParameters);
+   Console.WriteLine(result.Output); //result.Output contains the evaluated value of the action
+```
+
+In the above scenario if `GiveDiscount20Percent` succeeds, it will return 20 percent discount in output. If it fails, `EvaluateRule` action will call `GiveDiscount10Percent` internally and if it succeeds, it will return 10 percent discount in output.
+
+EvaluateRule also supports passing filtered inputs and computed inputs to chained rule
+```jsonc
+ "Actions": {
+         "OnSuccess": {
+            "Name": "EvaluateRule",
+               "Context": {
+                   "WorkflowName": "inputWorkflow",
+                   "ruleName": "GiveDiscount10Percent",
+                   "inputFilter": ["input2"], //will only pass input2 from existing inputs,scopedparams to the chained rule
+                   "additionalInputs":[ // will pass a new input named currentDiscount with the result of the expression to the chained rule
+                     {
+                       "Name": "currentDiscount",
+                       "Expression": "input1.TotalBilled * 0.9"
+                     }
+                   ]
+               }
+         }
+      }
+
+```
+
 
 ### Custom Actions
 RulesEngine allows registering custom actions which can be used in the rules workflow.
