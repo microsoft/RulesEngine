@@ -24,8 +24,8 @@
     <DelaySign>True</DelaySign>
     <Deterministic>true</Deterministic>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <AssemblyVersion>3.5.7.7</AssemblyVersion>
-    <FileVersion>3.5.7.7</FileVersion>
+    <AssemblyVersion>3.5.8.8</AssemblyVersion>
+    <FileVersion>3.5.8.8</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

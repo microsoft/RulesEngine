@@ -4,8 +4,8 @@
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\signing\RulesEngine-publicKey.snk</AssemblyOriginatorKeyFile>
     <DelaySign>True</DelaySign>
-    <AssemblyVersion>1.0.7.7</AssemblyVersion>
-    <FileVersion>1.0.7.7</FileVersion>
+    <AssemblyVersion>1.0.8.8</AssemblyVersion>
+    <FileVersion>1.0.8.8</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.17.0" />
