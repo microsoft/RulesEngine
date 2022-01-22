@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6</TargetFramework>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\signing\RulesEngine-publicKey.snk</AssemblyOriginatorKeyFile>
     <DelaySign>True</DelaySign>
-    <AssemblyVersion>1.0.3.3</AssemblyVersion>
-    <FileVersion>1.0.3.3</FileVersion>
+    <AssemblyVersion>1.0.7.7</AssemblyVersion>
+    <FileVersion>1.0.7.7</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.17.0" />

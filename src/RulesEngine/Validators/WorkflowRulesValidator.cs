@@ -12,7 +12,7 @@ namespace RulesEngine.Validators
     {
         public WorkflowsValidator()
         {
-            RuleFor(c => c.WorkflowName).NotEmpty().WithMessage(Constants.WORKFLOW_NAME_NULL_ERRMSG);
+            RuleFor(c => c.Name).NotEmpty().WithMessage(Constants.WORKFLOW_NAME_NULL_ERRMSG);
             When(c => c.Rules?.Any() != true, () => {
                 RuleFor(c => c.WorkflowsToInject).NotEmpty().WithMessage(Constants.INJECT_WORKFLOW_RULES_ERRMSG);
             }).Otherwise(() => {

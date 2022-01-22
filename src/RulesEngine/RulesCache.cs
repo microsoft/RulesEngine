@@ -27,7 +27,7 @@ namespace RulesEngine
             return _workflow.ContainsKey(workflowName);
         }
 
-        public List<string> GetAllWorkflowNames()
+        public List<string> GetAllNames()
         {
             return _workflow.Keys.ToList();
         }

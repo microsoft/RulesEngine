@@ -16,7 +16,7 @@ namespace RulesEngine.Validators
         private readonly List<ExpressionType> _nestedOperators = new List<ExpressionType> { ExpressionType.And, ExpressionType.AndAlso, ExpressionType.Or, ExpressionType.OrElse };
         public RuleValidator()
         {
-            RuleFor(c => c.RuleName).NotEmpty().WithMessage(Constants.RULE_NAME_NULL_ERRMSG);
+            RuleFor(c => c.Name).NotEmpty().WithMessage(Constants.RULE_NAME_NULL_ERRMSG);
 
             //Nested expression check
             When(c => c.Operator != null, () => {

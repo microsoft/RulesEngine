@@ -25,7 +25,7 @@ namespace RulesEngine.Extensions
             var successfulRuleResult = ruleResultTrees.FirstOrDefault(ruleResult => ruleResult.IsSuccess == true);
             if (successfulRuleResult != null)
             {
-                var eventName = successfulRuleResult.Rule.SuccessEvent ?? successfulRuleResult.Rule.RuleName;
+                var eventName = successfulRuleResult.Rule.SuccessEvent ?? successfulRuleResult.Rule.Name;
                 onSuccessFunc(eventName);
             }
 

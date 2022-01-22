@@ -71,7 +71,7 @@ namespace RulesEngineBenchmark
         {
             foreach (var workflow in workflow)
             {
-                _ = rulesEngine.ExecuteAllRulesAsync(workflow.WorkflowName, ruleInput).Result;
+                _ = rulesEngine.ExecuteAllRulesAsync(workflow.Name, ruleInput).Result;
             }
         }
     }

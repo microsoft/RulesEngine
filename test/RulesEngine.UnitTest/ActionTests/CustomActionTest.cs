@@ -55,10 +55,10 @@ namespace RulesEngine.UnitTest.ActionTests
         {
             return new Workflow[] {
                 new Workflow {
-                    WorkflowName = "successReturnContextAction",
+                    Name = "successReturnContextAction",
                     Rules = new Rule[] {
                         new Rule {
-                            RuleName = "trueRule",
+                            Name = "trueRule",
                             Expression = "input1 == true",
                             Actions = new RuleActions() {
                                 OnSuccess = new ActionInfo {

@@ -4,8 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>DemoApp.EFDataExample</RootNamespace>
     <AssemblyName>DemoApp.EFDataExample</AssemblyName>
-    <AssemblyVersion>1.0.3.3</AssemblyVersion>
-    <FileVersion>1.0.3.3</FileVersion>
+    <AssemblyVersion>1.0.7.7</AssemblyVersion>
+    <FileVersion>1.0.7.7</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

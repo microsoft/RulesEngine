@@ -58,10 +58,10 @@ namespace RulesEngine.UnitTest
         {
             return new[] {
                 new Workflow {
-                    WorkflowName = "NestedRulesTest",
+                    Name = "NestedRulesTest",
                     Rules = new Rule[] {
                         new Rule {
-                            RuleName = "TestRule",
+                            Name = "TestRule",
                             RuleExpressionType = RuleExpressionType.LambdaExpression,
                         }
                     }
@@ -73,18 +73,18 @@ namespace RulesEngine.UnitTest
         {
             return new[] {
                 new Workflow {
-                    WorkflowName = "NestedRulesTest",
+                    Name = "NestedRulesTest",
                     Rules = new Rule[] {
                         new Rule {
-                            RuleName = "AndRuleTrueFalse",
+                            Name = "AndRuleTrueFalse",
                             Expression = "true == true",
                             Rules = new Rule[] {
                                 new Rule{
-                                    RuleName = "trueRule1",
+                                    Name = "trueRule1",
                                     Expression = "input1.TrueValue == true",
                                 },
                                 new Rule {
-                                    RuleName = "falseRule1",
+                                    Name = "falseRule1",
                                     Expression = "input1.TrueValue == false"
                                 }
 

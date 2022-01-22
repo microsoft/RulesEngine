@@ -26,7 +26,7 @@ namespace RulesEngine.UnitTest
                     IsSuccess = true,
                     Rule = new Rule()
                     {
-                        RuleName = "Test Rule 1"
+                        Name = "Test Rule 1"
                     }
                 },
                 new RuleResultTree()
@@ -37,7 +37,7 @@ namespace RulesEngine.UnitTest
                     IsSuccess = false,
                     Rule = new Rule()
                     {
-                        RuleName = "Test Rule 2"
+                        Name = "Test Rule 2"
                     }
                 },
 
@@ -65,7 +65,7 @@ namespace RulesEngine.UnitTest
                     IsSuccess = true,
                     Rule = new Rule()
                     {
-                        RuleName = "Test Rule 1",
+                        Name = "Test Rule 1",
                         SuccessEvent = "Event 1"
                     }
                 },
@@ -77,7 +77,7 @@ namespace RulesEngine.UnitTest
                     IsSuccess = false,
                     Rule = new Rule()
                     {
-                        RuleName = "Test Rule 2"
+                        Name = "Test Rule 2"
                     }
                 },
 
@@ -105,7 +105,7 @@ namespace RulesEngine.UnitTest
                     IsSuccess = false,
                     Rule = new Rule()
                     {
-                        RuleName = "Test Rule 1"
+                        Name = "Test Rule 1"
                     }
                 },
                 new RuleResultTree()
@@ -116,7 +116,7 @@ namespace RulesEngine.UnitTest
                     IsSuccess = false,
                     Rule = new Rule()
                     {
-                        RuleName = "Test Rule 2"
+                        Name = "Test Rule 2"
                     }
                 },
 
@@ -145,7 +145,7 @@ namespace RulesEngine.UnitTest
                     IsSuccess = true,
                     Rule = new Rule()
                     {
-                        RuleName = "Test Rule 1"
+                        Name = "Test Rule 1"
                     }
                 },
                 new RuleResultTree()
@@ -156,7 +156,7 @@ namespace RulesEngine.UnitTest
                     IsSuccess = false,
                     Rule = new Rule()
                     {
-                        RuleName = "Test Rule 2"
+                        Name = "Test Rule 2"
                     }
                 },
 
@@ -184,7 +184,7 @@ namespace RulesEngine.UnitTest
                     IsSuccess = false,
                     Rule = new Rule()
                     {
-                        RuleName = "Test Rule 1"
+                        Name = "Test Rule 1"
                     }
                 },
                 new RuleResultTree()
@@ -195,7 +195,7 @@ namespace RulesEngine.UnitTest
                     IsSuccess = false,
                     Rule = new Rule()
                     {
-                        RuleName = "Test Rule 2"
+                        Name = "Test Rule 2"
                     }
                 },
 

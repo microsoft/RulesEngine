@@ -16,32 +16,8 @@ namespace RulesEngine.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<ScopedParam>()
-              .HasKey(k => k.Name);
-
-            modelBuilder.Entity<Workflow>(entity => {
-                entity.HasKey(k => k.WorkflowName);
-                entity.Ignore(b => b.WorkflowsToInject);
-            });
-
-            modelBuilder.Entity<Rule>(entity => {
-                entity.HasKey(k => k.RuleName);
-
-                entity.Property(b => b.Properties)
-                .HasConversion(
-                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, (JsonSerializerOptions)null));
-
-                entity.Property(p => p.Actions)
-                .HasConversion(
-                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-                   v => JsonSerializer.Deserialize<RuleActions>(v, (JsonSerializerOptions)null));
-
-                entity.Ignore(b => b.WorkflowsToInject);
-            });
-
             //modelBuilder.Entity<RulesEngine.Models.Rule>(entity => {
-            //    entity.HasKey(k => k.RuleName); //adds shadow property RuleName1
+            //    entity.HasKey(k => k.Name); //adds shadow property Name1
             //    entity.Ignore(b => b.WorkflowsToInject);
             //    entity.Ignore(b => b.WorkflowRulesToInject); //has a get which is why this line is necessary
 

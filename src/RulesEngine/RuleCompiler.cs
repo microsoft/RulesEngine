@@ -74,7 +74,7 @@ namespace RulesEngine
             }
             catch (Exception ex)
             {
-                var message = $"Error while compiling rule `{rule.RuleName}`: {ex.Message}";
+                var message = $"Error while compiling rule `{rule.Name}`: {ex.Message}";
                 _logger.LogError(message);
                 return Helpers.ToRuleExceptionResult(_reSettings, rule, new RuleException(message, ex));
             }
@@ -256,7 +256,7 @@ namespace RulesEngine
                 }
                 catch(Exception ex)
                 {
-                    var message = $"Error while executing scoped params for rule `{rule.RuleName}` - {ex}";
+                    var message = $"Error while executing scoped params for rule `{rule.Name}` - {ex}";
                     var resultFn = Helpers.ToRuleExceptionResult(_reSettings, rule, new RuleException(message, ex));
                     return resultFn(ruleParams);
                 }
