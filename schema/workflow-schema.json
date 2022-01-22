@@ -4,7 +4,7 @@
     "Rule": {
       "title": "Rule",
       "properties": {
-        "RuleName": {
+        "Name": {
           "type": "string"
         },
         "Operator": {
@@ -48,7 +48,7 @@
         }
       },
       "required": [
-        "RuleName",
+        "Name",
         "Operator",
         "Rules"
       ],
@@ -58,11 +58,11 @@
       "title": "Leaf Rule",
       "type": "object",
       "required": [
-        "RuleName",
+        "Name",
         "Expression"
       ],
       "properties": {
-        "RuleName": {
+        "Name": {
           "type": "string"
         },
         "Expression": {

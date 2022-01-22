@@ -1,8 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6</TargetFramework>
+    <AssemblyVersion>1.0.8.8</AssemblyVersion>
+    <FileVersion>1.0.8.8</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

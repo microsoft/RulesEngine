@@ -28,7 +28,7 @@ namespace RulesEngine.HelperFunctions
                 }
                 catch (Exception ex)
                 {
-                    exceptionMessage = GetExceptionMessage($"Error while executing rule : {rule?.RuleName} - {ex.Message}", reSettings);
+                    exceptionMessage = GetExceptionMessage($"Error while executing rule : {rule?.Name} - {ex.Message}", reSettings);
                     HandleRuleException(new RuleException(exceptionMessage,ex), rule, reSettings);
                     isSuccess = false;
                 }
@@ -53,7 +53,7 @@ namespace RulesEngine.HelperFunctions
 
         internal static void HandleRuleException(Exception ex, Rule rule, ReSettings reSettings)
         {
-            ex.Data.Add(nameof(rule.RuleName), rule.RuleName);
+            ex.Data.Add(nameof(rule.Name), rule.Name);
             ex.Data.Add(nameof(rule.Expression), rule.Expression);
 
             if (!reSettings.EnableExceptionAsErrorMessage)
@@ -92,7 +92,7 @@ namespace RulesEngine.HelperFunctions
                 if (!ruleResultTree.IsSuccess)
                 {
                     string errMsg = ruleResultTree.Rule.ErrorMessage;
-                    errMsg = string.IsNullOrEmpty(errMsg) ? $"Error message is not configured for {ruleResultTree.Rule.RuleName}" : errMsg;
+                    errMsg = string.IsNullOrEmpty(errMsg) ? $"Error message is not configured for {ruleResultTree.Rule.Name}" : errMsg;
 
                     if (ruleResultTree.Rule.ErrorType == ErrorType.Error && !ruleResultMessage.ErrorMessages.Contains(errMsg))
                     {

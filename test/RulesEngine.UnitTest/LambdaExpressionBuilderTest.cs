@@ -29,13 +29,13 @@ namespace RulesEngine.UnitTest
 
 
             var mainRule = new Rule {
-                RuleName = "rule1",
+                Name = "rule1",
                 Operator = "And",
                 Rules = new List<Rule>()
             };
 
             var dummyRule = new Rule {
-                RuleName = "testRule1",
+                Name = "testRule1",
                 RuleExpressionType = RuleExpressionType.LambdaExpression,
                 Expression = "RequestType == \"vod\""
             };

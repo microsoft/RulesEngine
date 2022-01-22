@@ -25,10 +25,10 @@ An example rule:
 ```json
 [
   {
-    "WorkflowName": "Discount",
+    "Name": "Discount",
     "Rules": [
       {
-        "RuleName": "GiveDiscount10",
+        "Name": "GiveDiscount10",
         "SuccessEvent": "10",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
@@ -36,7 +36,7 @@ An example rule:
         "Expression": "input1.country == \"india\" AND input1.loyaltyFactor <= 2 AND input1.totalPurchasesToDate >= 5000"
       },
       {
-        "RuleName": "GiveDiscount20",
+        "Name": "GiveDiscount20",
         "SuccessEvent": "20",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
@@ -77,7 +77,7 @@ A simple example via code only is as follows:
 List<Rule> rules = new List<Rule>();
 
 Rule rule = new Rule();
-rule.RuleName = "Test Rule";
+rule.Name = "Test Rule";
 rule.SuccessEvent = "Count is within tolerance.";
 rule.ErrorMessage = "Over expected.";
 rule.Expression = "count < 3";
@@ -85,7 +85,7 @@ rule.RuleExpressionType = RuleExpressionType.LambdaExpression;
 rules.Add(rule);
 
 Workflow workflow = new Workflow();
-workflow.WorkflowName = "Example Workflow";
+workflow.Name = "Example Workflow";
 workflow.Rules = rules;
 workflow.Add(workflowRule);
 

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.5.1]
+- Updated nuget packages to support Net6
+- Supports EF Core 6 Code First
+- renamed Rule.RuleName to Rule.Name
+- renamed Workflow.WorkflowName to Workflow.Name
+- added PrimaryKeys to Workflow, Rule & ScopedParam classes
+
 ## [3.5.0]
 - `EvaluateRule` action now support custom inputs and filtered inputs
 - Added `ContainsWorkflow` method in RulesEngine (by @okolobaxa)
@@ -67,7 +74,7 @@ Breaking Change:
 - Added `Properties` field to Rule to allow custom fields to Rule
 
 ## [2.1.4] - 15-10-2020
-- Added exception data properties to identify RuleName.
+- Added exception data properties to identify Name.
 
 ## [2.1.3] - 12-10-2020
 - Optional parameter for rethrow exception on failure of expression compilation.

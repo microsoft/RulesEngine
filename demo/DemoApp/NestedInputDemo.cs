@@ -54,12 +54,12 @@ namespace DemoApp
             var bre = new RulesEngine.RulesEngine(Workflows.ToArray(), null);
             foreach (var workflow in Workflows)
             {
-                var resultList = bre.ExecuteAllRulesAsync(workflow.WorkflowName, nestedInput).Result;
+                var resultList = bre.ExecuteAllRulesAsync(workflow.Name, nestedInput).Result;
 
                 resultList.OnSuccess((eventName) => {
-                    Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in success - {eventName}");
+                    Console.WriteLine($"{workflow.Name} evaluation resulted in success - {eventName}");
                 }).OnFail(() => {
-                    Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in failure");
+                    Console.WriteLine($"{workflow.Name} evaluation resulted in failure");
                 });
 
             }

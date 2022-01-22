@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
 
+using System;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace RulesEngine.Models
@@ -10,6 +12,19 @@ namespace RulesEngine.Models
     [ExcludeFromCodeCoverage]
     public class ScopedParam
     {
+        /// <summary>
+        /// default contructor
+        /// </summary>
+        public ScopedParam()
+        {
+            this.Id = Guid.NewGuid();
+        }
+
+        /// <summary>
+        /// Id is Primary Key in Database
+        /// </summary>
+        [Key]
+        public Guid Id { get; private set; }
 
         /// <summary>
         /// Gets or sets the name of the param.

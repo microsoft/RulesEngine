@@ -54,7 +54,7 @@ namespace RulesEngine.Interfaces
         /// Returns the list of all registered workflow names
         /// </summary>
         /// <returns></returns>
-        List<string> GetAllRegisteredWorkflowNames();
+        List<string> GetAllRegisteredNames();
         void AddOrUpdateWorkflow(params Workflow[] Workflows);
     }
 }

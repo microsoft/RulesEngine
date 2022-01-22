@@ -16,12 +16,12 @@ namespace DemoApp
             Console.WriteLine($"Running {nameof(BasicDemo)}....");
             List<Workflow> workflows = new List<Workflow>();
             Workflow workflow = new Workflow();
-            workflow.WorkflowName = "Test Workflow Rule 1";
+            workflow.Name = "Test Workflow Rule 1";
 
             List<Rule> rules = new List<Rule>();
 
             Rule rule = new Rule();
-            rule.RuleName = "Test Rule";
+            rule.Name = "Test Rule";
             rule.SuccessEvent = "Count is within tolerance.";
             rule.ErrorMessage = "Over expected.";
             rule.Expression = "count < 3";

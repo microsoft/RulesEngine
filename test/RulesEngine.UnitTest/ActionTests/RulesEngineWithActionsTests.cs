@@ -30,11 +30,11 @@ namespace RulesEngine.UnitTest
             var result = await engine.ExecuteActionWorkflowAsync("ActionWorkflow", "EvaluateRuleTest", new RuleParameter[0]);
             Assert.NotNull(result);
             Assert.Equal(2 * 2, result.Output);
-            Assert.Contains(result.Results, c => c.Rule.RuleName == "ExpressionOutputRuleTest");
+            Assert.Contains(result.Results, c => c.Rule.Name == "ExpressionOutputRuleTest");
         }
 
         [Fact]
-        public async Task ExecuteActionWorkflowAsync_CalledWithIncorrectWorkflowOrRuleName_ThrowsArgumentException()
+        public async Task ExecuteActionWorkflowAsync_CalledWithIncorrectWorkflowOrName_ThrowsArgumentException()
         {
             var engine = new RulesEngine(GetWorkflowWithActions());
             await Assert.ThrowsAsync<ArgumentException>(async () => await engine.ExecuteActionWorkflowAsync("WrongWorkflow", "ExpressionOutputRuleTest", new RuleParameter[0]));
@@ -76,10 +76,10 @@ namespace RulesEngine.UnitTest
         private Workflow[] GetWorkflowsWithoutActions()
         {
             var workflow1 = new Workflow {
-                WorkflowName = "NoActionWorkflow",
+                Name = "NoActionWorkflow",
                 Rules = new List<Rule>{
                     new Rule{
-                        RuleName = "NoActionTest",
+                        Name = "NoActionTest",
                         RuleExpressionType = RuleExpressionType.LambdaExpression,
                         Expression = "1 == 1",
                     }
@@ -93,10 +93,10 @@ namespace RulesEngine.UnitTest
         {
 
             var workflow1 = new Workflow {
-                WorkflowName = "ActionWorkflow",
+                Name = "ActionWorkflow",
                 Rules = new List<Rule>{
                     new Rule{
-                        RuleName = "ExpressionOutputRuleTest",
+                        Name = "ExpressionOutputRuleTest",
                         RuleExpressionType = RuleExpressionType.LambdaExpression,
                         Expression = "1 == 1",
                         Actions = new RuleActions{
@@ -109,7 +109,7 @@ namespace RulesEngine.UnitTest
                         }
                     },
                     new Rule{
-                        RuleName = "EvaluateRuleTest",
+                        Name = "EvaluateRuleTest",
                         RuleExpressionType = RuleExpressionType.LambdaExpression,
                         Expression = "1 == 1",
                         Actions = new RuleActions{
@@ -129,7 +129,7 @@ namespace RulesEngine.UnitTest
             };
 
             var workflow2 = new Workflow {
-                WorkflowName = "WorkflowWithGlobalsAndSelfRefActions",
+                Name = "WorkflowWithGlobalsAndSelfRefActions",
                 GlobalParams = new[] {
                     new ScopedParam {
                         Name = "global1",
@@ -139,7 +139,7 @@ namespace RulesEngine.UnitTest
                 Rules = new[] {
 
                     new Rule{
-                        RuleName = "RuleReferencingSameWorkflow",
+                        Name = "RuleReferencingSameWorkflow",
                         Expression = "1 == 1",
                         Actions = new RuleActions {
                             OnSuccess = new ActionInfo{
@@ -151,7 +151,7 @@ namespace RulesEngine.UnitTest
                             }
                         }
                     },new Rule{
-                        RuleName = "RuleReferencingSameWorkflowWithInputFilter",
+                        Name = "RuleReferencingSameWorkflowWithInputFilter",
                         Expression = "1 == 1",
                         Actions = new RuleActions {
                             OnSuccess = new ActionInfo{
@@ -175,7 +175,7 @@ namespace RulesEngine.UnitTest
 
 
                     , new Rule{
-                        RuleName = "OtherRule",
+                        Name = "OtherRule",
                         Expression = "additionalValue == 1",
                         Actions = new RuleActions {
                              OnSuccess = new ActionInfo{

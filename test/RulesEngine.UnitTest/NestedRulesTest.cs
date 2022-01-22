@@ -112,63 +112,63 @@ namespace RulesEngine.UnitTest
         {
             return new[] {
                 new Workflow {
-                    WorkflowName = "NestedRulesTest",
+                    Name = "NestedRulesTest",
                     Rules = new Rule[] {
                         new Rule {
-                            RuleName = "AndRuleTrueFalse",
+                            Name = "AndRuleTrueFalse",
                             Operator = "And",
                             Rules = new Rule[] {
                                 new Rule{
-                                    RuleName = "trueRule1",
+                                    Name = "trueRule1",
                                     Expression = "input1.TrueValue == true",
                                 },
                                 new Rule {
-                                    RuleName = "falseRule1",
+                                    Name = "falseRule1",
                                     Expression = "input1.TrueValue == false"
                                 }
 
                             }
                         },
                         new Rule {
-                            RuleName = "OrRuleTrueFalse",
+                            Name = "OrRuleTrueFalse",
                             Operator = "Or",
                             Rules = new Rule[] {
                                 new Rule{
-                                    RuleName = "trueRule2",
+                                    Name = "trueRule2",
                                     Expression = "input1.TrueValue == true",
                                 },
                                 new Rule {
-                                    RuleName = "falseRule2",
+                                    Name = "falseRule2",
                                     Expression = "input1.TrueValue == false"
                                 }
 
                             }
                         },
                         new Rule {
-                            RuleName = "AndRuleFalseTrue",
+                            Name = "AndRuleFalseTrue",
                             Operator = "And",
                             Rules = new Rule[] {
                                 new Rule{
-                                    RuleName = "trueRule3",
+                                    Name = "trueRule3",
                                     Expression = "input1.TrueValue == false",
                                 },
                                 new Rule {
-                                    RuleName = "falseRule4",
+                                    Name = "falseRule4",
                                     Expression = "input1.TrueValue == true"
                                 }
 
                             }
                         },
                          new Rule {
-                            RuleName = "OrRuleFalseTrue",
+                            Name = "OrRuleFalseTrue",
                             Operator = "Or",
                             Rules = new Rule[] {
                                 new Rule{
-                                    RuleName = "trueRule3",
+                                    Name = "trueRule3",
                                     Expression = "input1.TrueValue == false",
                                 },
                                 new Rule {
-                                    RuleName = "falseRule4",
+                                    Name = "falseRule4",
                                     Expression = "input1.TrueValue == true"
                                 }
 
@@ -177,14 +177,14 @@ namespace RulesEngine.UnitTest
                     }
                 },
                 new Workflow {
-                    WorkflowName = "NestedRulesActionsTest",
+                    Name = "NestedRulesActionsTest",
                     Rules = new Rule[] {
                         new Rule {
-                            RuleName = "AndRuleTrueFalse",
+                            Name = "AndRuleTrueFalse",
                             Operator = "And",
                             Rules = new Rule[] {
                                 new Rule{
-                                    RuleName = "trueRule1",
+                                    Name = "trueRule1",
                                     Expression = "input1.TrueValue == true",
                                     Actions =  new RuleActions {
                                         OnSuccess = new ActionInfo{
@@ -196,7 +196,7 @@ namespace RulesEngine.UnitTest
                                     }
                                 },
                                 new Rule {
-                                    RuleName = "falseRule1",
+                                    Name = "falseRule1",
                                     Expression = "input1.TrueValue == false",
                                     Actions =  new RuleActions {
                                         OnFailure = new ActionInfo{

@@ -58,7 +58,7 @@ namespace RulesEngine.UnitTest
             var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
             Assert.True(result.All(c => c.IsSuccess));
 
-            var workflowToUpdate = workflow.Single(c => c.WorkflowName == workflowName);
+            var workflowToUpdate = workflow.Single(c => c.Name == workflowName);
             engine.RemoveWorkflow(workflowName);
             workflowToUpdate.GlobalParams.First().Expression = "true == false";
             engine.AddWorkflow(workflowToUpdate);
@@ -143,7 +143,7 @@ namespace RulesEngine.UnitTest
 
         private void CheckResultTreeContainsAllInputs(string workflowName, List<RuleResultTree> result)
         {
-            var workflow = GetWorkflowList().Single(c => c.WorkflowName == workflowName);
+            var workflow = GetWorkflowList().Single(c => c.Name == workflowName);
             var expectedInputs = new List<string>() { "input1" };
             expectedInputs.AddRange(workflow.GlobalParams?.Select(c => c.Name) ?? new List<string>());
 
@@ -180,20 +180,20 @@ namespace RulesEngine.UnitTest
         {
             return new Workflow[] {
                 new Workflow {
-                    WorkflowName = "NoLocalAndGlobalParams",
+                    Name = "NoLocalAndGlobalParams",
                     Rules = new List<Rule> {
                         new Rule {
-                            RuleName = "TruthTest",
+                            Name = "TruthTest",
                             Expression = "input1.trueValue"
                         }
                     }
                 },
                 new Workflow {
-                    WorkflowName = "LocalParamsOnly",
+                    Name = "LocalParamsOnly",
                     Rules = new List<Rule> {
                         new Rule {
 
-                            RuleName = "WithLocalParam",
+                            Name = "WithLocalParam",
                             LocalParams = new List<ScopedParam> {
                                 new ScopedParam {
                                     Name = "localParam1",
@@ -204,17 +204,17 @@ namespace RulesEngine.UnitTest
                         },
                         new Rule {
 
-                            RuleName = "WithoutLocalParam",
+                            Name = "WithoutLocalParam",
                             Expression = "input1.falseValue == false"
                         },
                     }
                 },
                 new Workflow {
-                    WorkflowName = "LocalParamsOnly2",
+                    Name = "LocalParamsOnly2",
                     Rules = new List<Rule> {
                         new Rule {
 
-                            RuleName = "WithLocalParam",
+                            Name = "WithLocalParam",
                             LocalParams = new List<ScopedParam> {
                                 new ScopedParam {
                                     Name = "localParam1",
@@ -227,7 +227,7 @@ namespace RulesEngine.UnitTest
                 },
 
                 new Workflow {
-                    WorkflowName = "GlobalParamsOnly",
+                    Name = "GlobalParamsOnly",
                     GlobalParams = new List<ScopedParam> {
                         new ScopedParam {
                             Name = "globalParam1",
@@ -236,13 +236,13 @@ namespace RulesEngine.UnitTest
                     },
                     Rules = new List<Rule> {
                         new Rule {
-                            RuleName = "TrueTest",
+                            Name = "TrueTest",
                             Expression = "globalParam1 == true"
                         }
                     }
                 },
                 new Workflow {
-                    WorkflowName = "GlobalAndLocalParams",
+                    Name = "GlobalAndLocalParams",
                     GlobalParams = new List<ScopedParam> {
                         new ScopedParam {
                             Name = "globalParam1",
@@ -251,7 +251,7 @@ namespace RulesEngine.UnitTest
                     },
                     Rules = new List<Rule> {
                         new Rule {
-                            RuleName = "WithLocalParam",
+                            Name = "WithLocalParam",
                             LocalParams = new List<ScopedParam> {
                                 new ScopedParam {
                                     Name = "localParam1",
@@ -264,7 +264,7 @@ namespace RulesEngine.UnitTest
 
                 },
                 new Workflow {
-                    WorkflowName = "GlobalParamReferencedInLocalParams",
+                    Name = "GlobalParamReferencedInLocalParams",
                     GlobalParams = new List<ScopedParam> {
                         new ScopedParam {
                             Name = "globalParam1",
@@ -274,7 +274,7 @@ namespace RulesEngine.UnitTest
                     Rules = new List<Rule> {
                         new Rule {
 
-                            RuleName = "WithLocalParam",
+                            Name = "WithLocalParam",
                             LocalParams = new List<ScopedParam> {
                                 new ScopedParam {
                                     Name = "localParam1",
@@ -286,7 +286,7 @@ namespace RulesEngine.UnitTest
                     }
                 },
                 new Workflow {
-                    WorkflowName = "GlobalParamReferencedInNextGlobalParams",
+                    Name = "GlobalParamReferencedInNextGlobalParams",
                     GlobalParams = new List<ScopedParam> {
                         new ScopedParam {
                             Name = "globalParam1",
@@ -299,13 +299,13 @@ namespace RulesEngine.UnitTest
                     },
                     Rules = new List<Rule> {
                         new Rule {
-                            RuleName = "WithLocalParam",
+                            Name = "WithLocalParam",
                             Expression = "globalParam1 == \"testString\" && globalParam2 == \"TESTSTRING\""
                         },
                     }
                 },
                 new Workflow {
-                    WorkflowName = "LocalParamReferencedInNextLocalParams",
+                    Name = "LocalParamReferencedInNextLocalParams",
                     Rules = new List<Rule> {
                         new Rule {
                             LocalParams = new List<ScopedParam> {
@@ -318,13 +318,13 @@ namespace RulesEngine.UnitTest
                                     Expression = "localParam1.ToUpper()"
                                 }
                             },
-                            RuleName = "WithLocalParam",
+                            Name = "WithLocalParam",
                             Expression = "localParam1 == \"testString\" && localParam2 == \"TESTSTRING\""
                         },
                     }
                 },
                 new Workflow {
-                    WorkflowName = "GlobalParamAndLocalParamsInNestedRules",
+                    Name = "GlobalParamAndLocalParamsInNestedRules",
                     GlobalParams = new List<ScopedParam> {
                         new ScopedParam {
                             Name = "globalParam1",
@@ -333,7 +333,7 @@ namespace RulesEngine.UnitTest
                     },
                     Rules = new List<Rule> {
                         new Rule {
-                           RuleName = "NestedRuleTest",
+                           Name = "NestedRuleTest",
                            Operator = "And",
                            LocalParams = new List<ScopedParam> {
                                 new ScopedParam {
@@ -343,11 +343,11 @@ namespace RulesEngine.UnitTest
                            },
                            Rules =  new List<Rule>{
                                new Rule{
-                                   RuleName = "NestedRule1",
+                                   Name = "NestedRule1",
                                    Expression = "globalParam1 == \"hello\" && localParam1 == \"world\""
                                },
                                new Rule {
-                                   RuleName = "NestedRule2",
+                                   Name = "NestedRule2",
                                    LocalParams = new List<ScopedParam> {
                                        new ScopedParam {
                                            Name = "nestedLocalParam1",
@@ -363,11 +363,11 @@ namespace RulesEngine.UnitTest
                     }
                 },
                 new Workflow {
-                    WorkflowName = "LocalParamsOnlyWithComplexInput",
+                    Name = "LocalParamsOnlyWithComplexInput",
                     Rules = new List<Rule> {
                         new Rule {
 
-                            RuleName = "WithLocalParam",
+                            Name = "WithLocalParam",
                             LocalParams = new List<ScopedParam> {
                                 new ScopedParam {
                                     Name = "localParam1",
@@ -379,7 +379,7 @@ namespace RulesEngine.UnitTest
                     }
                 },
                 new Workflow {
-                    WorkflowName = "GlobalParamsOnlyWithComplexInput",
+                    Name = "GlobalParamsOnlyWithComplexInput",
                     GlobalParams = new List<ScopedParam> {
                         new ScopedParam {
                             Name = "globalParam1",
@@ -388,7 +388,7 @@ namespace RulesEngine.UnitTest
                     },
                     Rules = new List<Rule> {
                         new Rule {
-                            RuleName = "TrueTest",
+                            Name = "TrueTest",
                             Expression = "globalParam1 == \"hello\""
                         }
                     }

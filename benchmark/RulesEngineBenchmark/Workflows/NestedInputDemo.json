@@ -1,9 +1,9 @@
 ﻿[
   {
-    "WorkflowName": "NestedInputDemoWorkflow1",
+    "Name": "NestedInputDemoWorkflow1",
     "Rules": [
       {
-        "RuleName": "CheckNestedSimpleProp",
+        "Name": "CheckNestedSimpleProp",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
@@ -12,10 +12,10 @@
     ]
   },
   {
-    "WorkflowName": "NestedInputDemoWorkflow2",
+    "Name": "NestedInputDemoWorkflow2",
     "Rules": [
       {
-        "RuleName": "CheckNestedListProp",
+        "Name": "CheckNestedListProp",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
@@ -25,10 +25,10 @@
   },
 
   {
-    "WorkflowName": "NestedInputDemoWorkflow3",
+    "Name": "NestedInputDemoWorkflow3",
     "Rules": [
       {
-        "RuleName": "CheckNestedListPropFunctions",
+        "Name": "CheckNestedListPropFunctions",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",

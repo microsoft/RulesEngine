@@ -167,13 +167,13 @@ namespace RulesEngine
                 {                    
                     var validator = new WorkflowsValidator();
                     validator.ValidateAndThrow(workflow);
-                    if (!_rulesCache.ContainsWorkflows(workflow.WorkflowName))
+                    if (!_rulesCache.ContainsWorkflows(workflow.Name))
                     {
-                        _rulesCache.AddOrUpdateWorkflows(workflow.WorkflowName, workflow);
+                        _rulesCache.AddOrUpdateWorkflows(workflow.Name, workflow);
                     }
                     else
                     {
-                        throw new ValidationException($"Cannot add workflow `{workflow.WorkflowName}` as it already exists. Use `AddOrUpdateWorkflow` to update existing workflow");
+                        throw new ValidationException($"Cannot add workflow `{workflow.Name}` as it already exists. Use `AddOrUpdateWorkflow` to update existing workflow");
                     }
                 }
             }
@@ -197,7 +197,7 @@ namespace RulesEngine
                 {
                     var validator = new WorkflowsValidator();
                     validator.ValidateAndThrow(workflow);
-                    _rulesCache.AddOrUpdateWorkflows(workflow.WorkflowName, workflow);
+                    _rulesCache.AddOrUpdateWorkflows(workflow.Name, workflow);
                 }
             }
             catch (ValidationException ex)
@@ -206,9 +206,9 @@ namespace RulesEngine
             }
         }
 
-        public List<string> GetAllRegisteredWorkflowNames()
+        public List<string> GetAllRegisteredNames()
         {
-            return _rulesCache.GetAllWorkflowNames();
+            return _rulesCache.GetAllNames();
         }
 
         /// <summary>
@@ -287,7 +287,7 @@ namespace RulesEngine
                 var dictFunc = new Dictionary<string, RuleFunc<RuleResultTree>>();
                 foreach (var rule in workflow.Rules.Where(c => c.Enabled))
                 {
-                    dictFunc.Add(rule.RuleName, CompileRule(rule, ruleParams, workflow.GlobalParams?.ToArray()));
+                    dictFunc.Add(rule.Name, CompileRule(rule, ruleParams, workflow.GlobalParams?.ToArray()));
                 }
 
                 _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, dictFunc);
@@ -308,7 +308,7 @@ namespace RulesEngine
             {
                 throw new ArgumentException($"Workflow `{workflowName}` is not found");
             }
-            var currentRule = workflow.Rules?.SingleOrDefault(c => c.RuleName == ruleName && c.Enabled);
+            var currentRule = workflow.Rules?.SingleOrDefault(c => c.Name == ruleName && c.Enabled);
             if (currentRule == null)
             {
                 throw new ArgumentException($"Workflow `{workflowName}` does not contain any rule named `{ruleName}`");

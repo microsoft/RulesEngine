@@ -1,14 +1,14 @@
 {
-  "WorkflowName": "inputWorkflow",
+  "Name": "inputWorkflow",
   "Rules": [
     {
-      "RuleName": "Rule1",
+      "Name": "Rule1",
       "Operator": "Or",
       "ErrorMessage": "One or more adjust rules failed.",
       "ErrorType": "Error",
       "Rules": [
         {
-          "RuleName": "GiveDiscount10",
+          "Name": "GiveDiscount10",
           "SuccessEvent": "10",
           "ErrorMessage": "One or more adjust rules failed.",
           "ErrorType": "Error",
@@ -16,7 +16,7 @@
           "Expression": "input1.country == \"india\" AND input1.loyaltyFactor <= 2 AND input1.totalPurchasesToDate >= 5000 AND input2.totalOrders > 2 AND input3.noOfVisitsPerMonth > 2"
         },
         {
-          "RuleName": "GiveDiscount20",
+          "Name": "GiveDiscount20",
           "SuccessEvent": "20",
           "ErrorMessage": "One or more adjust rules failed.",
           "ErrorType": "Error",
@@ -24,7 +24,7 @@
           "Expression": "input1.country == \"india\" AND input1.loyaltyFactor == 3 AND input1.totalPurchasesToDate >= 10000 AND input2.totalOrders > 2 AND input3.noOfVisitsPerMonth > 2"
         },
         {
-          "RuleName": "GiveDiscount25",
+          "Name": "GiveDiscount25",
           "SuccessEvent": "25",
           "ErrorMessage": "One or more adjust rules failed.",
           "ErrorType": "Error",

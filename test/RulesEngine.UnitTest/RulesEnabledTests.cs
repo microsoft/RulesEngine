@@ -44,7 +44,7 @@ namespace RulesEngine.UnitTest
         [InlineData("RuleEnabledNestedFeatureTest", new bool[] { true, true, false })]
         public async Task WorkflowUpdatedRuleEnabled_ShouldReflect(string workflowName, bool[] expectedRuleResults)
         {
-            var workflow = GetWorkflows().Single(c => c.WorkflowName == workflowName);
+            var workflow = GetWorkflows().Single(c => c.Name == workflowName);
             var rulesEngine = new RulesEngine(reSettings: new ReSettings() { EnableExceptionAsErrorMessage = false});
             rulesEngine.AddWorkflow(workflow);
             var input1 = new {
@@ -72,7 +72,7 @@ namespace RulesEngine.UnitTest
             var result2 = await rulesEngine.ExecuteAllRulesAsync(workflowName, input1);
             Assert.Equal(expectedLength, result2.Count);
 
-            Assert.DoesNotContain(result2, c => c.Rule.RuleName == firstRule.RuleName);
+            Assert.DoesNotContain(result2, c => c.Rule.Name == firstRule.Name);
         }
 
         private bool NestedEnabledCheck(IEnumerable<RuleResultTree> ruleResults)
@@ -99,19 +99,19 @@ namespace RulesEngine.UnitTest
         {
             return new[] {
                 new Workflow {
-                    WorkflowName = "RuleEnabledFeatureTest",
+                    Name = "RuleEnabledFeatureTest",
                     Rules = new List<Rule> {
                         new Rule {
-                            RuleName = "RuleWithoutEnabledFieldMentioned",
+                            Name = "RuleWithoutEnabledFieldMentioned",
                             Expression = "input1.TrueValue == true"
                         },
                         new Rule {
-                            RuleName = "RuleWithEnabledSetToTrue",
+                            Name = "RuleWithEnabledSetToTrue",
                             Expression = "input1.TrueValue == true",
                             Enabled = true
                         },
                         new Rule {
-                            RuleName = "RuleWithEnabledSetToFalse",
+                            Name = "RuleWithEnabledSetToFalse",
                             Expression = "input1.TrueValue == true",
                             Enabled = false
                         }
@@ -119,30 +119,30 @@ namespace RulesEngine.UnitTest
                     }
                 },
                 new Workflow {
-                    WorkflowName = "RuleEnabledNestedFeatureTest",
+                    Name = "RuleEnabledNestedFeatureTest",
                     Rules = new List<Rule> {
                         new Rule {
-                            RuleName = "RuleWithoutEnabledFieldMentioned",
+                            Name = "RuleWithoutEnabledFieldMentioned",
                             Operator = "And",
                             Rules = new List<Rule> {
                                 new Rule {
-                                    RuleName = "RuleWithoutEnabledField",
+                                    Name = "RuleWithoutEnabledField",
                                     Expression = "input1.TrueValue"
                                 }
                             }
                         },
                         new Rule {
-                            RuleName = "RuleWithOneChildSetToFalse",
+                            Name = "RuleWithOneChildSetToFalse",
                             Expression = "input1.TrueValue == true",
                             Operator = "And",
                             Rules = new List<Rule>{
                                 new Rule {
-                                    RuleName = "RuleWithEnabledFalse",
+                                    Name = "RuleWithEnabledFalse",
                                     Expression = "input1.TrueValue",
                                     Enabled = false,
                                 },
                                 new Rule {
-                                    RuleName = "RuleWithEnabledTrue",
+                                    Name = "RuleWithEnabledTrue",
                                     Expression = "input1.TrueValue",
                                     Enabled = true
                                 }
@@ -150,24 +150,24 @@ namespace RulesEngine.UnitTest
 
                         },
                         new Rule {
-                            RuleName = "RuleWithParentSetToFalse",
+                            Name = "RuleWithParentSetToFalse",
                             Operator = "And",
                             Enabled = false,
                             Rules = new List<Rule>{
                                 new Rule {
-                                    RuleName = "RuleWithEnabledTrue",
+                                    Name = "RuleWithEnabledTrue",
                                     Expression = "input1.TrueValue",
                                     Enabled = true
                                 }
                             }
                         },
                         new Rule {
-                            RuleName = "RuleWithAllChildSetToFalse",
+                            Name = "RuleWithAllChildSetToFalse",
                             Operator = "And",
                             Enabled = true,
                             Rules  = new List<Rule>{
                                 new Rule {
-                                    RuleName = "ChildRuleWithEnabledFalse",
+                                    Name = "ChildRuleWithEnabledFalse",
                                     Expression = "input1.TrueValue",
                                     Enabled = false
                                 }

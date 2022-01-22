@@ -3,15 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 
 namespace RulesEngine.Models
 {
-    [Obsolete("WorkflowRules class is deprecated. Use Workflow class instead.")]
-    [ExcludeFromCodeCoverage]
-    public class WorkflowRules : Workflow {
-    }
-
     /// <summary>
     /// Workflow rules class for deserialization  the json config file
     /// </summary>
@@ -19,17 +16,28 @@ namespace RulesEngine.Models
     public class Workflow
     {
         /// <summary>
-        /// Gets the workflow name.
+        /// default contructor
         /// </summary>
-        public string WorkflowName { get; set; }
+        public Workflow()
+        {
+            this.Id = Guid.NewGuid();
+        }
 
-    /// <summary>Gets or sets the workflow rules to inject.</summary>
-    /// <value>The workflow rules to inject.</value>
-    [Obsolete("WorkflowRulesToInject is deprecated. Use WorkflowsToInject instead.")]
-    public IEnumerable<string> WorkflowRulesToInject {
-      set { WorkflowsToInject = value; }
-    }
-    public IEnumerable<string> WorkflowsToInject { get; set; }
+        /// <summary>
+        /// Id is Primary Key in Database
+        /// </summary>
+        [Key]
+        public Guid Id { get; private set; }
+
+        /// <summary>
+        /// Get/Set the workflow name.
+        /// </summary>
+        public string Name { get; set; }
+        
+        /// <summary>Gets or sets the workflow rules to inject.</summary>
+        /// <value>The workflow rules to inject.</value>
+        [NotMapped]
+        public IEnumerable<string> WorkflowsToInject { get; set; }
 
         /// <summary>
         /// Gets or Sets the global params which will be applicable to all rules

@@ -113,8 +113,8 @@ namespace RulesEngine.UnitTest
             Assert.DoesNotContain(result2, c => c.IsSuccess);
 
             // New execution should have different result than previous execution.
-            var previousResults = result1.Select(c => new { c.Rule.RuleName, c.IsSuccess });
-            var newResults = result2.Select(c => new { c.Rule.RuleName, c.IsSuccess });
+            var previousResults = result1.Select(c => new { c.Rule.Name, c.IsSuccess });
+            var newResults = result2.Select(c => new { c.Rule.Name, c.IsSuccess });
             Assert.NotEqual(previousResults, newResults);
         }
 
@@ -123,7 +123,7 @@ namespace RulesEngine.UnitTest
         public void GetAllRegisteredWorkflows_ReturnsListOfAllWorkflows(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName);
-            var workflow = re.GetAllRegisteredWorkflowNames();
+            var workflow = re.GetAllRegisteredNames();
 
             Assert.NotNull(workflow);
             Assert.Equal(2, workflow.Count);
@@ -134,7 +134,7 @@ namespace RulesEngine.UnitTest
         public void GetAllRegisteredWorkflows_NoWorkflow_ReturnsEmptyList()
         {
             var re = new RulesEngine();
-            var workflow = re.GetAllRegisteredWorkflowNames();
+            var workflow = re.GetAllRegisteredNames();
 
             Assert.NotNull(workflow);
             Assert.Empty(workflow);
@@ -198,8 +198,8 @@ namespace RulesEngine.UnitTest
             Assert.IsType<List<RuleResultTree>>(result2);
             Assert.Contains(result2, c => c.IsSuccess);
 
-            var expected = result1.Select(c => new { c.Rule.RuleName, c.IsSuccess });
-            var actual = result2.Select(c => new { c.Rule.RuleName, c.IsSuccess });
+            var expected = result1.Select(c => new { c.Rule.Name, c.IsSuccess });
+            var actual = result2.Select(c => new { c.Rule.Name, c.IsSuccess });
             Assert.Equal(expected, actual);
 
 
@@ -262,7 +262,7 @@ namespace RulesEngine.UnitTest
             });
 
             Assert.Throws<RuleValidationException>(() => {
-                var workflow = new Workflow() { WorkflowName = "test" };
+                var workflow = new Workflow() { Name = "test" };
                 var re = CreateRulesEngine(workflow);
             });
         }
@@ -358,7 +358,7 @@ namespace RulesEngine.UnitTest
             var fileData = File.ReadAllText(files[0]);
             var bre = new RulesEngine(JsonConvert.DeserializeObject<Workflow[]>(fileData), null);
             var result = await bre.ExecuteAllRulesAsync("inputWorkflow", ruleParams?.ToArray());
-            var ruleResult = result?.FirstOrDefault(r => string.Equals(r.Rule.RuleName, "GiveDiscount10", StringComparison.OrdinalIgnoreCase));
+            var ruleResult = result?.FirstOrDefault(r => string.Equals(r.Rule.Name, "GiveDiscount10", StringComparison.OrdinalIgnoreCase));
             Assert.True(ruleResult.IsSuccess);
         }
 
@@ -516,10 +516,10 @@ namespace RulesEngine.UnitTest
         {
 
             var workflow = new Workflow {
-                WorkflowName = "TestWorkflow",
+                Name = "TestWorkflow",
                 Rules = new[] {
                     new Rule {
-                        RuleName = "ruleWithRuntimeError",
+                        Name = "ruleWithRuntimeError",
                         Expression = "input1.Country.ToLower() == \"india\""
                     }
                 }
@@ -543,10 +543,10 @@ namespace RulesEngine.UnitTest
         {
 
             var workflow = new Workflow {
-                WorkflowName = "TestWorkflow",
+                Name = "TestWorkflow",
                 Rules = new[] {
                     new Rule {
-                        RuleName = "ruleWithRuntimeError",
+                        Name = "ruleWithRuntimeError",
                         Expression = "input1.Country.ToLower() == \"india\""
                     }
                 }
@@ -568,10 +568,10 @@ namespace RulesEngine.UnitTest
         {
 
             var workflow = new Workflow {
-                WorkflowName = "TestWorkflow",
+                Name = "TestWorkflow",
                 Rules = new[] {
                     new Rule {
-                        RuleName = "ruleWithRuntimeError",
+                        Name = "ruleWithRuntimeError",
                         Expression = "input1.Country.ToLower() == \"india\""
                     }
                 }
@@ -596,10 +596,10 @@ namespace RulesEngine.UnitTest
         public async Task RemoveWorkFlow_ShouldRemoveAllCompiledCache()
         {
             var workflow = new Workflow {
-                WorkflowName = "Test",
+                Name = "Test",
                 Rules = new Rule[]{
                     new Rule {
-                        RuleName = "RuleWithLocalParam",
+                        Name = "RuleWithLocalParam",
                         LocalParams = new List<LocalParam> {
                             new LocalParam {
                                 Name = "lp1",
@@ -630,10 +630,10 @@ namespace RulesEngine.UnitTest
         public async Task ClearWorkFlow_ShouldRemoveAllCompiledCache()
         {
             var workflow = new Workflow {
-                WorkflowName = "Test",
+                Name = "Test",
                 Rules = new Rule[]{
                     new Rule {
-                        RuleName = "RuleWithLocalParam",
+                        Name = "RuleWithLocalParam",
                         LocalParams = new LocalParam[] {
                             new LocalParam {
                                 Name = "lp1",
@@ -664,10 +664,10 @@ namespace RulesEngine.UnitTest
         public async Task ExecuteRule_WithNullInput_ShouldNotThrowException()
         {
             var workflow = new Workflow {
-                WorkflowName = "Test",
+                Name = "Test",
                 Rules = new Rule[]{
                     new Rule {
-                        RuleName = "RuleWithLocalParam",
+                        Name = "RuleWithLocalParam",
 
                         RuleExpressionType = RuleExpressionType.LambdaExpression,
                         Expression = "input1 == null || input1.hello.world = \"wow\""
@@ -695,13 +695,13 @@ namespace RulesEngine.UnitTest
         }
 
         [Fact]
-        public async Task ExecuteRule_SpecialCharInWorkflowName_RunsSuccessfully()
+        public async Task ExecuteRule_SpecialCharInName_RunsSuccessfully()
         {
             var workflow = new Workflow {
-                WorkflowName = "Exámple",
+                Name = "Exámple",
                 Rules = new Rule[]{
                     new Rule {
-                        RuleName = "RuleWithLocalParam",
+                        Name = "RuleWithLocalParam",
 
                         RuleExpressionType = RuleExpressionType.LambdaExpression,
                         Expression = "input1 == null || input1.hello.world = \"wow\""
@@ -709,7 +709,7 @@ namespace RulesEngine.UnitTest
                 }
             };
 
-            var workflowStr = "{\"WorkflowName\":\"Exámple\",\"WorkflowsToInject\":null,\"GlobalParams\":null,\"Rules\":[{\"RuleName\":\"RuleWithLocalParam\",\"Properties\":null,\"Operator\":null,\"ErrorMessage\":null,\"Enabled\":true,\"ErrorType\":\"Warning\",\"RuleExpressionType\":\"LambdaExpression\",\"WorkflowsToInject\":null,\"Rules\":null,\"LocalParams\":null,\"Expression\":\"input1 == null || input1.hello.world = \\\"wow\\\"\",\"Actions\":null,\"SuccessEvent\":null}]}";
+            var workflowStr = "{\"Name\":\"Exámple\",\"WorkflowsToInject\":null,\"GlobalParams\":null,\"Rules\":[{\"Name\":\"RuleWithLocalParam\",\"Properties\":null,\"Operator\":null,\"ErrorMessage\":null,\"Enabled\":true,\"ErrorType\":\"Warning\",\"RuleExpressionType\":\"LambdaExpression\",\"WorkflowsToInject\":null,\"Rules\":null,\"LocalParams\":null,\"Expression\":\"input1 == null || input1.hello.world = \\\"wow\\\"\",\"Actions\":null,\"SuccessEvent\":null}]}";
 
             var re = new RulesEngine(new string[] { workflowStr },null,null);
 
@@ -725,14 +725,14 @@ namespace RulesEngine.UnitTest
         [Fact]
         public void ContainsWorkFlowName_ShouldReturn()
         {
-            const string ExistedWorkflowName = "ExistedWorkflowName";
-            const string NotExistedWorkflowName = "NotExistedWorkflowName";
+            const string ExistedName = "ExistedName";
+            const string NotExistedName = "NotExistedName";
 
             var workflow = new Workflow {
-                WorkflowName = ExistedWorkflowName,
+                Name = ExistedName,
                 Rules = new Rule[]{
                     new Rule {
-                        RuleName = "Rule",
+                        Name = "Rule",
                         RuleExpressionType = RuleExpressionType.LambdaExpression,
                         Expression = "1==1"
                     }
@@ -742,8 +742,8 @@ namespace RulesEngine.UnitTest
             var re = new RulesEngine();
             re.AddWorkflow(workflow);
 
-            Assert.True(re.ContainsWorkflow(ExistedWorkflowName));
-            Assert.False(re.ContainsWorkflow(NotExistedWorkflowName));
+            Assert.True(re.ContainsWorkflow(ExistedName));
+            Assert.False(re.ContainsWorkflow(NotExistedName));
         }
 
         [Theory]
@@ -774,7 +774,7 @@ namespace RulesEngine.UnitTest
             var data = GetFileContent(filename);
 
             var injectWorkflow = new Workflow {
-                WorkflowName = "inputWorkflowReference",
+                Name = "inputWorkflowReference",
                 WorkflowsToInject = new List<string> { "inputWorkflow" }
             };
 

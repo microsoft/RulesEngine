@@ -1,8 +1,8 @@
 {
-    "WorkflowName": "inputWorkflow",
+    "Name": "inputWorkflow",
     "Rules": [
         {
-            "RuleName": "GiveDiscount10",
+            "Name": "GiveDiscount10",
             "SuccessEvent": "10",
             "ErrorMessage": "One or more adjust rules failed.",
             "ErrorType": "Error",
@@ -10,7 +10,7 @@
             "Expression": "input1.Boolean"
         },
         {
-            "RuleName": "GiveDiscount20",
+            "Name": "GiveDiscount20",
             "SuccessEvent": "20",
             "ErrorMessage": "One or more adjust rules failed.",
             "ErrorType": "Error",
