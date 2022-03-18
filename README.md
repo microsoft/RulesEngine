@@ -84,12 +84,15 @@ rule.Expression = "count < 3";
 rule.RuleExpressionType = RuleExpressionType.LambdaExpression;
 rules.Add(rule);
 
-Workflow workflow = new Workflow();
-workflow.WorkflowName = "Example Workflow";
-workflow.Rules = rules;
-workflow.Add(workflowRule);
+var workflows = new List<Workflow>();
 
-var bre = new RulesEngine.RulesEngine(workflow.ToArray(), null);
+Workflow exampleWorkflow = new Workflow();
+exampleWorkflow.WorkflowName = "Example Workflow";
+exampleWorkflow.Rules = rules;
+
+workflows.Add(exampleWorkflow);
+
+var bre = new RulesEngine.RulesEngine(workflows.ToArray(), null);
 ```
 ### Entity Framework
 
