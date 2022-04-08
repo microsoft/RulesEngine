@@ -42,14 +42,23 @@ namespace RulesEngine.ExpressionBuilders
         }
 
         public Func<object[], T> Compile<T>(string expression, RuleParameter[] ruleParams)
-        {           
+        {
+            var rtype = typeof(T);
+            if(rtype == typeof(object))
+            {
+                rtype = null;
+            }
             var cacheKey = GetCacheKey(expression, ruleParams, typeof(T));
             return _memoryCache.GetOrCreate(cacheKey, (entry) => {
                 entry.SetSize(1);
                 var parameterExpressions = GetParameterExpression(ruleParams).ToArray();
             
-                var e = Parse(expression, parameterExpressions, typeof(T));
-                var expressionBody = new List<Expression>() { e.Body };
+                var e = Parse(expression, parameterExpressions, rtype).Body;
+                if(rtype == null)
+                {
+                    e = Expression.Convert(e, typeof(T));
+                }
+                var expressionBody = new List<Expression>() { e };
                 var wrappedExpression = WrapExpression<T>(expressionBody, parameterExpressions, new ParameterExpression[] { });
                 return wrappedExpression.CompileFast();
             });
@@ -75,7 +84,7 @@ namespace RulesEngine.ExpressionBuilders
         }
 
         public T Evaluate<T>(string expression, RuleParameter[] ruleParams)
-        {
+        {   
             var func = Compile<T>(expression, ruleParams);
             return func(ruleParams.Select(c => c.Value).ToArray());
         }
