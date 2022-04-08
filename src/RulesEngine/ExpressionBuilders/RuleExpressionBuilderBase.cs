@@ -22,7 +22,7 @@ namespace RulesEngine.ExpressionBuilders
         /// <returns>Expression type</returns>
         internal abstract RuleFunc<RuleResultTree> BuildDelegateForRule(Rule rule, RuleParameter[] ruleParams);
 
-        internal abstract LambdaExpression Parse(string expression, ParameterExpression[] parameters, Type returnType);
+        internal abstract Expression Parse(string expression, ParameterExpression[] parameters, Type returnType);
 
         internal abstract Func<object[], Dictionary<string, object>> CompileScopedParams(RuleParameter[] ruleParameters, RuleExpressionParameter[] scopedParameters);
     }

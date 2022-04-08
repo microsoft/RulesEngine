@@ -131,7 +131,7 @@ namespace RulesEngine
                 {
                     try
                     {
-                        var lpExpression = expressionBuilder.Parse(lp.Expression, parameters.ToArray(), null).Body;
+                        var lpExpression = expressionBuilder.Parse(lp.Expression, parameters.ToArray(), null);
                         var ruleExpParam = new RuleExpressionParameter() {
                             ParameterExpression = Expression.Parameter(lpExpression.Type, lp.Name),
                             ValueExpression = lpExpression

@@ -43,7 +43,7 @@ namespace RulesEngine.ExpressionBuilders
             }
         }
 
-        internal override LambdaExpression Parse(string expression, ParameterExpression[] parameters, Type returnType)
+        internal override Expression Parse(string expression, ParameterExpression[] parameters, Type returnType)
         {
             try
             {

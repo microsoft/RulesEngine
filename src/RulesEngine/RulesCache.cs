@@ -55,7 +55,7 @@ namespace RulesEngine
         public void AddOrUpdateCompiledRule(string compiledRuleKey, IDictionary<string, RuleFunc<RuleResultTree>> compiledRule)
         {
             long ticks = DateTime.UtcNow.Ticks;
-            _compileRules.GetOrCreate(compiledRuleKey, () => (compiledRule, ticks));
+            _compileRules.Set(compiledRuleKey,(compiledRule, ticks));
         }
 
         /// <summary>Checks if the compiled rules are up-to-date.</summary>

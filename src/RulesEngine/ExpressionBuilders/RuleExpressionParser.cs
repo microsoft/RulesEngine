@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Dynamic.Core.Parser;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -34,11 +35,11 @@ namespace RulesEngine.ExpressionBuilders
             var dict_add = typeof(Dictionary<string, object>).GetMethod("Add", BindingFlags.Public | BindingFlags.Instance, null, new[] { typeof(string), typeof(object) }, null);
             _methodInfo.Add("dict_add", dict_add);
         }
-        public LambdaExpression Parse(string expression, ParameterExpression[] parameters, Type returnType)
+        public Expression Parse(string expression, ParameterExpression[] parameters, Type returnType)
         {
             var config = new ParsingConfig { CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes) };
+            return new ExpressionParser(parameters, expression, new object[] { }, config).Parse(returnType);
 
-            return DynamicExpressionParser.ParseLambda(config, false, parameters, returnType, expression);
         }
 
         public Func<object[], T> Compile<T>(string expression, RuleParameter[] ruleParams)
@@ -52,7 +53,7 @@ namespace RulesEngine.ExpressionBuilders
             return _memoryCache.GetOrCreate(cacheKey, () => {
                 var parameterExpressions = GetParameterExpression(ruleParams).ToArray();
             
-                var e = Parse(expression, parameterExpressions, rtype).Body;
+                var e = Parse(expression, parameterExpressions, rtype);
                 if(rtype == null)
                 {
                     e = Expression.Convert(e, typeof(T));
