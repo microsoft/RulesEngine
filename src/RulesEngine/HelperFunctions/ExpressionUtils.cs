@@ -10,7 +10,7 @@ namespace RulesEngine.HelperFunctions
     {
         public static bool CheckContains(string check, string valList)
         {
-            if (String.IsNullOrEmpty(check) || String.IsNullOrEmpty(valList))
+            if (string.IsNullOrEmpty(check) || string.IsNullOrEmpty(valList))
                 return false;
 
             var list = valList.Split(',').ToList();

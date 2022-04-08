@@ -2,7 +2,7 @@
 //  Licensed under the MIT License.
 
 using FastExpressionCompiler;
-using Microsoft.Extensions.Caching.Memory;
+using RulesEngine.HelperFunctions;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -16,13 +16,13 @@ namespace RulesEngine.ExpressionBuilders
     public class RuleExpressionParser
     {
         private readonly ReSettings _reSettings;
-        private static IMemoryCache _memoryCache;
+        private static MemCache _memoryCache;
         private readonly IDictionary<string, MethodInfo> _methodInfo;
 
         public RuleExpressionParser(ReSettings reSettings)
         {
             _reSettings = reSettings;
-            _memoryCache = _memoryCache ?? new MemoryCache(new MemoryCacheOptions {
+            _memoryCache = _memoryCache ?? new MemCache(new MemCacheConfig {
                 SizeLimit = 1000
             });
             _methodInfo = new Dictionary<string, MethodInfo>();
@@ -49,8 +49,7 @@ namespace RulesEngine.ExpressionBuilders
                 rtype = null;
             }
             var cacheKey = GetCacheKey(expression, ruleParams, typeof(T));
-            return _memoryCache.GetOrCreate(cacheKey, (entry) => {
-                entry.SetSize(1);
+            return _memoryCache.GetOrCreate(cacheKey, () => {
                 var parameterExpressions = GetParameterExpression(ruleParams).ToArray();
             
                 var e = Parse(expression, parameterExpressions, rtype).Body;

@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using RulesEngine.Actions;
 using RulesEngine.Exceptions;
 using RulesEngine.ExpressionBuilders;
+using RulesEngine.HelperFunctions;
 using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using RulesEngine.Validators;
@@ -29,7 +30,7 @@ namespace RulesEngine
         #region Variables
         private readonly ILogger _logger;
         private readonly ReSettings _reSettings;
-        private readonly RulesCache _rulesCache = new RulesCache();
+        private readonly RulesCache _rulesCache;
         private readonly RuleExpressionParser _ruleExpressionParser;
         private readonly RuleCompiler _ruleCompiler;
         private readonly ActionFactory _actionFactory;
@@ -52,6 +53,11 @@ namespace RulesEngine
         {
             _logger = logger ?? new NullLogger<RulesEngine>();
             _reSettings = reSettings ?? new ReSettings();
+            if(_reSettings.CacheConfig == null)
+            {
+                _reSettings.CacheConfig = new MemCacheConfig();         
+            }
+            _rulesCache = new RulesCache(_reSettings);
             _ruleExpressionParser = new RuleExpressionParser(_reSettings);
             _ruleCompiler = new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings, _ruleExpressionParser),_reSettings, _logger);
             _actionFactory = new ActionFactory(GetActionRegistry(_reSettings));
