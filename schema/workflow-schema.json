@@ -1,11 +1,23 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
+    "ScopedParam": {
+      "type": "object",
+      "properties": {
+        "Name": { "type": "string" },
+        "Expression": { "type": "string" }
+      },
+      "required": [ "Name", "Expression" ]
+    },
     "Rule": {
       "title": "Rule",
       "properties": {
         "RuleName": {
           "type": "string"
+        },
+        "LocalParams": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/ScopedParam" }
         },
         "Operator": {
           "enum": [
@@ -17,12 +29,6 @@
         },
         "ErrorMessage": {
           "type": "string"
-        },
-        "ErrorType": {
-          "enum": [
-            "Warning",
-            "Error"
-          ]
         },
         "SuccessEvent": {
           "type": "string"
@@ -45,6 +51,10 @@
         },
         "Actions": {
           "$ref": "#/definitions/RuleActions"
+        },
+        "Enabled": {
+          "type": "boolean",
+          "default": true
         }
       },
       "required": [
@@ -65,6 +75,10 @@
         "RuleName": {
           "type": "string"
         },
+        "LocalParams": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/ScopedParam" }
+        },
         "Expression": {
           "type": "string"
         },
@@ -76,12 +90,6 @@
         "ErrorMessage": {
           "type": "string"
         },
-        "ErrorType": {
-          "enum": [
-            "Warning",
-            "Error"
-          ]
-        },
         "SuccessEvent": {
           "type": "string"
         },
@@ -90,6 +98,10 @@
         },
         "Actions": {
           "$ref": "#/definitions/RuleActions"
+        },
+        "Enabled": {
+          "type": "boolean",
+          "default": true
         }
       }
     },
@@ -116,10 +128,19 @@
         }
       }
     }
+
   },
   "properties": {
-    "WorkFlowName": {
+    "WorkflowName": {
       "type": "string"
+    },
+    "WorkflowsToInject": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "GlobalParams": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/ScopedParam" }
     },
     "Rules": {
       "type": "array",
@@ -136,7 +157,7 @@
     }
   },
   "required": [
-    "WorkFlowName",
+    "WorkflowName",
     "Rules"
   ],
   "type": "object"
