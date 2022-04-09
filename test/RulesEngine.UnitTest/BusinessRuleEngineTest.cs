@@ -16,6 +16,7 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -173,7 +174,7 @@ namespace RulesEngine.UnitTest
 
             List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow",
                             input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18);
-                //, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18);
+            //, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
             Assert.Contains(result, c => c.IsSuccess);
@@ -499,7 +500,7 @@ namespace RulesEngine.UnitTest
         [InlineData("rules9.json")]
         public async Task ExecuteRuleWithIgnoreException_CompilationException_DoesNotReturnsAsErrorMessage(string ruleFileName)
         {
-            var re = GetRulesEngine(ruleFileName, new ReSettings() { EnableExceptionAsErrorMessage = true , IgnoreException = true});
+            var re = GetRulesEngine(ruleFileName, new ReSettings() { EnableExceptionAsErrorMessage = true, IgnoreException = true });
 
             dynamic input1 = new ExpandoObject();
             input1.Data = new { TestProperty = "" };
@@ -510,6 +511,29 @@ namespace RulesEngine.UnitTest
 
             Assert.NotNull(result);
             Assert.False(result[1].ExceptionMessage.StartsWith("Exception while parsing expression"));
+        }
+
+
+        [Theory]
+        [InlineData("rules10.json")]
+        public async Task ExecuteRuleWithJsonElement(string ruleFileName)
+        {
+            var re = GetRulesEngine(ruleFileName, new ReSettings() {
+                                        EnableExceptionAsErrorMessage = true,
+                                        CustomTypes = new Type[] { typeof(System.Text.Json.JsonElement) }
+            
+                                            });
+
+            var input1 = new {
+                Data = System.Text.Json.JsonSerializer.SerializeToElement(new {
+                    category= "abc"
+                })
+            };
+
+            var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
+
+            Assert.NotNull(result);
+            Assert.All(result, c => Assert.True(c.IsSuccess));
         }
 
 
@@ -562,7 +586,7 @@ namespace RulesEngine.UnitTest
             };
 
             _ = await Assert.ThrowsAsync<RuleException>(async () => await re.ExecuteAllRulesAsync("TestWorkflow", input));
-            
+
         }
 
         [Fact]
@@ -617,7 +641,7 @@ namespace RulesEngine.UnitTest
             var re = new RulesEngine();
             re.AddWorkflow(workflow);
 
-            var result1 = await re.ExecuteAllRulesAsync("Test","hello");
+            var result1 = await re.ExecuteAllRulesAsync("Test", "hello");
             Assert.True(result1.All(c => c.IsSuccess));
 
             re.RemoveWorkflow("Test");
@@ -680,11 +704,11 @@ namespace RulesEngine.UnitTest
             var re = new RulesEngine();
             re.AddWorkflow(workflow);
 
-            var result1 = await re.ExecuteAllRulesAsync("Test", new RuleParameter("input1", value:null));
+            var result1 = await re.ExecuteAllRulesAsync("Test", new RuleParameter("input1", value: null));
             Assert.True(result1.All(c => c.IsSuccess));
 
 
-            var result2 = await re.ExecuteAllRulesAsync("Test",new object[] { null });
+            var result2 = await re.ExecuteAllRulesAsync("Test", new object[] { null });
             Assert.True(result2.All(c => c.IsSuccess));
 
             dynamic input1 = new ExpandoObject();
@@ -713,7 +737,7 @@ namespace RulesEngine.UnitTest
 
             var workflowStr = "{\"WorkflowName\":\"Exámple\",\"WorkflowsToInject\":null,\"GlobalParams\":null,\"Rules\":[{\"RuleName\":\"RuleWithLocalParam\",\"Properties\":null,\"Operator\":null,\"ErrorMessage\":null,\"Enabled\":true,\"ErrorType\":\"Warning\",\"RuleExpressionType\":\"LambdaExpression\",\"WorkflowsToInject\":null,\"Rules\":null,\"LocalParams\":null,\"Expression\":\"input1 == null || input1.hello.world = \\\"wow\\\"\",\"Actions\":null,\"SuccessEvent\":null}]}";
 
-            var re = new RulesEngine(new string[] { workflowStr },null,null);
+            var re = new RulesEngine(new string[] { workflowStr }, null, null);
 
             dynamic input1 = new ExpandoObject();
             input1.hello = new ExpandoObject();
@@ -749,7 +773,7 @@ namespace RulesEngine.UnitTest
         }
 
         [Theory]
-        [InlineData(typeof(RulesEngine),typeof(IRulesEngine))]
+        [InlineData(typeof(RulesEngine), typeof(IRulesEngine))]
         public void Class_PublicMethods_ArePartOfInterface(Type classType, Type interfaceType)
         {
             var classMethods = classType.GetMethods(BindingFlags.DeclaredOnly |
@@ -758,7 +782,7 @@ namespace RulesEngine.UnitTest
 
 
             var interfaceMethods = interfaceType.GetMethods();
-                                       
+
 
             Assert.Equal(interfaceMethods.Count(), classMethods.Count());
         }
