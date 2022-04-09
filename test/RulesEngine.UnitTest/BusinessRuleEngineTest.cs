@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -545,7 +544,7 @@ namespace RulesEngine.UnitTest
                 }
             };
 
-            var re = new RulesEngine(new[] { workflow }, null, null);
+            var re = new RulesEngine(new[] { workflow }, null);
             var input = new RuleTestClass {
                 Country = null
             };
@@ -572,7 +571,7 @@ namespace RulesEngine.UnitTest
                 }
             };
 
-            var re = new RulesEngine(new[] { workflow }, null, new ReSettings {
+            var re = new RulesEngine(new[] { workflow }, new ReSettings {
                 EnableExceptionAsErrorMessage = false
             });
             var input = new RuleTestClass {
@@ -597,7 +596,7 @@ namespace RulesEngine.UnitTest
                 }
             };
 
-            var re = new RulesEngine(new[] { workflow }, null, new ReSettings {
+            var re = new RulesEngine(new[] { workflow }, new ReSettings {
                 IgnoreException = true
             });
             var input = new RuleTestClass {
@@ -731,7 +730,7 @@ namespace RulesEngine.UnitTest
 
             var workflowStr = "{\"WorkflowName\":\"Exámple\",\"WorkflowsToInject\":null,\"GlobalParams\":null,\"Rules\":[{\"RuleName\":\"RuleWithLocalParam\",\"Properties\":null,\"Operator\":null,\"ErrorMessage\":null,\"Enabled\":true,\"ErrorType\":\"Warning\",\"RuleExpressionType\":\"LambdaExpression\",\"WorkflowsToInject\":null,\"Rules\":null,\"LocalParams\":null,\"Expression\":\"input1 == null || input1.hello.world = \\\"wow\\\"\",\"Actions\":null,\"SuccessEvent\":null}]}";
 
-            var re = new RulesEngine(new string[] { workflowStr }, null, null);
+            var re = new RulesEngine(new string[] { workflowStr }, null);
 
             dynamic input1 = new ExpandoObject();
             input1.hello = new ExpandoObject();
@@ -799,8 +798,7 @@ namespace RulesEngine.UnitTest
             };
 
             var injectWorkflowStr = JsonConvert.SerializeObject(injectWorkflow);
-            var mockLogger = new Mock<ILogger>();
-            return new RulesEngine(new string[] { data, injectWorkflowStr }, mockLogger.Object, reSettings);
+            return new RulesEngine(new string[] { data, injectWorkflowStr }, reSettings);
         }
 
         private string GetFileContent(string filename)

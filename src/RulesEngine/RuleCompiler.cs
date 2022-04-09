@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Microsoft.Extensions.Logging;
 using RulesEngine.Exceptions;
 using RulesEngine.ExpressionBuilders;
 using RulesEngine.HelperFunctions;
@@ -10,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Runtime.InteropServices;
 
 namespace RulesEngine
 {
@@ -31,19 +29,12 @@ namespace RulesEngine
         private readonly ReSettings _reSettings;
 
         /// <summary>
-        /// The logger
-        /// </summary>
-        private readonly ILogger _logger;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="RuleCompiler"/> class.
         /// </summary>
         /// <param name="expressionBuilderFactory">The expression builder factory.</param>
         /// <exception cref="ArgumentNullException">expressionBuilderFactory</exception>
-        internal RuleCompiler(RuleExpressionBuilderFactory expressionBuilderFactory, ReSettings reSettings, ILogger logger)
+        internal RuleCompiler(RuleExpressionBuilderFactory expressionBuilderFactory, ReSettings reSettings)
         {
-            _logger = logger ?? throw new ArgumentNullException($"{nameof(logger)} can't be null.");
-          
             _expressionBuilderFactory = expressionBuilderFactory ?? throw new ArgumentNullException($"{nameof(expressionBuilderFactory)} can't be null.");
             _reSettings = reSettings;
         }
@@ -61,7 +52,6 @@ namespace RulesEngine
             if (rule == null)
             {
                 var ex =  new ArgumentNullException(nameof(rule));
-                _logger.LogError(ex.Message);
                 throw ex;
             }
             try
@@ -75,7 +65,6 @@ namespace RulesEngine
             catch (Exception ex)
             {
                 var message = $"Error while compiling rule `{rule.RuleName}`: {ex.Message}";
-                _logger.LogError(message);
                 return Helpers.ToRuleExceptionResult(_reSettings, rule, new RuleException(message, ex));
             }
         }
@@ -187,7 +176,7 @@ namespace RulesEngine
 
             return (paramArray) => {
                 var (isSuccess, resultList) = ApplyOperation(paramArray, ruleFuncList, operation);
-                Func<object[], bool> isSuccessFn = (p) => isSuccess;
+                bool isSuccessFn(object[] p) => isSuccess;
                 var result = Helpers.ToResultTree(_reSettings, parentRule, resultList, isSuccessFn);
                 return result(paramArray);
             };
