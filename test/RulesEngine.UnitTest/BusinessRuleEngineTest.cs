@@ -389,15 +389,9 @@ namespace RulesEngine.UnitTest
             var re = GetRulesEngine(ruleFileName);
 
             dynamic input1 = new ExpandoObject();
-            if (propValue != null)
-            {
-                input1.Property1 = propValue;
-            }
 
-            if (propValue == null)
-            {
-                input1.Property1 = null;
-            }
+            input1.Property1 = propValue;
+
 
             var utils = new TestInstanceUtils();
 
