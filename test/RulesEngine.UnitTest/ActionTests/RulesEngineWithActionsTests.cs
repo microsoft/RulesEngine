@@ -24,6 +24,16 @@ namespace RulesEngine.UnitTest
         }
 
         [Fact]
+        public async Task WhenExpressionIsSuccess_ComplexOutputExpressionAction_ReturnsExpressionEvaluation()
+        {
+            var engine = new RulesEngine(GetWorkflowWithActions());
+            var result = await engine.ExecuteActionWorkflowAsync("ActionWorkflow", "ComplexOutputRuleTest", new RuleParameter[0]);
+            Assert.NotNull(result);
+            dynamic output = result.Output;
+            Assert.Equal(2, output.test);
+        }
+
+        [Fact]
         public async Task WhenExpressionIsSuccess_EvaluateRuleAction_ReturnsExpressionEvaluation()
         {
             var engine = new RulesEngine(GetWorkflowWithActions());
@@ -104,6 +114,19 @@ namespace RulesEngine.UnitTest
                                 Name = "OutputExpression",
                                 Context = new Dictionary<string, object>{
                                     {"expression", "2*2"}
+                                }
+                            }
+                        }
+                    },
+                    new Rule{
+                        RuleName = "ComplexOutputRuleTest",
+                        RuleExpressionType = RuleExpressionType.LambdaExpression,
+                        Expression = "1 == 1",
+                        Actions = new RuleActions{
+                            OnSuccess = new ActionInfo{
+                                Name = "OutputExpression",
+                                Context = new Dictionary<string, object>{
+                                    {"expression", "new (2 as test)"}
                                 }
                             }
                         }

@@ -26,7 +26,7 @@ namespace RulesEngine.UnitTest
         {
             var workflow = GetWorkflowList();
 
-            var engine = new RulesEngine(null, null);
+            var engine = new RulesEngine();
             engine.AddWorkflow(workflow);
 
             var input1 = new {
@@ -47,7 +47,7 @@ namespace RulesEngine.UnitTest
         {
             var workflow = GetWorkflowList();
 
-            var engine = new RulesEngine(null, null);
+            var engine = new RulesEngine();
             engine.AddWorkflow(workflow);
 
             var input1 = new {
@@ -77,7 +77,7 @@ namespace RulesEngine.UnitTest
         {
             var workflow = GetWorkflowList();
 
-            var engine = new RulesEngine(new string[] { }, null, new ReSettings {
+            var engine = new RulesEngine(new string[] { }, new ReSettings {
                 EnableScopedParams = false
             });
             engine.AddWorkflow(workflow);

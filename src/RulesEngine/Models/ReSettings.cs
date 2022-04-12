@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using RulesEngine.Actions;
+using RulesEngine.HelperFunctions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -57,6 +58,8 @@ namespace RulesEngine.Models
             get { return EnableScopedParams; }
             set { EnableScopedParams = value; }
         }
+
+        public MemCacheConfig CacheConfig { get; set; }
     }
 
     public enum NestedRuleExecutionMode

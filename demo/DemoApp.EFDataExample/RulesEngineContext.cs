@@ -24,18 +24,20 @@ namespace RulesEngine.Data
                 entity.Ignore(b => b.WorkflowsToInject);
             });
 
+            var serializationOptions = new JsonSerializerOptions(JsonSerializerDefaults.General);
+
             modelBuilder.Entity<Rule>(entity => {
                 entity.HasKey(k => k.RuleName);
 
                 entity.Property(b => b.Properties)
                 .HasConversion(
-                    v => JsonSerializer.Serialize(v, null),
-                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, null));
+                    v => JsonSerializer.Serialize(v, serializationOptions),
+                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, serializationOptions)); ;
 
                 entity.Property(p => p.Actions)
                 .HasConversion(
-                    v => JsonSerializer.Serialize(v, null),
-                   v => JsonSerializer.Deserialize<RuleActions>(v, null));
+                    v => JsonSerializer.Serialize(v, serializationOptions),
+                   v => JsonSerializer.Deserialize<RuleActions>(v, serializationOptions));
 
                 entity.Ignore(b => b.WorkflowsToInject);
             });
