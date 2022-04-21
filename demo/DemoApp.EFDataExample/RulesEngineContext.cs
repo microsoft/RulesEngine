@@ -40,6 +40,7 @@ namespace RulesEngine.Data
                    v => JsonSerializer.Deserialize<RuleActions>(v, serializationOptions));
 
                 entity.Ignore(b => b.WorkflowsToInject);
+                entity.Ignore(b => b.WorkflowRulesToInject);
             });
         }
     }
