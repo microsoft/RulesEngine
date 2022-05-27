@@ -2,7 +2,7 @@ RulesEngine is a highly extensible library to build rule based system using C# e
 
 
 **Features**
-- Json based rules defination
+- Json based rules definition
 - Multiple input support
 - Dynamic object input support
 - C# Expression support
