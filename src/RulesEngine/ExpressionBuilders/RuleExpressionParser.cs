@@ -2,12 +2,13 @@
 //  Licensed under the MIT License.
 
 using FastExpressionCompiler;
-using Microsoft.Extensions.Caching.Memory;
+using RulesEngine.HelperFunctions;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Dynamic.Core.Parser;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -16,13 +17,13 @@ namespace RulesEngine.ExpressionBuilders
     public class RuleExpressionParser
     {
         private readonly ReSettings _reSettings;
-        private static IMemoryCache _memoryCache;
+        private static MemCache _memoryCache;
         private readonly IDictionary<string, MethodInfo> _methodInfo;
 
         public RuleExpressionParser(ReSettings reSettings)
         {
             _reSettings = reSettings;
-            _memoryCache = _memoryCache ?? new MemoryCache(new MemoryCacheOptions {
+            _memoryCache = _memoryCache ?? new MemCache(new MemCacheConfig {
                 SizeLimit = 1000
             });
             _methodInfo = new Dictionary<string, MethodInfo>();
@@ -34,22 +35,30 @@ namespace RulesEngine.ExpressionBuilders
             var dict_add = typeof(Dictionary<string, object>).GetMethod("Add", BindingFlags.Public | BindingFlags.Instance, null, new[] { typeof(string), typeof(object) }, null);
             _methodInfo.Add("dict_add", dict_add);
         }
-        public LambdaExpression Parse(string expression, ParameterExpression[] parameters, Type returnType)
+        public Expression Parse(string expression, ParameterExpression[] parameters, Type returnType)
         {
             var config = new ParsingConfig { CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes) };
+            return new ExpressionParser(parameters, expression, new object[] { }, config).Parse(returnType);
 
-            return DynamicExpressionParser.ParseLambda(config, false, parameters, returnType, expression);
         }
 
         public Func<object[], T> Compile<T>(string expression, RuleParameter[] ruleParams)
-        {           
+        {
+            var rtype = typeof(T);
+            if(rtype == typeof(object))
+            {
+                rtype = null;
+            }
             var cacheKey = GetCacheKey(expression, ruleParams, typeof(T));
-            return _memoryCache.GetOrCreate(cacheKey, (entry) => {
-                entry.SetSize(1);
+            return _memoryCache.GetOrCreate(cacheKey, () => {
                 var parameterExpressions = GetParameterExpression(ruleParams).ToArray();
             
-                var e = Parse(expression, parameterExpressions, typeof(T));
-                var expressionBody = new List<Expression>() { e.Body };
+                var e = Parse(expression, parameterExpressions, rtype);
+                if(rtype == null)
+                {
+                    e = Expression.Convert(e, typeof(T));
+                }
+                var expressionBody = new List<Expression>() { e };
                 var wrappedExpression = WrapExpression<T>(expressionBody, parameterExpressions, new ParameterExpression[] { });
                 return wrappedExpression.CompileFast();
             });
@@ -75,7 +84,7 @@ namespace RulesEngine.ExpressionBuilders
         }
 
         public T Evaluate<T>(string expression, RuleParameter[] ruleParams)
-        {
+        {   
             var func = Compile<T>(expression, ruleParams);
             return func(ruleParams.Select(c => c.Value).ToArray());
         }

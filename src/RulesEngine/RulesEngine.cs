@@ -2,13 +2,12 @@
 // Licensed under the MIT License.
 
 using FluentValidation;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RulesEngine.Actions;
 using RulesEngine.Exceptions;
 using RulesEngine.ExpressionBuilders;
+using RulesEngine.HelperFunctions;
 using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using RulesEngine.Validators;
@@ -27,9 +26,8 @@ namespace RulesEngine
     public class RulesEngine : IRulesEngine
     {
         #region Variables
-        private readonly ILogger _logger;
         private readonly ReSettings _reSettings;
-        private readonly RulesCache _rulesCache = new RulesCache();
+        private readonly RulesCache _rulesCache;
         private readonly RuleExpressionParser _ruleExpressionParser;
         private readonly RuleCompiler _ruleCompiler;
         private readonly ActionFactory _actionFactory;
@@ -37,23 +35,27 @@ namespace RulesEngine
         #endregion
 
         #region Constructor
-        public RulesEngine(string[] jsonConfig, ILogger logger = null, ReSettings reSettings = null) : this(logger, reSettings)
+        public RulesEngine(string[] jsonConfig, ReSettings reSettings = null) : this(reSettings)
         {
             var workflow = jsonConfig.Select(item => JsonConvert.DeserializeObject<Workflow>(item)).ToArray();
             AddWorkflow(workflow);
         }
 
-        public RulesEngine(Workflow[] Workflows, ILogger logger = null, ReSettings reSettings = null) : this(logger, reSettings)
+        public RulesEngine(Workflow[] Workflows, ReSettings reSettings = null) : this(reSettings)
         {
             AddWorkflow(Workflows);
         }
 
-        public RulesEngine(ILogger logger = null, ReSettings reSettings = null)
+        public RulesEngine(ReSettings reSettings = null)
         {
-            _logger = logger ?? new NullLogger<RulesEngine>();
             _reSettings = reSettings ?? new ReSettings();
+            if(_reSettings.CacheConfig == null)
+            {
+                _reSettings.CacheConfig = new MemCacheConfig();         
+            }
+            _rulesCache = new RulesCache(_reSettings);
             _ruleExpressionParser = new RuleExpressionParser(_reSettings);
-            _ruleCompiler = new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings, _ruleExpressionParser),_reSettings, _logger);
+            _ruleCompiler = new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings, _ruleExpressionParser),_reSettings);
             _actionFactory = new ActionFactory(GetActionRegistry(_reSettings));
         }
 
@@ -80,8 +82,6 @@ namespace RulesEngine
         /// <returns>List of rule results</returns>
         public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params object[] inputs)
         {
-            _logger.LogTrace($"Called {nameof(ExecuteAllRulesAsync)} for workflow {workflowName} and count of input {inputs.Count()}");
-
             var ruleParams = new List<RuleParameter>();
 
             for (var i = 0; i < inputs.Length; i++)
@@ -212,6 +212,16 @@ namespace RulesEngine
         }
 
         /// <summary>
+        /// Checks is workflow exist.
+        /// </summary>
+        /// <param name="workflowName">The workflow name.</param>
+        /// <returns> <c>true</c> if contains the specified workflow name; otherwise, <c>false</c>.</returns>
+        public bool ContainsWorkflow(string workflowName)
+        {
+            return _rulesCache.ContainsWorkflows(workflowName);
+        }
+
+        /// <summary>
         /// Clears the workflow.
         /// </summary>
         public void ClearWorkflows()
@@ -248,7 +258,6 @@ namespace RulesEngine
             }
             else
             {
-                _logger.LogTrace($"Rule config file is not present for the {workflowName} workflow");
                 // if rules are not registered with Rules Engine
                 throw new ArgumentException($"Rule config file is not present for the {workflowName} workflow");
             }
@@ -281,7 +290,6 @@ namespace RulesEngine
                 }
 
                 _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, dictFunc);
-                _logger.LogTrace($"Rules has been compiled for the {workflowName} workflow and added to dictionary");
                 return true;
             }
             else
@@ -321,8 +329,6 @@ namespace RulesEngine
         /// <returns>list of rule result set</returns>
         private List<RuleResultTree> ExecuteAllRuleByWorkflow(string workflowName, RuleParameter[] ruleParameters)
         {
-            _logger.LogTrace($"Compiled rules found for {workflowName} workflow and executed");
-
             var result = new List<RuleResultTree>();
             var compiledRulesCacheKey = GetCompiledRulesKey(workflowName, ruleParameters);
             foreach (var compiledRule in _rulesCache.GetCompiledRules(compiledRulesCacheKey)?.Values)
@@ -345,7 +351,7 @@ namespace RulesEngine
         {
             return new Dictionary<string, Func<ActionBase>>{
                 {"OutputExpression",() => new OutputExpressionAction(_ruleExpressionParser) },
-                {"EvaluateRule", () => new EvaluateRuleAction(this) }
+                {"EvaluateRule", () => new EvaluateRuleAction(this,_ruleExpressionParser) }
             };
         }
 

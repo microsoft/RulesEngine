@@ -19,7 +19,7 @@ namespace RulesEngine.UnitTest.ActionTests
         public async Task CustomActionOnRuleMustHaveContextValues()
         {
             var workflow = GetWorkflow();
-            var re = new RulesEngine(workflow, null, reSettings: new ReSettings {
+            var re = new RulesEngine(workflow, reSettings: new ReSettings {
                 CustomActions = new Dictionary<string, System.Func<Actions.ActionBase>> {
 
                     { "ReturnContext", () => new ReturnContextAction() }
@@ -39,7 +39,7 @@ namespace RulesEngine.UnitTest.ActionTests
             var workflowViaTextJson = System.Text.Json.JsonSerializer.Deserialize<Workflow[]>(workflowStr,serializationOptions);
 
 
-            var re = new RulesEngine(workflow, null, reSettings: new ReSettings {
+            var re = new RulesEngine(workflow, reSettings: new ReSettings {
                 CustomActions = new Dictionary<string, System.Func<Actions.ActionBase>> {
 
                     { "ReturnContext", () => new ReturnContextAction() }

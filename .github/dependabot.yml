@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: "github-actions"
     # default location of `.github/workflows`
     directory: "/"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
     schedule:
       interval: "weekly"
     # assignees:
@@ -14,9 +14,9 @@ updates:
   - package-ecosystem: "nuget"
     # location of package manifests
     directory: "/"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
     schedule:
-      interval: "daily"
+      interval: "weekly"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-minor"]

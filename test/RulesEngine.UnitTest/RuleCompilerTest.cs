@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Microsoft.Extensions.Logging.Abstractions;
 using RulesEngine.ExpressionBuilders;
 using RulesEngine.Models;
 using System;
@@ -17,10 +16,10 @@ namespace RulesEngine.UnitTest
         [Fact]
         public void RuleCompiler_NullCheck()
         {
-            Assert.Throws<ArgumentNullException>(() => new RuleCompiler(null, null,null));
+            Assert.Throws<ArgumentNullException>(() => new RuleCompiler(null, null));
             var reSettings = new ReSettings();
             var parser = new RuleExpressionParser(reSettings);
-            Assert.Throws<ArgumentNullException>(() => new RuleCompiler(new RuleExpressionBuilderFactory(reSettings, parser), null,null));
+            Assert.Throws<ArgumentNullException>(() => new RuleCompiler(null, null));
         }
 
         [Fact]
@@ -28,11 +27,9 @@ namespace RulesEngine.UnitTest
         {
             var reSettings = new ReSettings();
             var parser = new RuleExpressionParser(reSettings);
-            var compiler = new RuleCompiler(new RuleExpressionBuilderFactory(reSettings, parser),null, new NullLogger<RuleCompiler>());
+            var compiler = new RuleCompiler(new RuleExpressionBuilderFactory(reSettings, parser),null);
             Assert.Throws<ArgumentNullException>(() => compiler.CompileRule(null, null,null));
             Assert.Throws<ArgumentNullException>(() => compiler.CompileRule(null, new RuleParameter[] { null },null));
         }
-
-
     }
 }
