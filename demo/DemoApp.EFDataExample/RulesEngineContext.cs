@@ -27,10 +27,6 @@ namespace RulesEngine.Data
                 entity.Ignore(b => b.WorkflowsToInject);
             });
 
-            //modelBuilder.Entity<Rule>()
-            //.Property<string>("RuleNameZ");
-
-            //modelBuilder.Entity<Rule>().HasOne<Workflow>().WithMany(r => r.Rules).HasForeignKey("RuleNameZ");
             modelBuilder.Entity<Rule>().HasOne<Rule>().WithMany(r => r.Rules).HasForeignKey("RuleNameFK");
 
             var serializationOptions = new JsonSerializerOptions(JsonSerializerDefaults.General);
