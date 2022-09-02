@@ -101,7 +101,9 @@ namespace RulesEngine
         /// <returns>List of rule results</returns>
         public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params RuleParameter[] ruleParams)
         {
-            var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, ruleParams);
+            var sortedRuleParams = ruleParams.ToList();
+            sortedRuleParams.Sort((RuleParameter a, RuleParameter b) => string.Compare(a.Name, b.Name));
+            var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, sortedRuleParams.ToArray());
             await ExecuteActionAsync(ruleResultList);
             return ruleResultList;
         }
@@ -343,7 +345,7 @@ namespace RulesEngine
 
         private string GetCompiledRulesKey(string workflowName, RuleParameter[] ruleParams)
         {
-            var key = $"{workflowName}-" + string.Join("-", ruleParams.Select(c => c.Type.Name));
+            var key = $"{workflowName}-" + string.Join("-", ruleParams.Select(c => $"{c.Name}_{c.Type.Name}"));
             return key;
         }
 
