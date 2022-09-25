@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.0.0]
+- RulesEngine is now available in both dotnet 6 and netstandard 2.0
+- Dependency on ILogger, MemoryCache have been removed 
+- Obsolete Properties and Methods have been removed
+### Breaking Changes
+- ILogger has been removed from RulesEngine and all its constructors
+```diff
+- RulesEngine(string[] jsonConfig, ILogger logger = null, ReSettings reSettings = null)
++ RulesEngine(string[] jsonConfig, ReSettings reSettings = null)
+
+- RulesEngine(Workflow[] Workflows, ILogger logger = null, ReSettings reSettings = null)
++ RulesEngine(Workflow[] Workflows, ReSettings reSettings = null)
+
+- RulesEngine(ILogger logger = null, ReSettings reSettings = null)
++ RulesEngine(ReSettings reSettings = null)
+```
+- Obsolete methods and properties have been removed, from the follow models:-
+	- RuleResultTree
+		- `ToResultTreeMessages()` has been removed from `RuleResultTree` model
+		- `GetMessages()` has been removed from `RuleResultTree` model
+		- `RuleEvaluatedParams` has been removed from `RuleResultTree` model, Please use `Inputs` instead
+
+	- Workflow
+		- `WorkflowRulesToInject` has been removed, Please use `WorkflowsToInject` instead
+		- `ErrorType` has been removed from `Rule`
+
+	- Resettings
+		- `EnableLocalParams` has been removed from `ReSettings`, Please use `EnableScopedParams` instead
+	
+
 ## [3.5.0]
 - `EvaluateRule` action now support custom inputs and filtered inputs
 - Added `ContainsWorkflow` method in RulesEngine (by @okolobaxa)
