@@ -50,29 +50,6 @@ namespace RulesEngine.Models
         /// </summary>
         public string ExceptionMessage { get; set; }
 
-        /// <summary>
-        /// Gets or sets the rule evaluated parameters.
-        /// </summary>
-        /// <value>
-        /// The rule evaluated parameters.
-        /// </value>
-        [Obsolete("Use `Inputs` field to get details of all input, localParams and globalParams")]
-        public IEnumerable<RuleParameter> RuleEvaluatedParams { get; set; }
-
-        /// <summary>
-        /// This method will return all the error and warning messages to caller
-        /// </summary>
-        /// <returns>RuleResultMessage</returns>
-        [ExcludeFromCodeCoverage]
-        [Obsolete("will be removed in next major version")]
-        public RuleResultMessage GetMessages()
-        {
-            var ruleResultMessage = new RuleResultMessage();
-
-            Helpers.ToResultTreeMessages(this, ref ruleResultMessage);
-
-            return ruleResultMessage;
-        }
     }
 
     /// <summary>

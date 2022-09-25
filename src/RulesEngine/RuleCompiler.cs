@@ -252,14 +252,6 @@ namespace RulesEngine
                
                 var extendedInputs = ruleParams.Concat(scopedParams);
                 var result = ruleFunc(extendedInputs.ToArray());
-                // To be removed in next major release
-#pragma warning disable CS0618 // Type or member is obsolete
-                if(result.RuleEvaluatedParams == null)
-                {
-                    result.RuleEvaluatedParams = scopedParams;
-                }
-#pragma warning restore CS0618 // Type or member is obsolete
-
                 return result;
             };
         }

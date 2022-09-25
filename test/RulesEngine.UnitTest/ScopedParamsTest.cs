@@ -162,10 +162,6 @@ namespace RulesEngine.UnitTest
             var localParamNames = resultTree.Rule.LocalParams?.Select(c => c.Name) ?? new List<string>();
             Assert.All(localParamNames, input => Assert.True(resultTree.Inputs.ContainsKey(input)));
 
-#pragma warning disable CS0618 // Type or member is obsolete
-            Assert.All(localParamNames, lp => Assert.Contains(resultTree.RuleEvaluatedParams, c => c.Name == lp));
-#pragma warning restore CS0618 // Type or member is obsolete
-
             if (resultTree.ChildResults?.Any() == true)
             {
                 foreach (var childResultTree in resultTree.ChildResults)
