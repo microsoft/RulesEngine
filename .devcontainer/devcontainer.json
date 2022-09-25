@@ -15,7 +15,8 @@
 		"coenraads.bracket-pair-colorizer",
 		"vscode-icons-team.vscode-icons",
 		"editorconfig.editorconfig",
-		"aliasadidev.nugetpackagemanagergui"
+		"aliasadidev.nugetpackagemanagergui",
+		"formulahendry.dotnet-test-explorer"
 	],
 	"postCreateCommand": "dotnet restore RulesEngine.sln && dotnet build RulesEngine.sln --configuration Release --no-restore && dotnet test RulesEngine.sln --configuration Release --no-build --verbosity minimal",
 	"features": {
