@@ -74,50 +74,5 @@ namespace RulesEngine.HelperFunctions
         {
             return reSettings.IgnoreException ? "" : message;
         }
-
-        /// <summary>
-        /// To the result tree error messages
-        /// </summary>
-        /// <param name="ruleResultTree">ruleResultTree</param>
-        /// <param name="ruleResultMessage">ruleResultMessage</param>
-        [Obsolete]
-        internal static void ToResultTreeMessages(RuleResultTree ruleResultTree, ref RuleResultMessage ruleResultMessage)
-        {
-            if (ruleResultTree.ChildResults != null)
-            {
-                GetChildRuleMessages(ruleResultTree.ChildResults, ref ruleResultMessage);
-            }
-            else
-            {
-                if (!ruleResultTree.IsSuccess)
-                {
-                    string errMsg = ruleResultTree.Rule.ErrorMessage;
-                    errMsg = string.IsNullOrEmpty(errMsg) ? $"Error message is not configured for {ruleResultTree.Rule.RuleName}" : errMsg;
-
-                    if (ruleResultTree.Rule.ErrorType == ErrorType.Error && !ruleResultMessage.ErrorMessages.Contains(errMsg))
-                    {
-                        ruleResultMessage.ErrorMessages.Add(errMsg);
-                    }
-                    else if (ruleResultTree.Rule.ErrorType == ErrorType.Warning && !ruleResultMessage.WarningMessages.Contains(errMsg))
-                    {
-                        ruleResultMessage.WarningMessages.Add(errMsg);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// To get the child error message recursively
-        /// </summary>
-        /// <param name="childResultTree">childResultTree</param>
-        /// <param name="ruleResultMessage">ruleResultMessage</param>
-        [Obsolete]
-        private static void GetChildRuleMessages(IEnumerable<RuleResultTree> childResultTree, ref RuleResultMessage ruleResultMessage)
-        {
-            foreach (var item in childResultTree)
-            {
-                ToResultTreeMessages(item, ref ruleResultMessage);
-            }
-        }
     }
 }

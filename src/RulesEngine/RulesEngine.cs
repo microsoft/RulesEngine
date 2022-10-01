@@ -345,8 +345,8 @@ namespace RulesEngine
 
         private string GetCompiledRulesKey(string workflowName, RuleParameter[] ruleParams)
         {
-            var ruleParamsHash = string.Join("-", ruleParams.Select(c => $"{c.Name}_{c.Type.Name}")).GetHashCode();
-            var key = $"{workflowName}-" + ruleParamsHash;
+            var ruleParamsKey = string.Join("-", ruleParams.Select(c => $"{c.Name}_{c.Type.Name}"));
+            var key = $"{workflowName}-" + ruleParamsKey;
             return key;
         }
 

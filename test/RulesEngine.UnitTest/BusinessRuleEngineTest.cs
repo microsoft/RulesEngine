@@ -238,22 +238,6 @@ namespace RulesEngine.UnitTest
             Assert.False(string.IsNullOrEmpty(result[0].ExceptionMessage) || string.IsNullOrWhiteSpace(result[0].ExceptionMessage));
         }
 
-        [Theory]
-        [InlineData("rules2.json")]
-        [Obsolete]
-        public async Task ExecuteRule_ReturnsListOfRuleResultTree_ResultMessage(string ruleFileName)
-        {
-            var re = GetRulesEngine(ruleFileName);
-
-            dynamic input1 = GetInput1();
-            dynamic input2 = GetInput2();
-            dynamic input3 = GetInput3();
-
-            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
-            Assert.NotNull(result);
-            Assert.NotNull(result.First().GetMessages());
-            Assert.NotNull(result.First().GetMessages().WarningMessages);
-        }
 
         [Fact]
         public void RulesEngine_New_IncorrectJSON_ThrowsException()
