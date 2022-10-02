@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - RulesEngine is now available in both dotnet 6 and netstandard 2.0
 - Dependency on ILogger, MemoryCache have been removed 
 - Obsolete Properties and Methods have been removed
+- Fixed name of RuleParameter is ignored if the type is recognized (by @peeveen)
 ### Breaking Changes
 - ILogger has been removed from RulesEngine and all its constructors
 ```diff
