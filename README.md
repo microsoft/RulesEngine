@@ -51,10 +51,9 @@ An example rule:
 You can inject the rules into the Rules Engine by initiating an instance by using the following code - 
 
 ```c#
-var rulesEngine = new RulesEngine(workflow, logger);
+var rulesEngine = new RulesEngine(workflow);
 ```
-Here, *workflow* is a list of deserialized objects based on the schema explained above and *logger* is a custom logger instance made out of an [ILogger](https://github.com/microsoft/RulesEngine/wiki/Getting-Started#logger) instance.
-
+Here, *workflow* is a list of deserialized objects based on the schema explained above
 Once initialised, the Rules Engine needs to execute the rules for a given input. This can be done by calling the method `ExecuteAllRulesAsync`: 
 
 ```c#
@@ -92,7 +91,7 @@ exampleWorkflow.Rules = rules;
 
 workflows.Add(exampleWorkflow);
 
-var bre = new RulesEngine.RulesEngine(workflows.ToArray(), null);
+var bre = new RulesEngine.RulesEngine(workflows.ToArray());
 ```
 ### Entity Framework
 
