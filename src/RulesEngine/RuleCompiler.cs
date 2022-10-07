@@ -83,7 +83,7 @@ namespace RulesEngine
             var scopedParamList = GetRuleExpressionParameters(rule.RuleExpressionType, rule?.LocalParams, ruleParams);
 
             var extendedRuleParams = ruleParams.Concat(scopedParamList.Select(c => new RuleParameter(c.ParameterExpression.Name, c.ParameterExpression.Type)))
-                                               .ToArray();
+                                               .DistinctBy(e => e.Name).ToArray();
 
             RuleFunc<RuleResultTree> ruleFn;
             
@@ -250,7 +250,7 @@ namespace RulesEngine
                     return resultFn(ruleParams);
                 }
                
-                var extendedInputs = ruleParams.Concat(scopedParams);
+                var extendedInputs = ruleParams.Concat(scopedParams).DistinctBy(e => e.Name);
                 var result = ruleFunc(extendedInputs.ToArray());
                 return result;
             };
@@ -260,5 +260,7 @@ namespace RulesEngine
         {
             return _expressionBuilderFactory.RuleGetExpressionBuilder(expressionType);
         }
+
+        
     }
 }

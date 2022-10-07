@@ -26,10 +26,10 @@ namespace RulesEngine.Actions
             var innerResult = await base.ExecuteAndReturnResultAsync(context, ruleParameters, includeRuleResults);
             var output = innerResult.Output as ActionRuleResult;
             List<RuleResultTree> resultList = null;
-            if (includeRuleResults)
+            if (includeRuleResults || output?.Results?.Count > 0)
             {
                 resultList = new List<RuleResultTree>(output?.Results ?? new List<RuleResultTree>() { });
-                resultList.AddRange(innerResult.Results);
+                if (innerResult.Results?.Count() > 0) resultList.AddRange(innerResult.Results);
             }
             return new ActionRuleResult {
                 Output = output?.Output,
