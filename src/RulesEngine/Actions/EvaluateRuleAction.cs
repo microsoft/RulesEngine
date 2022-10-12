@@ -27,14 +27,6 @@ namespace RulesEngine.Actions
             var output = innerResult.Output as ActionRuleResult;
             List<RuleResultTree> resultList = null;
 
-            if (innerResult.Exception != null)
-            {
-                foreach(var result in innerResult.Results)
-                {
-                    result.ExceptionMessage += innerResult.Exception.Message;
-                }
-            }
-
             if (includeRuleResults || output?.Results?.Count > 0)
             {
                 resultList = new List<RuleResultTree>(output?.Results ?? new List<RuleResultTree>() { });
