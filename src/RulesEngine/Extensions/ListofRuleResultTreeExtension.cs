@@ -36,7 +36,7 @@ namespace RulesEngine.Extensions
         /// Calls the Failure Func if all rules failed in the ruleReults
         /// </summary>
         /// <param name="ruleResultTrees"></param>
-        /// <param name="onSuccessFunc"></param>
+        /// <param name="onFailureFunc"></param>
         /// <returns></returns>
         public static List<RuleResultTree> OnFail(this List<RuleResultTree> ruleResultTrees, OnFailureFunc onFailureFunc)
         {
