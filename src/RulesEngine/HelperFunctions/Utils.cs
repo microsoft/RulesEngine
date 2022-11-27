@@ -72,7 +72,9 @@ namespace RulesEngine.HelperFunctions
             if (signedIndex > unsignedIndex)
                 return SignedNumericTypes[signedIndex];
             // Otherwise we will need to increase the size.
-            return SignedNumericTypes[Math.Min(unsignedIndex+1,SignedNumericTypes.Count-1)];
+            // There are fewer unsigned types than signed types, so we can't exceed the
+            // signed-type array length by adding 1.
+            return SignedNumericTypes[unsignedIndex + 1];
         }
         public static Type CreateAbstractClassType(dynamic input, int sampleSize = 1)
         {
