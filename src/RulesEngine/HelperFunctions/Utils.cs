@@ -137,9 +137,8 @@ namespace RulesEngine.HelperFunctions
         {
             if (!(input is ExpandoObject))
             {
-                var underlyingType = Nullable.GetUnderlyingType(type);
                 try {
-                    return Convert.ChangeType(input, underlyingType ?? type);
+                    return Convert.ChangeType(input, Nullable.GetUnderlyingType(type) ?? type);
                 } catch (InvalidCastException) {
                     return TypeDescriptor.GetConverter(type).ConvertFrom(input);
                 }
