@@ -70,7 +70,7 @@ namespace RulesEngine.UnitTest {
 
 			// This test should PASS. We are passing a sampleSize of 1, which should mean that the
 			// type detection code will look at only the first list element (an int), and convert
-			// the entire list to ints. Subsequently, the -5.5 value (which should make the "< -5.5"
+			// the entire list to ints. Subsequently, the -5.5 value (which should make the "< -5.6"
 			// condition FAIL) will be converted to -6, causing it to PASS.
 			// Note that -5.5 will, weirdly, become -6, even though a simple explicit cast of
 			// "(int)-5.5" is actually "-5". This is because the Utils code uses
