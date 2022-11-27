@@ -57,6 +57,7 @@ namespace RulesEngine.UnitTest {
 				inputDataObject.values = inputValues;
 				var inputDynamic = new RuleParameter("test", inputDataObject, sampleSize);
 				var result = await engine.ExecuteAllRulesAsync(workflowName, inputDynamic);
+				Assert.Equal("", result.First().ExceptionMessage);
 				Assert.True(result.First().IsSuccess == expectedToPass);
 			}
 
