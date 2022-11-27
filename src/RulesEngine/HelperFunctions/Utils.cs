@@ -35,7 +35,8 @@ namespace RulesEngine.HelperFunctions
             // If the other is not a value type, then null is a valid value for that type.
             if ((t1 == null && t2 != null) || (t1 != null && t2 == null)) {
                 var nonNullType = t1 ?? t2;
-                return nonNullType.IsValueType ? typeof(Nullable<>).MakeGenericType(nonNullType) : nonNullType;
+                // If the non-null type is already a Nullable type, it's good enough.
+                return nonNullType.IsValueType && Nullable.GetUnderlyingType(nonNullType) == null ? typeof(Nullable<>).MakeGenericType(nonNullType) : nonNullType;
             }
             var t1IsValueType = t1.IsValueType;
             var t2IsValueType = t2.IsValueType;
@@ -107,6 +108,15 @@ namespace RulesEngine.HelperFunctions
                             var sampleCount = (sampleSize <= 0 ? expandoListCount : sampleSize);
                             for (int f = 1; f < sampleCount; ++f)
                                 otherTypes.Add(expandoList[f] == null ? null : CreateAbstractClassType(expandoList[f], sampleSize));
+                            // If there are any nulls, we want to deal with them LAST.
+                            // Otherwise we might find an int, then a null (changing our type to Nullable<int>)
+                            // then a double, then a null ... in that example, we would want Nullable<double> to
+                            // be the result. Without re-ordering (or more complex logic in CoerceTypes), we
+                            // would end up with "object" (or worse, an exception of some kind).
+                            if (otherTypes.Any(t => t == null)) {
+                                otherTypes = otherTypes.Where(t => t != null).ToList();
+                                otherTypes.Add(null);
+                            }
                             var internalType = otherTypes.Aggregate(firstType, CoerceTypes) ?? typeof(object);
                             value = new List<object>().Cast(internalType).ToList(internalType).GetType();
                         }

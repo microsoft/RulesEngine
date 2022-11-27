@@ -16,6 +16,9 @@ namespace RulesEngine.UnitTest {
 	public class NumericCoercionTest {
 		[Fact]
 		public void NumericCoercionTest_TypesAreCoercedCorrectly() {
+			Assert.Equal(typeof(System.Nullable<bool>), Utils.CoerceTypes(typeof(bool), null));
+			Assert.Equal(typeof(System.Nullable<bool>), Utils.CoerceTypes(typeof(System.Nullable<bool>), typeof(bool)));
+			Assert.Equal(typeof(System.Nullable<bool>), Utils.CoerceTypes(typeof(System.Nullable<bool>), null));
 			Assert.Equal(typeof(int), Utils.CoerceTypes(typeof(int), typeof(Int32)));
 			Assert.Equal(typeof(int), Utils.CoerceTypes(typeof(sbyte), typeof(ushort)));
 			Assert.Equal(typeof(short), Utils.CoerceTypes(typeof(SByte), typeof(byte)));
@@ -99,7 +102,13 @@ namespace RulesEngine.UnitTest {
 			// This test should FAIL simply because it doesn't have a value < -5.6
 			await RunTest(new List<dynamic> { -1, -2, -3.0, null, -4.0, -5.0, -5.499, -5.5, -5.5 }, 0, false);
 			// This test should PASS because it DOES have a value < -5.6
-			await RunTest(new List<dynamic> { -1, -2, -3.0, null, -4.0, -5.0, -5.499, -5.5, -5.5, -5.60001 }, 0, true);
+			await RunTest(new List<dynamic> { -1, null, -2, -3.0, null, -4.0, -5.0, -5.499, -5.5, -5.5, -5.60001 }, 0, true);
+
+			// Now make sure it copes with type1 -> null -> type2 -> null -> etc
+			// This test should FAIL simply because it doesn't have a value < -5.6
+			await RunTest(new List<dynamic> { -1, -2, -3.0, null, -4.0, -5.0, -5.499, -5.5, -5.5 }, 0, false);
+			// This test should PASS because it DOES have a value < -5.6
+			await RunTest(new List<dynamic> { -1, null, -2, -3.0, null, -4.0, -5.0, -5.499, -5.5, -5.5, -5.60001 }, 0, true);
 		}
 	}
 }
