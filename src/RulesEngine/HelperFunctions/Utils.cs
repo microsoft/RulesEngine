@@ -55,9 +55,9 @@ namespace RulesEngine.HelperFunctions
             var unsignedIndex1 = UnsignedNumericTypes.IndexOf(t1);
             var signedIndex2 = SignedNumericTypes.IndexOf(t2);
             var unsignedIndex2 = UnsignedNumericTypes.IndexOf(t2);
-            // Both types could still be non-numeric value types (bool, char, tuples, enums).
+            // Either or both types could still be non-numeric value types (bool, char, tuples, enums).
             // If this is the case, then once again, we have to use "object".
-            if ((signedIndex1 == -1) && (unsignedIndex1 == -1) && (signedIndex2 == -1) && (unsignedIndex2 == -1))
+            if (((signedIndex1 == -1) && (unsignedIndex1 == -1)) || ((signedIndex2 == -1) && (unsignedIndex2 == -1)))
                 return typeof(object);
             // If they are both signed value types, use the larger.
             if (signedIndex1 != -1 && signedIndex2 != -1)

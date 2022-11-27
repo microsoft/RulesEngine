@@ -29,6 +29,10 @@ namespace RulesEngine.UnitTest {
 			Assert.Equal(typeof(float), Utils.CoerceTypes(typeof(float), typeof(UInt64)));
 			Assert.Equal(typeof(double), Utils.CoerceTypes(typeof(double), typeof(Int64)));
 			Assert.Equal(typeof(System.Nullable<double>), Utils.CoerceTypes(typeof(double), null));
+			Assert.Equal(typeof(object), Utils.CoerceTypes(typeof(char), typeof(int)));
+			Assert.Equal(typeof(object), Utils.CoerceTypes(typeof(bool), typeof(int)));
+			Assert.Equal(typeof(object), Utils.CoerceTypes(typeof(char), typeof(Enum)));
+			Assert.Equal(typeof(System.Nullable<char>), Utils.CoerceTypes(typeof(char), null));
 		}
 
 		[Fact]
