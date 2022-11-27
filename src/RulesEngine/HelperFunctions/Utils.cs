@@ -129,8 +129,7 @@ namespace RulesEngine.HelperFunctions
                 try {
                     return Convert.ChangeType(input, underlyingType ?? type);
                 } catch (InvalidCastException) {
-                    var converter = TypeDescriptor.GetConverter(type);
-                    return converter.ConvertFrom(input);
+                    return TypeDescriptor.GetConverter(type).ConvertFrom(input);
                 }
             }
             object obj = Activator.CreateInstance(type);
