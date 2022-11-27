@@ -34,18 +34,20 @@ namespace RulesEngine.UnitTest {
 		[Fact]
 		public async Task NumericCoercionTest_ReturnsExpectedResults() {
 			var workflowName = "NumericCoercionTestWorkflow";
+			var testObjectName = "test";
+
 			var workflow = new Workflow {
 				WorkflowName = workflowName,
 				Rules = new Rule[] {
 										new Rule {
 												RuleName = "NumericCoercionTestRuleWithoutCast",
 												RuleExpressionType = RuleExpressionType.LambdaExpression,
-												Expression = "test.values.Any(it != null AND it <= -5.6)"
+												Expression = $"{testObjectName}.values.Any(it != null AND it <= -5.6)"
 										},
 										new Rule {
 												RuleName = "NumericCoercionTestRuleWithCast",
 												RuleExpressionType = RuleExpressionType.LambdaExpression,
-												Expression = "test.values.Cast(\"System.Nullable`1[System.Double]\").Any(it != null AND it <= -5.6)"
+												Expression = @$"{testObjectName}.values.Cast(""System.Nullable`1[System.Double]"").Any(it != null AND it <= -5.6)"
 										}
 								}
 			};
@@ -55,9 +57,9 @@ namespace RulesEngine.UnitTest {
 			async Task RunTest(object inputValues, int sampleSize, bool expectedToPass) {
 				dynamic inputDataObject = new ExpandoObject();
 				inputDataObject.values = inputValues;
-				var inputDynamic = new RuleParameter("test", inputDataObject, sampleSize);
+				var inputDynamic = new RuleParameter(testObjectName, inputDataObject, sampleSize);
 				var result = await engine.ExecuteAllRulesAsync(workflowName, inputDynamic);
-				Assert.Equal("", result.First().ExceptionMessage);
+				Assert.Equal(string.Empty, result.First().ExceptionMessage);
 				Assert.True(result.First().IsSuccess == expectedToPass);
 			}
 
