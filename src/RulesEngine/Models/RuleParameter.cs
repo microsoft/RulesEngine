@@ -11,9 +11,9 @@ namespace RulesEngine.Models
     [ExcludeFromCodeCoverage]
     public class RuleParameter
     {
-        public RuleParameter(string name, object value)
+        public RuleParameter(string name, object value, int typeDetectionSampleSize = 1)
         {
-            Value = Utils.GetTypedObject(value);
+            Value = Utils.GetTypedObject(value, typeDetectionSampleSize);
             Init(name, Value?.GetType());
         }
 

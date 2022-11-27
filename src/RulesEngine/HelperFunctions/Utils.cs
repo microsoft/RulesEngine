@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Dynamic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -12,11 +13,11 @@ namespace RulesEngine.HelperFunctions
 {
     public static class Utils
     {
-        public static object GetTypedObject(dynamic input)
+        public static object GetTypedObject(dynamic input, int sampleSize = 1)
         {
             if (input is ExpandoObject)
             {
-                Type type = CreateAbstractClassType(input);
+                Type type = CreateAbstractClassType(input, sampleSize);
                 return CreateObject(type, input);
             }
             else
@@ -27,37 +28,49 @@ namespace RulesEngine.HelperFunctions
         private static readonly List<Type> UnsignedNumericTypes = new List<Type> { typeof(byte), typeof(ushort), typeof(uint), typeof(ulong)};
         private static readonly List<Type> SignedNumericTypes = new List<Type> { typeof(sbyte), typeof(short), typeof(int), typeof(long), typeof(decimal), typeof(float), typeof(double) };
         internal static Type CoerceNumericTypes(Type t1, Type t2) {
-            // TODO: A bit more intelligence maybe? It could check the actual value
-            // instead of "just" the type to see if the value is within the range of
-            // the current type.
+            // If the types are the same, use that type.
             if (t1 == t2)
                 return t1;
-            // If either type is "object", we're stuck.
-            if (t1 == typeof(object) || t2 == typeof(object))
+            // If one of the types is null, we can try to create a Nullable type from the other.
+            // If the other is not a value type, then null is a valid value for that type.
+            if ((t1 == null && t2 != null) || (t1 != null && t2 == null)) {
+                var nonNullType = t1 ?? t2;
+                return nonNullType.IsValueType ? typeof(Nullable<>).MakeGenericType(nonNullType) : nonNullType;
+            }
+            var t1IsValueType = t1.IsValueType;
+            var t2IsValueType = t2.IsValueType;
+            // If both types are not value types, we'll have to use "object".
+            if (!t1IsValueType && !t2IsValueType)
                 return typeof(object);
+            // If one type is a value type, and the other isn't, we'll have to use "object", unless the other
+            // type is already a Nullable variant of the value type, in which case we use that.
+            if (t1IsValueType && Nullable.GetUnderlyingType(t2) == t1)
+                return t2;
+            if (t2IsValueType && Nullable.GetUnderlyingType(t1) == t2)
+                return t1;
+            if (t1IsValueType != t2IsValueType)
+                return typeof(object);
+            // If we have a mix of value types, we might be able to come up with a compromise ...
             var signedIndex1 = SignedNumericTypes.IndexOf(t1);
             var unsignedIndex1 = UnsignedNumericTypes.IndexOf(t1);
             var signedIndex2 = SignedNumericTypes.IndexOf(t2);
             var unsignedIndex2 = UnsignedNumericTypes.IndexOf(t2);
-            // If neither type is a number, we're stuck.
-            if ((signedIndex1 == -1 && unsignedIndex1 == -1) || (signedIndex2 == -1 && unsignedIndex2 == -1))
-                return typeof(object);
-            // If they are both signed types, use the larger.
+            // If they are both signed value types, use the larger.
             if (signedIndex1 != -1 && signedIndex2 != -1)
                 return SignedNumericTypes[Math.Max(signedIndex1, signedIndex2)];
-            // If they are both unsigned types, use the larger.
+            // If they are both unsigned value types, use the larger.
             if (unsignedIndex1 != -1 && unsignedIndex2 != -1)
                 return UnsignedNumericTypes[Math.Max(unsignedIndex1, unsignedIndex2)];
-            // If there is a signed/unsigned mismatch, we will need to use a signed type.
-            // If the signed type is larger than the unsigned type, use that.
+            // If there is a signed/unsigned mismatch, we will need to use a signed value type.
+            // If the signed value type is larger than the unsigned value type, use that.
             var signedIndex = Math.Max(signedIndex1, signedIndex2);
             var unsignedIndex = Math.Max(unsignedIndex1, unsignedIndex2);
             if (signedIndex > unsignedIndex)
                 return SignedNumericTypes[signedIndex];
-            // Otherwise we will need to step up the size.
+            // Otherwise we will need to increase the size.
             return SignedNumericTypes[Math.Min(unsignedIndex+1,SignedNumericTypes.Count-1)];
         }
-        public static Type CreateAbstractClassType(dynamic input)
+        public static Type CreateAbstractClassType(dynamic input, int sampleSize = 1)
         {
             List<DynamicProperty> props = new List<DynamicProperty>();
 
@@ -83,18 +96,18 @@ namespace RulesEngine.HelperFunctions
                             value = typeof(List<object>);
                         else
                         {
-                            var firstType = CreateAbstractClassType(expandoList[0]);
+                            var firstType = expandoList[0] == null ? null : CreateAbstractClassType(expandoList[0], sampleSize);
                             var otherTypes = new List<Type>(expandoListCount);
-                            for(int f = 1; f < expandoListCount; ++f)
-                                otherTypes.Add(CreateAbstractClassType(expandoList[f]));
-                            var internalType = otherTypes.Aggregate(firstType, CoerceNumericTypes);
+                            var sampleCount = (sampleSize <= 0 ? expandoListCount : sampleSize);
+                            for (int f = 1; f < sampleCount; ++f)
+                                otherTypes.Add(expandoList[f] == null ? null : CreateAbstractClassType(expandoList[f], sampleSize));
+                            var internalType = otherTypes.Aggregate(firstType, CoerceNumericTypes) ?? typeof(object);
                             value = new List<object>().Cast(internalType).ToList(internalType).GetType();
                         }
-
                     }
                     else
                     {
-                        value = CreateAbstractClassType(expando.Value);
+                        value = CreateAbstractClassType(expando.Value, sampleSize);
                     }
                     props.Add(new DynamicProperty(expando.Key, value));
                 }
@@ -108,7 +121,13 @@ namespace RulesEngine.HelperFunctions
         {
             if (!(input is ExpandoObject))
             {
-                return Convert.ChangeType(input, type);
+                var underlyingType = Nullable.GetUnderlyingType(type);
+                try {
+                    return Convert.ChangeType(input, underlyingType ?? type);
+                } catch (InvalidCastException) {
+                    var converter = TypeDescriptor.GetConverter(type);
+                    return converter.ConvertFrom(input);
+                }
             }
             object obj = Activator.CreateInstance(type);
 
