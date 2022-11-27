@@ -61,22 +61,30 @@ namespace RulesEngine.UnitTest {
 			var engine = new RulesEngine();
 			engine.AddOrUpdateWorkflow(workflow);
 
-			async Task RunTest(object inputValues, int sampleSize, bool expectedToPass) {
+			async Task RunTest(object inputValues, int sampleSize, bool[] expectedResults, bool[] noExceptionExpecteds) {
 				dynamic inputDataObject = new ExpandoObject();
 				inputDataObject.values = inputValues;
 				var inputDynamic = new RuleParameter(testObjectName, inputDataObject, sampleSize);
-				var result = await engine.ExecuteAllRulesAsync(workflowName, inputDynamic);
-				Assert.Equal(string.Empty, result.First().ExceptionMessage);
-				Assert.True(result.First().IsSuccess == expectedToPass);
+				var results = await engine.ExecuteAllRulesAsync(workflowName, inputDynamic);
+				int index = 0;
+				foreach (var result in results) {
+					var expectedResult = expectedResults[index];
+					var noExceptionExpected = noExceptionExpecteds[index++];
+					if (noExceptionExpected)
+						Assert.Equal(string.Empty, result.ExceptionMessage);
+					else
+						Assert.NotEqual(string.Empty, result.ExceptionMessage);
+					Assert.True(result.IsSuccess == expectedResult);
+				}
 			}
 
 			// Using a non-dynamic array will work. The runtime will treat this as an array of
 			// doubles. Even though we are only using a sample size of 1, that is enough to
 			// convince the engine that the collection is a collection of doubles.
 			// So this will PASS since there ARE values < -5.6
-			await RunTest(new[] { -1, -2, -3.0, -4.0, -5.0, -5.499, -5.5, -5.60001 }, 1, true);
+			await RunTest(new[] { -1, -2, -3.0, -4.0, -5.0, -5.499, -5.5, -5.60001 }, 1, new[] { true, true }, new[] { true, true });
 			// And this will FAIL since there are NO values < -5.6
-			await RunTest(new[] { -1, -2, -3.0, -4.0, -5.0, -5.499, -5.5 }, 1, false);
+			await RunTest(new[] { -1, -2, -3.0, -4.0, -5.0, -5.499, -5.5 }, 1, new[] { false, false }, new[] { true, true });
 
 			// This test should PASS. We are passing a sampleSize of 1, which should mean that the
 			// type detection code will look at only the first list element (an int), and convert
@@ -86,29 +94,33 @@ namespace RulesEngine.UnitTest {
 			// "(int)-5.5" is actually "-5". This is because the Utils code uses
 			// Convert.ChangeType(), which does a different style of conversion, and will convert
 			// -5.5 to -6 for some reason.
-			await RunTest(new List<dynamic> { -1, -2, -3.0, -4.0, -5.0, -5.499, -5.5 }, 1, true);
+			// The casting rule will fail though, as it will be attempting to cast ints to nullable
+			// doubles.
+			await RunTest(new List<dynamic> { -1, -2, -3.0, -4.0, -5.0, -5.499, -5.5 }, 1, new[] { true, false }, new[] { true, false });
 			// Same test, but with a sample size of 0 (meaning "sample all data"). Since later
 			// values are doubles, this will treat all values as doubles, and so we will get the
-			// correct result of FAIL.
-			await RunTest(new List<dynamic> { -1, -2, -3.0, -4.0, -5.0, -5.499, -5.5, -5.5 }, 0, false);
+			// correct result of PASS (since there is a value < -5.6).
+			await RunTest(new List<dynamic> { -1, -2, -3.0, -4.0, -5.0, -5.499, -5.5, -5.5, -5.60001 }, 0, new[] { true, true }, new[] { true, true });
+			// Same test again, but without the < -5.6 value.
+			await RunTest(new List<dynamic> { -1, -2, -3.0, -4.0, -5.0, -5.499, -5.5, -5.5 }, 0, new[] { false, false }, new[] { true, true });
 
 			// Now we'll throw in a null value.
 			// Again, this test will sample only the first element (an int), which will then make
 			// the code attempt to convert the entire list to ints. This will throw an exception
 			// when it hits the null.
-			await Assert.ThrowsAsync<System.NotSupportedException>(async () => await RunTest(new List<dynamic> { -1, -2, -3.0, null, -4.0, -5.0, -5.499, -5.5, -5.5 }, 1, false));
+			await Assert.ThrowsAsync<System.NotSupportedException>(async () => await RunTest(new List<dynamic> { -1, -2, -3.0, null, -4.0, -5.0, -5.499, -5.5, -5.5 }, 1, new[] { false, false }, new[] { true, true }));
 			// But by checking the entire set of data, the type detection will decide that the
 			// data should be treated as System.Nullable<System.Double>.
 			// This test should FAIL simply because it doesn't have a value < -5.6
-			await RunTest(new List<dynamic> { -1, -2, -3.0, null, -4.0, -5.0, -5.499, -5.5, -5.5 }, 0, false);
+			await RunTest(new List<dynamic> { -1, -2, -3.0, null, -4.0, -5.0, -5.499, -5.5, -5.5 }, 0, new[] { false, false }, new[] { true, true });
 			// This test should PASS because it DOES have a value < -5.6
-			await RunTest(new List<dynamic> { -1, -2, -3.0, null, -4.0, -5.0, -5.499, -5.5, -5.5, -5.60001 }, 0, true);
+			await RunTest(new List<dynamic> { -1, -2, -3.0, null, -4.0, -5.0, -5.499, -5.5, -5.5, -5.60001 }, 0, new[] { true, true }, new[] { true, true });
 
 			// Now make sure it copes with type1 -> null -> type2 -> null -> etc
 			// This test should FAIL simply because it doesn't have a value < -5.6
-			await RunTest(new List<dynamic> { -1, null, -2, -3.0, null, -4.0, -5.0, -5.499, -5.5, -5.5 }, 0, false);
+			await RunTest(new List<dynamic> { -1, null, -2, -3.0, null, -4.0, -5.0, -5.499, -5.5, -5.5 }, 0, new[] { false, false }, new[] { true, true });
 			// This test should PASS because it DOES have a value < -5.6
-			await RunTest(new List<dynamic> { -1, null, -2, -3.0, null, -4.0, -5.0, -5.499, -5.5, -5.5, -5.60001 }, 0, true);
+			await RunTest(new List<dynamic> { -1, null, -2, -3.0, null, -4.0, -5.0, -5.499, -5.5, -5.5, -5.60001 }, 0, new[] { true, true }, new[] { true, true });
 		}
 	}
 }
