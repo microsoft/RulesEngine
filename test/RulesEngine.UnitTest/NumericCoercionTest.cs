@@ -16,19 +16,19 @@ namespace RulesEngine.UnitTest {
 	public class NumericCoercionTest {
 		[Fact]
 		public void NumericCoercionTest_TypesAreCoercedCorrectly() {
-			Assert.Equal(typeof(int), Utils.CoerceNumericTypes(typeof(int), typeof(Int32)));
-			Assert.Equal(typeof(int), Utils.CoerceNumericTypes(typeof(sbyte), typeof(ushort)));
-			Assert.Equal(typeof(short), Utils.CoerceNumericTypes(typeof(SByte), typeof(byte)));
-			Assert.Equal(typeof(byte), Utils.CoerceNumericTypes(typeof(byte), typeof(byte)));
-			Assert.Equal(typeof(ulong), Utils.CoerceNumericTypes(typeof(uint), typeof(ulong)));
-			Assert.Equal(typeof(ushort), Utils.CoerceNumericTypes(typeof(byte), typeof(UInt16)));
-			Assert.Equal(typeof(double), Utils.CoerceNumericTypes(typeof(Double), typeof(ulong)));
-			Assert.Equal(typeof(decimal), Utils.CoerceNumericTypes(typeof(long), typeof(ulong)));
-			Assert.Equal(typeof(System.Nullable<decimal>), Utils.CoerceNumericTypes(typeof(decimal), null));
-			Assert.Equal(typeof(float), Utils.CoerceNumericTypes(typeof(Single), typeof(long)));
-			Assert.Equal(typeof(float), Utils.CoerceNumericTypes(typeof(float), typeof(UInt64)));
-			Assert.Equal(typeof(double), Utils.CoerceNumericTypes(typeof(double), typeof(Int64)));
-			Assert.Equal(typeof(System.Nullable<double>), Utils.CoerceNumericTypes(typeof(double), null));
+			Assert.Equal(typeof(int), Utils.CoerceTypes(typeof(int), typeof(Int32)));
+			Assert.Equal(typeof(int), Utils.CoerceTypes(typeof(sbyte), typeof(ushort)));
+			Assert.Equal(typeof(short), Utils.CoerceTypes(typeof(SByte), typeof(byte)));
+			Assert.Equal(typeof(byte), Utils.CoerceTypes(typeof(byte), typeof(byte)));
+			Assert.Equal(typeof(ulong), Utils.CoerceTypes(typeof(uint), typeof(ulong)));
+			Assert.Equal(typeof(ushort), Utils.CoerceTypes(typeof(byte), typeof(UInt16)));
+			Assert.Equal(typeof(double), Utils.CoerceTypes(typeof(Double), typeof(ulong)));
+			Assert.Equal(typeof(decimal), Utils.CoerceTypes(typeof(long), typeof(ulong)));
+			Assert.Equal(typeof(System.Nullable<decimal>), Utils.CoerceTypes(typeof(decimal), null));
+			Assert.Equal(typeof(float), Utils.CoerceTypes(typeof(Single), typeof(long)));
+			Assert.Equal(typeof(float), Utils.CoerceTypes(typeof(float), typeof(UInt64)));
+			Assert.Equal(typeof(double), Utils.CoerceTypes(typeof(double), typeof(Int64)));
+			Assert.Equal(typeof(System.Nullable<double>), Utils.CoerceTypes(typeof(double), null));
 		}
 
 		[Fact]

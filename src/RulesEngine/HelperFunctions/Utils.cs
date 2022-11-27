@@ -27,7 +27,7 @@ namespace RulesEngine.HelperFunctions
         }
         private static readonly List<Type> UnsignedNumericTypes = new List<Type> { typeof(byte), typeof(ushort), typeof(uint), typeof(ulong)};
         private static readonly List<Type> SignedNumericTypes = new List<Type> { typeof(sbyte), typeof(short), typeof(int), typeof(long), typeof(decimal), typeof(float), typeof(double) };
-        internal static Type CoerceNumericTypes(Type t1, Type t2) {
+        internal static Type CoerceTypes(Type t1, Type t2) {
             // If the types are the same, use that type.
             if (t1 == t2)
                 return t1;
@@ -101,7 +101,7 @@ namespace RulesEngine.HelperFunctions
                             var sampleCount = (sampleSize <= 0 ? expandoListCount : sampleSize);
                             for (int f = 1; f < sampleCount; ++f)
                                 otherTypes.Add(expandoList[f] == null ? null : CreateAbstractClassType(expandoList[f], sampleSize));
-                            var internalType = otherTypes.Aggregate(firstType, CoerceNumericTypes) ?? typeof(object);
+                            var internalType = otherTypes.Aggregate(firstType, CoerceTypes) ?? typeof(object);
                             value = new List<object>().Cast(internalType).ToList(internalType).GetType();
                         }
                     }
