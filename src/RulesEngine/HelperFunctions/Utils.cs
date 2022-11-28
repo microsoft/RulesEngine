@@ -27,6 +27,44 @@ namespace RulesEngine.HelperFunctions
         }
         private static readonly List<Type> UnsignedNumericTypes = new List<Type> { typeof(byte), typeof(ushort), typeof(uint), typeof(ulong)};
         private static readonly List<Type> SignedNumericTypes = new List<Type> { typeof(sbyte), typeof(short), typeof(int), typeof(long), typeof(decimal), typeof(float), typeof(double) };
+        private static Type CoerceNumericTypes(int signedIndex1, int unsignedIndex1, int signedIndex2, int unsignedIndex2) {
+            // If they are both signed value types, use the larger.
+            if (signedIndex1 != -1 && signedIndex2 != -1)
+                return SignedNumericTypes[Math.Max(signedIndex1, signedIndex2)];
+            // If they are both unsigned value types, use the larger.
+            if (unsignedIndex1 != -1 && unsignedIndex2 != -1)
+                return UnsignedNumericTypes[Math.Max(unsignedIndex1, unsignedIndex2)];
+            // If there is a signed/unsigned mismatch, we will need to use a signed value type.
+            // If the signed value type is larger than the unsigned value type, use that.
+            var signedIndex = Math.Max(signedIndex1, signedIndex2);
+            var unsignedIndex = Math.Max(unsignedIndex1, unsignedIndex2);
+            if (signedIndex > unsignedIndex)
+                return SignedNumericTypes[signedIndex];
+            // Otherwise we will need to increase the size.
+            // There are fewer unsigned types than signed types, so we can't exceed the
+            // signed-type array length by adding 1.
+            return SignedNumericTypes[unsignedIndex + 1];
+        }
+        private static Type CoerceValueTypes(Type t1, Type t2) {
+            // It's possible that one type is a Nullable variant of a signed/unsigned type,
+            // and the other is a vice-verse unsigned/signed type. We need to handle that.
+            var underlyingType1 = Nullable.GetUnderlyingType(t1);
+            var underlyingType2 = Nullable.GetUnderlyingType(t2);
+            var makeNullable = underlyingType1 != null || underlyingType2 != null;
+            t1 = underlyingType1 ?? t1;
+            t2 = underlyingType2 ?? t2;
+            // If we have a mix of value types, we might be able to come up with a compromise ...
+            var signedIndex1 = SignedNumericTypes.IndexOf(t1);
+            var unsignedIndex1 = UnsignedNumericTypes.IndexOf(t1);
+            var signedIndex2 = SignedNumericTypes.IndexOf(t2);
+            var unsignedIndex2 = UnsignedNumericTypes.IndexOf(t2);
+            // Either or both types could still be non-numeric value types (bool, char, tuples, enums).
+            // If this is the case, then once again, we have to use "object".
+            if (((signedIndex1 == -1) && (unsignedIndex1 == -1)) || ((signedIndex2 == -1) && (unsignedIndex2 == -1)))
+                return typeof(object);
+            var numericType = CoerceNumericTypes(signedIndex1, unsignedIndex1, signedIndex2, unsignedIndex2);
+            return makeNullable ? typeof(Nullable<>).MakeGenericType(numericType) : numericType;
+        }
         internal static Type CoerceTypes(Type t1, Type t2) {
             // If the types are the same, use that type.
             if (t1 == t2)
@@ -51,31 +89,7 @@ namespace RulesEngine.HelperFunctions
                 return t1;
             if (t1IsValueType != t2IsValueType)
                 return typeof(object);
-            // If we have a mix of value types, we might be able to come up with a compromise ...
-            var signedIndex1 = SignedNumericTypes.IndexOf(t1);
-            var unsignedIndex1 = UnsignedNumericTypes.IndexOf(t1);
-            var signedIndex2 = SignedNumericTypes.IndexOf(t2);
-            var unsignedIndex2 = UnsignedNumericTypes.IndexOf(t2);
-            // Either or both types could still be non-numeric value types (bool, char, tuples, enums).
-            // If this is the case, then once again, we have to use "object".
-            if (((signedIndex1 == -1) && (unsignedIndex1 == -1)) || ((signedIndex2 == -1) && (unsignedIndex2 == -1)))
-                return typeof(object);
-            // If they are both signed value types, use the larger.
-            if (signedIndex1 != -1 && signedIndex2 != -1)
-                return SignedNumericTypes[Math.Max(signedIndex1, signedIndex2)];
-            // If they are both unsigned value types, use the larger.
-            if (unsignedIndex1 != -1 && unsignedIndex2 != -1)
-                return UnsignedNumericTypes[Math.Max(unsignedIndex1, unsignedIndex2)];
-            // If there is a signed/unsigned mismatch, we will need to use a signed value type.
-            // If the signed value type is larger than the unsigned value type, use that.
-            var signedIndex = Math.Max(signedIndex1, signedIndex2);
-            var unsignedIndex = Math.Max(unsignedIndex1, unsignedIndex2);
-            if (signedIndex > unsignedIndex)
-                return SignedNumericTypes[signedIndex];
-            // Otherwise we will need to increase the size.
-            // There are fewer unsigned types than signed types, so we can't exceed the
-            // signed-type array length by adding 1.
-            return SignedNumericTypes[unsignedIndex + 1];
+            return CoerceValueTypes(t1, t2);
         }
         public static Type CreateAbstractClassType(dynamic input, int sampleSize = 1)
         {

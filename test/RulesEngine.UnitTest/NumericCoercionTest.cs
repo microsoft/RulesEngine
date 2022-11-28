@@ -36,6 +36,7 @@ namespace RulesEngine.UnitTest {
 			Assert.Equal(typeof(object), Utils.CoerceTypes(typeof(bool), typeof(int)));
 			Assert.Equal(typeof(object), Utils.CoerceTypes(typeof(char), typeof(Enum)));
 			Assert.Equal(typeof(System.Nullable<char>), Utils.CoerceTypes(typeof(char), null));
+			Assert.Equal(typeof(System.Nullable<Int64>), Utils.CoerceTypes(typeof(System.Nullable<UInt32>), typeof(Int32)));
 		}
 
 		[Fact]
