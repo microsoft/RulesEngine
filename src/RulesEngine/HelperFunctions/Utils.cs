@@ -46,10 +46,17 @@ namespace RulesEngine.HelperFunctions
             return SignedNumericTypes[unsignedIndex + 1];
         }
         private static Type CoerceValueTypes(Type t1, Type t2) {
-            // It's possible that one type is a Nullable variant of a signed/unsigned type,
-            // and the other is a vice-verse unsigned/signed type. We need to handle that.
+            // We might have a value type and a Nullable variant of that value type.
+            // In that case, we stick with the Nullable variant.
             var underlyingType1 = Nullable.GetUnderlyingType(t1);
             var underlyingType2 = Nullable.GetUnderlyingType(t2);
+            if (underlyingType1 == t2)
+                return t1;
+            if (underlyingType2 == t1)
+                return t2;
+            // It's possible that one type is a Nullable variant of a signed/unsigned type,
+            // and the other is a vice-verse unsigned/signed type. We need to handle that.
+            // So remember the Null-ness for later, and revert back to the underlying types.
             var makeNullable = underlyingType1 != null || underlyingType2 != null;
             t1 = underlyingType1 ?? t1;
             t2 = underlyingType2 ?? t2;
@@ -63,6 +70,8 @@ namespace RulesEngine.HelperFunctions
             if (((signedIndex1 == -1) && (unsignedIndex1 == -1)) || ((signedIndex2 == -1) && (unsignedIndex2 == -1)))
                 return typeof(object);
             var numericType = CoerceNumericTypes(signedIndex1, unsignedIndex1, signedIndex2, unsignedIndex2);
+            // If we found a Nullable type earlier, then use Nullable for this (potentially
+            // different) type.
             return makeNullable ? typeof(Nullable<>).MakeGenericType(numericType) : numericType;
         }
         internal static Type CoerceTypes(Type t1, Type t2) {
@@ -76,18 +85,8 @@ namespace RulesEngine.HelperFunctions
                 // If the non-null type is already a Nullable type, it's good enough.
                 return nonNullType.IsValueType && Nullable.GetUnderlyingType(nonNullType) == null ? typeof(Nullable<>).MakeGenericType(nonNullType) : nonNullType;
             }
-            var t1IsValueType = t1.IsValueType;
-            var t2IsValueType = t2.IsValueType;
-            // If both types are not value types, we'll have to use "object".
-            if (!t1IsValueType && !t2IsValueType)
-                return typeof(object);
-            // If one type is a value type, and the other isn't, we'll have to use "object", unless the other
-            // type is already a Nullable variant of the value type, in which case we use that.
-            if (t1IsValueType && Nullable.GetUnderlyingType(t2) == t1)
-                return t2;
-            if (t2IsValueType && Nullable.GetUnderlyingType(t1) == t2)
-                return t1;
-            if (t1IsValueType != t2IsValueType)
+            // Unless both types are value types, we'll have to use "object".
+            if (!t1.IsValueType || !t2.IsValueType)
                 return typeof(object);
             return CoerceValueTypes(t1, t2);
         }
