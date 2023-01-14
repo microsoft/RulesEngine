@@ -61,7 +61,7 @@ Nuget package: [![nuget](https://img.shields.io/nuget/dt/RulesEngine)](https://w
 ### Initialise RulesEngine with the workflow:
 ```c#
 var workflowRules = //Get list of workflow rules declared in the json
-var re = new RulesEngine.RulesEngine(workflowRules, null);
+var re = new RulesEngine.RulesEngine(workflowRules);
 ```
 
 ### Execute the workflow rules with input:
@@ -102,7 +102,7 @@ It is possible to use a custom name in rules by passing input as `RuleParameter`
 Now we can call rulesEngine with the custom names:
 ```c#
 var workflowRules = //Get list of workflow rules declared in the json
-var re = new RulesEngine.RulesEngine(workflowRules, null);
+var re = new RulesEngine.RulesEngine(workflowRules);
 
 
 // Declare input1,input2,input3 
@@ -444,7 +444,7 @@ Actions can have async code as well
                                          }
                      };
 
-   var re = new RulesEngine(workflowRules,logger,reSettings);
+   var re = new RulesEngine(workflowRules,reSettings);
 ```
 3. You can now use the name you registered in the Rules json in success or failure actions
 ```jsonc
