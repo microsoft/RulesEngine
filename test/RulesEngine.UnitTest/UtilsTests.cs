@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Newtonsoft.Json.Linq;
 using RulesEngine.HelperFunctions;
 using System;
 using System.Collections.Generic;
@@ -60,6 +61,20 @@ namespace RulesEngine.UnitTest
             Assert.IsNotType<ExpandoObject>(typedobj);
             Assert.NotNull(typedobj.GetType().GetProperty("Test"));
         }
+
+
+        [Fact]
+        public void GetJObject_nonDynamicObject()
+        {
+            dynamic obj = JObject.FromObject(new {
+                Test = "hello"
+            });
+            dynamic typedobj = Utils.GetTypedObject(obj);
+            Assert.IsNotType<ExpandoObject>(typedobj);
+            Assert.IsType<JObject>(typedobj);
+            Assert.NotNull(typedobj.Test);
+        }
+
 
         [Fact]
         public void CreateObject_dynamicObject()
