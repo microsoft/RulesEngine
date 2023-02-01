@@ -49,7 +49,7 @@ namespace RulesEngine.UnitTest.RuleExpressionParserTests
                          value);
 
 
-            var value2 = ruleParser.Evaluate<object>("As(input.list[1].item2,string) == \"world\"", new[] { new Models.RuleParameter("input", input) });
+            var value2 = ruleParser.Evaluate<object>("input.list[1].item2 == \"world\"", new[] { new Models.RuleParameter("input", input) });
 
             Assert.Equal(true,
                          value2);
