@@ -79,6 +79,10 @@ namespace RulesEngine.HelperFunctions
 
         public T Set<T>(string key, T value, DateTimeOffset? expiry = null)
         {
+            if (_config.SizeLimit < 1)
+            {
+                return T;
+            }
             var fixedExpiry = expiry ?? DateTimeOffset.MaxValue;
 
             while (_cacheDictionary.Count > _config.SizeLimit)
