@@ -41,6 +41,11 @@ namespace RulesEngine.Actions
             return _parentResult;
         }
 
+        public bool ContainsKey(string name)
+        {
+            return _context.ContainsKey(name);            
+        }
+
         public bool TryGetContext<T>(string name,out T output)
         {
             try

@@ -103,8 +103,8 @@ namespace RulesEngine
         {
             var sortedRuleParams = ruleParams.ToList();
             sortedRuleParams.Sort((RuleParameter a, RuleParameter b) => string.Compare(a.Name, b.Name));
-            var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, sortedRuleParams.ToArray());
-            await ExecuteActionAsync(ruleResultList);
+            var ruleResultList = await ValidateWorkflowAndExecuteRule(workflowName, sortedRuleParams.ToArray());
+            //await ExecuteActionAsync(ruleResultList); // Actions now are executed after each rule.
             return ruleResultList;
         }
 
@@ -117,11 +117,18 @@ namespace RulesEngine
                     await ExecuteActionAsync(ruleResult.ChildResults);
                 }
                 var actionResult = await ExecuteActionForRuleResult(ruleResult, false);
-                ruleResult.ActionResult = new ActionResult {
-                    Output = actionResult.Output,
-                    Exception = actionResult.Exception
-                };
+                ruleResult.ActionResult = actionResult;
             }
+        }
+
+        private async ValueTask ExecuteActionAsync(RuleResultTree ruleResult)
+        {
+            if (ruleResult.ChildResults != null)
+            {
+                await ExecuteActionAsync(ruleResult.ChildResults);
+            }
+            var actionResult = await ExecuteActionForRuleResult(ruleResult, false);
+            ruleResult.ActionResult = actionResult;
         }
 
         public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters)
@@ -250,13 +257,13 @@ namespace RulesEngine
         /// <param name="input">input</param>
         /// <param name="workflowName">workflow name</param>
         /// <returns>list of rule result set</returns>
-        private List<RuleResultTree> ValidateWorkflowAndExecuteRule(string workflowName, RuleParameter[] ruleParams)
+        private async Task<List<RuleResultTree>> ValidateWorkflowAndExecuteRule(string workflowName, RuleParameter[] ruleParams)
         {
             List<RuleResultTree> result;
 
             if (RegisterRule(workflowName, ruleParams))
             {
-                result = ExecuteAllRuleByWorkflow(workflowName, ruleParams);
+                result = await ExecuteAllRuleByWorkflow(workflowName, ruleParams);
             }
             else
             {
@@ -329,13 +336,14 @@ namespace RulesEngine
         /// <param name="workflowName"></param>
         /// <param name="ruleParams"></param>
         /// <returns>list of rule result set</returns>
-        private List<RuleResultTree> ExecuteAllRuleByWorkflow(string workflowName, RuleParameter[] ruleParameters)
+        private async Task<List<RuleResultTree>> ExecuteAllRuleByWorkflow(string workflowName, RuleParameter[] ruleParameters)
         {
             var result = new List<RuleResultTree>();
             var compiledRulesCacheKey = GetCompiledRulesKey(workflowName, ruleParameters);
             foreach (var compiledRule in _rulesCache.GetCompiledRules(compiledRulesCacheKey)?.Values)
-            {
+            {                
                 var resultTree = compiledRule(ruleParameters);
+                await ExecuteActionAsync(resultTree);
                 result.Add(resultTree);
             }
 
