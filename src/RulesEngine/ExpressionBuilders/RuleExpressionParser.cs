@@ -37,7 +37,10 @@ namespace RulesEngine.ExpressionBuilders
         }
         public Expression Parse(string expression, ParameterExpression[] parameters, Type returnType)
         {
-            var config = new ParsingConfig { CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes) };
+            var requiredTypes = parameters.Select(c => c.Type).Concat(_reSettings.CustomTypes ?? new Type[] { }).ToArray();
+            var config = new ParsingConfig { 
+                CustomTypeProvider = new CustomTypeProvider(requiredTypes)
+            };
             return new ExpressionParser(parameters, expression, new object[] { }, config).Parse(returnType);
 
         }
