@@ -12,6 +12,23 @@ namespace RulesEngine.Models
     [ExcludeFromCodeCoverage]
     public class ReSettings
     {
+
+        public ReSettings() { }
+
+        // create a copy of settings
+        internal ReSettings(ReSettings reSettings)
+        {
+            CustomTypes = reSettings.CustomTypes;
+            CustomActions = reSettings.CustomActions;
+            EnableExceptionAsErrorMessage = reSettings.EnableExceptionAsErrorMessage;
+            IgnoreException = reSettings.IgnoreException;
+            EnableFormattedErrorMessage = reSettings.EnableFormattedErrorMessage;
+            EnableScopedParams = reSettings.EnableScopedParams;
+            NestedRuleExecutionMode = reSettings.NestedRuleExecutionMode;
+            CacheConfig = reSettings.CacheConfig;
+        }
+
+
         /// <summary>
         /// Get/Set the custom types to be used in Rule expressions
         /// </summary>

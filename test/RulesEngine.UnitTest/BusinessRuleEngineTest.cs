@@ -391,7 +391,7 @@ namespace RulesEngine.UnitTest
             Func<bool> func = () => true;
 
             var re = GetRulesEngine(ruleFileName, new ReSettings {
-                CustomTypes = new[] { typeof(Func<bool>) }
+               CustomTypes = new[] { typeof(Func<bool>) }
             });
 
             dynamic input1 = new ExpandoObject();

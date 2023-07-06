@@ -101,6 +101,7 @@ namespace RulesEngine.UnitTest
         [Theory]
         [InlineData("GlobalParamsOnly")]
         [InlineData("LocalParamsOnly2")]
+        [InlineData("GlobalParamsOnlyWithComplexInput")]
         public async Task ErrorInScopedParam_ShouldAppearAsErrorMessage(string workflowName)
         {
             var workflow = GetWorkflowList();
@@ -386,9 +387,13 @@ namespace RulesEngine.UnitTest
                         new Rule {
                             RuleName = "TrueTest",
                             Expression = "globalParam1 == \"hello\""
+                        },
+                        new Rule {
+                            RuleName = "TrueTest2",
+                            Expression = "globalParam1.ToUpper() == \"HELLO\""
                         }
                     }
-                },
+                }
             };
         }
     }

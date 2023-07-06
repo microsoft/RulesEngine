@@ -47,7 +47,7 @@ namespace RulesEngine
         /// <param name="input"></param>
         /// <param name="ruleParam"></param>
         /// <returns>Compiled func delegate</returns>
-        internal RuleFunc<RuleResultTree> CompileRule(Rule rule, RuleParameter[] ruleParams, ScopedParam[] globalParams)
+        internal RuleFunc<RuleResultTree> CompileRule(Rule rule, RuleExpressionType ruleExpressionType, RuleParameter[] ruleParams, Lazy<RuleExpressionParameter[]> globalParams)
         {
             if (rule == null)
             {
@@ -56,10 +56,13 @@ namespace RulesEngine
             }
             try
             {
-                var globalParamExp = GetRuleExpressionParameters(rule.RuleExpressionType,globalParams, ruleParams);
+                var globalParamExp = globalParams.Value;
                 var extendedRuleParams = ruleParams.Concat(globalParamExp.Select(c => new RuleParameter(c.ParameterExpression.Name,c.ParameterExpression.Type)))
                                                    .ToArray();
+                CompileScopedParams(ruleExpressionType, ruleParams, globalParamExp);
                 var ruleExpression = GetDelegateForRule(rule, extendedRuleParams);
+                
+
                 return GetWrappedRuleFunc(rule,ruleExpression,ruleParams,globalParamExp);
             }
             catch (Exception ex)
@@ -100,7 +103,7 @@ namespace RulesEngine
             return GetWrappedRuleFunc(rule, ruleFn, ruleParams, scopedParamList);
         }
 
-        private RuleExpressionParameter[] GetRuleExpressionParameters(RuleExpressionType ruleExpressionType,IEnumerable<ScopedParam> localParams, RuleParameter[] ruleParams)
+        internal RuleExpressionParameter[] GetRuleExpressionParameters(RuleExpressionType ruleExpressionType,IEnumerable<ScopedParam> localParams, RuleParameter[] ruleParams)
         {
             if(!_reSettings.EnableScopedParams)
             {
@@ -225,6 +228,12 @@ namespace RulesEngine
                 
             }
             return (isSuccess, resultList);
+        }
+
+        internal Func<object[],Dictionary<string,object>> CompileScopedParams(RuleExpressionType ruleExpressionType, RuleParameter[] ruleParameters,RuleExpressionParameter[] ruleExpParams)
+        {
+            return GetExpressionBuilder(ruleExpressionType).CompileScopedParams(ruleParameters, ruleExpParams);
+
         }
 
         private RuleFunc<RuleResultTree> GetWrappedRuleFunc(Rule rule, RuleFunc<RuleResultTree> ruleFunc,RuleParameter[] ruleParameters,RuleExpressionParameter[] ruleExpParams)
