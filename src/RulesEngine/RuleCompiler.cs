@@ -59,7 +59,6 @@ namespace RulesEngine
                 var globalParamExp = globalParams.Value;
                 var extendedRuleParams = ruleParams.Concat(globalParamExp.Select(c => new RuleParameter(c.ParameterExpression.Name,c.ParameterExpression.Type)))
                                                    .ToArray();
-                CompileScopedParams(ruleExpressionType, ruleParams, globalParamExp);
                 var ruleExpression = GetDelegateForRule(rule, extendedRuleParams);
                 
 
