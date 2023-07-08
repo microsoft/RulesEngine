@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -30,6 +32,8 @@ namespace RulesEngine.Models
           set { WorkflowsToInject = value; }
         }
         public IEnumerable<string> WorkflowsToInject { get; set; }
+
+        public RuleExpressionType RuleExpressionType { get; set; } = RuleExpressionType.LambdaExpression;
 
         /// <summary>
         /// Gets or Sets the global params which will be applicable to all rules

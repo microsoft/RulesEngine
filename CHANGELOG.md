@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.0.0]
+- Fixed security bug related to System.Dynamic.Linq.Core
+
+### Breaking Changes
+- As a part of security bug fix, method call for only registered types via reSettings will be allowed. This only impacts strongly typed inputs and nested types
+
+
 ## [4.0.0]
 - RulesEngine is now available in both dotnet 6 and netstandard 2.0
 - Dependency on ILogger, MemoryCache have been removed 

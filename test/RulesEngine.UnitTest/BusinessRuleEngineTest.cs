@@ -388,9 +388,11 @@ namespace RulesEngine.UnitTest
         [InlineData("rules6.json")]
         public async Task ExecuteRule_RuleWithMethodExpression_ReturnsSucess(string ruleFileName)
         {
-            var re = GetRulesEngine(ruleFileName);
-
             Func<bool> func = () => true;
+
+            var re = GetRulesEngine(ruleFileName, new ReSettings {
+               CustomTypes = new[] { typeof(Func<bool>) }
+            });
 
             dynamic input1 = new ExpandoObject();
             input1.Property1 = "hello";
@@ -851,7 +853,7 @@ namespace RulesEngine.UnitTest
         }
 
         [ExcludeFromCodeCoverage]
-        private class TestInstanceUtils
+        public class TestInstanceUtils
         {
             public bool CheckExists(string str)
             {
