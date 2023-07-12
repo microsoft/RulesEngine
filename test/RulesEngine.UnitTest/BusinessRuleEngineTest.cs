@@ -254,6 +254,23 @@ namespace RulesEngine.UnitTest
         }
 
 
+        [Fact]
+        public void RulesEngine_AddOrUpdate_IncorrectJSON_ThrowsException()
+        {
+            Assert.Throws<RuleValidationException>(() => {
+                var workflow = new Workflow();
+                var re = new RulesEngine();
+                re.AddOrUpdateWorkflow(workflow);
+            });
+
+            Assert.Throws<RuleValidationException>(() => {
+                var workflow = new Workflow() { WorkflowName = "test" };
+                var re = new RulesEngine();
+                re.AddOrUpdateWorkflow(workflow);
+            });
+        }
+
+
         [Theory]
         [InlineData("rules1.json")]
         public async Task ExecuteRule_InvalidWorkFlow_ThrowsException(string ruleFileName)
