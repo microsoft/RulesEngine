@@ -40,7 +40,7 @@
       {
         "RuleName": "GiveDiscount25",
         "SuccessEvent": "25",
-        "ErrorMessage": "One or more adjust rules failed, country : $(input4.country), loyaltyFactor : $(input4.loyaltyFactor), totalPurchasesToDate : $(input4.totalPurchasesToDate), totalOrders : $(input5.totalOrders), noOfVisitsPerMonth : $(input30.noOfVisitsPerMonth)",
+        "ErrorMessage": "One or more adjust rules failed, country : $(input4.country), loyaltyFactor : $(input4.loyaltyFactor), totalPurchasesToDate : $(input4.totalPurchasesToDate), totalOrders : $(input5.totalOrders), noOfVisitsPerMonth : $(input30.noOfVisitsPerMonth), $(model2)",
         "ErrorType": "Error",
         "localParams": [
           {
