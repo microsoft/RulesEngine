@@ -241,7 +241,7 @@ namespace RulesEngine
             {
                 return ruleFunc;
             }
-            var paramDelegate = GetExpressionBuilder(rule.RuleExpressionType).CompileScopedParams(ruleParameters, ruleExpParams);
+            var paramDelegate = CompileScopedParams(rule.RuleExpressionType,ruleParameters, ruleExpParams);
 
             return (ruleParams) => {
                 var inputs = ruleParams.Select(c => c.Value).ToArray();

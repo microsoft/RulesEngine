@@ -287,7 +287,10 @@ namespace RulesEngine
             if (workflow != null)
             {
                 var dictFunc = new Dictionary<string, RuleFunc<RuleResultTree>>();
-                _reSettings.CustomTypes = _reSettings.CustomTypes.Safe().Union(ruleParams.Select(c => c.Type)).ToArray();
+                if (_reSettings.AutoRegisterInputType)
+                {
+                    _reSettings.CustomTypes = _reSettings.CustomTypes.Safe().Union(ruleParams.Select(c => c.Type)).ToArray();
+                }
                 // add separate compilation for global params
 
                 var globalParamExp = new Lazy<RuleExpressionParameter[]>(

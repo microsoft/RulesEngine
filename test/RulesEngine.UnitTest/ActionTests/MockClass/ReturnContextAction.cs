@@ -5,11 +5,13 @@ using RulesEngine.Actions;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace RulesEngine.UnitTest.ActionTests.MockClass
 {
+    [ExcludeFromCodeCoverage]
     public class ReturnContextAction : ActionBase
     {
         public override ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters)
