@@ -12,7 +12,6 @@ namespace RulesEngine.Models
     [ExcludeFromCodeCoverage]
     public class ReSettings
     {
-
         public ReSettings() { }
 
         // create a copy of settings
@@ -26,7 +25,9 @@ namespace RulesEngine.Models
             EnableScopedParams = reSettings.EnableScopedParams;
             NestedRuleExecutionMode = reSettings.NestedRuleExecutionMode;
             CacheConfig = reSettings.CacheConfig;
-        }
+            IsExpressionCaseSensitive = reSettings.IsExpressionCaseSensitive;
+            AutoRegisterInputType = reSettings.AutoRegisterInputType;
+    }
 
 
         /// <summary>
@@ -61,6 +62,17 @@ namespace RulesEngine.Models
         /// Enables Global params and local params for rules
         /// </summary>
         public bool EnableScopedParams { get; set; } = true;
+
+        /// <summary>
+        /// Sets whether expression are case sensitive
+        /// </summary>
+        public bool IsExpressionCaseSensitive { get; set; } = false;
+
+        /// <summary>
+        /// Auto Registers input type in Custom Type to allow calling method on type.
+        /// Default : true
+        /// </summary>
+        public bool AutoRegisterInputType { get; set; } = true;
 
         /// <summary>
         /// Sets the mode for Nested rule execution, Default: All
