@@ -532,6 +532,280 @@ namespace RulesEngine.UnitTest
             Assert.All(result, c => Assert.True(c.IsSuccess));
         }
 
+        [Theory]
+        [InlineData("rules11.json")]
+        public async Task RulesEngineWithGlobalParam_RunsSuccessfully(string ruleFileName)
+        {
+
+            var re = GetRulesEngine(ruleFileName, new ReSettings() { });
+
+            var input1 = new[] {
+            new {
+                Value= 0.13259286,
+                ChangeDateTime= "2023-07-28T19:57:07.432339Z"
+            },
+            new {
+                Value= 0.09435427,
+                ChangeDateTime= "2023-07-28T19:58:04.536459Z"
+            },
+            new {
+                Value= 0.14896593,
+                ChangeDateTime= "2023-07-28T19:59:08.682072Z"
+            },
+            new {
+                Value= 0.12852388,
+                ChangeDateTime= "2023-07-28T20:00:06.78036Z"
+            },
+            new {
+                Value= 0.17011189,
+                ChangeDateTime= "2023-07-28T20:00:54.873615Z"
+            },
+            new {
+                Value= 0.0532116,
+                ChangeDateTime= "2023-07-28T20:02:52.04049Z"
+            },
+            new {
+                Value= 0.04064374,
+                ChangeDateTime= "2023-07-28T20:03:54.168499Z"
+            },
+            new {
+                Value= 0.03748944,
+                ChangeDateTime= "2023-07-28T20:03:54.194786Z"
+            },
+            new {
+                Value= 0.07752395,
+                ChangeDateTime= "2023-07-28T20:06:32.451464Z"
+            },
+            new {
+                Value= 0.07294922,
+                ChangeDateTime= "2023-07-28T20:07:38.691755Z"
+            },
+            new {
+                Value= 0.09892442,
+                ChangeDateTime= "2023-07-28T20:08:37.98802Z"
+            },
+            new {
+                Value= 0.06370641,
+                ChangeDateTime= "2023-07-28T20:05:41.358461Z"
+            },
+            new {
+                Value= 0.07550429,
+                ChangeDateTime= "2023-07-28T20:09:48.129748Z"
+            },
+            new {
+                Value= 0.0653021,
+                ChangeDateTime= "2023-07-28T20:10:48.274482Z"
+            },
+            new {
+                Value= 0.09304246,
+                ChangeDateTime= "2023-07-28T20:11:49.436983Z"
+            },
+            new {
+                Value= 0.0797422,
+                ChangeDateTime= "2023-07-28T20:12:53.609118Z"
+            },
+            new {
+                Value= 0.08211832,
+                ChangeDateTime= "2023-07-28T20:13:52.699728Z"
+            },
+            new {
+                Value= 0.06955433,
+                ChangeDateTime= "2023-07-28T20:15:03.843289Z"
+            },
+            new {
+                Value= 0.07626661,
+                ChangeDateTime= "2023-07-28T20:15:03.870057Z"
+            },
+            new {
+                Value= 0.05033984,
+                ChangeDateTime= "2023-07-28T20:16:17.032262Z"
+            },
+            new {
+                Value= 0.05202596,
+                ChangeDateTime= "2023-07-28T20:17:20.172669Z"
+            },
+            new {
+                Value= 0.06861198,
+                ChangeDateTime= "2023-07-28T20:18:32.303309Z"
+            },
+            new {
+                Value= 0.04935532,
+                ChangeDateTime= "2023-07-28T20:19:33.451426Z"
+            },
+            new {
+                Value= 0.04073699,
+                ChangeDateTime= "2023-07-28T20:20:37.737395Z"
+            },
+            new {
+                Value= 0.02164916,
+                ChangeDateTime= "2023-07-28T20:21:38.883635Z"
+            },
+            new {
+                Value= 0.01334031,
+                ChangeDateTime= "2023-07-28T20:22:40.053193Z"
+            },
+            new {
+                Value= 0.0336915,
+                ChangeDateTime= "2023-07-28T20:23:44.240297Z"
+            },
+            new {
+                Value= 0.04870055,
+                ChangeDateTime= "2023-07-28T20:26:33.584756Z"
+            },
+            new {
+                Value= 0.07125243,
+                ChangeDateTime= "2023-07-28T20:28:11.7889Z"
+            },
+            new {
+                Value= 0.04904275,
+                ChangeDateTime= "2023-07-28T20:24:40.346216Z"
+            },
+            new {
+                Value= 0.03625701,
+                ChangeDateTime= "2023-07-28T20:27:20.707478Z"
+            },
+            new {
+                Value= 0.05703328,
+                ChangeDateTime= "2023-07-28T20:28:57.876436Z"
+            },
+            new {
+                Value= 0.04364996,
+                ChangeDateTime= "2023-07-28T20:25:43.496357Z"
+            },
+            new {
+                Value= 0.07558272,
+                ChangeDateTime= "2023-07-28T20:30:11.023295Z"
+            },
+            new {
+                Value= 0.03073958,
+                ChangeDateTime= "2023-07-28T20:33:00.347672Z"
+            },
+            new {
+                Value= 0.0341309,
+                ChangeDateTime= "2023-07-28T20:33:59.790621Z"
+            },
+            new {
+                Value= 0.05270871,
+                ChangeDateTime= "2023-07-28T20:31:15.166193Z"
+            },
+            new {
+                Value= 0.09138862,
+                ChangeDateTime= "2023-07-28T20:32:08.259273Z"
+            },
+            new {
+                Value= 0.15922104,
+                ChangeDateTime= "2023-07-28T20:35:12.963809Z"
+            },
+            new {
+                Value= 0.11383641,
+                ChangeDateTime= "2023-07-28T20:36:26.120815Z"
+            },
+            new {
+                Value= 0.12404025,
+                ChangeDateTime= "2023-07-28T20:37:37.27212Z"
+            },
+            new {
+                Value= 0.06010197,
+                ChangeDateTime= "2023-07-28T20:38:47.409412Z"
+            },
+            new {
+                Value= 0.08396237,
+                ChangeDateTime= "2023-07-28T20:39:37.504217Z"
+            },
+            new {
+                Value= 0.06731881,
+                ChangeDateTime= "2023-07-28T20:40:27.588895Z"
+            },
+            new {
+                Value= 0.05617253,
+                ChangeDateTime= "2023-07-28T20:41:33.760373Z"
+            },
+            new {
+                Value= 0.0585155,
+                ChangeDateTime= "2023-07-28T20:42:26.847144Z"
+            },
+            new {
+                Value= 0.06793098,
+                ChangeDateTime= "2023-07-28T20:43:36.988904Z"
+            },
+            new {
+                Value= 0.06879344,
+                ChangeDateTime= "2023-07-28T20:44:46.133926Z"
+            },
+            new {
+                Value= 0.06931814,
+                ChangeDateTime= "2023-07-28T20:45:50.275932Z"
+            },
+            new {
+                Value= 0.04802603,
+                ChangeDateTime= "2023-07-28T20:46:36.367289Z"
+            },
+            new {
+                Value= 0.04036225,
+                ChangeDateTime= "2023-07-28T20:47:27.484188Z"
+            },
+            new {
+                Value= 0.04968483,
+                ChangeDateTime= "2023-07-28T20:48:13.582228Z"
+            },
+            new {
+                Value= 0.0773483,
+                ChangeDateTime= "2023-07-28T19:49:16.354277Z"
+            },
+            new {
+                Value= 0.08710921,
+                ChangeDateTime= "2023-07-28T19:48:25.253743Z"
+            },
+            new {
+                Value= 0.07665287,
+                ChangeDateTime= "2023-07-28T19:50:25.496642Z"
+            },
+            new {
+                Value= 0.06121748,
+                ChangeDateTime= "2023-07-28T19:51:20.644955Z"
+            },
+            new {
+                Value= 0.04179136,
+                ChangeDateTime= "2023-07-28T19:52:26.793369Z"
+            },
+            new {
+                Value= 0.13522345,
+                ChangeDateTime= "2023-07-28T19:54:19.051669Z"
+            },
+            new {
+                Value= 0.08536856,
+                ChangeDateTime= "2023-07-28T19:56:04.287806Z"
+            },
+            new {
+                Value= 0.05041369,
+                ChangeDateTime= "2023-07-28T19:53:18.901696Z"
+            },
+            new {
+                Value= 0.1627249,
+                ChangeDateTime= "2023-07-28T19:55:13.160235Z"
+            },
+            new {
+                Value= 0.05,
+                ChangeDateTime= "2023-07-28T19:54:03.2197Z"
+            },
+            new {
+                Value= 0.05,
+                ChangeDateTime= "2023-07-28T19:56:00.802023Z"
+            },
+            new {
+                Value= 0.02792705297470093,
+                ChangeDateTime= "2023-07-28T20:49:03.6825337Z"
+            }
+       }.ToList();
+
+            var result = await re.ExecuteAllRulesAsync("MyWorkflow", new RuleParameter("input1", input1));
+
+            Assert.NotNull(result);
+            Assert.True(result[0].IsSuccess);
+            Assert.True(result[1].IsSuccess);
+        }
+
+
 
         [Fact]
         public async Task ExecuteRule_RuntimeError_ShouldReturnAsErrorMessage()
@@ -767,6 +1041,10 @@ namespace RulesEngine.UnitTest
             Assert.True(re.ContainsWorkflow(ExistedWorkflowName));
             Assert.False(re.ContainsWorkflow(NotExistedWorkflowName));
         }
+
+      
+
+
 
         [Theory]
         [InlineData(typeof(RulesEngine), typeof(IRulesEngine))]
