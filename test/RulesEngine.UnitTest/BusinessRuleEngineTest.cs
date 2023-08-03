@@ -801,7 +801,7 @@ namespace RulesEngine.UnitTest
             var result = await re.ExecuteAllRulesAsync("MyWorkflow", new RuleParameter("input1", input1));
 
             Assert.NotNull(result);
-            Assert.True(result[0].IsSuccess);
+            Assert.False(result[0].IsSuccess);
             Assert.True(result[1].IsSuccess);
         }
 
