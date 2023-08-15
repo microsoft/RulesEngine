@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using RulesEngine.Models;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -10,6 +11,14 @@ using Xunit;
 
 namespace RulesEngine.UnitTest
 {
+    [ExcludeFromCodeCoverage]
+    public class MyObject
+    {
+        public string Name { get; set; }
+
+        public int Count { get; set; }
+    }
+
     [ExcludeFromCodeCoverage]
     public class ScopedParamsTest
     {
@@ -141,6 +150,34 @@ namespace RulesEngine.UnitTest
 
 
         }
+
+        [Theory]
+        [InlineData("LocalParam_CorrectAnswer")]
+        public async Task LocalParam_GivesCorrectAnswer(string workflowName)
+        {
+            var workflow = GetWorkflowList();
+
+            var reSettingsWithCustomTypes = new ReSettings { CustomTypes = new Type[] {  } };
+            var bre = new RulesEngine(workflow, reSettingsWithCustomTypes);
+
+            var myObject = new MyObject() {
+                Name = "My Object",
+                Count = 2
+            };
+
+            var rp1 = new RuleParameter("myObj", myObject);
+
+            List<RuleResultTree> resultList = await bre.ExecuteAllRulesAsync(workflowName, rp1);
+            Assert.True(resultList[0].IsSuccess);
+
+            myObject.Count = 3;
+
+            resultList = await bre.ExecuteAllRulesAsync(workflowName, rp1);
+            Assert.False(resultList[0].IsSuccess);
+
+        }
+
+
 
         private void CheckResultTreeContainsAllInputs(string workflowName, List<RuleResultTree> result)
         {
@@ -391,6 +428,32 @@ namespace RulesEngine.UnitTest
                         new Rule {
                             RuleName = "TrueTest2",
                             Expression = "globalParam1.ToUpper() == \"HELLO\""
+                        }
+                    }
+                },
+                new Workflow {
+                    WorkflowName = "LocalParam_CorrectAnswer",
+                    Rules = new List<Rule> {
+                        new Rule
+                        {
+                            RuleName = "Test Rule",
+                            LocalParams = new List<LocalParam>
+                            {
+                                new LocalParam
+                                {
+                                    Name = "threshold",
+                                    Expression = "3"
+                                },
+                                new LocalParam
+                                {
+                                    Name = "myList",
+                                    Expression = "new int[]{ 1, 2, 3, 4, 5 }"
+                                }
+                            },
+                            SuccessEvent = "Count is within tolerance.",
+                            ErrorMessage = "Not as expected.",
+                            Expression = "myList.Where(x => x < threshold).Contains(myObj.Count)",
+                            RuleExpressionType = RuleExpressionType.LambdaExpression
                         }
                     }
                 }
