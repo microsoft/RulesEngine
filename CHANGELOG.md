@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.0.2]
+- Fixed Scoped Params returning incorrect results in some corner case scenarios
+
 ## [5.0.1]
 - Added option to disable automatic type registry for input parameters in reSettings
 - Added option to make expression case sensitive in reSettings
