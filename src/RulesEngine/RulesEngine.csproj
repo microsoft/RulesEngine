@@ -8,8 +8,9 @@
     <PackageProjectUrl>https://github.com/microsoft/RulesEngine</PackageProjectUrl>
     <Authors>Abbas Cyclewala</Authors>
     <Description>Rules Engine is a package for abstracting business logic/rules/policies out of the system. This works in a very simple way by giving you an ability to put your rules in a store outside the core logic of the system thus ensuring that any change in rules doesn't affect the core system.</Description>
-	<PackageReleaseNotes>https://github.com/microsoft/RulesEngine/blob/main/CHANGELOG.md</PackageReleaseNotes>
-	<PackageTags>BRE, Rules Engine, Abstraction</PackageTags>
+	  <PackageReleaseNotes>https://github.com/microsoft/RulesEngine/blob/main/CHANGELOG.md</PackageReleaseNotes>
+	  <PackageTags>BRE, Rules Engine, Abstraction</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -27,7 +28,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
