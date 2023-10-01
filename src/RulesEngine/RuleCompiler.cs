@@ -131,7 +131,7 @@ namespace RulesEngine
                     catch(Exception ex)
                     {
                         var message = $"{ex.Message}, in ScopedParam: {lp.Name}";
-                        throw new RuleException(message);
+                        throw new RuleException(message, ex);
                     }
                 }
             }

@@ -1,6 +1,20 @@
 ﻿[
   {
     "WorkflowName": "NestedInputDemoWorkflow1",
+    "GlobalParams": [
+      {
+        "Name": "papa",
+        "Expression": "new object[] { \"1\", 4, null }"
+      },
+      {
+        "Name": "pa",
+        "Expression": "papa[0]"
+      },
+      {
+        "Name": "obj",
+        "Expression": "new pep[] { new pep(\"popo\" as string, pa as object) }"
+      }      
+    ],
     "Rules": [
       {
         "RuleName": "CheckNestedSimpleProp",

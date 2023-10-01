@@ -51,7 +51,11 @@ namespace DemoApp
             var fileData = File.ReadAllText(files[0]);
             var Workflows = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
-            var bre = new RulesEngine.RulesEngine(Workflows.ToArray(), null);
+            var executionRules = new ReSettings();
+            executionRules.NestedRuleExecutionMode = NestedRuleExecutionMode.Performance;
+            executionRules.CustomTypes = new Type[] { typeof(pep) };
+
+            var bre = new RulesEngine.RulesEngine(Workflows.ToArray(), executionRules);
             foreach (var workflow in Workflows)
             {
                 var resultList = bre.ExecuteAllRulesAsync(workflow.WorkflowName, nestedInput).Result;
@@ -63,8 +67,18 @@ namespace DemoApp
                 });
 
             }
+        }
 
+        public class pep
+        {
+            public string Key;
+            public object Value;
 
+            public pep(string key, object value)
+            {
+                this.Key = key;
+                this.Value = value;
+            }
         }
     }
 }
