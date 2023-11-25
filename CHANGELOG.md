@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.0.3]
+- Updated dependencies to latest
+- Fixed RulesEngine throwing exception when type name is same as input name
+
 ## [5.0.2]
 - Fixed Scoped Params returning incorrect results in some corner case scenarios
 
