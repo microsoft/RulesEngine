@@ -35,6 +35,8 @@ RulesEngine is a highly extensible library to build rule based system using C# e
       - [Usage](#usage-1)
   - [Custom Actions](#custom-actions)
     - [Steps to use a custom Action](#steps-to-use-a-custom-action)
+- [Standalone Expression Evaluator](#standalone-expression-evaluator)
+  - [Usage](#usage-2)
 
 
 
@@ -526,5 +528,29 @@ Actions can have async code as well
 }
 ```
 
+## Standalone Expression Evaluator
+If you are not looking for a full fledged RulesEngine and need only an expression evaluator. RulesEngine offers `RuleExpressionParser` which handles expression parsing and evaluation.
 
-_For more details please check out [Rules Engine Wiki](https://github.com/microsoft/RulesEngine/wiki)._
+### Usage
+```c#
+using System;
+using RulesEngine.Models;
+using RulesEngine.ExpressionBuilders;
+					
+public class Program
+{
+	public static void Main()
+	{
+		var reParser = new RuleExpressionParser(new ReSettings());
+		var result = reParser.Evaluate<string>("a+b", new RuleParameter[]{
+			new RuleParameter("a","Hello "),
+			new RuleParameter("b","World")
+		});
+		Console.WriteLine(result);
+	}
+}
+```
+This will output "Hello World"
+
+For more advanced usage, refer - https://dotnetfiddle.net/KSX8i0
+
