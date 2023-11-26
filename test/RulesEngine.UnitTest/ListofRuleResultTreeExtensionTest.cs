@@ -49,7 +49,7 @@ namespace RulesEngine.UnitTest
                 successEventName = eventName;
             });
 
-            Assert.True(successEventName.Equals("Test Rule 1"));
+            Assert.Equal("Test Rule 1", successEventName);
         }
 
         [Fact]
@@ -89,7 +89,7 @@ namespace RulesEngine.UnitTest
                 successEventName = eventName;
             });
 
-            Assert.True(successEventName.Equals("Event 1"));
+            Assert.Equal("Event 1", successEventName);
         }
 
         [Fact]
@@ -128,7 +128,7 @@ namespace RulesEngine.UnitTest
                 successEventName = eventName;
             });
 
-            Assert.True(successEventName.Equals(string.Empty));
+            Assert.Equal(successEventName, string.Empty);
         }
 
 
