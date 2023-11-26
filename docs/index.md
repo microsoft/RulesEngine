@@ -9,6 +9,7 @@ RulesEngine is a highly extensible library to build rule based system using C# e
 - Extending expression via custom class/type injection
 - Scoped parameters
 - Post rule execution actions
+- Standalone expression evaluator
 
 **Table Of Content**
 - [Installation](#installation)
@@ -18,11 +19,13 @@ RulesEngine is a highly extensible library to build rule based system using C# e
   - [Execute the workflow rules with input:](#execute-the-workflow-rules-with-input)
   - [Using custom names for inputs](#using-custom-names-for-inputs)
 - [C# Expression support](#c-expression-support)
+- [Extending expression via custom class/type injection](#extending-expression-via-custom-classtype-injection)
+  - [Example](#example)
 - [ScopedParams](#scopedparams)
   - [GlobalParams](#globalparams)
-    - [Example](#example)
-  - [LocalParams](#localparams)
     - [Example](#example-1)
+  - [LocalParams](#localparams)
+    - [Example](#example-2)
   - [Referencing ScopedParams in other ScopedParams](#referencing-scopedparams-in-other-scopedparams)
 - [Post rule execution actions](#post-rule-execution-actions)
   - [Inbuilt Actions](#inbuilt-actions)
@@ -121,6 +124,58 @@ The lambda expression allows you to use most of C# constructs and along with som
 For more details on supported expression language refer - [expression language](https://dynamic-linq.net/expression-language)
 
 For supported linq operations refer - [sequence operators](https://dynamic-linq.net/expression-language#sequence-operators)
+
+
+## Extending expression via custom class/type injection
+Although RulesEngine supports C# expressions, you may need to perform more complex operation.
+
+RulesEngine supports injecting custom classes/types via `ReSettings` which can allow you to call properties and methods of your custom class in expressions
+
+### Example
+Create a custom static class
+```c#
+using System;
+using System.Linq;
+
+namespace RE.HelperFunctions
+{
+    public static class Utils
+    {
+        public static bool CheckContains(string check, string valList)
+        {
+            if (String.IsNullOrEmpty(check) || String.IsNullOrEmpty(valList))
+                return false;
+
+            var list = valList.Split(',').ToList();
+            return list.Contains(check);
+        }
+    }
+}
+```
+
+Add it in your ReSettings and pass in RulesEngine constructor
+
+```c#
+  var reSettings = new ReSettings{
+      CustomTypes = new Type[] { typeof(Utils) }
+  }
+
+  var rulesEngine = new RulesEngine.RulesEngine(workflowRules,reSettings);
+```
+
+With this you can call Utils class in your Rules
+
+```json
+{
+    "WorkflowName": "DiscountWithCustomInputNames",
+    "Rules": [
+      {
+        "RuleName": "GiveDiscount10",
+        "Expression": "Utils.CheckContains(input1.country, \"india,usa,canada,France\") == true"
+      }
+}
+
+```
 
 
 ## ScopedParams
