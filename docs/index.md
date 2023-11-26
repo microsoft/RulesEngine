@@ -175,6 +175,7 @@ With this you can call Utils class in your Rules
         "RuleName": "GiveDiscount10",
         "Expression": "Utils.CheckContains(input1.country, \"india,usa,canada,France\") == true"
       }
+    ]
 }
 
 ```
