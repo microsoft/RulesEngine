@@ -19,9 +19,9 @@ namespace RulesEngine.ExpressionBuilders
         private readonly ReSettings _reSettings;
         private readonly IDictionary<string, MethodInfo> _methodInfo;
 
-        public RuleExpressionParser(ReSettings reSettings)
+        public RuleExpressionParser(ReSettings reSettings = null)
         {
-            _reSettings = reSettings;
+            _reSettings = reSettings ?? new ReSettings();
             _methodInfo = new Dictionary<string, MethodInfo>();
             PopulateMethodInfo();
         }
