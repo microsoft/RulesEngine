@@ -21,6 +21,12 @@ namespace RulesEngine.Models
         {
             Init(name, type);
         }
+
+        public static RuleParameter Create(string name, Type type)
+        {
+            return new RuleParameter(name, type);
+        }
+
         public Type Type { get; private set; }
         public string Name { get; private set; }
         public object Value { get; private set; }
