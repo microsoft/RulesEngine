@@ -19,46 +19,30 @@ namespace RulesEngine.HelperFunctions
                 Type type = CreateAbstractClassType(input);
                 return CreateObject(type, input);
             }
-            else
-            {
-                return input;
-            }
+
+            return input;
         }
+
         public static Type CreateAbstractClassType(dynamic input)
         {
-            List<DynamicProperty> props = new List<DynamicProperty>();
+            var props = new List<DynamicProperty>();
 
             if (input == null)
             {
                 return typeof(object);
             }
-            if (!(input is ExpandoObject))
+            if (input is not ExpandoObject expandoObject)
             {
                 return input.GetType();
             }
 
-            else
+            foreach (var expando in expandoObject)
             {
-                foreach (var expando in (IDictionary<string, object>)input)
-                {
-                    Type value;
-                    if (expando.Value is IList)
-                    {
-                        if (((IList)expando.Value).Count == 0)
-                            value = typeof(List<object>);
-                        else
-                        {
-                            var internalType = CreateAbstractClassType(((IList)expando.Value)[0]);
-                            value = new List<object>().Cast(internalType).ToList(internalType).GetType();
-                        }
-
-                    }
-                    else
-                    {
-                        value = CreateAbstractClassType(expando.Value);
-                    }
-                    props.Add(new DynamicProperty(expando.Key, value));
-                }
+                var value = expando.Value switch {
+                    IList list => GetListType(list),
+                    _ => CreateAbstractClassType(expando.Value)
+                };
+                props.Add(new DynamicProperty(expando.Key, value));
             }
 
             var type = DynamicClassFactory.CreateType(props);
@@ -67,41 +51,44 @@ namespace RulesEngine.HelperFunctions
 
         public static object CreateObject(Type type, dynamic input)
         {
-            if (!(input is ExpandoObject))
+            if (input is not ExpandoObject expandoObject)
             {
                 return Convert.ChangeType(input, type);
             }
-            object obj = Activator.CreateInstance(type);
+            var obj = Activator.CreateInstance(type);
 
             var typeProps = type.GetProperties().ToDictionary(c => c.Name);
 
-            foreach (var expando in (IDictionary<string, object>)input)
+            foreach (var expando in expandoObject)
             {
                 if (typeProps.ContainsKey(expando.Key) &&
                     expando.Value != null && (expando.Value.GetType().Name != "DBNull" || expando.Value != DBNull.Value))
                 {
                     object val;
                     var propInfo = typeProps[expando.Key];
-                    if (expando.Value is ExpandoObject)
+                    switch (expando.Value)
                     {
-                        var propType = propInfo.PropertyType;
-                        val = CreateObject(propType, expando.Value);
-                    }
-                    else if (expando.Value is IList)
-                    {
-                        var internalType = propInfo.PropertyType.GenericTypeArguments.FirstOrDefault() ?? typeof(object);
-                        var temp = (IList)expando.Value;
-                        var newList = new List<object>().Cast(internalType).ToList(internalType);
-                        for (int i = 0; i < temp.Count; i++)
+                        case ExpandoObject:
                         {
-                            var child = CreateObject(internalType, temp[i]);
-                            newList.Add(child);
-                        };
-                        val = newList;
-                    }
-                    else
-                    {
-                        val = expando.Value;
+                            var propType = propInfo.PropertyType;
+                            val = CreateObject(propType, expando.Value);
+                            break;
+                        }
+                        case IList temp:
+                        {
+                            var internalType = propInfo.PropertyType.GenericTypeArguments.FirstOrDefault() ?? typeof(object);
+                            var newList = new List<object>().Cast(internalType).ToList(internalType);
+                            foreach (var t in temp)
+                            {
+                                var child = CreateObject(internalType, t);
+                                newList.Add(child);
+                            };
+                            val = newList;
+                            break;
+                        }
+                        default:
+                            val = expando.Value;
+                            break;
                     }
                     propInfo.SetValue(obj, val, null);
                 }
@@ -123,7 +110,52 @@ namespace RulesEngine.HelperFunctions
             var genericMethod = methodInfo.MakeGenericMethod(innerType);
             return genericMethod.Invoke(null, new[] { self }) as IList;
         }
+
+        private static Type GetNullableType(Type type)
+        {
+            // Use Nullable.GetUnderlyingType() to remove the Nullable<T> wrapper if type is already nullable.
+            type = Nullable.GetUnderlyingType(type) ?? type; // avoid type becoming null
+            return type.IsValueType ? typeof(Nullable<>).MakeGenericType(type) : type;
+        }
+
+        private static Type GetListType(IList items)
+        {
+            if (items.Count == 0)
+            {
+                return typeof(List<object>);
+            }
+
+            Type internalType;
+            if (items[0] is not ExpandoObject)
+            {
+                internalType = CreateAbstractClassType(items[0]);
+            }
+            else
+            {
+                var expandoItems = items.Cast<IDictionary<string, object>>().ToList();
+
+                var props = new List<DynamicProperty>();
+
+                // loop for each item to get all unique property and then create type
+                foreach (var property in expandoItems
+                             .SelectMany(expandoItem => expandoItem)
+                             .Where(pair => !props.Any(x => x.Name.Equals(pair.Key, StringComparison.OrdinalIgnoreCase))))
+                {
+                    var type = property.Value switch {
+                        IList list => GetListType(list),
+                        _ => CreateAbstractClassType(property.Value)
+                    };
+
+                    // if property not exist in all items then convert type to nullable type
+                    var isPropertyExistInAllItems = expandoItems.All(x => x.ContainsKey(property.Key));
+                    type = isPropertyExistInAllItems ? type : GetNullableType(type);
+                    props.Add(new DynamicProperty(property.Key, type));
+                }
+
+                internalType = DynamicClassFactory.CreateType(props);
+            }
+
+            return new List<object>().Cast(internalType)!.ToList(internalType)!.GetType();
+        }
     }
-
-
 }

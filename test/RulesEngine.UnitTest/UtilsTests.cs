@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
+using System.Linq;
 using Xunit;
 
 namespace RulesEngine.UnitTest
@@ -22,7 +23,6 @@ namespace RulesEngine.UnitTest
     [ExcludeFromCodeCoverage]
     public class UtilsTests
     {
-
         [Fact]
         public void GetTypedObject_dynamicObject()
         {
@@ -50,7 +50,6 @@ namespace RulesEngine.UnitTest
             Assert.Equal(typedobj.GetType(), typedobj2.GetType());
         }
 
-
         [Fact]
         public void GetTypedObject_nonDynamicObject()
         {
@@ -61,7 +60,6 @@ namespace RulesEngine.UnitTest
             Assert.IsNotType<ExpandoObject>(typedobj);
             Assert.NotNull(typedobj.GetType().GetProperty("Test"));
         }
-
 
         [Fact]
         public void GetJObject_nonDynamicObject()
@@ -75,7 +73,6 @@ namespace RulesEngine.UnitTest
             Assert.NotNull(typedobj.Test);
         }
 
-
         [Fact]
         public void CreateObject_dynamicObject()
         {
@@ -86,7 +83,6 @@ namespace RulesEngine.UnitTest
             object newObj = Utils.CreateObject(typeof(TestClass), obj);
             Assert.IsNotType<ExpandoObject>(newObj);
             Assert.NotNull(newObj.GetType().GetProperty("Test"));
-
         }
 
         [Fact]
@@ -100,9 +96,105 @@ namespace RulesEngine.UnitTest
             Type type = Utils.CreateAbstractClassType(obj);
             Assert.NotEqual(typeof(ExpandoObject), type);
             Assert.NotNull(type.GetProperty("Test"));
-
         }
 
+        [Fact]
+        public void GetTypedObject_dynamicObject_withExpandoObject()
+        {
+            // Arrange
+            dynamic obj = new ExpandoObject();
+            obj.Test = "hello";
 
+            dynamic childObject = new ExpandoObject();
+            childObject.Id = 1;
+            obj.Child = childObject;
+
+            // Act
+            object typedObject = Utils.GetTypedObject(obj);
+
+            // Assert
+            Assert.IsNotType<ExpandoObject>(typedObject);
+
+            var childProperty = typedObject.GetType().GetProperty("Child");
+            Assert.NotNull(childProperty);
+            Assert.NotNull(childProperty.PropertyType.GetProperty("Id"));
+        }
+
+        [Fact]
+        public void GetTypedObject_dynamicObject_withEmptyList()
+        {
+            // Arrange
+            dynamic obj = new ExpandoObject();
+            obj.Test = "hello";
+            obj.TestList = new List<int>();
+
+            // Act
+            object typedObject = Utils.GetTypedObject(obj);
+
+            // Assert
+            Assert.IsNotType<ExpandoObject>(typedObject);
+            Assert.NotNull(typedObject.GetType().GetProperty("TestList"));
+        }
+
+        [Fact]
+        public void GetTypedObject_dynamicObject_withNestedList()
+        {
+            // Arrange
+            dynamic obj = new ExpandoObject();
+            obj.Test = "hello";
+
+            dynamic testListItemOne = new ExpandoObject();
+            testListItemOne.Id = 1;
+            testListItemOne.ChildList = new[] { "ChildListItem" };
+
+            obj.TestList = new[] { testListItemOne };
+
+            // Act
+            object typedObject = Utils.GetTypedObject(obj);
+
+            // Assert
+            Assert.IsNotType<ExpandoObject>(typedObject);
+            var listTypePropertyInfo = typedObject.GetType().GetProperty("TestList");
+            Assert.NotNull(listTypePropertyInfo);
+
+            var internalType = listTypePropertyInfo.PropertyType.GenericTypeArguments.FirstOrDefault();
+            Assert.NotNull(internalType);
+            Assert.NotNull(internalType.GetProperty("ChildList"));
+        }
+
+        [Fact]
+        public void GetTypedObject_dynamicObject_withListOfExpandoObject()
+        {
+            // Arrange
+            dynamic obj = new ExpandoObject();
+            obj.Test = "hello";
+
+            dynamic testListItemOne = new ExpandoObject();
+            testListItemOne.Id = 1;
+            testListItemOne.FirstName = "FirstName";
+
+            dynamic testListItemSecond = new ExpandoObject();
+            testListItemSecond.Id = 2;
+            testListItemSecond.LastName = "LastName";
+
+            obj.TestList = new[] { testListItemOne, testListItemSecond };
+
+            // Act
+            object typedObject = Utils.GetTypedObject(obj);
+
+            // Assert
+            Assert.IsNotType<ExpandoObject>(typedObject);
+
+            var listTypePropertyInfo = typedObject.GetType().GetProperty("TestList");
+            Assert.NotNull(listTypePropertyInfo);
+
+            var internalType = listTypePropertyInfo.PropertyType.GenericTypeArguments.FirstOrDefault();
+            Assert.NotNull(internalType);
+
+            var internalTypeProperties = internalType.GetProperties();
+            Assert.Single(internalTypeProperties, x => x.Name == "Id");
+            Assert.Single(internalTypeProperties, x => x.Name == "FirstName");
+            Assert.Single(internalTypeProperties, x => x.Name == "LastName");
+        }
     }
 }
