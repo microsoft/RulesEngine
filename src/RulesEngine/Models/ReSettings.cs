@@ -27,6 +27,7 @@ namespace RulesEngine.Models
             CacheConfig = reSettings.CacheConfig;
             IsExpressionCaseSensitive = reSettings.IsExpressionCaseSensitive;
             AutoRegisterInputType = reSettings.AutoRegisterInputType;
+            UseFastExpressionCompiler = reSettings.UseFastExpressionCompiler;
     }
 
 
@@ -79,6 +80,8 @@ namespace RulesEngine.Models
         /// </summary>
         public NestedRuleExecutionMode NestedRuleExecutionMode { get; set; } = NestedRuleExecutionMode.All;
         public MemCacheConfig CacheConfig { get; set; }
+
+        public bool UseFastExpressionCompiler { get; set; } = true;
     }
 
     public enum NestedRuleExecutionMode
