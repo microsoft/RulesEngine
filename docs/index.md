@@ -37,6 +37,8 @@ RulesEngine is a highly extensible library to build rule based system using C# e
     - [Steps to use a custom Action](#steps-to-use-a-custom-action)
 - [Standalone Expression Evaluator](#standalone-expression-evaluator)
   - [Usage](#usage-2)
+- [Settings](#settings)
+  - [NestedRuleExecutionMode](#nestedruleexecutionmode)
 
 
 
@@ -555,3 +557,29 @@ This will output "Hello World"
 
 For more advanced usage, refer - https://dotnetfiddle.net/KSX8i0
 
+## Settings
+RulesEngine allows you to pass optional `ReSettings` in constructor to specify certain configuration for RulesEngine.
+
+Here are the all the options available:-
+
+
+| Property | Type | Default Value | Description |
+| --- | --- | --- | --- |
+| `CustomTypes` | `Type[]` | N/A | Custom types to be used in rule expressions. |
+| `CustomActions` | `Dictionary<string, Func<ActionBase>>` | N/A | Custom actions that can be used in the rules. |
+| `EnableExceptionAsErrorMessage` | `bool` | `true` | If `true`, returns any exception occurred while rule execution as an error message. Otherwise, throws an exception. This setting is only applicable if `IgnoreException` is set to `false`. |
+| `IgnoreException` | `bool` | `false` | If `true`, it will ignore any exception thrown with rule compilation/execution. |
+| `EnableFormattedErrorMessage` | `bool` | `true` | Enables error message formatting. |
+| `EnableScopedParams` | `bool` | `true` | Enables global parameters and local parameters for rules. |
+| `IsExpressionCaseSensitive` | `bool` | `false` | Sets whether expressions are case sensitive. |
+| `AutoRegisterInputType` | `bool` | `true` | Auto registers input type in custom type to allow calling method on type. |
+| `NestedRuleExecutionMode` | `NestedRuleExecutionMode` | `All` | Sets the mode for nested rule execution. |
+| `CacheConfig` | `MemCacheConfig` | N/A | Configures the memory cache. |
+| `UseFastExpressionCompiler` | `bool` | `true` | Whether to use FastExpressionCompiler for rule compilation. |
+
+
+### NestedRuleExecutionMode 
+| Value | Description |
+| --- | --- |
+| `All` | Executes all nested rules. |
+| `Performance` | Skips nested rules whose execution does not impact parent rule's result. |
