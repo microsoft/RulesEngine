@@ -57,8 +57,17 @@ namespace RulesEngine.ExpressionBuilders
             }
             var expressionBody = new List<Expression>() { e };
             var wrappedExpression = WrapExpression<T>(expressionBody, parameterExpressions, new ParameterExpression[] { });
-            return wrappedExpression.CompileFast();
+            return CompileExpression(wrappedExpression);
 
+        }
+
+        private Func<object[], T> CompileExpression<T>(Expression<Func<object[], T>> expression)
+        {
+            if(_reSettings.UseFastExpressionCompiler)
+            {
+                return expression.CompileFast();
+            }
+            return expression.Compile();
         }
 
         private Expression<Func<object[], T>> WrapExpression<T>(List<Expression> expressionList, ParameterExpression[] parameters, ParameterExpression[] variables)
@@ -77,7 +86,7 @@ namespace RulesEngine.ExpressionBuilders
         {
             ruleExpParams = ruleExpParams ?? new RuleExpressionParameter[] { };
             var expression = CreateDictionaryExpression(ruleParams, ruleExpParams);
-            return expression.CompileFast();
+            return CompileExpression(expression);
         }
 
         public T Evaluate<T>(string expression, RuleParameter[] ruleParams)

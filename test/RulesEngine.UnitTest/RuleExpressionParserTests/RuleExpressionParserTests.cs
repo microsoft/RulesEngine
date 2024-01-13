@@ -3,14 +3,8 @@
 
 using Newtonsoft.Json.Linq;
 using RulesEngine.ExpressionBuilders;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
-using System.Text.Json;
 
 namespace RulesEngine.UnitTest.RuleExpressionParserTests
 {
@@ -59,5 +53,17 @@ namespace RulesEngine.UnitTest.RuleExpressionParserTests
 
             Assert.Equal("helloworld", value3);
         }
+
+        [Theory]
+        [InlineData(false)]
+        public void TestExpressionWithDifferentCompilerSettings(bool fastExpressionEnabled){
+            var ruleParser = new RuleExpressionParser(new Models.ReSettings() { UseFastExpressionCompiler = fastExpressionEnabled });
+
+            decimal? d1 = null;
+            var result = ruleParser.Evaluate<bool>("d1 < 20", new[] { Models.RuleParameter.Create("d1", d1) });
+            Assert.False(result);
+        }
     }
+
+    
 }
