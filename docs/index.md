@@ -579,6 +579,7 @@ Here are the all the options available:-
 
 
 ### NestedRuleExecutionMode 
+
 | Value | Description |
 | --- | --- |
 | `All` | Executes all nested rules. |
