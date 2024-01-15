@@ -29,7 +29,7 @@ namespace RulesEngine.UnitTest
             var parser = new RuleExpressionParser(reSettings);
             var compiler = new RuleCompiler(new RuleExpressionBuilderFactory(reSettings, parser),null);
             Assert.Throws<ArgumentNullException>(() => compiler.CompileRule(null, RuleExpressionType.LambdaExpression,null,null));
-            Assert.Throws<ArgumentNullException>(() => compiler.CompileRule(null, RuleExpressionType.LambdaExpression, new RuleParameter[] { null },null));
+            Assert.Throws<ArgumentNullException>(() => compiler.CompileRule(null, RuleExpressionType.LambdaExpression, new RuleParameterInfo[] { null },null));
         }
     }
 }

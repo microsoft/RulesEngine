@@ -41,7 +41,9 @@ namespace RulesEngine.ExpressionBuilders
 
         }
 
-        public Func<object[], T> Compile<T>(string expression, RuleParameter[] ruleParams)
+
+
+        internal Func<object[], T> Compile<T>(string expression, RuleParameterInfo[] ruleParams)
         {
             var rtype = typeof(T);
             if(rtype == typeof(object))
@@ -58,6 +60,12 @@ namespace RulesEngine.ExpressionBuilders
             var expressionBody = new List<Expression>() { e };
             var wrappedExpression = WrapExpression<T>(expressionBody, parameterExpressions, new ParameterExpression[] { });
             return CompileExpression(wrappedExpression);
+
+        }
+
+        public Func<object[], T> Compile<T>(string expression, RuleParameter[] ruleParams)
+        {
+            return Compile<T>(expression, ruleParams.Select(c => c.GetInfo()).ToArray());
 
         }
 
@@ -82,7 +90,7 @@ namespace RulesEngine.ExpressionBuilders
             return Expression.Lambda<Func<object[], T>>(blockExp, argExp);
         }
 
-        internal Func<object[],Dictionary<string,object>> CompileRuleExpressionParameters(RuleParameter[] ruleParams, RuleExpressionParameter[] ruleExpParams = null)
+        internal Func<object[],Dictionary<string,object>> CompileRuleExpressionParameters(RuleParameterInfo[] ruleParams, RuleExpressionParameter[] ruleExpParams = null)
         {
             ruleExpParams = ruleExpParams ?? new RuleExpressionParameter[] { };
             var expression = CreateDictionaryExpression(ruleParams, ruleExpParams);
@@ -112,7 +120,7 @@ namespace RulesEngine.ExpressionBuilders
         /// or
         /// type
         /// </exception>
-        private IEnumerable<ParameterExpression> GetParameterExpression(RuleParameter[] ruleParams)
+        private IEnumerable<ParameterExpression> GetParameterExpression(RuleParameterInfo[] ruleParams)
         {
             foreach (var ruleParam in ruleParams)
             {
@@ -125,7 +133,7 @@ namespace RulesEngine.ExpressionBuilders
             }
         }
 
-        private Expression<Func<object[],Dictionary<string,object>>> CreateDictionaryExpression(RuleParameter[] ruleParams, RuleExpressionParameter[] ruleExpParams)
+        private Expression<Func<object[],Dictionary<string,object>>> CreateDictionaryExpression(RuleParameterInfo[] ruleParams, RuleExpressionParameter[] ruleExpParams)
         {
             var body = new List<Expression>();
             var paramExp = new List<ParameterExpression>();

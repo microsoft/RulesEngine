@@ -18,7 +18,7 @@ namespace RulesEngine.Models
         }
 
        
-        internal RuleParameter(string name, Type type,object value = null)
+        private RuleParameter(string name, Type type,object value = null)
         {
             Value = Utils.GetTypedObject(value);
             Init(name, type);
@@ -27,13 +27,10 @@ namespace RulesEngine.Models
         public Type Type { get; private set; }
         public string Name { get; private set; }
         public object Value { get; private set; }
-        public ParameterExpression ParameterExpression { get; private set; }
-
         private void Init(string name, Type type)
         {
             Name = name;
             Type = type ?? typeof(object);
-            ParameterExpression = Expression.Parameter(Type, Name);
         }
 
         public static RuleParameter Create<T>(string name, T value)
@@ -43,6 +40,8 @@ namespace RulesEngine.Models
             return new RuleParameter(name,type,value);
         }
 
-
+        internal RuleParameterInfo GetInfo(){
+            return new RuleParameterInfo(Name,Type);
+        }
     }
 }

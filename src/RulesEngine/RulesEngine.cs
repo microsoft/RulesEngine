@@ -286,20 +286,21 @@ namespace RulesEngine
             var workflow = _rulesCache.GetWorkflow(workflowName);
             if (workflow != null)
             {
+                var ruleParamInfoList = ruleParams.Select(c => c.GetInfo()).ToArray(); 
                 var dictFunc = new Dictionary<string, RuleFunc<RuleResultTree>>();
                 if (_reSettings.AutoRegisterInputType)
                 {
-                    _reSettings.CustomTypes = _reSettings.CustomTypes.Safe().Union(ruleParams.Select(c => c.Type)).ToArray();
+                    _reSettings.CustomTypes = _reSettings.CustomTypes.Safe().Union(ruleParamInfoList.Select(c => c.Type)).ToArray();
                 }
                 // add separate compilation for global params
 
                 var globalParamExp = new Lazy<RuleExpressionParameter[]>(
-                    () => _ruleCompiler.GetRuleExpressionParameters(workflow.RuleExpressionType, workflow.GlobalParams, ruleParams)
+                    () => _ruleCompiler.GetRuleExpressionParameters(workflow.RuleExpressionType, workflow.GlobalParams, ruleParamInfoList)
                 );
 
                 foreach (var rule in workflow.Rules.Where(c => c.Enabled))
                 {
-                    dictFunc.Add(rule.RuleName, CompileRule(rule,workflow.RuleExpressionType, ruleParams, globalParamExp));
+                    dictFunc.Add(rule.RuleName, CompileRule(rule,workflow.RuleExpressionType, ruleParamInfoList, globalParamExp));
                 }
 
                 _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, dictFunc);
@@ -324,13 +325,14 @@ namespace RulesEngine
             {
                 throw new ArgumentException($"Workflow `{workflowName}` does not contain any rule named `{ruleName}`");
             }
+            var ruleParamInfo = ruleParameters.Select(c => c.GetInfo()).ToArray();
             var globalParamExp = new Lazy<RuleExpressionParameter[]>(
-                  () => _ruleCompiler.GetRuleExpressionParameters(workflow.RuleExpressionType, workflow.GlobalParams, ruleParameters)
+                  () => _ruleCompiler.GetRuleExpressionParameters(workflow.RuleExpressionType, workflow.GlobalParams, ruleParamInfo)
               );
-            return CompileRule(currentRule,workflow.RuleExpressionType, ruleParameters, globalParamExp);
+            return CompileRule(currentRule,workflow.RuleExpressionType, ruleParamInfo, globalParamExp);
         }
 
-        private RuleFunc<RuleResultTree> CompileRule(Rule rule, RuleExpressionType ruleExpressionType, RuleParameter[] ruleParams, Lazy<RuleExpressionParameter[]> scopedParams)
+        private RuleFunc<RuleResultTree> CompileRule(Rule rule, RuleExpressionType ruleExpressionType, RuleParameterInfo[] ruleParams, Lazy<RuleExpressionParameter[]> scopedParams)
         {
             return _ruleCompiler.CompileRule(rule, ruleExpressionType, ruleParams, scopedParams);
         }
@@ -363,6 +365,7 @@ namespace RulesEngine
             var key = $"{workflowName}-" + ruleParamsKey;
             return key;
         }
+
 
         private IDictionary<string, Func<ActionBase>> GetDefaultActionRegistry()
         {

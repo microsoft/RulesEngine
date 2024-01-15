@@ -23,7 +23,7 @@ namespace RulesEngine.ExpressionBuilders
             _ruleExpressionParser = ruleExpressionParser;
         }
 
-        internal override RuleFunc<RuleResultTree> BuildDelegateForRule(Rule rule, RuleParameter[] ruleParams)
+        internal override RuleFunc<RuleResultTree> BuildDelegateForRule(Rule rule, RuleParameterInfo[] ruleParams)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace RulesEngine.ExpressionBuilders
             
         }
 
-        internal override Func<object[],Dictionary<string,object>> CompileScopedParams(RuleParameter[] ruleParameters, RuleExpressionParameter[] scopedParameters)
+        internal override Func<object[],Dictionary<string,object>> CompileScopedParams(RuleParameterInfo[] ruleParameters, RuleExpressionParameter[] scopedParameters)
         {
             return _ruleExpressionParser.CompileRuleExpressionParameters(ruleParameters, scopedParameters);
         }
