@@ -244,24 +244,29 @@ namespace RulesEngine
             var paramDelegate = CompileScopedParams(rule.RuleExpressionType,ruleParameters, ruleExpParams);
 
             return (ruleParams) => {
-                var inputs = ruleParams.Select(c => c.Value).ToArray();
-                IEnumerable<RuleParameter> scopedParams;
-                try
-                {
-                    var scopedParamsDict = paramDelegate(inputs);
-                    scopedParams = scopedParamsDict.Select(c => new RuleParameter(c.Key, c.Value));
-                }
-                catch(Exception ex)
-                {
-                    var message = $"Error while executing scoped params for rule `{rule.RuleName}` - {ex}";
-                    var resultFn = Helpers.ToRuleExceptionResult(_reSettings, rule, new RuleException(message, ex));
-                    return resultFn(ruleParams);
-                }
-               
-                var extendedInputs = ruleParams.Concat(scopedParams);
-                var result = ruleFunc(extendedInputs.ToArray());
-                return result;
+                return GetWrappedRuleFuncInternal(rule, ruleFunc, ruleParams, paramDelegate);
             };
+        }
+
+        private RuleResultTree GetWrappedRuleFuncInternal(Rule rule, RuleFunc<RuleResultTree> ruleFunc, RuleParameter[] ruleParams, Func<object[], Dictionary<string, object>> paramDelegate)
+        {
+            var inputs = ruleParams.Select(c => c.Value).ToArray();
+            IEnumerable<RuleParameter> scopedParams;
+            try
+            {
+                var scopedParamsDict = paramDelegate(inputs);
+                scopedParams = scopedParamsDict.Select(c => new RuleParameter(c.Key, c.Value));
+            }
+            catch (Exception ex)
+            {
+                var message = $"Error while executing scoped params for rule `{rule.RuleName}` - {ex}";
+                var resultFn = Helpers.ToRuleExceptionResult(_reSettings, rule, new RuleException(message, ex));
+                return resultFn(ruleParams);
+            }
+
+            var extendedInputs = ruleParams.Concat(scopedParams);
+            var result = ruleFunc(extendedInputs.ToArray());
+            return result;
         }
 
         private RuleExpressionBuilderBase GetExpressionBuilder(RuleExpressionType expressionType)

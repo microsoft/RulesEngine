@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
-	<!--<PackageReference Include="RulesEngine" Version="3.0.2" />-->
+	  <!--<PackageReference Include="RulesEngine" Version="5.0.3" />-->
   </ItemGroup>
 
   <ItemGroup>

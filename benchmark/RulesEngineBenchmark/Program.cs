@@ -15,7 +15,7 @@ namespace RulesEngineBenchmark
     public class REBenchmark
     {
         private readonly RulesEngine.RulesEngine rulesEngine;
-        private readonly object ruleInput;
+      
         private readonly List<Workflow> workflow;
 
         private class ListItem
@@ -41,7 +41,16 @@ namespace RulesEngineBenchmark
                 EnableScopedParams = false
             });
 
-            ruleInput = new {
+            
+        }
+
+        [Params(1000, 10000)]
+        public int N;
+
+        [Benchmark]
+        public void RuleExecutionDefault()
+        {
+            var ruleInput = new {
                 SimpleProp = "simpleProp",
                 NestedProp = new {
                     SimpleProp = "nestedSimpleProp",
@@ -61,14 +70,6 @@ namespace RulesEngineBenchmark
                 }
 
             };
-        }
-
-        [Params(1000, 10000)]
-        public int N;
-
-        [Benchmark]
-        public void RuleExecutionDefault()
-        {
             foreach (var workflow in workflow)
             {
                 _ = rulesEngine.ExecuteAllRulesAsync(workflow.WorkflowName, ruleInput).Result;

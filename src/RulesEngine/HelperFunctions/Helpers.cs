@@ -18,31 +18,35 @@ namespace RulesEngine.HelperFunctions
         internal static RuleFunc<RuleResultTree> ToResultTree(ReSettings reSettings, Rule rule, IEnumerable<RuleResultTree> childRuleResults, Func<object[], bool> isSuccessFunc, string exceptionMessage = "")
         {
             return (inputs) => {
-
-                var isSuccess = false;
-                var inputsDict = new Dictionary<string, object>();
-                try
-                {
-                    inputsDict = inputs.ToDictionary(c => c.Name, c => c.Value);
-                    isSuccess = isSuccessFunc(inputs.Select(c => c.Value).ToArray());
-                }
-                catch (Exception ex)
-                {
-                    exceptionMessage = GetExceptionMessage($"Error while executing rule : {rule?.RuleName} - {ex.Message}", reSettings);
-                    HandleRuleException(new RuleException(exceptionMessage,ex), rule, reSettings);
-                    isSuccess = false;
-                }
-
-                return new RuleResultTree {
-                    Rule = rule,
-                    Inputs = inputsDict,
-                    IsSuccess = isSuccess,
-                    ChildResults = childRuleResults,
-                    ExceptionMessage = exceptionMessage
-                };
+                return ToResultTreeInternal(reSettings, rule, childRuleResults, isSuccessFunc, ref exceptionMessage, inputs);
 
             };
             
+        }
+
+        private static RuleResultTree ToResultTreeInternal(ReSettings reSettings, Rule rule, IEnumerable<RuleResultTree> childRuleResults, Func<object[], bool> isSuccessFunc, ref string exceptionMessage, RuleParameter[] inputs)
+        {
+            var isSuccess = false;
+            var inputsDict = new Dictionary<string, object>();
+            try
+            {
+                inputsDict = inputs.ToDictionary(c => c.Name, c => c.Value);
+                isSuccess = isSuccessFunc(inputs.Select(c => c.Value).ToArray());
+            }
+            catch (Exception ex)
+            {
+                exceptionMessage = GetExceptionMessage($"Error while executing rule : {rule?.RuleName} - {ex.Message}", reSettings);
+                HandleRuleException(new RuleException(exceptionMessage, ex), rule, reSettings);
+                isSuccess = false;
+            }
+
+            return new RuleResultTree {
+                Rule = rule,
+                Inputs = inputsDict,
+                IsSuccess = isSuccess,
+                ChildResults = childRuleResults,
+                ExceptionMessage = exceptionMessage
+            };
         }
 
         internal static RuleFunc<RuleResultTree> ToRuleExceptionResult(ReSettings reSettings, Rule rule,Exception ex)
