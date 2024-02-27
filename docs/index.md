@@ -404,7 +404,7 @@ Define OnSuccess or OnFailure Action for your Rule:
            "OnFailure": { // This will execute if the Rule evaluates to failure
                "Name": "EvaluateRule",
                "Context": {
-                   "WorkflowName": "inputWorkflow",
+                   "workflowName": "inputWorkflow",
                    "ruleName": "GiveDiscount10Percent"
                }
            }
@@ -443,7 +443,7 @@ EvaluateRule also supports passing filtered inputs and computed inputs to chaine
          "OnSuccess": {
             "Name": "EvaluateRule",
                "Context": {
-                   "WorkflowName": "inputWorkflow",
+                   "workflowName": "inputWorkflow",
                    "ruleName": "GiveDiscount10Percent",
                    "inputFilter": ["input2"], //will only pass input2 from existing inputs,scopedparams to the chained rule
                    "additionalInputs":[ // will pass a new input named currentDiscount with the result of the expression to the chained rule
