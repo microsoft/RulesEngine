@@ -836,7 +836,38 @@ namespace RulesEngine.UnitTest
             Assert.All(result, rule => Assert.StartsWith("Error while executing rule :", rule.ExceptionMessage));
         }
 
+        [Fact]
+        public async Task ExecuteRule_RuntimeErrorInPreviousRun_ShouldReturnEmptyErrorMessage()
+        {
+            var workflow = new Workflow {
+                WorkflowName = "TestWorkflow",
+                Rules = new[] {
+                    new Rule {
+                        RuleName = "ruleWithRuntimeError",
+                        Expression = "input1.Country.ToLower() == \"india\""
+                    }
+                }
+            };
 
+            var re = new RulesEngine(new[] { workflow }, null);
+            var input = new RuleTestClass {
+                Country = null
+            };
+
+            var result = await re.ExecuteAllRulesAsync("TestWorkflow", input);
+
+            Assert.NotNull(result);
+            Assert.All(result, rule => Assert.False(rule.IsSuccess));
+            Assert.All(result, rule => Assert.StartsWith("Error while executing rule :", rule.ExceptionMessage));
+
+            input.Country="india";
+            result = await re.ExecuteAllRulesAsync("TestWorkflow", input);
+
+            Assert.NotNull(result);
+            Assert.All(result, rule => Assert.True(rule.IsSuccess));
+            Assert.All(result, rule => Assert.Empty(rule.ExceptionMessage));
+        }
+        
         [Fact]
         public async Task ExecuteRule_RuntimeError_ThrowsException()
         {
