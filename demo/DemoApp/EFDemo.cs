@@ -2,8 +2,6 @@
 //  Licensed under the MIT License.
 
 using DemoApp.EFDataExample;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -15,6 +13,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DemoApp
 {
+    using System.Text.Json;
+
     public class EFDemo
     {
         public void Run()
@@ -24,11 +24,9 @@ namespace DemoApp
             var orderInfo = "{\"totalOrders\": 5,\"recurringItems\": 2}";
             var telemetryInfo = "{\"noOfVisitsPerMonth\": 10,\"percentageOfBuyingToVisit\": 15}";
 
-            var converter = new ExpandoObjectConverter();
-
-            dynamic input1 = JsonConvert.DeserializeObject<ExpandoObject>(basicInfo, converter);
-            dynamic input2 = JsonConvert.DeserializeObject<ExpandoObject>(orderInfo, converter);
-            dynamic input3 = JsonConvert.DeserializeObject<ExpandoObject>(telemetryInfo, converter);
+           dynamic input1 = JsonSerializer.Deserialize<ExpandoObject>(basicInfo);
+            dynamic input2 = JsonSerializer.Deserialize<ExpandoObject>(orderInfo);
+            dynamic input3 = JsonSerializer.Deserialize<ExpandoObject>(telemetryInfo);
 
             var inputs = new dynamic[]
                 {
@@ -42,7 +40,7 @@ namespace DemoApp
                 throw new Exception("Rules not found.");
 
             var fileData = File.ReadAllText(files[0]);
-            var workflow = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
+            var workflow = JsonSerializer.Deserialize<List<Workflow>>(fileData);
 
             RulesEngineDemoContext db = new RulesEngineDemoContext();
             if (db.Database.EnsureCreated())

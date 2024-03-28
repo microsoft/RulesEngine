@@ -2,8 +2,6 @@
 // Licensed under the MIT License.
 
 using FluentValidation;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using RulesEngine.Actions;
 using RulesEngine.Exceptions;
 using RulesEngine.ExpressionBuilders;
@@ -20,10 +18,13 @@ using System.Threading.Tasks;
 
 namespace RulesEngine
 {
+    using System.Text.Json;
+    using System.Text.Json.Nodes;
+
     /// <summary>
     /// 
     /// </summary>
-    /// <seealso cref="RulesEngine.Interfaces.IRulesEngine" />
+    /// <seealso cref="IRulesEngine" />
     public class RulesEngine : IRulesEngine
     {
         #region Variables
@@ -38,7 +39,7 @@ namespace RulesEngine
         #region Constructor
         public RulesEngine(string[] jsonConfig, ReSettings reSettings = null) : this(reSettings)
         {
-            var workflow = jsonConfig.Select(item => JsonConvert.DeserializeObject<Workflow>(item)).ToArray();
+            var workflow = jsonConfig.Select(item => JsonSerializer.Deserialize<Workflow>(item)).ToArray();
             AddWorkflow(workflow);
         }
 
@@ -403,7 +404,7 @@ namespace RulesEngine
                             {
                                 var arrParams = inputs?.Select(c => new { Name = c.Key, c.Value });
                                 var model = arrParams?.Where(a => string.Equals(a.Name, property))?.FirstOrDefault();
-                                var value = model?.Value != null ? JsonConvert.SerializeObject(model?.Value) : null;
+                                var value = model?.Value != null ? JsonSerializer.Serialize(model?.Value) : null;
                                 errorMessage = errorMessage?.Replace($"$({property})", value ?? $"$({property})");
                             }
                         }
@@ -430,10 +431,10 @@ namespace RulesEngine
             var model = arrParams?.Where(a => string.Equals(a.Name, typeName))?.FirstOrDefault();
             if (model != null)
             {
-                var modelJson = JsonConvert.SerializeObject(model?.Value);
-                var jObj = JObject.Parse(modelJson);
-                JToken jToken = null;
-                var val = jObj?.TryGetValue(propertyName, StringComparison.OrdinalIgnoreCase, out jToken);
+                var modelJson = JsonSerializer.Serialize(model?.Value);
+                var jObj = JsonObject.Parse(modelJson).AsObject();
+                JsonNode jToken = null;
+                var val = jObj?.TryGetPropertyValue(propertyName, out jToken);
                 errorMessage = errorMessage.Replace($"$({property})", jToken != null ? jToken?.ToString() : $"({property})");
             }
 
