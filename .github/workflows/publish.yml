@@ -104,17 +104,3 @@ jobs:
           foreach($file in (Get-ChildItem "${{ env.NuGetDirectory }}" -Recurse -Include *.nupkg)) {
               dotnet nuget push $file --api-key "${{ secrets.NUGET_APIKEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
           }
-You can create a new project on GitHub and push the files to the repository:
-
-PowerShell
-copy
-dotnet new gitignore
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-
-# TODO Update this URL with the URL of your repository
-git remote add origin https://github.com/meziantou/SampleNuGet.git
-
-git push -u origin main
