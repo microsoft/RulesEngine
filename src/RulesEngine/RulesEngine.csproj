@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net6.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <Version>5.0.3</Version>
     <Copyright>Copyright (c) Microsoft Corporation.</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -11,6 +11,9 @@
 	  <PackageReleaseNotes>https://github.com/microsoft/RulesEngine/blob/main/CHANGELOG.md</PackageReleaseNotes>
 	  <PackageTags>BRE, Rules Engine, Abstraction</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageProjectUrl>https://github.com/taskinozdemir/RulesEngine/</PackageProjectUrl>
+    <PackageTags>rulesengine, library</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -25,6 +28,8 @@
     <DelaySign>True</DelaySign>
     <Deterministic>true</Deterministic>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -40,8 +45,11 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0"/>
+  <ItemGroup>
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>
