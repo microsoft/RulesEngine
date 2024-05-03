@@ -14,6 +14,7 @@
     <EnablePackageValidation>true</EnablePackageValidation>
     <PackageProjectUrl>https://github.com/taskinozdemir/RulesEngine/</PackageProjectUrl>
     <PackageTags>rulesengine, library</PackageTags>
+    <PackageIcon>icon.svg</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
