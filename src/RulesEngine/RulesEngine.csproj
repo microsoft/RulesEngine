@@ -36,7 +36,7 @@
   <ItemGroup>
     <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
-    <None Include="..\..\icon.svg" Pack="true" PackagePath="\"/>
+    <None Include="..\..\icon.jpg" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <ItemGroup>
