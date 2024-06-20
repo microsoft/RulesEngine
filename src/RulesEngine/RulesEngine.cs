@@ -27,15 +27,18 @@ namespace RulesEngine
     public class RulesEngine : IRulesEngine
     {
         #region Variables
+
         private readonly ReSettings _reSettings;
         private readonly RulesCache _rulesCache;
         private readonly RuleExpressionParser _ruleExpressionParser;
         private readonly RuleCompiler _ruleCompiler;
         private readonly ActionFactory _actionFactory;
         private const string ParamParseRegex = "(\\$\\(.*?\\))";
+
         #endregion
 
         #region Constructor
+
         public RulesEngine(string[] jsonConfig, ReSettings reSettings = null) : this(reSettings)
         {
             var workflow = jsonConfig.Select(item => JsonConvert.DeserializeObject<Workflow>(item)).ToArray();
@@ -69,8 +72,8 @@ namespace RulesEngine
                 actionDictionary.Add(customAction);
             }
             return actionDictionary;
-
         }
+
         #endregion
 
         #region Public Methods
@@ -311,7 +314,6 @@ namespace RulesEngine
             }
         }
 
-
         private RuleFunc<RuleResultTree> CompileRule(string workflowName, string ruleName, RuleParameter[] ruleParameters)
         {
             var workflow = _rulesCache.GetWorkflow(workflowName);
@@ -334,8 +336,6 @@ namespace RulesEngine
         {
             return _ruleCompiler.CompileRule(rule, ruleExpressionType, ruleParams, scopedParams);
         }
-
-
 
         /// <summary>
         /// This will execute the compiled rules 
@@ -409,9 +409,9 @@ namespace RulesEngine
                         }
                         ruleResult.ExceptionMessage = errorMessage;
                     }
-
                 }
             }
+
             return ruleResultList;
         }
 
@@ -439,6 +439,7 @@ namespace RulesEngine
 
             return errorMessage;
         }
+
         #endregion
     }
 }
