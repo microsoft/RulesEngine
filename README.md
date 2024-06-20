@@ -1,24 +1,17 @@
 # Rules Engine
-![build](https://github.com/microsoft/RulesEngine/workflows/build/badge.svg?branch=main)
-[![Coverage Status](https://coveralls.io/repos/github/microsoft/RulesEngine/badge.svg?branch=main)](https://coveralls.io/github/microsoft/RulesEngine?branch=main)
+![build](https://github.com/asulwer/RulesEngine/workflows/build/badge.svg?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/asulwer/RulesEngine/badge.svg?branch=main)](https://coveralls.io/github/asulwer/RulesEngine?branch=main)
 [![Nuget download][download-image]][download-url]
-
-[download-image]: https://img.shields.io/nuget/dt/RulesEngine
-[download-url]: https://www.nuget.org/packages/RulesEngine/
 
 ## Overview
 
 Rules Engine is a library/NuGet package for abstracting business logic/rules/policies out of a system. It provides a simple way of giving you the ability to put your rules in a store outside the core logic of the system, thus ensuring that any change in rules don't affect the core system.
 
-## Installation
-
-To install this library, download the latest version of [NuGet Package](https://www.nuget.org/packages/RulesEngine/) from [nuget.org](https://www.nuget.org/) and refer it into your project.  
-
 ## How to use it
 
 There are several ways to populate workflows for the Rules Engine as listed below.
 
-You need to store the rules based on the [schema definition](https://github.com/microsoft/RulesEngine/blob/main/schema/workflow-schema.json) given and they can be stored in any store as deemed appropriate like Azure Blob Storage, Cosmos DB, Azure App Configuration, [Entity Framework](https://github.com/microsoft/RulesEngine#entity-framework), SQL Servers, file systems etc. For RuleExpressionType `LambdaExpression`, the rule is written as a [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
+You need to store the rules based on the [schema definition](https://github.com/asulwer/RulesEngine/blob/main/schema/workflow-schema.json) given and they can be stored in any store as deemed appropriate like Azure Blob Storage, Cosmos DB, Azure App Configuration, [Entity Framework](https://github.com/microsoft/RulesEngine#entity-framework), SQL Servers, file systems etc. For RuleExpressionType `LambdaExpression`, the rule is written as a [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
 
 An example rule:
 
@@ -130,12 +123,8 @@ https://alexreich.github.io/RulesEngineEditor/demo
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+the rights to use your contribution.
 
 ---
 
-_For more details please check out [Rules Engine Wiki](https://github.com/microsoft/RulesEngine/wiki)._
+_For more details please check out [Rules Engine Wiki](https://github.com/asulwer/RulesEngine/wiki)._
