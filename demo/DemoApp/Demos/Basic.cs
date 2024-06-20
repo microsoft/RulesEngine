@@ -22,7 +22,7 @@ namespace DemoApp.Demos
 
             var rule = new Rule();
             rule.RuleName = "Test Rule";
-            rule.SuccessEvent = "Count is within tolerance.";
+            rule.SuccessMessage = "Count is within tolerance.";
             rule.ErrorMessage = "Over expected.";
             rule.Expression = "count < 3";
             rule.RuleExpressionType = RuleExpressionType.LambdaExpression;
