@@ -1,10 +1,12 @@
 # Rules Engine
-![build](https://github.com/microsoft/RulesEngine/workflows/build/badge.svg?branch=main)
-[![Coverage Status](https://coveralls.io/repos/github/microsoft/RulesEngine/badge.svg?branch=main)](https://coveralls.io/github/microsoft/RulesEngine?branch=main)
-[![Nuget download][download-image]][download-url]
 
-[download-image]: https://img.shields.io/nuget/dt/RulesEngine
-[download-url]: https://www.nuget.org/packages/RulesEngine/
+# NOTICE: This is a FORK of the original RulesEngine project. The original project can be found [here]( https://github.com/microsoft/RulesEngine)
+
+I will try to update some things, but I am not the original author of this project.
+
+Also, I usually don´t work with GitHub, and I am doing this in my free time, so please be patient with me :)<br>Any help is appreciated.
+
+First of I want to Update to System.Text.Json, .NET 8, and some other stuff.
 
 ## Overview
 
