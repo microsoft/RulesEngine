@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RulesEngineBenchmark", "ben
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp.EFDataExample", "demo\DemoApp.EFDataExample\DemoApp.EFDataExample.csproj", "{E376D3E6-6890-4C09-9EA0-3EFD9C1E036D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{2E8DCFB4-0505-407B-9972-292F75AFD639}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +60,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{57BB8C07-799A-4F87-A7CC-D3D3F694DD02} = {2E8DCFB4-0505-407B-9972-292F75AFD639}
+		{E376D3E6-6890-4C09-9EA0-3EFD9C1E036D} = {2E8DCFB4-0505-407B-9972-292F75AFD639}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E1F2EC8E-4005-4DFE-90ED-296D4592867A}

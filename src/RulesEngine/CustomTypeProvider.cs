@@ -12,7 +12,7 @@ namespace RulesEngine
     public class CustomTypeProvider : DefaultDynamicLinqCustomTypeProvider
     {
         private HashSet<Type> _types;
-        public CustomTypeProvider(ParsingConfig config, Type[] types) : base(config)
+        public CustomTypeProvider(Type[] types) : base(ParsingConfig.Default)
         {
             _types = new HashSet<Type>(types ?? new Type[] { });
             _types.Add(typeof(ExpressionUtils));
