@@ -1,6 +1,9 @@
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
+## [5.0.4]
+- Refactoring code, big time
+- Upgraded dependencies
 
 ## [5.0.3]
 - Updated dependencies to latest
