@@ -8,43 +8,36 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Xunit;
 
-namespace RulesEngine.UnitTest
+namespace RulesEngine.UnitTest;
+
+[Trait("Category", "Unit")]
+[ExcludeFromCodeCoverage]
+public class LambdaExpressionBuilderTest
 {
-    [Trait("Category", "Unit")]
-    [ExcludeFromCodeCoverage]
-    public class LambdaExpressionBuilderTest
+    [Fact]
+    public void BuildExpressionForRuleTest()
     {
-        [Fact]
-        public void BuildExpressionForRuleTest()
-        {
-            var reSettings = new ReSettings();
-            var objBuilderFactory = new RuleExpressionBuilderFactory(reSettings, new RuleExpressionParser(reSettings));
-            var builder = objBuilderFactory.RuleGetExpressionBuilder(RuleExpressionType.LambdaExpression);
+        var reSettings = new ReSettings();
+        var objBuilderFactory = new RuleExpressionBuilderFactory(reSettings, new RuleExpressionParser(reSettings));
+        var builder = objBuilderFactory.RuleGetExpressionBuilder(RuleExpressionType.LambdaExpression);
 
-            var ruleParameters = new RuleParameter[] {
-                new RuleParameter("RequestType","Sales"),
-                new RuleParameter("RequestStatus", "Active"),
-                new RuleParameter("RegistrationStatus", "InProcess")
-            };
+        var ruleParameters = new RuleParameter[] {
+            new("RequestType", "Sales"), new("RequestStatus", "Active"), new("RegistrationStatus", "InProcess")
+        };
 
 
-            var mainRule = new Rule {
-                RuleName = "rule1",
-                Operator = "And",
-                Rules = new List<Rule>()
-            };
+        var mainRule = new Rule { RuleName = "rule1", Operator = "And", Rules = new List<Rule>() };
 
-            var dummyRule = new Rule {
-                RuleName = "testRule1",
-                RuleExpressionType = RuleExpressionType.LambdaExpression,
-                Expression = "RequestType == \"vod\""
-            };
+        var dummyRule = new Rule {
+            RuleName = "testRule1",
+            RuleExpressionType = RuleExpressionType.LambdaExpression,
+            Expression = "RequestType == \"vod\""
+        };
 
-            mainRule.Rules = mainRule.Rules.Append(dummyRule);
-            var func = builder.BuildDelegateForRule(dummyRule, ruleParameters);
+        mainRule.Rules = mainRule.Rules.Append(dummyRule);
+        var func = builder.BuildDelegateForRule(dummyRule, ruleParameters);
 
-            Assert.NotNull(func);
-            Assert.Equal(typeof(RuleResultTree), func.Method.ReturnType);
-        }
+        Assert.NotNull(func);
+        Assert.Equal(typeof(RuleResultTree), func.Method.ReturnType);
     }
 }

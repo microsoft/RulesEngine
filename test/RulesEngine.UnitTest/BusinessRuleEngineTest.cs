@@ -880,7 +880,8 @@ public class RulesEngineTest
     private dynamic GetInput1()
     {
         var converter = new ExpandoObjectConverter();
-        const string basicInfo = "{\"name\": \"Dishant\",\"email\": \"abc@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyaltyFactor\": 3,\"totalPurchasesToDate\": 10000}";
+        const string basicInfo =
+            "{\"name\": \"Dishant\",\"email\": \"abc@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyaltyFactor\": 3,\"totalPurchasesToDate\": 10000}";
         return JsonConvert.DeserializeObject<ExpandoObject>(basicInfo, converter);
     }
 

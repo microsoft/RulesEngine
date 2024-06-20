@@ -1,25 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using RulesEngine.Data;
-using RulesEngine.Models;
+using System;
+using System.IO;
 
-namespace DemoApp.EFDataExample
+namespace DemoApp.EFDataExample;
+
+public class RulesEngineDemoContext : RulesEngineContext
 {
-    public class RulesEngineDemoContext : RulesEngineContext
+    public RulesEngineDemoContext()
     {
-        public string DbPath { get; private set; }
-
-        public RulesEngineDemoContext()
-        {
-            var folder = Environment.SpecialFolder.LocalApplicationData;
-            var path = Environment.GetFolderPath(folder);
-            DbPath = $"{path}{System.IO.Path.DirectorySeparatorChar}RulesEngineDemo.db";
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-          => options.UseSqlite($"Data Source={DbPath}");
-
+        var folder = Environment.SpecialFolder.LocalApplicationData;
+        var path = Environment.GetFolderPath(folder);
+        DbPath = $"{path}{Path.DirectorySeparatorChar}RulesEngineDemo.db";
     }
 
+    public string DbPath { get; }
+
+    override protected void OnConfiguring(DbContextOptionsBuilder options)
+    {
+        options.UseSqlite($"Data Source={DbPath}");
+    }
 }

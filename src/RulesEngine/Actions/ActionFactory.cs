@@ -4,31 +4,32 @@
 using System;
 using System.Collections.Generic;
 
-namespace RulesEngine.Actions
+namespace RulesEngine.Actions;
+
+internal class ActionFactory
 {
-    internal class ActionFactory
+    private readonly IDictionary<string, Func<ActionBase>> _actionRegistry;
+
+    internal ActionFactory()
     {
-        private readonly IDictionary<string, Func<ActionBase>> _actionRegistry;
+        _actionRegistry = new Dictionary<string, Func<ActionBase>>(StringComparer.OrdinalIgnoreCase);
+    }
 
-        internal ActionFactory()
+    internal ActionFactory(IDictionary<string, Func<ActionBase>> actionRegistry) : this()
+    {
+        foreach (var kv in actionRegistry)
         {
-            _actionRegistry = new Dictionary<string, Func<ActionBase>>(StringComparer.OrdinalIgnoreCase);
+            _actionRegistry.Add(kv.Key, kv.Value);
         }
-        internal ActionFactory(IDictionary<string, Func<ActionBase>> actionRegistry) : this()
+    }
+
+    internal ActionBase Get(string name)
+    {
+        if (_actionRegistry.ContainsKey(name))
         {
-            foreach (var kv in actionRegistry)
-            {
-                _actionRegistry.Add(kv.Key, kv.Value);
-            }
+            return _actionRegistry[name]();
         }
 
-        internal ActionBase Get(string name)
-        {
-            if (_actionRegistry.ContainsKey(name))
-            {
-                return _actionRegistry[name]();
-            }
-            throw new KeyNotFoundException($"Action with name: {name} does not exist");
-        }
+        throw new KeyNotFoundException($"Action with name: {name} does not exist");
     }
 }

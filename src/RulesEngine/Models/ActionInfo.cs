@@ -4,12 +4,11 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace RulesEngine.Models
+namespace RulesEngine.Models;
+
+[ExcludeFromCodeCoverage]
+public class ActionInfo
 {
-    [ExcludeFromCodeCoverage]
-    public class ActionInfo
-    {
-        public string Name { get; set; }
-        public Dictionary<string, object> Context { get; set; }
-    }
+    public string Name { get; set; }
+    public Dictionary<string, object> Context { get; set; }
 }

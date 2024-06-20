@@ -9,455 +9,362 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace RulesEngine.UnitTest
-{
-    [ExcludeFromCodeCoverage]
-    public class MyObject
-    {
-        public string Name { get; set; }
+namespace RulesEngine.UnitTest;
 
-        public int Count { get; set; }
+[ExcludeFromCodeCoverage]
+public class MyObject
+{
+    public string Name { get; set; }
+
+    public int Count { get; set; }
+}
+
+[ExcludeFromCodeCoverage]
+public class ScopedParamsTest
+{
+    [Theory]
+    [InlineData("NoLocalAndGlobalParams")]
+    [InlineData("LocalParamsOnly")]
+    [InlineData("GlobalParamsOnly")]
+    [InlineData("GlobalAndLocalParams")]
+    [InlineData("GlobalParamReferencedInLocalParams")]
+    [InlineData("GlobalParamReferencedInNextGlobalParams")]
+    [InlineData("LocalParamReferencedInNextLocalParams")]
+    [InlineData("GlobalParamAndLocalParamsInNestedRules")]
+    public async Task BasicWorkflows_ReturnsTrue(string workflowName)
+    {
+        var workflow = GetWorkflowList();
+
+        var engine = new RulesEngine();
+        engine.AddWorkflow(workflow);
+
+        var input1 = new { trueValue = true, falseValue = false };
+
+        var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
+        Assert.True(result.All(c => c.IsSuccess));
+
+        CheckResultTreeContainsAllInputs(workflowName, result);
     }
 
-    [ExcludeFromCodeCoverage]
-    public class ScopedParamsTest
+    [Theory]
+    [InlineData("GlobalAndLocalParams")]
+    public async Task WorkflowUpdate_GlobalParam_ShouldReflect(string workflowName)
     {
-        [Theory]
-        [InlineData("NoLocalAndGlobalParams")]
-        [InlineData("LocalParamsOnly")]
-        [InlineData("GlobalParamsOnly")]
-        [InlineData("GlobalAndLocalParams")]
-        [InlineData("GlobalParamReferencedInLocalParams")]
-        [InlineData("GlobalParamReferencedInNextGlobalParams")]
-        [InlineData("LocalParamReferencedInNextLocalParams")]
-        [InlineData("GlobalParamAndLocalParamsInNestedRules")]
-        public async Task BasicWorkflows_ReturnsTrue(string workflowName)
+        var workflow = GetWorkflowList();
+
+        var engine = new RulesEngine();
+        engine.AddWorkflow(workflow);
+
+        var input1 = new { trueValue = true, falseValue = false };
+
+        var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
+        Assert.True(result.All(c => c.IsSuccess));
+
+        var workflowToUpdate = workflow.Single(c => c.WorkflowName == workflowName);
+        engine.RemoveWorkflow(workflowName);
+        workflowToUpdate.GlobalParams.First().Expression = "true == false";
+        engine.AddWorkflow(workflowToUpdate);
+
+        var result2 = await engine.ExecuteAllRulesAsync(workflowName, input1);
+
+        Assert.True(result2.All(c => c.IsSuccess == false));
+    }
+
+
+    [Theory]
+    [InlineData("GlobalParamsOnly", new[] { false })]
+    [InlineData("LocalParamsOnly", new[] { false, true })]
+    [InlineData("GlobalAndLocalParams", new[] { false })]
+    public async Task DisabledScopedParam_ShouldReflect(string workflowName, bool[] outputs)
+    {
+        var workflow = GetWorkflowList();
+
+        var engine = new RulesEngine(new string[] { }, new ReSettings { EnableScopedParams = false });
+        engine.AddWorkflow(workflow);
+
+        var input1 = new { trueValue = true, falseValue = false };
+
+        var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
+        for (var i = 0; i < result.Count; i++)
         {
-            var workflow = GetWorkflowList();
-
-            var engine = new RulesEngine();
-            engine.AddWorkflow(workflow);
-
-            var input1 = new {
-                trueValue = true,
-                falseValue = false
-            };
-
-            var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
-            Assert.True(result.All(c => c.IsSuccess));
-
-            CheckResultTreeContainsAllInputs(workflowName, result);
-
-        }
-
-        [Theory]
-        [InlineData("GlobalAndLocalParams")]
-        public async Task WorkflowUpdate_GlobalParam_ShouldReflect(string workflowName)
-        {
-            var workflow = GetWorkflowList();
-
-            var engine = new RulesEngine();
-            engine.AddWorkflow(workflow);
-
-            var input1 = new {
-                trueValue = true,
-                falseValue = false
-            };
-
-            var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
-            Assert.True(result.All(c => c.IsSuccess));
-
-            var workflowToUpdate = workflow.Single(c => c.WorkflowName == workflowName);
-            engine.RemoveWorkflow(workflowName);
-            workflowToUpdate.GlobalParams.First().Expression = "true == false";
-            engine.AddWorkflow(workflowToUpdate);
-
-            var result2 = await engine.ExecuteAllRulesAsync(workflowName, input1);
-
-            Assert.True(result2.All(c => c.IsSuccess == false));
-        }
-
-
-        [Theory]
-        [InlineData("GlobalParamsOnly", new[] { false })]
-        [InlineData("LocalParamsOnly", new[] { false, true })]
-        [InlineData("GlobalAndLocalParams", new[] { false })]
-        public async Task DisabledScopedParam_ShouldReflect(string workflowName, bool[] outputs)
-        {
-            var workflow = GetWorkflowList();
-
-            var engine = new RulesEngine(new string[] { }, new ReSettings {
-                EnableScopedParams = false
-            });
-            engine.AddWorkflow(workflow);
-
-            var input1 = new {
-                trueValue = true,
-                falseValue = false
-            };
-
-            var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
-            for (var i = 0; i < result.Count; i++)
+            Assert.Equal(result[i].IsSuccess, outputs[i]);
+            if (result[i].IsSuccess == false)
             {
-                Assert.Equal(result[i].IsSuccess, outputs[i]);
-                if (result[i].IsSuccess == false)
-                {
-                    Assert.StartsWith("Exception while parsing expression", result[i].ExceptionMessage);
-                }
+                Assert.StartsWith("Exception while parsing expression", result[i].ExceptionMessage);
             }
         }
+    }
 
-        [Theory]
-        [InlineData("GlobalParamsOnly")]
-        [InlineData("LocalParamsOnly2")]
-        [InlineData("GlobalParamsOnlyWithComplexInput")]
-        public async Task ErrorInScopedParam_ShouldAppearAsErrorMessage(string workflowName)
+    [Theory]
+    [InlineData("GlobalParamsOnly")]
+    [InlineData("LocalParamsOnly2")]
+    [InlineData("GlobalParamsOnlyWithComplexInput")]
+    public async Task ErrorInScopedParam_ShouldAppearAsErrorMessage(string workflowName)
+    {
+        var workflow = GetWorkflowList();
+
+        var engine = new RulesEngine(new string[] { });
+        engine.AddWorkflow(workflow);
+
+        var input = new { };
+        var result = await engine.ExecuteAllRulesAsync(workflowName, input);
+
+        Assert.All(result, c => {
+            Assert.False(c.IsSuccess);
+            Assert.StartsWith("Error while compiling rule", c.ExceptionMessage);
+        });
+    }
+
+    [Theory]
+    [InlineData("GlobalParamsOnlyWithComplexInput")]
+    [InlineData("LocalParamsOnlyWithComplexInput")]
+    public async Task RuntimeErrorInScopedParam_ShouldAppearAsErrorMessage(string workflowName)
+    {
+        var workflow = GetWorkflowList();
+
+        var engine = new RulesEngine(new string[] { });
+        engine.AddWorkflow(workflow);
+
+
+        var input = new RuleTestClass();
+        var result = await engine.ExecuteAllRulesAsync(workflowName, input);
+
+        Assert.All(result, c => {
+            Assert.False(c.IsSuccess);
+            Assert.StartsWith("Error while executing scoped params for rule", c.ExceptionMessage);
+        });
+    }
+
+    [Theory]
+    [InlineData("LocalParam_CorrectAnswer")]
+    public async Task LocalParam_GivesCorrectAnswer(string workflowName)
+    {
+        var workflow = GetWorkflowList();
+
+        var reSettingsWithCustomTypes = new ReSettings { CustomTypes = new Type[] { } };
+        var bre = new RulesEngine(workflow, reSettingsWithCustomTypes);
+
+        var myObject = new MyObject { Name = "My Object", Count = 2 };
+
+        var rp1 = new RuleParameter("myObj", myObject);
+
+        var resultList = await bre.ExecuteAllRulesAsync(workflowName, rp1);
+        Assert.True(resultList[0].IsSuccess);
+
+        myObject.Count = 3;
+
+        resultList = await bre.ExecuteAllRulesAsync(workflowName, rp1);
+        Assert.False(resultList[0].IsSuccess);
+    }
+
+
+    private void CheckResultTreeContainsAllInputs(string workflowName, List<RuleResultTree> result)
+    {
+        var workflow = GetWorkflowList().Single(c => c.WorkflowName == workflowName);
+        var expectedInputs = new List<string> { "input1" };
+        expectedInputs.AddRange(workflow.GlobalParams?.Select(c => c.Name) ?? new List<string>());
+
+
+        foreach (var resultTree in result)
         {
-            var workflow = GetWorkflowList();
-
-            var engine = new RulesEngine(new string[] { }, null);
-            engine.AddWorkflow(workflow);
-
-            var input = new { };
-            var result = await engine.ExecuteAllRulesAsync(workflowName, input);
-
-            Assert.All(result, c => { 
-                Assert.False(c.IsSuccess);
-                Assert.StartsWith("Error while compiling rule", c.ExceptionMessage);
-            });
-
+            CheckInputs(expectedInputs, resultTree);
         }
+    }
 
-        [Theory]
-        [InlineData("GlobalParamsOnlyWithComplexInput")]
-        [InlineData("LocalParamsOnlyWithComplexInput")]
-        public async Task RuntimeErrorInScopedParam_ShouldAppearAsErrorMessage(string workflowName)
+    private static void CheckInputs(IEnumerable<string> expectedInputs, RuleResultTree resultTree)
+    {
+        Assert.All(expectedInputs, input => Assert.True(resultTree.Inputs.ContainsKey(input)));
+
+        var localParamNames = resultTree.Rule.LocalParams?.Select(c => c.Name) ?? new List<string>();
+        Assert.All(localParamNames, input => Assert.True(resultTree.Inputs.ContainsKey(input)));
+
+        if (resultTree.ChildResults?.Any() == true)
         {
-            var workflow = GetWorkflowList();
-
-            var engine = new RulesEngine(new string[] { }, null);
-            engine.AddWorkflow(workflow);
-
-
-
-            var input = new RuleTestClass();
-            var result = await engine.ExecuteAllRulesAsync(workflowName, input);
-
-            Assert.All(result, c => {
-                Assert.False(c.IsSuccess);
-                Assert.StartsWith("Error while executing scoped params for rule", c.ExceptionMessage);
-            });
-
-
-        }
-
-        [Theory]
-        [InlineData("LocalParam_CorrectAnswer")]
-        public async Task LocalParam_GivesCorrectAnswer(string workflowName)
-        {
-            var workflow = GetWorkflowList();
-
-            var reSettingsWithCustomTypes = new ReSettings { CustomTypes = new Type[] {  } };
-            var bre = new RulesEngine(workflow, reSettingsWithCustomTypes);
-
-            var myObject = new MyObject() {
-                Name = "My Object",
-                Count = 2
-            };
-
-            var rp1 = new RuleParameter("myObj", myObject);
-
-            List<RuleResultTree> resultList = await bre.ExecuteAllRulesAsync(workflowName, rp1);
-            Assert.True(resultList[0].IsSuccess);
-
-            myObject.Count = 3;
-
-            resultList = await bre.ExecuteAllRulesAsync(workflowName, rp1);
-            Assert.False(resultList[0].IsSuccess);
-
-        }
-
-
-
-        private void CheckResultTreeContainsAllInputs(string workflowName, List<RuleResultTree> result)
-        {
-            var workflow = GetWorkflowList().Single(c => c.WorkflowName == workflowName);
-            var expectedInputs = new List<string>() { "input1" };
-            expectedInputs.AddRange(workflow.GlobalParams?.Select(c => c.Name) ?? new List<string>());
-
-
-            foreach (var resultTree in result)
+            foreach (var childResultTree in resultTree.ChildResults)
             {
-                CheckInputs(expectedInputs, resultTree);
+                CheckInputs(expectedInputs.Concat(localParamNames), childResultTree);
             }
-
         }
+    }
 
-        private static void CheckInputs(IEnumerable<string> expectedInputs, RuleResultTree resultTree)
-        {
-            Assert.All(expectedInputs, input => Assert.True(resultTree.Inputs.ContainsKey(input)));
-
-            var localParamNames = resultTree.Rule.LocalParams?.Select(c => c.Name) ?? new List<string>();
-            Assert.All(localParamNames, input => Assert.True(resultTree.Inputs.ContainsKey(input)));
-
-            if (resultTree.ChildResults?.Any() == true)
-            {
-                foreach (var childResultTree in resultTree.ChildResults)
-                {
-                    CheckInputs(expectedInputs.Concat(localParamNames), childResultTree);
-                }
-
-            }
-
-        }
-        private Workflow[] GetWorkflowList()
-        {
-            return new Workflow[] {
-                new Workflow {
-                    WorkflowName = "NoLocalAndGlobalParams",
-                    Rules = new List<Rule> {
-                        new Rule {
-                            RuleName = "TruthTest",
-                            Expression = "input1.trueValue"
-                        }
-                    }
-                },
-                new Workflow {
-                    WorkflowName = "LocalParamsOnly",
-                    Rules = new List<Rule> {
-                        new Rule {
-
+    private Workflow[] GetWorkflowList()
+    {
+        return new Workflow[] {
+            new() {
+                WorkflowName = "NoLocalAndGlobalParams",
+                Rules = new List<Rule> { new() { RuleName = "TruthTest", Expression = "input1.trueValue" } }
+            },
+            new() {
+                WorkflowName = "LocalParamsOnly",
+                Rules =
+                    new List<Rule> {
+                        new() {
                             RuleName = "WithLocalParam",
-                            LocalParams = new List<ScopedParam> {
-                                new ScopedParam {
-                                    Name = "localParam1",
-                                    Expression = "input1.trueValue"
-                                }
-                            },
+                            LocalParams =
+                                new List<ScopedParam> {
+                                    new() { Name = "localParam1", Expression = "input1.trueValue" }
+                                },
                             Expression = "localParam1 == true"
                         },
-                        new Rule {
-
-                            RuleName = "WithoutLocalParam",
-                            Expression = "input1.falseValue == false"
-                        },
+                        new() { RuleName = "WithoutLocalParam", Expression = "input1.falseValue == false" }
                     }
-                },
-                new Workflow {
-                    WorkflowName = "LocalParamsOnly2",
-                    Rules = new List<Rule> {
-                        new Rule {
-
+            },
+            new() {
+                WorkflowName = "LocalParamsOnly2",
+                Rules =
+                    new List<Rule> {
+                        new() {
                             RuleName = "WithLocalParam",
-                            LocalParams = new List<ScopedParam> {
-                                new ScopedParam {
-                                    Name = "localParam1",
-                                    Expression = "input1.trueValue"
-                                }
-                            },
+                            LocalParams =
+                                new List<ScopedParam> {
+                                    new() { Name = "localParam1", Expression = "input1.trueValue" }
+                                },
                             Expression = "localParam1 == true"
                         }
                     }
-                },
-
-                new Workflow {
-                    WorkflowName = "GlobalParamsOnly",
-                    GlobalParams = new List<ScopedParam> {
-                        new ScopedParam {
-                            Name = "globalParam1",
-                            Expression = "input1.falseValue == false"
-                        }
+            },
+            new() {
+                WorkflowName = "GlobalParamsOnly",
+                GlobalParams =
+                    new List<ScopedParam> {
+                        new() { Name = "globalParam1", Expression = "input1.falseValue == false" }
                     },
-                    Rules = new List<Rule> {
-                        new Rule {
-                            RuleName = "TrueTest",
-                            Expression = "globalParam1 == true"
-                        }
-                    }
-                },
-                new Workflow {
-                    WorkflowName = "GlobalAndLocalParams",
-                    GlobalParams = new List<ScopedParam> {
-                        new ScopedParam {
-                            Name = "globalParam1",
-                            Expression = "input1.falseValue == false"
-                        }
+                Rules = new List<Rule> { new() { RuleName = "TrueTest", Expression = "globalParam1 == true" } }
+            },
+            new() {
+                WorkflowName = "GlobalAndLocalParams",
+                GlobalParams =
+                    new List<ScopedParam> {
+                        new() { Name = "globalParam1", Expression = "input1.falseValue == false" }
                     },
-                    Rules = new List<Rule> {
-                        new Rule {
+                Rules =
+                    new List<Rule> {
+                        new() {
                             RuleName = "WithLocalParam",
-                            LocalParams = new List<ScopedParam> {
-                                new ScopedParam {
-                                    Name = "localParam1",
-                                    Expression = "input1.trueValue"
-                                }
-                            },
+                            LocalParams =
+                                new List<ScopedParam> {
+                                    new() { Name = "localParam1", Expression = "input1.trueValue" }
+                                },
                             Expression = "globalParam1 == true && localParam1 == true"
-                        },
-                    }
-
-                },
-                new Workflow {
-                    WorkflowName = "GlobalParamReferencedInLocalParams",
-                    GlobalParams = new List<ScopedParam> {
-                        new ScopedParam {
-                            Name = "globalParam1",
-                            Expression = "\"testString\""
                         }
-                    },
-                    Rules = new List<Rule> {
-                        new Rule {
-
+                    }
+            },
+            new() {
+                WorkflowName = "GlobalParamReferencedInLocalParams",
+                GlobalParams = new List<ScopedParam> { new() { Name = "globalParam1", Expression = "\"testString\"" } },
+                Rules =
+                    new List<Rule> {
+                        new() {
                             RuleName = "WithLocalParam",
-                            LocalParams = new List<ScopedParam> {
-                                new ScopedParam {
-                                    Name = "localParam1",
-                                    Expression = "globalParam1.ToUpper()"
-                                }
-                            },
+                            LocalParams =
+                                new List<ScopedParam> {
+                                    new() { Name = "localParam1", Expression = "globalParam1.ToUpper()" }
+                                },
                             Expression = "globalParam1 == \"testString\" && localParam1 == \"TESTSTRING\""
-                        },
-                    }
-                },
-                new Workflow {
-                    WorkflowName = "GlobalParamReferencedInNextGlobalParams",
-                    GlobalParams = new List<ScopedParam> {
-                        new ScopedParam {
-                            Name = "globalParam1",
-                            Expression = "\"testString\""
-                        },
-                        new ScopedParam {
-                            Name = "globalParam2",
-                            Expression = "globalParam1.ToUpper()"
                         }
+                    }
+            },
+            new() {
+                WorkflowName = "GlobalParamReferencedInNextGlobalParams",
+                GlobalParams =
+                    new List<ScopedParam> {
+                        new() { Name = "globalParam1", Expression = "\"testString\"" },
+                        new() { Name = "globalParam2", Expression = "globalParam1.ToUpper()" }
                     },
-                    Rules = new List<Rule> {
-                        new Rule {
+                Rules =
+                    new List<Rule> {
+                        new() {
                             RuleName = "WithLocalParam",
                             Expression = "globalParam1 == \"testString\" && globalParam2 == \"TESTSTRING\""
-                        },
+                        }
                     }
-                },
-                new Workflow {
-                    WorkflowName = "LocalParamReferencedInNextLocalParams",
-                    Rules = new List<Rule> {
-                        new Rule {
+            },
+            new() {
+                WorkflowName = "LocalParamReferencedInNextLocalParams",
+                Rules =
+                    new List<Rule> {
+                        new() {
                             LocalParams = new List<ScopedParam> {
-                                new ScopedParam {
-                                    Name = "localParam1",
-                                    Expression = "\"testString\""
-                                },
-                                new ScopedParam {
-                                    Name = "localParam2",
-                                    Expression = "localParam1.ToUpper()"
-                                }
+                                new() { Name = "localParam1", Expression = "\"testString\"" },
+                                new() { Name = "localParam2", Expression = "localParam1.ToUpper()" }
                             },
                             RuleName = "WithLocalParam",
                             Expression = "localParam1 == \"testString\" && localParam2 == \"TESTSTRING\""
-                        },
-                    }
-                },
-                new Workflow {
-                    WorkflowName = "GlobalParamAndLocalParamsInNestedRules",
-                    GlobalParams = new List<ScopedParam> {
-                        new ScopedParam {
-                            Name = "globalParam1",
-                            Expression = @"""hello"""
                         }
-                    },
-                    Rules = new List<Rule> {
-                        new Rule {
-                           RuleName = "NestedRuleTest",
-                           Operator = "And",
-                           LocalParams = new List<ScopedParam> {
-                                new ScopedParam {
-                                    Name = "localParam1",
-                                    Expression = @"""world"""
+                    }
+            },
+            new() {
+                WorkflowName = "GlobalParamAndLocalParamsInNestedRules",
+                GlobalParams = new List<ScopedParam> { new() { Name = "globalParam1", Expression = @"""hello""" } },
+                Rules =
+                    new List<Rule> {
+                        new() {
+                            RuleName = "NestedRuleTest",
+                            Operator = "And",
+                            LocalParams =
+                                new List<ScopedParam> { new() { Name = "localParam1", Expression = @"""world""" } },
+                            Rules =
+                                new List<Rule> {
+                                    new() {
+                                        RuleName = "NestedRule1",
+                                        Expression = "globalParam1 == \"hello\" && localParam1 == \"world\""
+                                    },
+                                    new() {
+                                        RuleName = "NestedRule2",
+                                        LocalParams =
+                                            new List<ScopedParam> {
+                                                new() {
+                                                    Name = "nestedLocalParam1",
+                                                    Expression = "globalParam1 + \" \" + localParam1"
+                                                }
+                                            },
+                                        Expression = "nestedLocalParam1 == \"hello world\""
+                                    }
                                 }
-                           },
-                           Rules =  new List<Rule>{
-                               new Rule{
-                                   RuleName = "NestedRule1",
-                                   Expression = "globalParam1 == \"hello\" && localParam1 == \"world\""
-                               },
-                               new Rule {
-                                   RuleName = "NestedRule2",
-                                   LocalParams = new List<ScopedParam> {
-                                       new ScopedParam {
-                                           Name = "nestedLocalParam1",
-                                           Expression = "globalParam1 + \" \" + localParam1"
-                                       }
-                                   },
-                                   Expression = "nestedLocalParam1 == \"hello world\""
-                               }
-
-                           }
-
                         }
                     }
-                },
-                new Workflow {
-                    WorkflowName = "LocalParamsOnlyWithComplexInput",
-                    Rules = new List<Rule> {
-                        new Rule {
-
+            },
+            new() {
+                WorkflowName = "LocalParamsOnlyWithComplexInput",
+                Rules =
+                    new List<Rule> {
+                        new() {
                             RuleName = "WithLocalParam",
-                            LocalParams = new List<ScopedParam> {
-                                new ScopedParam {
-                                    Name = "localParam1",
-                                    Expression = "input1.Country.ToLower()"
-                                }
-                            },
+                            LocalParams =
+                                new List<ScopedParam> {
+                                    new() { Name = "localParam1", Expression = "input1.Country.ToLower()" }
+                                },
                             Expression = "localParam1 == \"hello\""
                         }
                     }
-                },
-                new Workflow {
-                    WorkflowName = "GlobalParamsOnlyWithComplexInput",
-                    GlobalParams = new List<ScopedParam> {
-                        new ScopedParam {
-                            Name = "globalParam1",
-                            Expression = "input1.Country.ToLower()"
-                        }
-                    },
-                    Rules = new List<Rule> {
-                        new Rule {
-                            RuleName = "TrueTest",
-                            Expression = "globalParam1 == \"hello\""
-                        },
-                        new Rule {
-                            RuleName = "TrueTest2",
-                            Expression = "globalParam1.ToUpper() == \"HELLO\""
-                        }
+            },
+            new() {
+                WorkflowName = "GlobalParamsOnlyWithComplexInput",
+                GlobalParams =
+                    new List<ScopedParam> { new() { Name = "globalParam1", Expression = "input1.Country.ToLower()" } },
+                Rules =
+                    new List<Rule> {
+                        new() { RuleName = "TrueTest", Expression = "globalParam1 == \"hello\"" },
+                        new() { RuleName = "TrueTest2", Expression = "globalParam1.ToUpper() == \"HELLO\"" }
                     }
-                },
-                new Workflow {
-                    WorkflowName = "LocalParam_CorrectAnswer",
-                    Rules = new List<Rule> {
-                        new Rule
-                        {
-                            RuleName = "Test Rule",
-                            LocalParams = new List<LocalParam>
-                            {
-                                new LocalParam
-                                {
-                                    Name = "threshold",
-                                    Expression = "3"
-                                },
-                                new LocalParam
-                                {
-                                    Name = "myList",
-                                    Expression = "new int[]{ 1, 2, 3, 4, 5 }"
-                                }
+            },
+            new() {
+                WorkflowName = "LocalParam_CorrectAnswer",
+                Rules = new List<Rule> {
+                    new() {
+                        RuleName = "Test Rule",
+                        LocalParams =
+                            new List<LocalParam> {
+                                new() { Name = "threshold", Expression = "3" },
+                                new() { Name = "myList", Expression = "new int[]{ 1, 2, 3, 4, 5 }" }
                             },
-                            SuccessEvent = "Count is within tolerance.",
-                            ErrorMessage = "Not as expected.",
-                            Expression = "myList.Where(x => x < threshold).Contains(myObj.Count)",
-                            RuleExpressionType = RuleExpressionType.LambdaExpression
-                        }
+                        SuccessEvent = "Count is within tolerance.",
+                        ErrorMessage = "Not as expected.",
+                        Expression = "myList.Where(x => x < threshold).Contains(myObj.Count)",
+                        RuleExpressionType = RuleExpressionType.LambdaExpression
                     }
                 }
-            };
-        }
+            }
+        };
     }
 }

@@ -115,7 +115,7 @@ dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggest
 #Style - Modifier preferences
 
 #when this rule is set to a list of modifiers, prefer the specified ordering.
-csharp_preferred_modifier_order = public,private,internal,readonly,static,async,override,sealed:suggestion
+csharp_preferred_modifier_order = public, private, internal, readonly, static, async, override, sealed:suggestion
 
 #Style - qualification options
 

@@ -4,12 +4,11 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace RulesEngine.Models
+namespace RulesEngine.Models;
+
+[ExcludeFromCodeCoverage]
+public class ActionResult
 {
-    [ExcludeFromCodeCoverage]
-    public class ActionResult
-    {
-        public object Output { get; set; }
-        public Exception Exception { get; set; }
-    }
+    public object Output { get; set; }
+    public Exception Exception { get; set; }
 }

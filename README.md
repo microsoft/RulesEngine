@@ -1,10 +1,12 @@
 # Rules Engine
 
-# NOTICE: This is a FORK of the RulesEngine project. 
+# NOTICE: This is a FORK of the RulesEngine project.
+
 It seems not to be actively maintained anymore.
 The original project can be found [here]( https://github.com/microsoft/RulesEngine)
 
-I usually don´t work with GitHub, and I am doing this in my free time, so please be patient with me :)<br>Any help is appreciated.
+I usually don´t work with GitHub, and I am doing this in my free time, so please be patient with me :)<br>Any help is
+appreciated.
 First of I want to Update to System.Text.Json, .NET 8, remove moq and use NSubstitute Instead.
 
 ## Overview
@@ -106,6 +108,7 @@ workflows.Add(exampleWorkflow);
 
 var bre = new RulesEngine.RulesEngine(workflows.ToArray());
 ```
+
 </details>
 
 <details>
@@ -140,12 +143,11 @@ in [Rules Engine Wiki](https://github.com/timophe-91/RulesEngine/wiki)._
 
 </details>
 
-
 ## Contributing
 
 This project welcomes contributions and suggestions. Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. 
+the rights to use your contribution.
 
 ---
 

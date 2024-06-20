@@ -7,207 +7,155 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
-namespace RulesEngine.UnitTest
+namespace RulesEngine.UnitTest;
+
+[Trait("Category", "Unit")]
+[ExcludeFromCodeCoverage]
+public class ListofRuleResultTreeExtensionTest
 {
-    [Trait("Category", "Unit")]
-    [ExcludeFromCodeCoverage]
-    public class ListofRuleResultTreeExtensionTest
+    [Fact]
+    public void OnSuccessWithSuccessTest()
     {
-        [Fact]
-        public void OnSuccessWithSuccessTest()
-        {
-            var rulesResultTree = new List<RuleResultTree>()
-            {
-                new RuleResultTree()
-                {
-                    ChildResults = null,
-                    ExceptionMessage = string.Empty,
-                    Inputs = new Dictionary<string, object>(),
-                    IsSuccess = true,
-                    Rule = new Rule()
-                    {
-                        RuleName = "Test Rule 1"
-                    }
-                },
-                new RuleResultTree()
-                {
-                    ChildResults = null,
-                    ExceptionMessage = string.Empty,
-                    Inputs = new Dictionary<string, object>(),
-                    IsSuccess = false,
-                    Rule = new Rule()
-                    {
-                        RuleName = "Test Rule 2"
-                    }
-                },
+        var rulesResultTree = new List<RuleResultTree> {
+            new() {
+                ChildResults = null,
+                ExceptionMessage = string.Empty,
+                Inputs = new Dictionary<string, object>(),
+                IsSuccess = true,
+                Rule = new Rule { RuleName = "Test Rule 1" }
+            },
+            new() {
+                ChildResults = null,
+                ExceptionMessage = string.Empty,
+                Inputs = new Dictionary<string, object>(),
+                IsSuccess = false,
+                Rule = new Rule { RuleName = "Test Rule 2" }
+            }
+        };
 
-            };
+        var successEventName = string.Empty;
 
-            var successEventName = string.Empty;
+        rulesResultTree.OnSuccess(eventName => {
+            successEventName = eventName;
+        });
 
-            rulesResultTree.OnSuccess((eventName) => {
-                successEventName = eventName;
-            });
+        Assert.Equal("Test Rule 1", successEventName);
+    }
 
-            Assert.Equal("Test Rule 1", successEventName);
-        }
+    [Fact]
+    public void OnSuccessWithSuccessWithEventTest()
+    {
+        var rulesResultTree = new List<RuleResultTree> {
+            new() {
+                ChildResults = null,
+                ExceptionMessage = string.Empty,
+                Inputs = new Dictionary<string, object>(),
+                IsSuccess = true,
+                Rule = new Rule { RuleName = "Test Rule 1", SuccessEvent = "Event 1" }
+            },
+            new() {
+                ChildResults = null,
+                ExceptionMessage = string.Empty,
+                Inputs = new Dictionary<string, object>(),
+                IsSuccess = false,
+                Rule = new Rule { RuleName = "Test Rule 2" }
+            }
+        };
 
-        [Fact]
-        public void OnSuccessWithSuccessWithEventTest()
-        {
-            var rulesResultTree = new List<RuleResultTree>()
-            {
-                new RuleResultTree()
-                {
-                    ChildResults = null,
-                    ExceptionMessage = string.Empty,
-                    Inputs = new Dictionary<string, object>(),
-                    IsSuccess = true,
-                    Rule = new Rule()
-                    {
-                        RuleName = "Test Rule 1",
-                        SuccessEvent = "Event 1"
-                    }
-                },
-                new RuleResultTree()
-                {
-                    ChildResults = null,
-                    ExceptionMessage = string.Empty,
-                    Inputs = new Dictionary<string, object>(),
-                    IsSuccess = false,
-                    Rule = new Rule()
-                    {
-                        RuleName = "Test Rule 2"
-                    }
-                },
+        var successEventName = string.Empty;
 
-            };
+        rulesResultTree.OnSuccess(eventName => {
+            successEventName = eventName;
+        });
 
-            var successEventName = string.Empty;
+        Assert.Equal("Event 1", successEventName);
+    }
 
-            rulesResultTree.OnSuccess((eventName) => {
-                successEventName = eventName;
-            });
+    [Fact]
+    public void OnSuccessWithouSuccessTest()
+    {
+        var rulesResultTree = new List<RuleResultTree> {
+            new() {
+                ChildResults = null,
+                ExceptionMessage = string.Empty,
+                Inputs = new Dictionary<string, object>(),
+                IsSuccess = false,
+                Rule = new Rule { RuleName = "Test Rule 1" }
+            },
+            new() {
+                ChildResults = null,
+                ExceptionMessage = string.Empty,
+                Inputs = new Dictionary<string, object>(),
+                IsSuccess = false,
+                Rule = new Rule { RuleName = "Test Rule 2" }
+            }
+        };
 
-            Assert.Equal("Event 1", successEventName);
-        }
+        var successEventName = string.Empty;
 
-        [Fact]
-        public void OnSuccessWithouSuccessTest()
-        {
-            var rulesResultTree = new List<RuleResultTree>()
-            {
-                new RuleResultTree()
-                {
-                    ChildResults = null,
-                    ExceptionMessage = string.Empty,
-                    Inputs = new Dictionary<string, object>(),
-                    IsSuccess = false,
-                    Rule = new Rule()
-                    {
-                        RuleName = "Test Rule 1"
-                    }
-                },
-                new RuleResultTree()
-                {
-                    ChildResults = null,
-                    ExceptionMessage = string.Empty,
-                    Inputs = new Dictionary<string, object>(),
-                    IsSuccess = false,
-                    Rule = new Rule()
-                    {
-                        RuleName = "Test Rule 2"
-                    }
-                },
+        rulesResultTree.OnSuccess(eventName => {
+            successEventName = eventName;
+        });
 
-            };
-
-            var successEventName = string.Empty;
-
-            rulesResultTree.OnSuccess((eventName) => {
-                successEventName = eventName;
-            });
-
-            Assert.Equal(successEventName, string.Empty);
-        }
+        Assert.Equal(successEventName, string.Empty);
+    }
 
 
-        [Fact]
-        public void OnFailWithSuccessTest()
-        {
-            var rulesResultTree = new List<RuleResultTree>()
-            {
-                new RuleResultTree()
-                {
-                    ChildResults = null,
-                    ExceptionMessage = string.Empty,
-                    Inputs = new Dictionary<string, object>(),
-                    IsSuccess = true,
-                    Rule = new Rule()
-                    {
-                        RuleName = "Test Rule 1"
-                    }
-                },
-                new RuleResultTree()
-                {
-                    ChildResults = null,
-                    ExceptionMessage = string.Empty,
-                    Inputs = new Dictionary<string, object>(),
-                    IsSuccess = false,
-                    Rule = new Rule()
-                    {
-                        RuleName = "Test Rule 2"
-                    }
-                },
+    [Fact]
+    public void OnFailWithSuccessTest()
+    {
+        var rulesResultTree = new List<RuleResultTree> {
+            new() {
+                ChildResults = null,
+                ExceptionMessage = string.Empty,
+                Inputs = new Dictionary<string, object>(),
+                IsSuccess = true,
+                Rule = new Rule { RuleName = "Test Rule 1" }
+            },
+            new() {
+                ChildResults = null,
+                ExceptionMessage = string.Empty,
+                Inputs = new Dictionary<string, object>(),
+                IsSuccess = false,
+                Rule = new Rule { RuleName = "Test Rule 2" }
+            }
+        };
 
-            };
+        var successEventName = true;
 
-            var successEventName = true;
+        rulesResultTree.OnFail(() => {
+            successEventName = false;
+        });
 
-            rulesResultTree.OnFail(() => {
-                successEventName = false;
-            });
+        Assert.True(successEventName);
+    }
 
-            Assert.True(successEventName);
-        }
+    [Fact]
+    public void OnFailWithoutSuccessTest()
+    {
+        var rulesResultTree = new List<RuleResultTree> {
+            new() {
+                ChildResults = null,
+                ExceptionMessage = string.Empty,
+                Inputs = new Dictionary<string, object>(),
+                IsSuccess = false,
+                Rule = new Rule { RuleName = "Test Rule 1" }
+            },
+            new() {
+                ChildResults = null,
+                ExceptionMessage = string.Empty,
+                Inputs = new Dictionary<string, object>(),
+                IsSuccess = false,
+                Rule = new Rule { RuleName = "Test Rule 2" }
+            }
+        };
 
-        [Fact]
-        public void OnFailWithoutSuccessTest()
-        {
-            var rulesResultTree = new List<RuleResultTree>()
-            {
-                new RuleResultTree()
-                {
-                    ChildResults = null,
-                    ExceptionMessage = string.Empty,
-                    Inputs = new Dictionary<string, object>(),
-                    IsSuccess = false,
-                    Rule = new Rule()
-                    {
-                        RuleName = "Test Rule 1"
-                    }
-                },
-                new RuleResultTree()
-                {
-                    ChildResults = null,
-                    ExceptionMessage = string.Empty,
-                    Inputs = new Dictionary<string, object>(),
-                    IsSuccess = false,
-                    Rule = new Rule()
-                    {
-                        RuleName = "Test Rule 2"
-                    }
-                },
+        var successEventName = true;
 
-            };
+        rulesResultTree.OnFail(() => {
+            successEventName = false;
+        });
 
-            var successEventName = true;
-
-            rulesResultTree.OnFail(() => {
-                successEventName = false;
-            });
-
-            Assert.False(successEventName);
-        }
+        Assert.False(successEventName);
     }
 }

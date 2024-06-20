@@ -4,16 +4,14 @@
 using Newtonsoft.Json;
 using System.Diagnostics.CodeAnalysis;
 
-namespace RulesEngine.UnitTest
-{
-    [ExcludeFromCodeCoverage]
-    public class RuleTestClass
-    {
-        [JsonProperty("country")]
-        public string Country { get; set; }
+namespace RulesEngine.UnitTest;
 
-        [JsonProperty("loyaltyFactor")]
-        public int loyaltyFactor { get; set; }
-        public int TotalPurchasesToDate { get; set; }
-    }
+[ExcludeFromCodeCoverage]
+public class RuleTestClass
+{
+    [JsonProperty("country")] public string Country { get; set; }
+
+    [JsonProperty("loyaltyFactor")] public int loyaltyFactor { get; set; }
+
+    public int TotalPurchasesToDate { get; set; }
 }
