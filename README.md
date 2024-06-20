@@ -95,6 +95,7 @@ var bre = new RulesEngine.RulesEngine(wfr, null);
 ```
 
 *Note: For each level of nested rules expected, a ThenInclude query appended will be needed as shown above.*
+</details>
 
 ## How it works
 
