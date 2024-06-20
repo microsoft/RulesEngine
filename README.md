@@ -85,6 +85,7 @@ workflows.Add(exampleWorkflow);
 var bre = new RulesEngine.RulesEngine(workflows.ToArray());
 ```
 </details>
+<details>
 <summary>Entity Framework</summary>
 
 Consuming Entity Framework and populating the Rules Engine is shown in the [EFDemo class](https://github.com/microsoft/RulesEngine/blob/main/demo/DemoApp/EFDemo.cs) with Workflow rules populating the array and passed to the Rules Engine, The Demo App includes an example [RulesEngineDemoContext](https://github.com/microsoft/RulesEngine/blob/main/demo/DemoApp.EFDataExample/RulesEngineDemoContext.cs) using SQLite and could be swapped out for another provider.
