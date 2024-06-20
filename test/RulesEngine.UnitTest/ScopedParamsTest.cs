@@ -43,7 +43,7 @@ namespace RulesEngine.UnitTest
                 falseValue = false
             };
 
-            var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
+            var result = await engine.ExecuteAllRulesAsync(workflowName, [input1]);
             Assert.True(result.All(c => c.IsSuccess));
 
             CheckResultTreeContainsAllInputs(workflowName, result);
@@ -64,7 +64,7 @@ namespace RulesEngine.UnitTest
                 falseValue = false
             };
 
-            var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
+            var result = await engine.ExecuteAllRulesAsync(workflowName, [input1]);
             Assert.True(result.All(c => c.IsSuccess));
 
             var workflowToUpdate = workflow.Single(c => c.WorkflowName == workflowName);
@@ -72,7 +72,7 @@ namespace RulesEngine.UnitTest
             workflowToUpdate.GlobalParams.First().Expression = "true == false";
             engine.AddWorkflow(workflowToUpdate);
 
-            var result2 = await engine.ExecuteAllRulesAsync(workflowName, input1);
+            var result2 = await engine.ExecuteAllRulesAsync(workflowName, [input1]);
 
             Assert.True(result2.All(c => c.IsSuccess == false));
         }
@@ -96,7 +96,7 @@ namespace RulesEngine.UnitTest
                 falseValue = false
             };
 
-            var result = await engine.ExecuteAllRulesAsync(workflowName, input1);
+            var result = await engine.ExecuteAllRulesAsync(workflowName, [input1]);
             for (var i = 0; i < result.Count; i++)
             {
                 Assert.Equal(result[i].IsSuccess, outputs[i]);
@@ -119,7 +119,7 @@ namespace RulesEngine.UnitTest
             engine.AddWorkflow(workflow);
 
             var input = new { };
-            var result = await engine.ExecuteAllRulesAsync(workflowName, input);
+            var result = await engine.ExecuteAllRulesAsync(workflowName, [input]);
 
             Assert.All(result, c => { 
                 Assert.False(c.IsSuccess);
@@ -141,7 +141,7 @@ namespace RulesEngine.UnitTest
 
 
             var input = new RuleTestClass();
-            var result = await engine.ExecuteAllRulesAsync(workflowName, input);
+            var result = await engine.ExecuteAllRulesAsync(workflowName, [input]);
 
             Assert.All(result, c => {
                 Assert.False(c.IsSuccess);
@@ -167,12 +167,12 @@ namespace RulesEngine.UnitTest
 
             var rp1 = new RuleParameter("myObj", myObject);
 
-            List<RuleResultTree> resultList = await bre.ExecuteAllRulesAsync(workflowName, rp1);
+            List<RuleResultTree> resultList = await bre.ExecuteAllRulesAsync(workflowName, [rp1]);
             Assert.True(resultList[0].IsSuccess);
 
             myObject.Count = 3;
 
-            resultList = await bre.ExecuteAllRulesAsync(workflowName, rp1);
+            resultList = await bre.ExecuteAllRulesAsync(workflowName, [rp1]);
             Assert.False(resultList[0].IsSuccess);
 
         }

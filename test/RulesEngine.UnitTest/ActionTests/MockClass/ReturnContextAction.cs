@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RulesEngine.UnitTest.ActionTests.MockClass
@@ -14,7 +15,7 @@ namespace RulesEngine.UnitTest.ActionTests.MockClass
     [ExcludeFromCodeCoverage]
     public class ReturnContextAction : ActionBase
     {
-        public override ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters)
+        public override ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters, CancellationToken ct = default)
         {
             var stringContext = context.GetContext<string>("stringContext");
             var intContext = context.GetContext<int>("intContext");

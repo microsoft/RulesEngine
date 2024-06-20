@@ -7,6 +7,8 @@ using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DemoApp.Demos
 {
@@ -18,7 +20,7 @@ namespace DemoApp.Demos
 
     public class NestedInput
     {
-        public void Run()
+        public async Task Run(CancellationToken ct = default)
         {
             Console.WriteLine($"Running {nameof(NestedInput)}....");
             var nestedInput = new {
@@ -39,7 +41,6 @@ namespace DemoApp.Demos
                         }
                     }
                 }
-
             };
 
             var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "NestedInput.json", SearchOption.AllDirectories);
@@ -48,20 +49,19 @@ namespace DemoApp.Demos
                 throw new Exception("Rules not found.");
             }
 
-            var fileData = File.ReadAllText(files[0]);
+            var fileData = await File.ReadAllTextAsync(files[0]);
             var Workflows = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
             var bre = new RulesEngine.RulesEngine(Workflows.ToArray(), null);
             foreach (var workflow in Workflows)
             {
-                var resultList = bre.ExecuteAllRulesAsync(workflow.WorkflowName, nestedInput).Result;
+                var resultList = await bre.ExecuteAllRulesAsync(workflow.WorkflowName, [nestedInput], ct);
 
                 resultList.OnSuccess((eventName) => {
                     Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in success - {eventName}");
                 }).OnFail(() => {
                     Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in failure");
                 });
-
             }
         }
     }

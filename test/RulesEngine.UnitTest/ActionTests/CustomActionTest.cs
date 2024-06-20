@@ -26,7 +26,7 @@ namespace RulesEngine.UnitTest.ActionTests
                 }
             });
 
-            var result = await re.ExecuteAllRulesAsync("successReturnContextAction", true);
+            var result = await re.ExecuteAllRulesAsync("successReturnContextAction", [true]);
         }
 
 
@@ -48,7 +48,7 @@ namespace RulesEngine.UnitTest.ActionTests
 
 
 
-            var result = await re.ExecuteAllRulesAsync("successReturnContextAction", true);
+            var result = await re.ExecuteAllRulesAsync("successReturnContextAction", [true]);
         }
 
         private Workflow[] GetWorkflow()

@@ -27,7 +27,7 @@ namespace RulesEngine.UnitTest
             var input1 = new {
                 TrueValue = true
             };
-            var result = await rulesEngine.ExecuteAllRulesAsync(workflowName, input1);
+            var result = await rulesEngine.ExecuteAllRulesAsync(workflowName, [input1]);
             Assert.NotNull(result);
             Assert.True(NestedEnabledCheck(result));
 
@@ -50,7 +50,7 @@ namespace RulesEngine.UnitTest
             var input1 = new {
                 TrueValue = true
             };
-            var result = await rulesEngine.ExecuteAllRulesAsync(workflowName, input1);
+            var result = await rulesEngine.ExecuteAllRulesAsync(workflowName, [input1]);
             Assert.NotNull(result);
             Assert.True(NestedEnabledCheck(result));
 
@@ -69,7 +69,7 @@ namespace RulesEngine.UnitTest
 
             var expectedLength = workflow.Rules.Count(c => c.Enabled);
 
-            var result2 = await rulesEngine.ExecuteAllRulesAsync(workflowName, input1);
+            var result2 = await rulesEngine.ExecuteAllRulesAsync(workflowName, [input1]);
             Assert.Equal(expectedLength, result2.Count);
 
             Assert.DoesNotContain(result2, c => c.Rule.RuleName == firstRule.RuleName);

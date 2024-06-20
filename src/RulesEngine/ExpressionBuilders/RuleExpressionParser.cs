@@ -62,9 +62,8 @@ namespace RulesEngine.ExpressionBuilders
         private Func<object[], T> CompileExpression<T>(Expression<Func<object[], T>> expression)
         {
             if(_reSettings.UseFastExpressionCompiler)
-            {
                 return expression.CompileFast();
-            }
+            
             return expression.Compile();
         }
 

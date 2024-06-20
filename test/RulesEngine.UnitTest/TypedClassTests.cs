@@ -80,7 +80,7 @@ namespace RulesEngine.UnitTest
 
             };
 
-            var result = await  re.ExecuteAllRulesAsync("Conferimento", new RuleParameter("transazione", param));
+            var result = await  re.ExecuteAllRulesAsync("Conferimento", [new RuleParameter("transazione", param)]);
 
             Assert.All(result, (res) => Assert.True(res.IsSuccess));
 
@@ -133,7 +133,7 @@ namespace RulesEngine.UnitTest
 
             };
 
-            var result = await re.ExecuteAllRulesAsync("Conferimento", new RuleParameter("Transazione", param));
+            var result = await re.ExecuteAllRulesAsync("Conferimento", [new RuleParameter("Transazione", param)]);
 
             Assert.All(result, (res) => Assert.True(res.IsSuccess));
 
@@ -190,10 +190,9 @@ namespace RulesEngine.UnitTest
 
             };
 
-            var result = await re.ExecuteAllRulesAsync("Conferimento", new RuleParameter("transazione", param));
+            var result = await re.ExecuteAllRulesAsync("Conferimento", [new RuleParameter("transazione", param)]);
 
             Assert.All(result, (res) => Assert.True(res.IsSuccess));
-
         }
     }
 }

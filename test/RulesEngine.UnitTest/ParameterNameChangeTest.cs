@@ -35,9 +35,9 @@ namespace RulesEngine.UnitTest
             var input_pass = new RuleParameter("test", dynamicBlah);
             var input_fail = new RuleParameter("SOME_OTHER_NAME", dynamicBlah);
             // RuleParameter name matches expression, so should pass.
-            var pass_results = await engine.ExecuteAllRulesAsync("ParameterNameChangeWorkflow", input_pass);
+            var pass_results = await engine.ExecuteAllRulesAsync("ParameterNameChangeWorkflow", [input_pass]);
             // RuleParameter name DOES NOT MATCH expression, so should fail.
-            var fail_results = await engine.ExecuteAllRulesAsync("ParameterNameChangeWorkflow", input_fail);
+            var fail_results = await engine.ExecuteAllRulesAsync("ParameterNameChangeWorkflow", [input_fail]);
             Assert.True(pass_results.First().IsSuccess);
             Assert.False(fail_results.First().IsSuccess);
         }

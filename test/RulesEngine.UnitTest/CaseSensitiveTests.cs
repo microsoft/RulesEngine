@@ -40,7 +40,7 @@ namespace RulesEngine.UnitTest
             };
 
             var re = new RulesEngine(new[] { worflow }, reSettings);
-            var result = await re.ExecuteAllRulesAsync("CaseSensitivityTest", "hello");
+            var result = await re.ExecuteAllRulesAsync("CaseSensitivityTest", ["hello"]);
 
             Assert.Equal(expected1, result[0].IsSuccess);
             Assert.Equal(expected2, result[1].IsSuccess);

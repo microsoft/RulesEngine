@@ -6,6 +6,7 @@ using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RulesEngine.Actions
@@ -21,9 +22,9 @@ namespace RulesEngine.Actions
             _ruleExpressionParser = ruleExpressionParser;
         }
 
-        internal async override ValueTask<ActionRuleResult> ExecuteAndReturnResultAsync(ActionContext context, RuleParameter[] ruleParameters, bool includeRuleResults = false)
+        internal async override ValueTask<ActionRuleResult> ExecuteAndReturnResultAsync(ActionContext context, RuleParameter[] ruleParameters, bool includeRuleResults = false, CancellationToken ct = default)
         {
-            var innerResult = await base.ExecuteAndReturnResultAsync(context, ruleParameters, includeRuleResults);
+            var innerResult = await base.ExecuteAndReturnResultAsync(context, ruleParameters, includeRuleResults, ct);
             var output = innerResult.Output as ActionRuleResult;
             List<RuleResultTree> resultList = null;
             if (includeRuleResults)
@@ -38,7 +39,7 @@ namespace RulesEngine.Actions
             };
         }
 
-        public async override ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters)
+        public async override ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters, CancellationToken ct = default)
         {
             var workflowName = context.GetContext<string>("workflowName");
             var ruleName = context.GetContext<string>("ruleName");
@@ -57,7 +58,7 @@ namespace RulesEngine.Actions
                 }
             }
    
-            var ruleResult = await _ruleEngine.ExecuteActionWorkflowAsync(workflowName, ruleName, filteredRuleParameters.ToArray());
+            var ruleResult = await _ruleEngine.ExecuteActionWorkflowAsync(workflowName, ruleName, filteredRuleParameters.ToArray(), ct);
             return ruleResult;
         }
     }

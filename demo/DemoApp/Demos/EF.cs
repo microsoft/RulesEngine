@@ -10,14 +10,15 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
-
+using System.Threading;
+using System.Threading.Tasks;
 using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
 
 namespace DemoApp.Demos
 {
     public class EF
     {
-        public void Run()
+        public async Task Run(CancellationToken ct = default)
         {
             Console.WriteLine($"Running {nameof(EF)}....");
             var basicInfo = "{\"name\": \"hello\",\"email\": \"abcy@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyaltyFactor\": 3,\"totalPurchasesToDate\": 10000}";
@@ -42,7 +43,7 @@ namespace DemoApp.Demos
             if (files == null || files.Length == 0)
                 throw new Exception("Rules not found.");
 
-            var fileData = File.ReadAllText(files[0]);
+            var fileData = await File.ReadAllTextAsync(files[0]);
             var workflow = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
             Workflow[] wfr = null;
@@ -51,7 +52,7 @@ namespace DemoApp.Demos
                 if (db.Database.EnsureCreated())
                 {
                     db.Workflows.AddRange(workflow);
-                    db.SaveChanges();
+                    await db.SaveChangesAsync();
                 }
 
                 wfr = db.Workflows.Include(i => i.Rules).ThenInclude(i => i.Rules).ToArray();
@@ -63,7 +64,7 @@ namespace DemoApp.Demos
 
                 string discountOffered = "No discount offered.";
 
-                List<RuleResultTree> resultList = bre.ExecuteAllRulesAsync("Discount", inputs).Result;
+                List<RuleResultTree> resultList = await bre.ExecuteAllRulesAsync("Discount", inputs, ct);
 
                 resultList.OnSuccess((eventName) => {
                     discountOffered = $"Discount offered is {eventName} % over MRP.";
