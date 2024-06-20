@@ -31,11 +31,11 @@ namespace DemoApp
             dynamic input3 = JsonConvert.DeserializeObject<ExpandoObject>(telemetryInfo, converter);
 
             var inputs = new dynamic[]
-                {
-                    input1,
-                    input2,
-                    input3
-                };
+            {
+                input1,
+                input2,
+                input3
+            };
 
             var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "Discount.json", SearchOption.AllDirectories);
             if (files == null || files.Length == 0)

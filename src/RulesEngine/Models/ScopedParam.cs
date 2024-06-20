@@ -10,7 +10,6 @@ namespace RulesEngine.Models
     [ExcludeFromCodeCoverage]
     public class ScopedParam
     {
-
         /// <summary>
         /// Gets or sets the name of the param.
         /// </summary>

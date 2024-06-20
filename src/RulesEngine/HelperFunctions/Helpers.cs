@@ -40,9 +40,7 @@ namespace RulesEngine.HelperFunctions
                     ChildResults = childRuleResults,
                     ExceptionMessage = exceptionMessage
                 };
-
-            };
-            
+            };            
         }
 
         internal static RuleFunc<RuleResultTree> ToRuleExceptionResult(ReSettings reSettings, Rule rule,Exception ex)

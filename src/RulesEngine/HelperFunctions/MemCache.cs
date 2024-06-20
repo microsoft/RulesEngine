@@ -46,8 +46,7 @@ namespace RulesEngine.HelperFunctions
                     return true;
                 }   
             }
-            return false;
-           
+            return false;           
         }
 
 
@@ -92,8 +91,7 @@ namespace RulesEngine.HelperFunctions
                     &&  dictionaryValue.expiry == result.expiry)
                 {   
                     _cacheDictionary.TryRemove(result.key, out _);
-                }
-                
+                }                
             }
 
             _cacheDictionary.AddOrUpdate(key, (value, fixedExpiry), (k, v) => (value, fixedExpiry));

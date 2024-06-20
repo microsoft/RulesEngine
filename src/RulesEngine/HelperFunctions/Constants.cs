@@ -21,6 +21,5 @@ namespace RulesEngine.HelperFunctions
         public const string LAMBDA_EXPRESSION_EXPRESSION_NULL_ERRMSG = "Expression cannot be null or empty when RuleExpressionType is LambdaExpression";
         public const string LAMBDA_EXPRESSION_OPERATOR_ERRMSG = "Cannot use Operator field when RuleExpressionType is LambdaExpression";
         public const string LAMBDA_EXPRESSION_RULES_ERRMSG = "Cannot use Rules field when RuleExpressionType is LambdaExpression";
-
     }
 }

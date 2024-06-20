@@ -38,9 +38,9 @@ namespace DemoApp
             dynamic datas = new ExpandoObject();
             datas.count = 1;
             var inputs = new dynamic[]
-              {
-                    datas
-              };
+            {
+                datas
+            };
 
             List<RuleResultTree> resultList = bre.ExecuteAllRulesAsync("Test Workflow Rule 1", inputs).Result;
 

@@ -25,12 +25,6 @@ namespace RulesEngine.Models
         /// </summary>
         public string WorkflowName { get; set; }
 
-        /// <summary>Gets or sets the workflow rules to inject.</summary>
-        /// <value>The workflow rules to inject.</value>
-        [Obsolete("WorkflowRulesToInject is deprecated. Use WorkflowsToInject instead.")]
-        public IEnumerable<string> WorkflowRulesToInject {
-          set { WorkflowsToInject = value; }
-        }
         public IEnumerable<string> WorkflowsToInject { get; set; }
 
         public RuleExpressionType RuleExpressionType { get; set; } = RuleExpressionType.LambdaExpression;
