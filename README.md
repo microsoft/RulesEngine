@@ -57,6 +57,7 @@ The *response* will contain a list of [*RuleResultTree*](https://github.com/asul
 _A demo app for the is available at [this location](https://github.com/asulwer/RulesEngine/tree/main/demo)._
 
 <details>
+
 <summary>Basic</summary>
 
 A simple example via code only is as follows:
@@ -86,7 +87,9 @@ var bre = new RulesEngine.RulesEngine(workflows.ToArray());
 [Additional Examples](https://github.com/asulwer/RulesEngine/tree/main/demo/DemoApp/Demos)
 
 </details>
+
 <details>
+
 <summary>Entity Framework</summary>
 
 Consuming Entity Framework and populating the Rules Engine is shown in the [EFDemo class](https://github.com/asulwer/RulesEngine/blob/main/demo/DemoApp/Demos/EF.cs) with Workflow rules populating the array and passed to the Rules Engine, The Demo App includes an example [RulesEngineDemoContext](https://github.com/asulwer/RulesEngine/blob/main/demo/DemoApp/Demos/RulesEngineContext.cs) using SQLite and could be swapped out for another provider.

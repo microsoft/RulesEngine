@@ -66,7 +66,7 @@ namespace RulesEngine.UnitTest
                     Rule = new Rule()
                     {
                         RuleName = "Test Rule 1",
-                        SuccessEvent = "Event 1"
+                        SuccessMessage = "Event 1"
                     }
                 },
                 new RuleResultTree()

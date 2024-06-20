@@ -450,7 +450,7 @@ namespace RulesEngine.UnitTest
                                     Expression = "new int[]{ 1, 2, 3, 4, 5 }"
                                 }
                             },
-                            SuccessEvent = "Count is within tolerance.",
+                            SuccessMessage = "Count is within tolerance.",
                             ErrorMessage = "Not as expected.",
                             Expression = "myList.Where(x => x < threshold).Contains(myObj.Count)",
                             RuleExpressionType = RuleExpressionType.LambdaExpression
