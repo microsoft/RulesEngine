@@ -8,7 +8,7 @@ Rules Engine is a library (not yet NuGet package) for abstracting business logic
 
 There are several ways to populate workflows for the Rules Engine as listed below.
 
-You need to store the rules based on the [schema definition](https://github.com/asulwer/RulesEngine/blob/main/schema/workflow-schema.json) given and they can be stored in any store as deemed appropriate like Azure Blob Storage, Cosmos DB, Azure App Configuration, [Entity Framework](https://github.com/asulwer/RulesEngine#entity-framework), SQL Servers, file systems etc. For RuleExpressionType `LambdaExpression`, the rule is written as a [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
+You need to store the rules based on the [schema definition](https://github.com/asulwer/RulesEngine/blob/main/schema/workflow-schema.json) given and they can be stored in any store as deemed appropriate [Demos](https://github.com/asulwer/RulesEngine/tree/main/demo). For RuleExpressionType `LambdaExpression`, the rule is written as a [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
 
 An example rule:
 
@@ -19,7 +19,7 @@ An example rule:
     "Rules": [
       {
         "RuleName": "GiveDiscount10",
-        "SuccessEvent": "10",
+        "SuccessMessage": "10",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
@@ -27,7 +27,7 @@ An example rule:
       },
       {
         "RuleName": "GiveDiscount20",
-        "SuccessEvent": "20",
+        "SuccessMessage": "20",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
@@ -52,9 +52,7 @@ List<RuleResultTree> response = await rulesEngine.ExecuteAllRulesAsync(workflowN
 
 Here, *workflowName* is the name of the workflow, which is *Discount* in the above mentioned example. And *input* is the object which needs to be checked against the rules,  which itself may consist of a list of class instances.
 
-The *response* will contain a list of [*RuleResultTree*](https://github.com/asulwer/RulesEngine/wiki/Getting-Started#ruleresulttree) which gives information if a particular rule passed or failed. 
-
-_Note: A detailed example showcasing how to use Rules Engine is explained in [Getting Started page](https://github.com/asulwer/RulesEngine/wiki/Getting-Started) of [Rules Engine Wiki](https://github.com/asulwer/RulesEngine/wiki)._
+The *response* will contain a list of [*RuleResultTree*](https://github.com/asulwer/RulesEngine/blob/main/src/RulesEngine/Models/RuleResultTree.cs) which gives information if a particular rule passed or failed. 
 
 _A demo app for the is available at [this location](https://github.com/asulwer/RulesEngine/tree/main/demo)._
 
@@ -84,11 +82,14 @@ workflows.Add(exampleWorkflow);
 
 var bre = new RulesEngine.RulesEngine(workflows.ToArray());
 ```
+
+[Additional Examples](https://github.com/asulwer/RulesEngine/tree/main/demo/DemoApp/Demos)
+
 </details>
 <details>
 <summary>Entity Framework</summary>
 
-Consuming Entity Framework and populating the Rules Engine is shown in the [EFDemo class](https://github.com/asulwer/RulesEngine/blob/main/demo/DemoApp/EFDemo.cs) with Workflow rules populating the array and passed to the Rules Engine, The Demo App includes an example [RulesEngineDemoContext](https://github.com/asulwer/RulesEngine/blob/main/demo/DemoApp.EFDataExample/RulesEngineDemoContext.cs) using SQLite and could be swapped out for another provider.
+Consuming Entity Framework and populating the Rules Engine is shown in the [EFDemo class](https://github.com/asulwer/RulesEngine/blob/main/demo/DemoApp/Demos/EF.cs) with Workflow rules populating the array and passed to the Rules Engine, The Demo App includes an example [RulesEngineDemoContext](https://github.com/asulwer/RulesEngine/blob/main/demo/DemoApp/Demos/RulesEngineContext.cs) using SQLite and could be swapped out for another provider.
 
 ```c#
 var wfr = db.Workflows.Include(i => i.Rules).ThenInclude(i => i.Rules).ToArray();
@@ -105,8 +106,6 @@ var bre = new RulesEngine.RulesEngine(wfr, null);
 The rules can be stored in any store and be fed to the system in a structure which adheres to the [schema](https://github.com/asulwer/RulesEngine/blob/main/schema/workflow-schema.json) of WorkFlow model.
 
 A wrapper needs to be created over the Rules Engine package, which will get the rules and input message(s) from any store that your system dictates and put it into the Engine. The wrapper then handles the output using appropriate means.
-
-_Note: To know in detail of the workings of Rules Engine, please visit [How it works section](https://github.com/asulwer/RulesEngine/wiki/Introduction#how-it-works) in [Rules Engine Wiki](https://github.com/asulwer/RulesEngine/wiki)._
 
 ## Contributing
 
