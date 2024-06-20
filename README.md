@@ -8,7 +8,7 @@ Rules Engine is a library (not yet NuGet package) for abstracting business logic
 
 There are several ways to populate workflows for the Rules Engine as listed below.
 
-You need to store the rules based on the [schema definition](https://github.com/asulwer/RulesEngine/blob/main/schema/workflow-schema.json) given and they can be stored in any store as deemed appropriate [Demos](https://github.com/asulwer/RulesEngine/tree/main/demo). For RuleExpressionType `LambdaExpression`, the rule is written as a [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
+You need to store the rules based on the [schema definition](https://github.com/asulwer/RulesEngine/blob/main/schema/workflow-schema.json) given and they can be stored in any store as deemed appropriate. For RuleExpressionType `LambdaExpression`, the rule is written as a [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
 
 An example rule:
 
@@ -99,20 +99,8 @@ var bre = new RulesEngine.RulesEngine(wfr, null);
 *Note: For each level of nested rules expected, a ThenInclude query appended will be needed as shown above.*
 </details>
 
-## How it works
-
-![](https://github.com/asulwer/RulesEngine/blob/main/assets/BlockDiagram.png)
-
-The rules can be stored in any store and be fed to the system in a structure which adheres to the [schema](https://github.com/asulwer/RulesEngine/blob/main/schema/workflow-schema.json) of WorkFlow model.
-
-A wrapper needs to be created over the Rules Engine package, which will get the rules and input message(s) from any store that your system dictates and put it into the Engine. The wrapper then handles the output using appropriate means.
-
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
 the rights to use your contribution.
-
----
-
-_For more details please check out [Rules Engine Wiki](https://github.com/asulwer/RulesEngine/wiki)._

@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <TargetFrameworks>net8.0;net6.0;netstandard2.0</TargetFrameworks>
-    <Version>5.0.3</Version>
+    <Version>5.0.4</Version>
     <Copyright>Copyright (c) Microsoft Corporation.</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageProjectUrl>https://github.com/microsoft/RulesEngine</PackageProjectUrl>
-    <Authors>Abbas Cyclewala</Authors>
+    <PackageProjectUrl>https://github.com/asulwer/RulesEngine</PackageProjectUrl>
+    <Authors>Abbas Cyclewala, Aaron Sulwer</Authors>
     <Description>Rules Engine is a package for abstracting business logic/rules/policies out of the system. This works in a very simple way by giving you an ability to put your rules in a store outside the core logic of the system thus ensuring that any change in rules doesn't affect the core system.</Description>
-	  <PackageReleaseNotes>https://github.com/microsoft/RulesEngine/blob/main/CHANGELOG.md</PackageReleaseNotes>
+	  <PackageReleaseNotes>https://github.com/asulwer/RulesEngine/blob/main/CHANGELOG.md</PackageReleaseNotes>
 	  <PackageTags>BRE, Rules Engine, Abstraction</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
