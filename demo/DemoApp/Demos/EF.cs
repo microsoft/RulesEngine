@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
-//  Licensed under the MIT License.
+// Licensed under the MIT License.
 
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using RulesEngine.Models;
@@ -8,15 +9,17 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
+using System.Linq;
+
 using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
 
-namespace DemoApp
+namespace DemoApp.Demos
 {
-    public class JSONDemo
+    public class EF
     {
         public void Run()
         {
-            Console.WriteLine($"Running {nameof(JSONDemo)}....");
+            Console.WriteLine($"Running {nameof(EF)}....");
             var basicInfo = "{\"name\": \"hello\",\"email\": \"abcy@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyaltyFactor\": 3,\"totalPurchasesToDate\": 10000}";
             var orderInfo = "{\"totalOrders\": 5,\"recurringItems\": 2}";
             var telemetryInfo = "{\"noOfVisitsPerMonth\": 10,\"percentageOfBuyingToVisit\": 15}";
@@ -34,28 +37,44 @@ namespace DemoApp
                 input3
             };
 
-            var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "Discount.json", SearchOption.AllDirectories);
+            var dir = Directory.GetCurrentDirectory();
+            var files = Directory.GetFiles(dir, "Discount.json", SearchOption.AllDirectories);
             if (files == null || files.Length == 0)
                 throw new Exception("Rules not found.");
 
             var fileData = File.ReadAllText(files[0]);
             var workflow = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
-            var bre = new RulesEngine.RulesEngine(workflow.ToArray(), null);
+            Workflow[] wfr = null;
+            using (RulesEngineContext db = new RulesEngineContext())
+            {
+                if (db.Database.EnsureCreated())
+                {
+                    db.Workflows.AddRange(workflow);
+                    db.SaveChanges();
+                }
 
-            string discountOffered = "No discount offered.";
+                wfr = db.Workflows.Include(i => i.Rules).ThenInclude(i => i.Rules).ToArray();
+            }
 
-            List<RuleResultTree> resultList = bre.ExecuteAllRulesAsync("Discount", inputs).Result;
+            if (wfr != null)
+            {
+                var bre = new RulesEngine.RulesEngine(wfr, null);
 
-            resultList.OnSuccess((eventName) => {
-                discountOffered = $"Discount offered is {eventName} % over MRP.";
-            });
+                string discountOffered = "No discount offered.";
 
-            resultList.OnFail(() => {
-                discountOffered = "The user is not eligible for any discount.";
-            });
+                List<RuleResultTree> resultList = bre.ExecuteAllRulesAsync("Discount", inputs).Result;
 
-            Console.WriteLine(discountOffered);
+                resultList.OnSuccess((eventName) => {
+                    discountOffered = $"Discount offered is {eventName} % over MRP.";
+                });
+
+                resultList.OnFail(() => {
+                    discountOffered = "The user is not eligible for any discount.";
+                });
+
+                Console.WriteLine(discountOffered);
+            }
         }
     }
 }

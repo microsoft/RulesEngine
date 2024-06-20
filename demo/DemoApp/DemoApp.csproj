@@ -7,17 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/RulesEngine/RulesEngine.csproj" />
-    <ProjectReference Include="..\DemoApp.EFDataExample\DemoApp.EFDataExample.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <None Update="Workflows\Discount.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Workflows\NestedInputDemo.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="../../src/RulesEngine/RulesEngine.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /y $(SolutionDir)demo\Workflows\Discount.json $(ProjectDir)$(OutDir)&#xD;&#xA;xcopy /y $(SolutionDir)demo\Workflows\NestedInput.json $(ProjectDir)$(OutDir)" />
+  </Target>
 
 </Project>

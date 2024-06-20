@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace DemoApp
+namespace DemoApp.Demos
 {
     internal class ListItem
     {
@@ -16,11 +16,11 @@ namespace DemoApp
         public string Value { get; set; }
     }
 
-    public class NestedInputDemo
+    public class NestedInput
     {
         public void Run()
         {
-            Console.WriteLine($"Running {nameof(NestedInputDemo)}....");
+            Console.WriteLine($"Running {nameof(NestedInput)}....");
             var nestedInput = new {
                 SimpleProp = "simpleProp",
                 NestedProp = new {
@@ -42,7 +42,7 @@ namespace DemoApp
 
             };
 
-            var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "NestedInputDemo.json", SearchOption.AllDirectories);
+            var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "NestedInput.json", SearchOption.AllDirectories);
             if (files == null || files.Length == 0)
             {
                 throw new Exception("Rules not found.");
@@ -63,8 +63,6 @@ namespace DemoApp
                 });
 
             }
-
-
         }
     }
 }

@@ -7,10 +7,10 @@ namespace DemoApp
     {
         public static void Main(string[] args)
         {
-            new BasicDemo().Run();
-            new JSONDemo().Run();
-            new NestedInputDemo().Run();
-            new EFDemo().Run();
+            new Demos.Basic().Run();
+            new Demos.JSON().Run();
+            new Demos.NestedInput().Run();
+            new Demos.EF().Run();
         }
     }
 }

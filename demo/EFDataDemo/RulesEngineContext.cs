@@ -4,16 +4,22 @@ using System.Linq;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RulesEngine.Models;
 
-namespace RulesEngine.Data
+namespace EFDataExample
 {
     public class RulesEngineContext : DbContext
     {
-        public DbSet<Workflow> Workflows { get; set; }
+        public string DbPath { get; private set; }
 
-        public DbSet<Rule> Rules { get; set; }
+        public RulesEngineContext()
+        {
+            var folder = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            var path = System.IO.Path.GetDirectoryName(folder);
+            DbPath = $"{path}{System.IO.Path.DirectorySeparatorChar}RulesEngineDemo.db";
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseSqlite($"Data Source={DbPath}");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -54,6 +60,8 @@ namespace RulesEngine.Data
                 entity.Ignore(b => b.WorkflowsToInject);
             });
         }
-    }
 
+        public DbSet<Workflow> Workflows { get; set; }
+        public DbSet<Rule> Rules { get; set; }
+    }
 }

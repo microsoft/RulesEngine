@@ -2,8 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>DemoApp.EFDataExample</RootNamespace>
-    <AssemblyName>DemoApp.EFDataExample</AssemblyName>
+    <RootNamespace>EFDataExample</RootNamespace>
+    <AssemblyName>EFDataExample</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <StartupObject>EFDataExample.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,5 +16,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\RulesEngine\RulesEngine.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /y $(SolutionDir)demo\Workflows\*.json $(ProjectDir)$(OutDir)" />
+  </Target>
 
 </Project>

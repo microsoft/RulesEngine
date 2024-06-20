@@ -27,9 +27,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RulesEngineBenchmark", "ben
 		{CD4DFE6A-083B-478E-8377-77F474833E30} = {CD4DFE6A-083B-478E-8377-77F474833E30}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp.EFDataExample", "demo\DemoApp.EFDataExample\DemoApp.EFDataExample.csproj", "{E376D3E6-6890-4C09-9EA0-3EFD9C1E036D}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{2E8DCFB4-0505-407B-9972-292F75AFD639}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{54D2DA48-B47D-4FEB-8E3B-1C613FED2B60}"
+	ProjectSection(SolutionItems) = preProject
+		demo\Workflows\Discount.json = demo\Workflows\Discount.json
+		demo\Workflows\NestedInput.json = demo\Workflows\NestedInput.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,17 +57,13 @@ Global
 		{C058809F-C720-4EFC-925D-A486627B238B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C058809F-C720-4EFC-925D-A486627B238B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C058809F-C720-4EFC-925D-A486627B238B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E376D3E6-6890-4C09-9EA0-3EFD9C1E036D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E376D3E6-6890-4C09-9EA0-3EFD9C1E036D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E376D3E6-6890-4C09-9EA0-3EFD9C1E036D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E376D3E6-6890-4C09-9EA0-3EFD9C1E036D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{57BB8C07-799A-4F87-A7CC-D3D3F694DD02} = {2E8DCFB4-0505-407B-9972-292F75AFD639}
-		{E376D3E6-6890-4C09-9EA0-3EFD9C1E036D} = {2E8DCFB4-0505-407B-9972-292F75AFD639}
+		{54D2DA48-B47D-4FEB-8E3B-1C613FED2B60} = {2E8DCFB4-0505-407B-9972-292F75AFD639}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E1F2EC8E-4005-4DFE-90ED-296D4592867A}

@@ -7,20 +7,20 @@ using System.Collections.Generic;
 using System.Dynamic;
 using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
 
-namespace DemoApp
+namespace DemoApp.Demos
 {
-    public class BasicDemo
+    public class Basic
     {
         public void Run()
         {
-            Console.WriteLine($"Running {nameof(BasicDemo)}....");
-            List<Workflow> workflows = new List<Workflow>();
-            Workflow workflow = new Workflow();
+            Console.WriteLine($"Running {nameof(Basic)}....");
+            var workflows = new List<Workflow>();
+            var workflow = new Workflow();
             workflow.WorkflowName = "Test Workflow Rule 1";
 
-            List<Rule> rules = new List<Rule>();
+            var rules = new List<Rule>();
 
-            Rule rule = new Rule();
+            var rule = new Rule();
             rule.RuleName = "Test Rule";
             rule.SuccessEvent = "Count is within tolerance.";
             rule.ErrorMessage = "Over expected.";
@@ -42,9 +42,9 @@ namespace DemoApp
                 datas
             };
 
-            List<RuleResultTree> resultList = bre.ExecuteAllRulesAsync("Test Workflow Rule 1", inputs).Result;
+            var resultList = bre.ExecuteAllRulesAsync("Test Workflow Rule 1", inputs).Result;
 
-            bool outcome = false;
+            var outcome = false;
 
             //Different ways to show test results:
             outcome = resultList.TrueForAll(r => r.IsSuccess);
