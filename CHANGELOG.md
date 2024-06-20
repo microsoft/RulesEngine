@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.0.4]
+- Removed .NET 6 support
+- Updated C# version to 12.0 (One of those fixed the static method imports for me)
+
 ## [5.0.3]
 
 - Updated dependencies to latest

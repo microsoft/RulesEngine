@@ -73,7 +73,7 @@ method `ExecuteAllRulesAsync`:
 List<RuleResultTree> response = await rulesEngine.ExecuteAllRulesAsync(workflowName, input);
 ```
 
-Here, *workflowName* is the name of the workflow, which is *Discount* in the above mentioned example. And *input* is the
+Here, *workflowName* is the name of the workflow, which is *Discount* in the above-mentioned example. And *input* is the
 object which needs to be checked against the rules, which itself may consist of a list of class instances.
 
 The *response* will contain a list of [
