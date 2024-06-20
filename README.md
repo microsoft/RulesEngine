@@ -1,5 +1,7 @@
 # Rules Engine
 
+# IMPORTANT: This fork is in the building. There might be information missing or wrong.
+
 # NOTICE: This is a FORK of the RulesEngine project.
 
 It seems not to be actively maintained anymore.
