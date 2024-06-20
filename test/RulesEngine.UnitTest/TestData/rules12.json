@@ -1,0 +1,11 @@
+{
+  "WorkflowName": "inputWorkflow",
+  "Rules": [
+    {
+      "RuleName": "StringIsNullOrWhiteSpace",
+      "SuccessEvent": "IsNull",
+      "RuleExpressionType": "LambdaExpression",
+      "Expression": "!string.IsNullOrWhiteSpace(input1.country)"
+    }
+  ]
+}
