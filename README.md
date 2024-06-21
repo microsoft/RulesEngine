@@ -1,4 +1,11 @@
+![build](https://github.com/timophe-91/RulesEngine/actions/workflows/dotnetcore-build.yml/badge.svg?branch=main)
 [![Coverage Status](https://coveralls.io/repos/github/timophe-91/RulesEngine/badge.svg?branch=main)](https://coveralls.io/github/timophe-91/RulesEngine?branch=main)
+[![Nuget download][download-image]][download-url]
+
+[download-image]: https://img.shields.io/nuget/dt/timophe.RulesEngine
+[download-url]: https://www.nuget.org/packages/timophe.RulesEngine/
+
+
 
 # Rules Engine
 
@@ -20,8 +27,7 @@ that any change in rules don't affect the core system.
 
 ## Installation
 
-TBA, this fork was just created (2024.06.20).
-So there is no active NuGet package yet.
+To install this library, download the latest version of [NuGet Package](https://www.nuget.org/packages/timophe.RulesEngine/) from [nuget.org](https://www.nuget.org/) and refer it into your project.  
 
 ## How to use it
 
