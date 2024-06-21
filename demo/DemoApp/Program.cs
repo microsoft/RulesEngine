@@ -19,6 +19,7 @@ namespace DemoApp
                 //cts.CancelAfter(TimeSpan.FromMilliseconds(94));
 
                 await new Demos.Basic().Run(cts.Token);
+                await new Demos.BasicWithCustomTypes().Run(cts.Token);
                 await new Demos.JSON().Run(cts.Token);
                 await new Demos.NestedInput().Run(cts.Token);
                 await new Demos.EF().Run(cts.Token);

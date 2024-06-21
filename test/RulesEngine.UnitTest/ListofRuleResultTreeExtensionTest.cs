@@ -164,7 +164,7 @@ namespace RulesEngine.UnitTest
 
             var successEventName = true;
 
-            rulesResultTree.OnFail(() => {
+            rulesResultTree.OnFail((eventName) => {
                 successEventName = false;
             });
 
@@ -203,7 +203,7 @@ namespace RulesEngine.UnitTest
 
             var successEventName = true;
 
-            rulesResultTree.OnFail(() => {
+            rulesResultTree.OnFail((eventName) => {
                 successEventName = false;
             });
 
