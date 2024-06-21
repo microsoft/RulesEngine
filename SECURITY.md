@@ -2,7 +2,7 @@
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-You can use the button at the top to report a vulnerability.
+You can use the button at the top on [this page](https://github.com/timophe-91/RulesEngine/security) to report a vulnerability. 
 
 Please include the requested information listed below (as much as you can provide) to help us better understand the nature and scope of the possible issue:
 
