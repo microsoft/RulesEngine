@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [5.0.4]
+## [1.0.0]
 
 - Updated C# version to 12.0
 - Update Dependencies to latest
