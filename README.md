@@ -1,5 +1,11 @@
-![build](https://github.com/timophe-91/RulesEngine/workflows/build/badge.svg?branch=main)
+![build](https://github.com/timophe-91/RulesEngine/actions/workflows/dotnetcore-build.yml/badge.svg?branch=main)
 [![Coverage Status](https://coveralls.io/repos/github/timophe-91/RulesEngine/badge.svg?branch=main)](https://coveralls.io/github/timophe-91/RulesEngine?branch=main)
+[![Nuget download][download-image]][download-url]
+
+[download-image]: https://img.shields.io/nuget/dt/timophe.RulesEngine
+[download-url]: https://www.nuget.org/packages/timophe.RulesEngine/
+
+
 
 # Rules Engine
 
