@@ -11,7 +11,6 @@ The original project can be found [here]( https://github.com/microsoft/RulesEngi
 
 I usually don´t work with GitHub, and I am doing this in my free time, so please be patient with me :)<br>Any help is
 appreciated.
-First of I want to Update to System.Text.Json, .NET 8, remove moq and use NSubstitute Instead.
 
 ## Overview
 
