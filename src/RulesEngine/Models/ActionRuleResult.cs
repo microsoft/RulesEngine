@@ -4,11 +4,10 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace RulesEngine.Models
+namespace RulesEngine.Models;
+
+[ExcludeFromCodeCoverage]
+public class ActionRuleResult : ActionResult
 {
-    [ExcludeFromCodeCoverage]
-    public class ActionRuleResult : ActionResult
-    {
-        public List<RuleResultTree> Results { get; set; }
-    }
+    public List<RuleResultTree> Results { get; set; }
 }

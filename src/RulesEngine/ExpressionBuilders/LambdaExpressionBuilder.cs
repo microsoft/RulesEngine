@@ -6,59 +6,61 @@ using RulesEngine.HelperFunctions;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Expressions;
 
-namespace RulesEngine.ExpressionBuilders
+namespace RulesEngine.ExpressionBuilders;
+
+internal sealed class LambdaExpressionBuilder : RuleExpressionBuilderBase
 {
-    internal sealed class LambdaExpressionBuilder : RuleExpressionBuilderBase
+    private readonly ReSettings _reSettings;
+    private readonly RuleExpressionParser _ruleExpressionParser;
+
+    internal LambdaExpressionBuilder(ReSettings reSettings, RuleExpressionParser ruleExpressionParser)
     {
-        private readonly ReSettings _reSettings;
-        private readonly RuleExpressionParser _ruleExpressionParser;
+        _reSettings = reSettings;
+        _ruleExpressionParser = ruleExpressionParser;
+    }
 
-        internal LambdaExpressionBuilder(ReSettings reSettings, RuleExpressionParser ruleExpressionParser)
+    internal override RuleFunc<RuleResultTree> BuildDelegateForRule(Rule rule, RuleParameter[] ruleParams)
+    {
+        try
         {
-            _reSettings = reSettings;
-            _ruleExpressionParser = ruleExpressionParser;
+            var ruleDelegate = _ruleExpressionParser.Compile<bool>(rule.Expression, ruleParams);
+            return Helpers.ToResultTree(_reSettings, rule, null, ruleDelegate);
         }
-
-        internal override RuleFunc<RuleResultTree> BuildDelegateForRule(Rule rule, RuleParameter[] ruleParams)
+        catch (Exception ex)
         {
-            try
-            {
-                var ruleDelegate = _ruleExpressionParser.Compile<bool>(rule.Expression, ruleParams);
-                return Helpers.ToResultTree(_reSettings, rule, null, ruleDelegate);
-            }
-            catch (Exception ex)
-            {
-                Helpers.HandleRuleException(ex,rule,_reSettings);
+            Helpers.HandleRuleException(ex, rule, _reSettings);
 
-                var exceptionMessage = Helpers.GetExceptionMessage($"Exception while parsing expression `{rule?.Expression}` - {ex.Message}",
-                                                                    _reSettings);
+            var exceptionMessage = Helpers.GetExceptionMessage(
+                $"Exception while parsing expression `{rule?.Expression}` - {ex.Message}",
+                _reSettings);
 
-                bool func(object[] param) => false;
-                
-                return Helpers.ToResultTree(_reSettings, rule, null,func, exceptionMessage);
+            bool func(object[] param)
+            {
+                return false;
             }
+
+            return Helpers.ToResultTree(_reSettings, rule, null, func, exceptionMessage);
         }
+    }
 
-        internal override Expression Parse(string expression, ParameterExpression[] parameters, Type returnType)
+    internal override Expression Parse(string expression, ParameterExpression[] parameters, Type returnType)
+    {
+        try
         {
-            try
-            {
-                return _ruleExpressionParser.Parse(expression, parameters, returnType);
-            }
-            catch(ParseException ex)
-            {
-                throw new ExpressionParserException(ex.Message, expression);
-            }
-            
+            return _ruleExpressionParser.Parse(expression, parameters, returnType);
         }
-
-        internal override Func<object[],Dictionary<string,object>> CompileScopedParams(RuleParameter[] ruleParameters, RuleExpressionParameter[] scopedParameters)
+        catch (ParseException ex)
         {
-            return _ruleExpressionParser.CompileRuleExpressionParameters(ruleParameters, scopedParameters);
+            throw new ExpressionParserException(ex.Message, expression);
         }
+    }
+
+    internal override Func<object[], Dictionary<string, object>> CompileScopedParams(RuleParameter[] ruleParameters,
+        RuleExpressionParameter[] scopedParameters)
+    {
+        return _ruleExpressionParser.CompileRuleExpressionParameters(ruleParameters, scopedParameters);
     }
 }

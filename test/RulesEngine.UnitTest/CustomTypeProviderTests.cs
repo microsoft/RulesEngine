@@ -4,41 +4,59 @@
 using Moq;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq.Dynamic.Core;
 using Xunit;
 
-namespace RulesEngine.UnitTest
+namespace RulesEngine.UnitTest;
+
+/// <inheritdoc />
+[Trait("Category", "Unit")]
+[ExcludeFromCodeCoverage]
+public sealed  class CustomTypeProviderTests : IDisposable
 {
-    [Trait("Category", "Unit")]
-    [ExcludeFromCodeCoverage]
-    public class CustomTypeProviderTests : IDisposable
+    private readonly MockRepository _mockRepository;
+    private bool _disposed;
+
+    public CustomTypeProviderTests()
     {
-        private readonly MockRepository _mockRepository;
-        public CustomTypeProviderTests()
+        _mockRepository = new MockRepository(MockBehavior.Strict);
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (_disposed)
         {
-            _mockRepository = new MockRepository(MockBehavior.Strict);
+            return;
         }
 
-        public void Dispose()
+        if (disposing)
         {
             _mockRepository.VerifyAll();
         }
 
-        private CustomTypeProvider CreateProvider()
-        {
-            return new CustomTypeProvider(null);
-        }
+        _disposed = true;
+    }
 
-        [Fact]
-        public void GetCustomTypes_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var unitUnderTest = CreateProvider();
+    private CustomTypeProvider CreateProvider()
+    {
+        return new CustomTypeProvider(ParsingConfig.Default, null);
+    }
 
-            // Act
-            var result = unitUnderTest.GetCustomTypes();
+    [Fact]
+    public void GetCustomTypes_StateUnderTest_ExpectedBehavior()
+    {
+        // Arrange
+        var unitUnderTest = CreateProvider();
 
-            // Assert
-            Assert.NotEmpty(result);
-        }
+        // Act
+        var result = unitUnderTest.GetCustomTypes();
+
+        // Assert
+        Assert.NotEmpty(result);
     }
 }

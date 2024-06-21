@@ -3,28 +3,30 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace RulesEngine.Models
+namespace RulesEngine.Models;
+
+/// <summary>
+///     Class LocalParam.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class ScopedParam
 {
-    /// <summary>Class LocalParam.
+    /// <summary>
+    ///     Gets or sets the name of the param.
     /// </summary>
-    [ExcludeFromCodeCoverage]
-    public class ScopedParam
-    {
+    /// <value>
+    ///     The name of the rule.
+    /// </value>
+    /// ]
+    public string Name { get; set; }
 
-        /// <summary>
-        /// Gets or sets the name of the param.
-        /// </summary>
-        /// <value>
-        /// The name of the rule.
-        /// </value>]
-        public string Name { get; set; }
+    /// <summary>
+    ///     Gets or Sets the lambda expression which can be reference in Rule.
+    /// </summary>
+    public string Expression { get; set; }
+}
 
-        /// <summary>
-        /// Gets or Sets the lambda expression which can be reference in Rule. 
-        /// </summary>
-        public string Expression { get; set; }
-    }
-
-    [ExcludeFromCodeCoverage]
-    public class LocalParam : ScopedParam { }
+[ExcludeFromCodeCoverage]
+public class LocalParam : ScopedParam
+{
 }

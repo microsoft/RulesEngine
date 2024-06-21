@@ -4,10 +4,17 @@
     "ScopedParam": {
       "type": "object",
       "properties": {
-        "Name": { "type": "string" },
-        "Expression": { "type": "string" }
+        "Name": {
+          "type": "string"
+        },
+        "Expression": {
+          "type": "string"
+        }
       },
-      "required": [ "Name", "Expression" ]
+      "required": [
+        "Name",
+        "Expression"
+      ]
     },
     "Rule": {
       "title": "Rule",
@@ -17,7 +24,9 @@
         },
         "LocalParams": {
           "type": "array",
-          "items": { "$ref": "#/definitions/ScopedParam" }
+          "items": {
+            "$ref": "#/definitions/ScopedParam"
+          }
         },
         "Operator": {
           "enum": [
@@ -77,7 +86,9 @@
         },
         "LocalParams": {
           "type": "array",
-          "items": { "$ref": "#/definitions/ScopedParam" }
+          "items": {
+            "$ref": "#/definitions/ScopedParam"
+          }
         },
         "Expression": {
           "type": "string"
@@ -128,7 +139,6 @@
         }
       }
     }
-
   },
   "properties": {
     "WorkflowName": {
@@ -136,11 +146,15 @@
     },
     "WorkflowsToInject": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "GlobalParams": {
       "type": "array",
-      "items": { "$ref": "#/definitions/ScopedParam" }
+      "items": {
+        "$ref": "#/definitions/ScopedParam"
+      }
     },
     "Rules": {
       "type": "array",

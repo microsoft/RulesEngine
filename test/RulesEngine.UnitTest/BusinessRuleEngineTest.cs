@@ -781,8 +781,8 @@ public class RulesEngineTest
         var result1 = await re.ExecuteAllRulesAsync("Test", new RuleParameter("input1", value: null));
         Assert.True(result1.TrueForAll(c => c.IsSuccess));
 
-
-        var result2 = await re.ExecuteAllRulesAsync("Test", [null]);
+        // (object) otherwise it will fail with null reference exception
+        var result2 = await re.ExecuteAllRulesAsync("Test", [(object)null]);
         Assert.True(result2.TrueForAll(c => c.IsSuccess));
 
         dynamic input1 = new ExpandoObject();
@@ -880,7 +880,8 @@ public class RulesEngineTest
     private dynamic GetInput1()
     {
         var converter = new ExpandoObjectConverter();
-        const string basicInfo = "{\"name\": \"Dishant\",\"email\": \"abc@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyaltyFactor\": 3,\"totalPurchasesToDate\": 10000}";
+        const string basicInfo =
+            "{\"name\": \"Dishant\",\"email\": \"abc@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyaltyFactor\": 3,\"totalPurchasesToDate\": 10000}";
         return JsonConvert.DeserializeObject<ExpandoObject>(basicInfo, converter);
     }
 

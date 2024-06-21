@@ -3,26 +3,21 @@
 
 using Newtonsoft.Json.Linq;
 using RulesEngine.ExpressionBuilders;
+using RulesEngine.Models;
 using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
-namespace RulesEngine.UnitTest.RuleExpressionParserTests
+namespace RulesEngine.UnitTest.RuleExpressionParserTests;
+
+[ExcludeFromCodeCoverage]
+public class RuleExpressionParserTests
 {
-    [ExcludeFromCodeCoverage]
-    public class RuleExpressionParserTests
+    [Fact]
+    public void TestExpressionWithJObject()
     {
-        public RuleExpressionParserTests() { 
-           
-        
-        }
+        var ruleParser = new RuleExpressionParser(new ReSettings());
 
-
-        [Fact]
-        public void TestExpressionWithJObject()
-        {
-            var ruleParser = new RuleExpressionParser(new Models.ReSettings());
-
-            var inputStr = @"{
+        var inputStr = @"{
                ""list"": [
                     { ""item1"": ""hello"",
                         ""item3"": 1
@@ -34,36 +29,37 @@ namespace RulesEngine.UnitTest.RuleExpressionParserTests
             }";
 
 
-            var input = JObject.Parse(inputStr);
+        var input = JObject.Parse(inputStr);
 
 
-            var value = ruleParser.Evaluate<object>("input.list[0].item3 == 1", new[] { new Models.RuleParameter("input", input) });
+        var value = ruleParser.Evaluate<object>("input.list[0].item3 == 1",
+            new[] { new RuleParameter("input", input) });
 
-            Assert.Equal(true,
-                         value);
-
-
-            var value2 = ruleParser.Evaluate<object>("input.list[1].item2 == \"world\"", new[] { new Models.RuleParameter("input", input) });
-
-            Assert.Equal(true,
-                         value2);
+        Assert.Equal(true,
+            value);
 
 
-            var value3= ruleParser.Evaluate<object>("string.Concat(input.list[0].item1,input.list[1].item2)", new[] { new Models.RuleParameter("input", input) });
+        var value2 = ruleParser.Evaluate<object>("input.list[1].item2 == \"world\"",
+            new[] { new RuleParameter("input", input) });
 
-            Assert.Equal("helloworld", value3);
-        }
+        Assert.Equal(true,
+            value2);
 
-        [Theory]
-        [InlineData(false)]
-        public void TestExpressionWithDifferentCompilerSettings(bool fastExpressionEnabled){
-            var ruleParser = new RuleExpressionParser(new Models.ReSettings() { UseFastExpressionCompiler = fastExpressionEnabled });
 
-            decimal? d1 = null;
-            var result = ruleParser.Evaluate<bool>("d1 < 20", new[] { Models.RuleParameter.Create("d1", d1) });
-            Assert.False(result);
-        }
+        var value3 = ruleParser.Evaluate<object>("string.Concat(input.list[0].item1,input.list[1].item2)",
+            new[] { new RuleParameter("input", input) });
+
+        Assert.Equal("helloworld", value3);
     }
 
-    
+    [Theory]
+    [InlineData(false)]
+    public void TestExpressionWithDifferentCompilerSettings(bool fastExpressionEnabled)
+    {
+        var ruleParser = new RuleExpressionParser(new ReSettings { UseFastExpressionCompiler = fastExpressionEnabled });
+
+        decimal? d1 = null;
+        var result = ruleParser.Evaluate<bool>("d1 < 20", new[] { RuleParameter.Create("d1", d1) });
+        Assert.False(result);
+    }
 }

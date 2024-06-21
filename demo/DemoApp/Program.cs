@@ -1,16 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-namespace DemoApp
+namespace DemoApp;
+
+public static class Program
 {
-    public static class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
-        {
-            new BasicDemo().Run();
-            new JSONDemo().Run();
-            new NestedInputDemo().Run();
-            new EFDemo().Run();
-        }
+        new BasicDemo().Run();
+        new JSONDemo().Run();
+        new NestedInputDemo().Run();
+        new EFDemo().Run();
     }
 }
