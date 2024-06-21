@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/timophe-91/RulesEngine/badge.svg?branch=main)](https://coveralls.io/github/timophe-91/RulesEngine?branch=main)
+
 # Rules Engine
 
 # IMPORTANT: This fork is in the building. There might be information missing or wrong.
