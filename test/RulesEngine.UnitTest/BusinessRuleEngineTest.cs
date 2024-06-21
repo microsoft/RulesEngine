@@ -782,7 +782,7 @@ public class RulesEngineTest
         Assert.True(result1.TrueForAll(c => c.IsSuccess));
 
 
-        var result2 = await re.ExecuteAllRulesAsync("Test", [null]);
+        var result2 = await re.ExecuteAllRulesAsync("Test", [(object)null]);
         Assert.True(result2.TrueForAll(c => c.IsSuccess));
 
         dynamic input1 = new ExpandoObject();
