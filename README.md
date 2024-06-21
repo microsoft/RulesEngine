@@ -85,6 +85,7 @@ if a particular rule passed or failed.
 _A demo app for the is available at [this location](https://github.com/timophe-91/RulesEngine/tree/main/demo)._
 
 ## Basic
+
 <details>
 A simple example via code only is as follows:
 
@@ -113,6 +114,7 @@ var bre = new RulesEngine.RulesEngine(workflows.ToArray());
 </details>
 
 ## Entity Framework
+
 <details>
 Consuming Entity Framework and populating the Rules Engine is shown in
 the [EFDemo class](https://github.com/microsoft/RulesEngine/blob/main/demo/DemoApp/EFDemo.cs) with Workflow rules
@@ -129,6 +131,7 @@ var bre = new RulesEngine.RulesEngine(wfr, null);
 </details>
 
 ## How it works
+
 <details>
 
 ![](https://github.com/timophe-91/RulesEngine/blob/main/assets/BlockDiagram.png)
@@ -145,9 +148,7 @@ in [Rules Engine Wiki](https://github.com/timophe-91/RulesEngine/wiki)._
 
 </details>
 
-
 ## Contributing
-
 
 This project welcomes contributions and suggestions. Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us

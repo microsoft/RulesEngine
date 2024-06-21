@@ -14,8 +14,8 @@ public class MemCacheConfig
 
 internal class MemCache
 {
-    private readonly MemCacheConfig _config;
     private readonly ConcurrentDictionary<string, (object value, DateTimeOffset expiry)> _cacheDictionary;
+    private readonly MemCacheConfig _config;
     private ConcurrentQueue<(string key, DateTimeOffset expiry)> _cacheEvictionQueue;
 
     public MemCache(MemCacheConfig config)
