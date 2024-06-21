@@ -43,7 +43,7 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflowReference", [input1, input2, input3]);
+            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflowReference", new[] { input1, input2, input3 });
             Assert.NotNull(result);
             Assert.True(result.Any());
         }
@@ -58,7 +58,7 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", [input1, input2, input3]);
+            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", new[] { input1, input2, input3 });
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
             Assert.Contains(result, c => c.IsSuccess);
@@ -75,7 +75,7 @@ namespace RulesEngine.UnitTest
             dynamic input3 = GetInput3();
 
             // Run previous rules.
-            List<RuleResultTree> result1 = await re.ExecuteAllRulesAsync("inputWorkflow", [input1, input2, input3]);
+            List<RuleResultTree> result1 = await re.ExecuteAllRulesAsync("inputWorkflow", new[] { input1, input2, input3 });
             Assert.NotNull(result1);
             Assert.IsType<List<RuleResultTree>>(result1);
             Assert.Contains(result1, c => c.IsSuccess);
@@ -97,7 +97,7 @@ namespace RulesEngine.UnitTest
             dynamic input3 = GetInput3();
 
             // Run previous rules.
-            List<RuleResultTree> result1 = await re.ExecuteAllRulesAsync("inputWorkflow", [input1, input2, input3]);
+            List<RuleResultTree> result1 = await re.ExecuteAllRulesAsync("inputWorkflow", new[] { input1, input2, input3 });
             Assert.NotNull(result1);
             Assert.IsType<List<RuleResultTree>>(result1);
             Assert.Contains(result1, c => c.IsSuccess);
@@ -107,7 +107,7 @@ namespace RulesEngine.UnitTest
             re.AddOrUpdateWorkflow(newWorkflow);
 
             // Run new rules.
-            List<RuleResultTree> result2 = await re.ExecuteAllRulesAsync("inputWorkflow", [input1, input2, input3]);
+            List<RuleResultTree> result2 = await re.ExecuteAllRulesAsync("inputWorkflow", new[] { input1, input2, input3 });
             Assert.NotNull(result2);
             Assert.IsType<List<RuleResultTree>>(result2);
             Assert.DoesNotContain(result2, c => c.IsSuccess);
@@ -171,10 +171,7 @@ namespace RulesEngine.UnitTest
             dynamic input17 = GetInput2();
             dynamic input18 = GetInput3();
 
-            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow",
-                            [input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18]);
-            //, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18);
-            Assert.NotNull(result);
+            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", new[] { input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18 });
             Assert.IsType<List<RuleResultTree>>(result);
             Assert.Contains(result, c => c.IsSuccess);
         }
@@ -190,12 +187,12 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            List<RuleResultTree> result1 = await re.ExecuteAllRulesAsync("inputWorkflow", [input1, input2, input3]);
+            List<RuleResultTree> result1 = await re.ExecuteAllRulesAsync("inputWorkflow", new[] { input1, input2, input3 });
             Assert.NotNull(result1);
             Assert.IsType<List<RuleResultTree>>(result1);
             Assert.Contains(result1, c => c.IsSuccess);
 
-            List<RuleResultTree> result2 = await re.ExecuteAllRulesAsync("inputWorkflow", [input1, input2, input3]);
+            List<RuleResultTree> result2 = await re.ExecuteAllRulesAsync("inputWorkflow", new[] { input1, input2, input3 });
             Assert.NotNull(result2);
             Assert.IsType<List<RuleResultTree>>(result2);
             Assert.Contains(result2, c => c.IsSuccess);
@@ -217,7 +214,7 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", input1);
+            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", new[] { input1 });
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
             Assert.DoesNotContain(result, c => c.IsSuccess);
@@ -233,7 +230,7 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", [input1, input2, input3]);
+            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", new[] { input1, input2, input3 });
             Assert.NotNull(result);
             Assert.False(string.IsNullOrEmpty(result[0].ExceptionMessage) || string.IsNullOrWhiteSpace(result[0].ExceptionMessage));
         }
@@ -278,7 +275,7 @@ namespace RulesEngine.UnitTest
             var re = GetRulesEngine(ruleFileName);
             dynamic input = GetInput1();
 
-            await Assert.ThrowsAsync<ArgumentException>(async () => { await re.ExecuteAllRulesAsync("inputWorkflow1", input); });
+            await Assert.ThrowsAsync<ArgumentException>(async () => { await re.ExecuteAllRulesAsync("inputWorkflow1", new[] { input }); });
         }
 
         [Theory]
@@ -290,11 +287,11 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            var result = await re.ExecuteAllRulesAsync("inputWorkflow", [input1, input2, input3]);
+            var result = await re.ExecuteAllRulesAsync("inputWorkflow", new[] { input1, input2, input3 });
             Assert.NotNull(result);
             re.RemoveWorkflow("inputWorkflow");
 
-            await Assert.ThrowsAsync<ArgumentException>(async () => await re.ExecuteAllRulesAsync("inputWorkflow", [input1, input2, input3]));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await re.ExecuteAllRulesAsync("inputWorkflow", new[] { input1, input2, input3 }));
         }
 
 
@@ -309,8 +306,8 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            await Assert.ThrowsAsync<ArgumentException>(async () => await re.ExecuteAllRulesAsync("inputWorkflow", [input1, input2, input3]));
-            await Assert.ThrowsAsync<ArgumentException>(async () => await re.ExecuteAllRulesAsync("inputWorkflowReference", [input1, input2, input3]));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await re.ExecuteAllRulesAsync("inputWorkflow", new[] { input1, input2, input3 }));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await re.ExecuteAllRulesAsync("inputWorkflowReference", new[] { input1, input2, input3 }));
         }
 
         [Theory]
@@ -324,14 +321,14 @@ namespace RulesEngine.UnitTest
             dynamic input2 = GetInput2();
             dynamic input3 = GetInput3();
 
-            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", [input1, input2, input3]);
+            List<RuleResultTree> result = await re.ExecuteAllRulesAsync("inputWorkflow", new[] { input1, input2, input3 });
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
             Assert.Contains(result, c => c.IsSuccess);
 
             input3.hello = "world";
 
-            result = await re.ExecuteAllRulesAsync("inputWorkflow", [input1, input2, input3]);
+            result = await re.ExecuteAllRulesAsync("inputWorkflow", new[] { input1, input2, input3 });
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
             Assert.Contains(result, c => c.IsSuccess);
@@ -378,7 +375,7 @@ namespace RulesEngine.UnitTest
             var input2 = new RuleParameter("input2", GetInput2());
             var input3 = new RuleParameter("input3", GetInput3());
 
-            var result = await re.ExecuteAllRulesAsync("inputWorkflow", [input1, input2, input3]);
+            var result = await re.ExecuteAllRulesAsync("inputWorkflow", new[] { input1, input2, input3 });
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
             Assert.Contains(result.First().ChildResults, c => c.ExceptionMessage.Contains("Unknown identifier 'input1'"));
@@ -980,7 +977,6 @@ namespace RulesEngine.UnitTest
             var result1 = await re.ExecuteAllRulesAsync("Test", [new RuleParameter("input1", value: null)]);
             Assert.True(result1.All(c => c.IsSuccess));
 
-
             var result2 = await re.ExecuteAllRulesAsync("Test", new object[] { null });
             Assert.True(result2.All(c => c.IsSuccess));
 
@@ -988,7 +984,7 @@ namespace RulesEngine.UnitTest
             input1.hello = new ExpandoObject();
             input1.hello.world = "wow";
 
-            List<RuleResultTree> result3 = await re.ExecuteAllRulesAsync("Test", input1);
+            List<RuleResultTree> result3 = await re.ExecuteAllRulesAsync("Test", new[] { input1 });
             Assert.True(result3.All(c => c.IsSuccess));
 
         }
@@ -1016,7 +1012,7 @@ namespace RulesEngine.UnitTest
             input1.hello = new ExpandoObject();
             input1.hello.world = "wow";
 
-            List<RuleResultTree> result3 = await re.ExecuteAllRulesAsync("Exámple", input1);
+            List<RuleResultTree> result3 = await re.ExecuteAllRulesAsync("Exámple", new[] { input1 });
             Assert.True(result3.All(c => c.IsSuccess));
 
         }

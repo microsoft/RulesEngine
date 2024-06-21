@@ -28,7 +28,7 @@ namespace RulesEngine.UnitTest
             dynamic input1 = new ExpandoObject();
             input1.trueValue = true;
 
-            List<RuleResultTree> result = await rulesEngine.ExecuteAllRulesAsync("NestedRulesTest", input1);
+            List<RuleResultTree> result = await rulesEngine.ExecuteAllRulesAsync("NestedRulesTest", new[] { input1 });
             var andResults = result.Where(c => c.Rule.Operator == "And").ToList();
             var orResults = result.Where(c => c.Rule.Operator == "Or").ToList();
             Assert.All(andResults,
@@ -74,7 +74,7 @@ namespace RulesEngine.UnitTest
             dynamic input1 = new ExpandoObject();
             input1.trueValue = true;
 
-            List<RuleResultTree> result = await rulesEngine.ExecuteAllRulesAsync("NestedRulesActionsTest", input1);
+            List<RuleResultTree> result = await rulesEngine.ExecuteAllRulesAsync("NestedRulesActionsTest", new[] { input1 });
 
             Assert.False(result[0].IsSuccess);
             Assert.Equal(input1.trueValue, result[0].ActionResult.Output);
@@ -97,7 +97,7 @@ namespace RulesEngine.UnitTest
             dynamic input1 = new ExpandoObject();
             input1.trueValue = true;
 
-            List<RuleResultTree> result = await rulesEngine.ExecuteAllRulesAsync("NestedRulesActionsTest", input1);
+            List<RuleResultTree> result = await rulesEngine.ExecuteAllRulesAsync("NestedRulesActionsTest", new[] { input1 });
 
             Assert.False(result[0].IsSuccess);
             Assert.Equal(input1.trueValue, result[0].ActionResult.Output);
