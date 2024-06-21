@@ -5,6 +5,7 @@ using FastExpressionCompiler;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Dynamic.Core.Parser;
@@ -30,6 +31,7 @@ public class RuleExpressionParser
         _methodInfo = methodInfo;
     }
 
+    [ExcludeFromCodeCoverage]
     private void PopulateMethodInfo()
     {
         var dictAdd = typeof(Dictionary<string, object>).GetMethod("Add",

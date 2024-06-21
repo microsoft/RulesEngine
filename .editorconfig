@@ -125,10 +125,3 @@ dotnet_style_qualification_for_field = false:suggestion
 dotnet_style_qualification_for_method = false:suggestion
 #prefer properties not to be prefaced with this. or Me. in Visual Basic
 dotnet_style_qualification_for_property = false:suggestion
-
-
-#file header
-[*.{cs,vb}]
-file_header_template = Copyright (c) Microsoft Corporation.\nLicensed under the MIT License.
-file_header_template_style = prepend:error
-file_header_template_style = replace:suggestion
