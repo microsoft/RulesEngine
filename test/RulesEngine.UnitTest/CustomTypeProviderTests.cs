@@ -4,15 +4,18 @@
 using Moq;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq.Dynamic.Core;
 using Xunit;
 
 namespace RulesEngine.UnitTest;
 
+/// <inheritdoc />
 [Trait("Category", "Unit")]
 [ExcludeFromCodeCoverage]
-public class CustomTypeProviderTests : IDisposable
+public sealed  class CustomTypeProviderTests : IDisposable
 {
     private readonly MockRepository _mockRepository;
+    private bool _disposed;
 
     public CustomTypeProviderTests()
     {
@@ -21,12 +24,27 @@ public class CustomTypeProviderTests : IDisposable
 
     public void Dispose()
     {
-        _mockRepository.VerifyAll();
+        Dispose(true);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            _mockRepository.VerifyAll();
+        }
+
+        _disposed = true;
     }
 
     private CustomTypeProvider CreateProvider()
     {
-        return new CustomTypeProvider(null);
+        return new CustomTypeProvider(ParsingConfig.Default, null);
     }
 
     [Fact]

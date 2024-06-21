@@ -42,8 +42,10 @@ public class RuleExpressionParser
 
     public Expression Parse(string expression, ParameterExpression[] parameters, Type returnType)
     {
+        var customTypesParsingConfig = new ParsingConfig { IsCaseSensitive = _reSettings.IsExpressionCaseSensitive };
+
         var config = new ParsingConfig {
-            CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes),
+            CustomTypeProvider = new CustomTypeProvider(customTypesParsingConfig, _reSettings.CustomTypes),
             IsCaseSensitive = _reSettings.IsExpressionCaseSensitive
         };
         return new ExpressionParser(parameters, expression, [], config).Parse(returnType);
@@ -115,7 +117,7 @@ public class RuleExpressionParser
     }
 
     // <summary>
-    /// Gets the parameter expression.
+    ///      Gets the parameter expression.
     /// </summary>
     /// <param name="ruleParams">The types.</param>
     /// <returns></returns>
@@ -128,7 +130,7 @@ public class RuleExpressionParser
     {
         foreach (var ruleParam in ruleParams)
         {
-            if (ruleParam == null)
+            if (ruleParam is null)
             {
                 throw new ArgumentException($"{nameof(ruleParam)} can't be null.");
             }
