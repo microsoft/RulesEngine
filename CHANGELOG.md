@@ -1,9 +1,22 @@
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
+
+## [Future]
+ - WorkflowName and RuleName being changed to Name
+   - redundant to say Workflow.WorkflowName or Rule.RuleName
+
+## [6.0.0]
+- methods that are obsolete have been removed
+- ALL issues in [master](https://github.com/microsoft/RulesEngine/issues) fork have been resolved, usually with a demo app supporting solution
+
+### Breaking Changes
+- CancellationToken for all RulesEngine Execute... methods
+- RulesEngine Execute... Methods must specify an array (object[] or RuleParameter[]), no longer params (CancellationToken)
+
 ## [5.0.4]
 - Refactoring code, big time
-- Upgraded dependencies
+- Upgraded dependencies to latest
 
 ## [5.0.3]
 - Updated dependencies to latest
@@ -23,7 +36,6 @@ All notable changes to this project will be documented in this file.
 
 ### Breaking Changes
 - As a part of security bug fix, method call for only registered types via reSettings will be allowed. This only impacts strongly typed inputs and nested types
-
 
 ## [4.0.0]
 - RulesEngine is now available in both dotnet 6 and netstandard 2.0
