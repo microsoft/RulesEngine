@@ -7,21 +7,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Starting the workflow"
-      - run: echo "Writing the signing key to a file"
       - name: Materialize Signing Key
         id: write_sign_key_file
         uses: timheuer/base64-to-file@v1
         with:
           fileName: 'key.snk'
           encodedString: ${{ secrets.SIGNING_KEY }}
-      - run: echo "Checking out the repository"
       - uses: actions/checkout@v4
-      - run: echo "Setting up .NET Core"
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
       - name: Pack
         run: dotnet pack src/RulesEngine/RulesEngine.csproj --configuration Release -p:ContinuousIntegrationBuild=true -p:DelaySign=false -p:AssemblyOriginatorKeyFile=${{ steps.write_sign_key_file.outputs.filePath }}
-      - name: Publish
+      - name: Cleanup Key
+        run: rm ${{ steps.write_sign_key_file.outputs.filePath }}
+      - name: Publish to GitHub Packages
         run: find ./src/RulesEngine/bin/Release -iname "*.nupkg" | xargs dotnet nuget push -s https://nuget.pkg.github.com/timophe-91/index.json -k ${{secrets.GITHUB_TOKEN}}
+      - name: Publish to Nuget.org
+        run: find ./src/RulesEngine/bin/Release -iname "*.nupkg" | xargs dotnet nuget push -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}}
