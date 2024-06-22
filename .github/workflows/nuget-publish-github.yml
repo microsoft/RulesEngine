@@ -22,7 +22,7 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Pack
-        run: dotnet pack src/RulesEngine/RulesEngine.csproj - Release -p:ContinuousIntegrationBuild=true -p:DelaySign=false
+        run: dotnet pack src/RulesEngine/RulesEngine.csproj --configuration Release -p:ContinuousIntegrationBuild=true -p:DelaySign=false
         env:
           SignAssembly: true
           AssemblyOriginatorKeyFile: ${{ steps.write_sign_key_file.outputs.filePath }}
