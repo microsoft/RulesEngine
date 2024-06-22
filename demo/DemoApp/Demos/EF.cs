@@ -70,7 +70,7 @@ namespace DemoApp.Demos
                     discountOffered = $"Discount offered is {eventName} % over MRP.";
                 });
 
-                resultList.OnFail((eventName) => {
+                resultList.OnFail(() => {
                     discountOffered = "The user is not eligible for any discount.";
                 });
 

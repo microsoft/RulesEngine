@@ -57,7 +57,7 @@ namespace DemoApp.Demos
             ruleResultTree.OnSuccess((eventName) => {
                 Console.WriteLine($"Result '{eventName}' is as expected.");
             });
-            ruleResultTree.OnFail((eventName) => {
+            ruleResultTree.OnFail(() => {
                 Console.WriteLine($"Test outcome: false");
             });
 
@@ -65,7 +65,7 @@ namespace DemoApp.Demos
             actionRuleResult.Results.OnSuccess((eventName) => {
                 Console.WriteLine($"Result '{eventName}' is as expected.");
             });
-            actionRuleResult.Results.OnFail((eventName) => {
+            actionRuleResult.Results.OnFail(() => {
                 Console.WriteLine($"Test outcome: false");
             });
         }

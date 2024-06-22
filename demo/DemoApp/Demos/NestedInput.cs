@@ -59,7 +59,7 @@ namespace DemoApp.Demos
 
                 resultList.OnSuccess((eventName) => {
                     Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in success - {eventName}");
-                }).OnFail((eventName) => {
+                }).OnFail(() => {
                     Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in failure");
                 });
             }

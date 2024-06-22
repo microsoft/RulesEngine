@@ -56,7 +56,7 @@ namespace DemoApp.Demos
                 outcome = true;
             });
 
-            resultList.OnFail((eventName) => {
+            resultList.OnFail(() => {
                 outcome = false;
             });
 

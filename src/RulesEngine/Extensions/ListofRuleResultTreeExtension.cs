@@ -11,7 +11,7 @@ namespace RulesEngine.Extensions
     public static class ListofRuleResultTreeExtension
     {
         public delegate void OnSuccessFunc(string eventName);
-        public delegate void OnFailureFunc(string eventName);
+        public delegate void OnFailureFunc();
 
 
         /// <summary>
@@ -40,13 +40,9 @@ namespace RulesEngine.Extensions
         /// <returns></returns>
         public static List<RuleResultTree> OnFail(this List<RuleResultTree> ruleResultTrees, OnFailureFunc onFailureFunc)
         {
-            var allFailure = ruleResultTrees.FirstOrDefault(ruleResult => ruleResult.IsSuccess == false);
-            if (allFailure != null)
-            {
-                var eventName = allFailure.Rule.ErrorMessage ?? allFailure.Rule.RuleName;
-                onFailureFunc(eventName);
-            }
-
+            bool allFailure = ruleResultTrees.All(ruleResult => ruleResult.IsSuccess == false);
+            if (allFailure)
+                onFailureFunc();
             return ruleResultTrees;
         }
     }
