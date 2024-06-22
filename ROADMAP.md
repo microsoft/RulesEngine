@@ -3,6 +3,9 @@
 This is the Roadmap of this RulesEngine fork.
 
 - Migrate from Newtonsoft.Json to System.Text.Json
-- From Moq to NSubstitute 
-- Enhance the Documentation and Wiki
+- Go From Moq to NSubstitute 
+- Enhance and Correct the Wiki
 - Refactor Code and add comments for readability
+- Fix Issues from the original project
+
+More to come .. :)
