@@ -15,10 +15,10 @@ jobs:
           fileName: 'key.snk'
           encodedString: ${{ secrets.SIGNING_KEY }}
       - run: echo "Checking out the repository"
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: echo "Setting up .NET Core"
       - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
       - name: Pack
