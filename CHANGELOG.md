@@ -2,13 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-## [5.0.4]
+## [1.0.0]
 
-- Updated C# version to 12.0 (One of those fixed the static method imports for me)
+- Updated C# version to 12.0
 - Update Dependencies to latest
 - Changed strong name key, for this fork
 - Updates for Readme and other files
 - Automated Format & Cleanup
+
+## Forked !
 
 ## [5.0.3]
 
