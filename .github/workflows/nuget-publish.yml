@@ -3,7 +3,7 @@ on:
   [workflow_dispatch]
 jobs:
   publish:
-    name: nuget publish to github packages
+    name: nuget publish package
     runs-on: ubuntu-latest
     steps:
       - run: echo "Starting the workflow"
@@ -23,6 +23,6 @@ jobs:
       - name: Cleanup Key
         run: rm ${{ steps.write_sign_key_file.outputs.filePath }}
       - name: Publish to GitHub Packages
-        run: find ./src/RulesEngine/bin/Release -iname "*.nupkg" | xargs dotnet nuget push -s https://nuget.pkg.github.com/timophe-91/index.json -k ${{secrets.GITHUB_TOKEN}}
+        run: find ./src/RulesEngine/bin/Release -iname "*.nupkg" | xargs dotnet nuget push --skip-duplicate -s https://nuget.pkg.github.com/timophe-91/index.json -k ${{secrets.GITHUB_TOKEN}}
       - name: Publish to Nuget.org
-        run: find ./src/RulesEngine/bin/Release -iname "*.nupkg" | xargs dotnet nuget push -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}}
+        run: find ./src/RulesEngine/bin/Release -iname "*.nupkg" | xargs dotnet nuget push --skip-duplicate -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}}
