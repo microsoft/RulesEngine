@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 ## [6.0.0]
 - methods that are obsolete have been removed
 - ALL issues in [master](https://github.com/microsoft/RulesEngine/issues) fork have been resolved, usually with a demo app supporting solution
+- only targeting netstandard2.0
 
 ### Breaking Changes
 - CancellationToken for all RulesEngine Execute... methods
