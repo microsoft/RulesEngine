@@ -9,7 +9,7 @@
 
 # Rules Engine
 
-# NOTICE: This is a FORK of the RulesEngine project.
+NOTICE: This is a FORK of the RulesEngine project.
 
 Important: This fork is in the building. There might be information missing or wrong.
 
