@@ -9,9 +9,9 @@
 
 # Rules Engine
 
-# IMPORTANT: This fork is in the building. There might be information missing or wrong.
+NOTICE: This is a FORK of the RulesEngine project.
 
-# NOTICE: This is a FORK of the RulesEngine project.
+Important: This fork is in the building. There might be information missing or wrong.
 
 It seems not to be actively maintained anymore.
 The original project can be found [here]( https://github.com/microsoft/RulesEngine)
