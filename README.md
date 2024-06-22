@@ -6,18 +6,16 @@
 [download-url]: https://www.nuget.org/packages/timophe.RulesEngine/
 
 
-
 # Rules Engine
 
 NOTICE: This is a FORK of the RulesEngine project.
 
-Important: This fork is in the building. There might be information missing or wrong.
-
 It seems not to be actively maintained anymore.
 The original project can be found [here]( https://github.com/microsoft/RulesEngine)
 
-I usually don´t work with GitHub, and I am doing this in my free time, so please be patient with me :)<br>Any help is
-appreciated.
+## Roadmap
+
+The Roadmap can be found [here](https://github.com/timophe-91/RulesEngine/blob/main/ROADMAP.md)
 
 ## Overview
 
