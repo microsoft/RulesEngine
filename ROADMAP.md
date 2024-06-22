@@ -11,5 +11,7 @@ This is the Roadmap of this RulesEngine fork.
 
 Probably braking changes:
 - Migrate from Newtonsoft.Json to System.Text.Json
+- Split Rule into LogicalRule and ExpressionRule for easier use
+-- With migration script
 
 More to come .. :)
