@@ -86,7 +86,7 @@ namespace RulesEngine
         /// <param name="inputs">A variable number of inputs</param>
         /// <returns>List of rule results</returns>        
         [Obsolete("Use Method with CancellationToken")]
-        public async ValueTask<List<RuleResultTree>> ExecuteAllRules(string workflowname, params object[] inputs)
+        public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowname, params object[] inputs)
         {
             return await ExecuteAllRulesAsync(workflowname, inputs, CancellationToken.None);
         }
