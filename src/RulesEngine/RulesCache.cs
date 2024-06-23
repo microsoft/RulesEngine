@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using RulesEngine.HelperFunctions;
-using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using System;
 using System.Collections.Concurrent;

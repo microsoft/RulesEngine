@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using RulesEngine.HelperFunctions;
-using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using System.Linq;
 

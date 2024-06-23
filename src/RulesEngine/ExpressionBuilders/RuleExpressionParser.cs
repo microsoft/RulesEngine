@@ -98,7 +98,7 @@ public class RuleExpressionParser
     internal Func<object[], Dictionary<string, object>> CompileRuleExpressionParameters(RuleParameter[] ruleParams,
         RuleExpressionParameter[] ruleExpParams = null)
     {
-        ruleExpParams = ruleExpParams ?? new RuleExpressionParameter[] { };
+        ruleExpParams ??= [];
         var expression = CreateDictionaryExpression(ruleParams, ruleExpParams);
         return CompileExpression(expression);
     }

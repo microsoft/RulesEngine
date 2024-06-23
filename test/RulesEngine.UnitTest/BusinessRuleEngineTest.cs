@@ -645,6 +645,54 @@ public class RulesEngineTest
     }
 
     [Fact]
+    public async Task ExecuteRule_WithEnumerableStaticAny_ReturnsListOfRuleResultTree()
+    {
+        var workflow = new Workflow {
+            WorkflowName = "inputWorkflow",
+            Rules = new[] {
+                new Rule {
+                    RuleName = "ruleWithStaticMethod",
+                    Expression = "input1.Any(s => s == \"hello\")",
+                    RuleExpressionType = RuleExpressionType.LambdaExpression
+                }
+            }
+        };
+
+        var reSettings = new ReSettings { CustomTypes = [typeof(TestInstanceUtils)] };
+        var re = new RulesEngine([workflow], reSettings);
+        IEnumerable<string> input1 = new List<string> { "hello", "world" };
+
+        var result = await re.ExecuteAllRulesAsync("inputWorkflow", input1);
+        Assert.NotNull(result);
+        Assert.IsType<List<RuleResultTree>>(result);
+        Assert.Contains(result, c => c.IsSuccess);
+    }
+
+    [Fact]
+    public async Task ExecuteRule_WithEnumerableStaticAnyAndSelect_ReturnsListOfRuleResultTree()
+    {
+        var workflow = new Workflow {
+            WorkflowName = "inputWorkflow",
+            Rules = new[] {
+                new Rule {
+                    RuleName = "ruleWithStaticMethod",
+                    Expression = "input1.Select(c => c.Equals(\"hello\")).Any()",
+                    RuleExpressionType = RuleExpressionType.LambdaExpression
+                }
+            }
+        };
+
+        var reSettings = new ReSettings { CustomTypes = [typeof(TestInstanceUtils)] };
+        var re = new RulesEngine([workflow], reSettings);
+        IEnumerable<string> input1 = new List<string> { "hello", "world" };
+        var result = await re.ExecuteAllRulesAsync("inputWorkflow", input1);
+        Assert.NotNull(result);
+        Assert.IsType<List<RuleResultTree>>(result);
+        Assert.Contains(result, c => c.IsSuccess);
+    }
+
+
+    [Fact]
     public async Task ExecuteRule_RuntimeError_ShouldReturnAsErrorMessage()
     {
         var workflow = new Workflow {
@@ -656,6 +704,9 @@ public class RulesEngineTest
 
         var re = new RulesEngine([workflow]);
         var input = new RuleTestClass { Country = null };
+
+        dynamic input1 = new ExpandoObject();
+
 
         var result = await re.ExecuteAllRulesAsync("TestWorkflow", input);
 
