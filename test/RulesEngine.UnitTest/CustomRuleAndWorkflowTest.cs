@@ -13,10 +13,10 @@ namespace RulesEngine.UnitTest;
 /// <summary>
 ///     Test with custom rules and workflows classes
 /// </summary>
-public class CustomRuleAndWorkflowText
+public class CustomRuleAndWorkflowTest
 {
     [Fact]
-    public async Task CustomRuleAndWorkflowTest()
+    public async Task RulesEngine_WithCustomRulesAndWorkflows_RunsSuccessfully()
     {
         var customRule = new CustomRule {
             RuleName = "CustomRule",
@@ -44,6 +44,8 @@ public class CustomRuleAndWorkflowText
             Rules = new[] { customRule }
         };
 
+        var json2 = JsonConvert.SerializeObject(customWorkflow);
+
         var re = new RulesEngine([customWorkflow]);
         var input1 = GetInput1();
         List<RuleResultTree> result = await re.ExecuteAllRulesAsync("CustomWorkflow", input1);
@@ -51,6 +53,47 @@ public class CustomRuleAndWorkflowText
         Assert.IsType<List<RuleResultTree>>(result);
         Assert.Contains(result, c => c.IsSuccess);
     }
+
+    [Fact]
+    public async Task RulesEngine_WithCustomRulesAndWorkflowsAsJsonArray_RunsSuccessfully()
+    {
+        var workflowJson = """
+                           {
+                               "WorkflowRulesToInject": null,
+                               "Rules": [
+                                   {
+                                       "ThisIsAmazingRule": [
+                                           {
+                                               "RuleName": "CustomRule1",
+                                               "RuleExpressionType": 0,
+                                               "Expression": "input1.x > 10",
+                                           },
+                                           {
+                                               "RuleName": "CustomRule2",
+                                               "RuleExpressionType": 0,
+                                               "Expression": "input1.x > 10",
+                                           }
+                                       ],
+                                       "RuleName": "CustomRule",
+                                       "Operator": "And",
+                                       "RuleExpressionType": 0,
+
+                                   }
+                               ],
+                               "WorkflowName": "CustomWorkflow",
+                               "RuleExpressionType": 0,
+                               "GlobalParams": null
+                           }
+                           """;
+
+        var re = new RulesEngine([workflowJson], typeof(CustomWorkflow));
+        var input1 = GetInput1();
+        List<RuleResultTree> result = await re.ExecuteAllRulesAsync("CustomWorkflow", input1);
+        Assert.NotNull(result);
+        Assert.IsType<List<RuleResultTree>>(result);
+        Assert.Contains(result, c => c.IsSuccess);
+    }
+
 
     private dynamic GetInput1()
     {
@@ -68,7 +111,7 @@ public class CustomRuleAndWorkflowText
         public Dictionary<string, object> Properties { get; set; }
         public string Operator { get; set; }
         public string ErrorMessage { get; set; }
-        public bool Enabled { get; set; }
+        public bool Enabled { get; set; } = true;
         public RuleExpressionType RuleExpressionType { get; set; }
         public IEnumerable<string> WorkflowsToInject { get; set; }
 

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using RulesEngine.Exceptions;
+using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -19,10 +20,9 @@ public class EmptyRulesTest
     {
         var workflow = GetEmptyWorkflow();
         var reSettings = new ReSettings();
-        var rulesEngine = new RulesEngine();
 
         var action = () => {
-            new RulesEngine(workflow, reSettings);
+            _ = new RulesEngine(workflow, reSettings);
             return Task.CompletedTask;
         };
 
@@ -36,10 +36,9 @@ public class EmptyRulesTest
     {
         var workflow = GetEmptyNestedWorkflows();
         var reSettings = new ReSettings();
-        var rulesEngine = new RulesEngine();
 
         var action = () => {
-            new RulesEngine(workflow, reSettings);
+            _ = new RulesEngine(workflow, reSettings);
             return Task.CompletedTask;
         };
 
@@ -50,12 +49,12 @@ public class EmptyRulesTest
 
     private Workflow[] GetEmptyWorkflow()
     {
-        return new[] { new Workflow { WorkflowName = "EmptyRulesTest", Rules = new Rule[] { } } };
+        return [new Workflow { WorkflowName = "EmptyRulesTest", Rules = Array.Empty<Rule>() }];
     }
 
     private Workflow[] GetEmptyNestedWorkflows()
     {
-        return new[] {
+        return [
             new Workflow {
                 WorkflowName = "EmptyNestedRulesTest",
                 Rules = new Rule[] {
@@ -112,6 +111,6 @@ public class EmptyRulesTest
                     }
                 }
             }
-        };
+        ];
     }
 }

@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace DemoApp;
+namespace DemoApp.Demo;
 
 internal class ListItem
 {
@@ -16,11 +16,11 @@ internal class ListItem
     public string Value { get; set; }
 }
 
-public class NestedInputDemo
+public class NestedInput
 {
     public void Run()
     {
-        Console.WriteLine($"Running {nameof(NestedInputDemo)}....");
+        Console.WriteLine($"Running {nameof(NestedInput)}....");
         var nestedInput = new {
             SimpleProp = "simpleProp",
             NestedProp = new {

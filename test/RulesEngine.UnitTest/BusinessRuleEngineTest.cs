@@ -654,7 +654,7 @@ public class RulesEngineTest
             }
         };
 
-        var re = new RulesEngine(new[] { workflow });
+        var re = new RulesEngine([workflow]);
         var input = new RuleTestClass { Country = null };
 
         var result = await re.ExecuteAllRulesAsync("TestWorkflow", input);
@@ -675,7 +675,7 @@ public class RulesEngineTest
             }
         };
 
-        var re = new RulesEngine(new[] { workflow }, new ReSettings { EnableExceptionAsErrorMessage = false });
+        var re = new RulesEngine([workflow], new ReSettings { EnableExceptionAsErrorMessage = false });
         var input = new RuleTestClass { Country = null };
 
         _ = await Assert.ThrowsAsync<RuleException>(
@@ -692,7 +692,7 @@ public class RulesEngineTest
             }
         };
 
-        var re = new RulesEngine(new[] { workflow }, new ReSettings { IgnoreException = true });
+        var re = new RulesEngine([workflow], new ReSettings { IgnoreException = true });
         var input = new RuleTestClass { Country = null };
 
         var result = await re.ExecuteAllRulesAsync("TestWorkflow", input);
@@ -849,7 +849,7 @@ public class RulesEngineTest
     private RulesEngine CreateRulesEngine(Workflow workflow)
     {
         var json = JsonConvert.SerializeObject(workflow);
-        return new RulesEngine(new[] { json });
+        return new RulesEngine([json]);
     }
 
     private RulesEngine GetRulesEngine(string filename, ReSettings reSettings = null)
@@ -861,7 +861,7 @@ public class RulesEngineTest
         };
 
         var injectWorkflowStr = JsonConvert.SerializeObject(injectWorkflow);
-        return new RulesEngine(new[] { data, injectWorkflowStr }, reSettings);
+        return new RulesEngine([data, injectWorkflowStr], reSettings);
     }
 
     private string GetFileContent(string filename)

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
 
-using DemoApp.EFDataExample;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using RulesEngine.Models;
@@ -10,16 +8,15 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
-using System.Linq;
 using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
 
-namespace DemoApp;
+namespace DemoApp.Demo;
 
-public class EFDemo
+public class Json
 {
     public void Run()
     {
-        Console.WriteLine($"Running {nameof(EFDemo)}....");
+        Console.WriteLine($"Running {nameof(Json)}....");
         var basicInfo =
             "{\"name\": \"hello\",\"email\": \"abcy@xyz.com\",\"creditHistory\": \"good\",\"country\": \"canada\",\"loyaltyFactor\": 3,\"totalPurchasesToDate\": 10000}";
         var orderInfo = "{\"totalOrders\": 5,\"recurringItems\": 2}";
@@ -42,16 +39,7 @@ public class EFDemo
         var fileData = File.ReadAllText(files[0]);
         var workflow = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
-        var db = new RulesEngineDemoContext();
-        if (db.Database.EnsureCreated())
-        {
-            db.Workflows.AddRange(workflow);
-            db.SaveChanges();
-        }
-
-        var wfr = db.Workflows.Include(i => i.Rules).ThenInclude(i => i.Rules).ToArray();
-
-        var bre = new RulesEngine.RulesEngine(wfr);
+        var bre = new RulesEngine.RulesEngine(workflow.ToArray());
 
         var discountOffered = "No discount offered.";
 

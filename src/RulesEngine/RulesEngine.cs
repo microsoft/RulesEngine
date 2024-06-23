@@ -50,6 +50,20 @@ public class RulesEngine : IRulesEngine
         AddWorkflow(workflows);
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="RulesEngine" /> class.
+    ///     This constructor is used when the rules are in another json format.
+    /// </summary>
+    /// <param name="jsonConfig">The json configuration.</param>
+    /// <param name="type">The type to deserialize the json to, must implement <see cref="IWorkflow" /></param>
+    /// <param name="settings">The <see cref="JsonSerializerSettings"/> to use for deserialization</param>
+    /// <param name="reSettings">The <see cref="ReSettings"/> to use for the rules engine</param>
+    public RulesEngine(string[] jsonConfig, Type type, JsonSerializerSettings settings = null, ReSettings reSettings = null) : this(reSettings)
+    {
+        var workflow = jsonConfig.Select(item => JsonConvert.DeserializeObject(item, type, settings)).OfType<IWorkflow>().ToArray();
+        AddWorkflow(workflow);
+    }
+
     public RulesEngine(IWorkflow[] workflows, ReSettings reSettings = null) : this(reSettings)
     {
         AddWorkflow(workflows);

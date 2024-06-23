@@ -7,13 +7,13 @@ using System.Collections.Generic;
 using System.Dynamic;
 using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
 
-namespace DemoApp;
+namespace DemoApp.Demo;
 
-public class BasicDemo
+public class Basic
 {
     public void Run()
     {
-        Console.WriteLine($"Running {nameof(BasicDemo)}....");
+        Console.WriteLine($"Running {nameof(Basic)}....");
         var workflows = new List<Workflow>();
         var workflow = new Workflow();
         workflow.WorkflowName = "Test Workflow Rule 1";
