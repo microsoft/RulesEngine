@@ -1,16 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace RulesEngine.Models;
 
 /// <summary>
-///     Outdated class. Use <see cref="Workflow"/> class instead.
+///     Outdated class. Use <see cref="Workflow" /> class instead.
 /// </summary>
 [Obsolete("WorkflowRules class is deprecated. Use Workflow class instead.")]
 [ExcludeFromCodeCoverage]
@@ -25,7 +23,7 @@ public class WorkflowRules : Workflow
 public class Workflow
 {
     /// <summary>
-    ///     Outdated property. Use <see cref="WorkflowsToInject"/> instead.
+    ///     Outdated property. Use <see cref="WorkflowsToInject" /> instead.
     /// </summary>
     [Obsolete("WorkflowRulesToInject is deprecated. Use WorkflowsToInject instead.")]
     public IEnumerable<string> WorkflowRulesToInject {

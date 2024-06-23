@@ -3,10 +3,8 @@
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using RulesEngine.Interfaces;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace RulesEngine.Models;
 

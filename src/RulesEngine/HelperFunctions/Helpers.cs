@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using RulesEngine.Exceptions;
-using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -19,7 +18,7 @@ internal static class Helpers
     ///     Converts the function to result tree.
     /// </summary>
     /// <param name="reSettings">The <see cref="ReSettings" /> to use for this operation.</param>
-    /// <param name="rule">The <see cref="IRule" /> for Exception handling.</param>
+    /// <param name="rule">The <see cref="Rule" /> for Exception handling.</param>
     /// <param name="childRuleResults">The <see cref="RuleResultTree" /> of the child rules.</param>
     /// <param name="isSuccessFunc">The function to check if the rule is successful.</param>
     /// <param name="exceptionMessage">The exception message if the isSuccessFunc throws an Exception</param>

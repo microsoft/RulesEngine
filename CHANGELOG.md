@@ -2,10 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.1.0] Pre-release 
+## [1.1.0] Pre-release
+
 - Added Interface for Rule and Workflow, to better customize handling of rules and workflows.
-  - Did not change more in the interface, cause there could be some breaking changes.
-  - If something breaks, please let me know, so I can fix it.
+    - Did not change more in the interface, cause there could be some breaking changes.
+    - If something breaks, please let me know, so I can fix it.
 
 ## [1.0.0]
 

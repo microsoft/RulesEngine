@@ -36,7 +36,7 @@ public class RuleExpressionParser
     {
         var dictAdd = typeof(Dictionary<string, object>).GetMethod("Add",
             BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static, null,
-            [typeof(string), typeof(object)], null);
+            [typeof(string), typeof(object), typeof(Enumerable)], null);
         _methodInfo.Add("dict_add", dictAdd);
     }
 
@@ -98,7 +98,7 @@ public class RuleExpressionParser
     internal Func<object[], Dictionary<string, object>> CompileRuleExpressionParameters(RuleParameter[] ruleParams,
         RuleExpressionParameter[] ruleExpParams = null)
     {
-        ruleExpParams = ruleExpParams ?? new RuleExpressionParameter[] { };
+        ruleExpParams ??= [];
         var expression = CreateDictionaryExpression(ruleParams, ruleExpParams);
         return CompileExpression(expression);
     }
