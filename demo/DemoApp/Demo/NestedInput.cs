@@ -7,8 +7,9 @@ using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
-namespace DemoApp;
+namespace DemoApp.Demo;
 
 internal class ListItem
 {
@@ -16,11 +17,11 @@ internal class ListItem
     public string Value { get; set; }
 }
 
-public class NestedInputDemo
+public class NestedInput
 {
-    public void Run()
+    public async Task Run()
     {
-        Console.WriteLine($"Running {nameof(NestedInputDemo)}....");
+        Console.WriteLine($"Running {nameof(NestedInput)}....");
         var nestedInput = new {
             SimpleProp = "simpleProp",
             NestedProp = new {
@@ -42,7 +43,7 @@ public class NestedInputDemo
         var bre = new RulesEngine.RulesEngine(Workflows.ToArray());
         foreach (var workflow in Workflows)
         {
-            var resultList = bre.ExecuteAllRulesAsync(workflow.WorkflowName, nestedInput).Result;
+            var resultList = await bre.ExecuteAllRulesAsync(workflow.WorkflowName, nestedInput);
 
             resultList.OnSuccess(eventName => {
                 Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in success - {eventName}");

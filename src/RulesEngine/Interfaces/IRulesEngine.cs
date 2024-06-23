@@ -25,14 +25,21 @@ public interface IRulesEngine
     /// <returns>List of rule results</returns>
     ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params RuleParameter[] ruleParams);
 
+    /// <summary>
+    ///     This will execute all the rules of the specified workflow
+    /// </summary>
+    /// <param name="workflowName"></param>
+    /// <param name="ruleName"></param>
+    /// <param name="ruleParameters"></param>
+    /// <returns></returns>
     ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName,
         RuleParameter[] ruleParameters);
 
     /// <summary>
     ///     Adds new workflows to RulesEngine
     /// </summary>
-    /// <param name="workflow"></param>
-    void AddWorkflow(params Workflow[] Workflows);
+    /// <param name="workflows">The workflows to add</param>
+    void AddWorkflow(params Workflow[] workflows);
 
     /// <summary>
     ///     Removes all registered workflows from RulesEngine
@@ -58,5 +65,9 @@ public interface IRulesEngine
     /// <returns></returns>
     List<string> GetAllRegisteredWorkflowNames();
 
-    void AddOrUpdateWorkflow(params Workflow[] Workflows);
+    /// <summary>
+    ///     Adds or updates the workflow.
+    /// </summary>
+    /// <param name="workflows">The workflows.</param>
+    void AddOrUpdateWorkflow(params Workflow[] workflows);
 }

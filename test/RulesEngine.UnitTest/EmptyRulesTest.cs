@@ -19,16 +19,15 @@ public class EmptyRulesTest
     {
         var workflow = GetEmptyWorkflow();
         var reSettings = new ReSettings();
-        var rulesEngine = new RulesEngine();
 
         var action = () => {
-            new RulesEngine(workflow, reSettings);
+            _ = new RulesEngine(workflow, reSettings);
             return Task.CompletedTask;
         };
 
         Exception ex = await Assert.ThrowsAsync<RuleValidationException>(action);
 
-        Assert.Contains("Atleast one of Rules or WorkflowsToInject must be not empty", ex.Message);
+        Assert.Contains("At least one of Rules or WorkflowsToInject must be not empty", ex.Message);
     }
 
     [Fact]
@@ -36,26 +35,25 @@ public class EmptyRulesTest
     {
         var workflow = GetEmptyNestedWorkflows();
         var reSettings = new ReSettings();
-        var rulesEngine = new RulesEngine();
 
         var action = () => {
-            new RulesEngine(workflow, reSettings);
+            _ = new RulesEngine(workflow, reSettings);
             return Task.CompletedTask;
         };
 
         Exception ex = await Assert.ThrowsAsync<RuleValidationException>(action);
 
-        Assert.Contains("Atleast one of Rules or WorkflowsToInject must be not empty", ex.Message);
+        Assert.Contains("At least one of Rules or WorkflowsToInject must be not empty", ex.Message);
     }
 
     private Workflow[] GetEmptyWorkflow()
     {
-        return new[] { new Workflow { WorkflowName = "EmptyRulesTest", Rules = new Rule[] { } } };
+        return [new Workflow { WorkflowName = "EmptyRulesTest", Rules = Array.Empty<Rule>() }];
     }
 
     private Workflow[] GetEmptyNestedWorkflows()
     {
-        return new[] {
+        return [
             new Workflow {
                 WorkflowName = "EmptyNestedRulesTest",
                 Rules = new Rule[] {
@@ -112,6 +110,6 @@ public class EmptyRulesTest
                     }
                 }
             }
-        };
+        ];
     }
 }

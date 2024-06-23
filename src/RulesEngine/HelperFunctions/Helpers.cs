@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using RulesEngine.Exceptions;
+using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -14,11 +15,20 @@ namespace RulesEngine.HelperFunctions;
 /// </summary>
 internal static class Helpers
 {
-    internal static RuleFunc<RuleResultTree> ToResultTree(ReSettings reSettings, Rule rule,
+    /// <summary>
+    ///     Converts the function to result tree.
+    /// </summary>
+    /// <param name="reSettings">The <see cref="ReSettings" /> to use for this operation.</param>
+    /// <param name="rule">The <see cref="IRule" /> for Exception handling.</param>
+    /// <param name="childRuleResults">The <see cref="RuleResultTree" /> of the child rules.</param>
+    /// <param name="isSuccessFunc">The function to check if the rule is successful.</param>
+    /// <param name="exceptionMessage">The exception message if the isSuccessFunc throws an Exception</param>
+    /// <returns>The <see cref="RuleFunc{RuleResultTree}" /> function.</returns>
+    internal static RuleFunc<RuleResultTree> ToResultTree(ReSettings reSettings, IRule rule,
         IEnumerable<RuleResultTree> childRuleResults, Func<object[], bool> isSuccessFunc, string exceptionMessage = "")
     {
         return inputs => {
-            var isSuccess = false;
+            bool isSuccess;
             var inputsDict = new Dictionary<string, object>();
             try
             {
@@ -27,7 +37,8 @@ internal static class Helpers
             }
             catch (Exception ex)
             {
-                exceptionMessage = GetExceptionMessage($"Error while executing rule : {rule?.RuleName} - {ex.Message}",
+                exceptionMessage = TryGetExceptionMessage(
+                    $"Error while executing rule : {rule?.RuleName} - {ex.Message}",
                     reSettings);
                 HandleRuleException(new RuleException(exceptionMessage, ex), rule, reSettings);
                 isSuccess = false;
@@ -43,13 +54,32 @@ internal static class Helpers
         };
     }
 
-    internal static RuleFunc<RuleResultTree> ToRuleExceptionResult(ReSettings reSettings, Rule rule, Exception ex)
+    /// <summary>
+    ///     Takes the <see cref="ReSettings" />, <see cref="IRule" />, and <see cref="Exception" /> and returns a
+    ///     <see cref="RuleFunc{RuleResultTree}" /> function.
+    ///     This function is used to handle exceptions in the Rule.
+    /// </summary>
+    /// <param name="reSettings">The <see cref="ReSettings" /> to use for this operation.</param>
+    /// <param name="rule">The <see cref="IRule" /> for Exception handling.</param>
+    /// <param name="ex">The <see cref="Exception" /> to handle.</param>
+    /// <returns>The <see cref="RuleFunc{RuleResultTree}" /> function.</returns>
+    internal static RuleFunc<RuleResultTree> ToRuleExceptionResult(ReSettings reSettings, IRule rule, Exception ex)
     {
         HandleRuleException(ex, rule, reSettings);
-        return ToResultTree(reSettings, rule, null, args => false, ex.Message);
+        return ToResultTree(reSettings, rule, null, _ => false, ex.Message);
     }
 
-    internal static void HandleRuleException(Exception ex, Rule rule, ReSettings reSettings)
+    /// <summary>
+    ///     Handles the rule exception.
+    /// </summary>
+    /// <param name="ex">The <see cref="Exception" /> to handle.</param>
+    /// <param name="rule">The <see cref="IRule" /> for Exception handling.</param>
+    /// <param name="reSettings">The <see cref="ReSettings" /> to check if the exception should be thrown or not.</param>
+    /// <exception cref="Exception">
+    ///     If the <see cref="ReSettings.EnableExceptionAsErrorMessage" /> is false, the exception is
+    ///     thrown.
+    /// </exception>
+    internal static void HandleRuleException(Exception ex, IRule rule, ReSettings reSettings)
     {
         ex.Data.Add(nameof(rule.RuleName), rule.RuleName);
         ex.Data.Add(nameof(rule.Expression), rule.Expression);
@@ -61,13 +91,12 @@ internal static class Helpers
     }
 
     /// <summary>
+    ///     Gets the exception message
     /// </summary>
-    /// <param name="ex"></param>
-    /// <param name="message"></param>
-    /// <param name="rule"></param>
-    /// <param name="reSettings"></param>
-    /// <returns></returns>
-    internal static string GetExceptionMessage(string message, ReSettings reSettings)
+    /// <param name="message">The message to check if it should be returned or not.</param>
+    /// <param name="reSettings">The <see cref="ReSettings" /> to check if the exception should be ignored or not.</param>
+    /// <returns>The exception message if the <see cref="ReSettings.IgnoreException" /> is false, else empty string.</returns>
+    internal static string TryGetExceptionMessage(string message, ReSettings reSettings)
     {
         return reSettings.IgnoreException ? "" : message;
     }

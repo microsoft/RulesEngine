@@ -654,7 +654,7 @@ public class RulesEngineTest
             }
         };
 
-        var re = new RulesEngine(new[] { workflow });
+        var re = new RulesEngine([workflow]);
         var input = new RuleTestClass { Country = null };
 
         var result = await re.ExecuteAllRulesAsync("TestWorkflow", input);
@@ -675,7 +675,7 @@ public class RulesEngineTest
             }
         };
 
-        var re = new RulesEngine(new[] { workflow }, new ReSettings { EnableExceptionAsErrorMessage = false });
+        var re = new RulesEngine([workflow], new ReSettings { EnableExceptionAsErrorMessage = false });
         var input = new RuleTestClass { Country = null };
 
         _ = await Assert.ThrowsAsync<RuleException>(
@@ -692,7 +692,7 @@ public class RulesEngineTest
             }
         };
 
-        var re = new RulesEngine(new[] { workflow }, new ReSettings { IgnoreException = true });
+        var re = new RulesEngine([workflow], new ReSettings { IgnoreException = true });
         var input = new RuleTestClass { Country = null };
 
         var result = await re.ExecuteAllRulesAsync("TestWorkflow", input);
@@ -781,8 +781,7 @@ public class RulesEngineTest
         var result1 = await re.ExecuteAllRulesAsync("Test", new RuleParameter("input1", value: null));
         Assert.True(result1.TrueForAll(c => c.IsSuccess));
 
-        // (object) otherwise it will fail with null reference exception
-        var result2 = await re.ExecuteAllRulesAsync("Test", [(object)null]);
+        var result2 = await re.ExecuteAllRulesAsync("Test", new object[] { null });
         Assert.True(result2.TrueForAll(c => c.IsSuccess));
 
         dynamic input1 = new ExpandoObject();
@@ -831,26 +830,32 @@ public class RulesEngineTest
         Assert.False(re.ContainsWorkflow(notExistedWorkflowName));
     }
 
-    [Theory]
-    [InlineData(typeof(RulesEngine), typeof(IRulesEngine))]
-    public void Class_PublicMethods_ArePartOfInterface(Type classType, Type interfaceType)
+    [Fact]
+    public void Class_PublicMethods_ArePartOfInterface()
     {
+        var classType = typeof(RulesEngine);
+        var interfaceType = typeof(IRulesEngine);
+        var interfaceExtendedType = typeof(IRulesEngineExtended);
+
         var classMethods = classType.GetMethods(BindingFlags.DeclaredOnly |
                                                 BindingFlags.Public |
                                                 BindingFlags.Instance);
 
 
         var interfaceMethods = interfaceType.GetMethods();
+        var interfaceExtensionMethods = interfaceExtendedType.GetMethods();
+
+        var combinedMethods = interfaceMethods.Concat(interfaceExtensionMethods);
 
 
-        Assert.Equal(interfaceMethods.Count(), classMethods.Count());
+        Assert.Equal(combinedMethods.Count(), classMethods.Length);
     }
 
 
     private RulesEngine CreateRulesEngine(Workflow workflow)
     {
         var json = JsonConvert.SerializeObject(workflow);
-        return new RulesEngine(new[] { json });
+        return new RulesEngine([json]);
     }
 
     private RulesEngine GetRulesEngine(string filename, ReSettings reSettings = null)
@@ -862,7 +867,7 @@ public class RulesEngineTest
         };
 
         var injectWorkflowStr = JsonConvert.SerializeObject(injectWorkflow);
-        return new RulesEngine(new[] { data, injectWorkflowStr }, reSettings);
+        return new RulesEngine([data, injectWorkflowStr], reSettings);
     }
 
     private string GetFileContent(string filename)

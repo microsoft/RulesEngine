@@ -9,6 +9,9 @@ using System.Linq.Dynamic.Core.CustomTypeProviders;
 
 namespace RulesEngine;
 
+/// <summary>
+///     Custom type provider to include custom types for dynamic linq
+/// </summary>
 public class CustomTypeProvider : DefaultDynamicLinqCustomTypeProvider
 {
     private readonly HashSet<Type> _types;

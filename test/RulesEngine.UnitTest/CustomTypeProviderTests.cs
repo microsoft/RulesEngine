@@ -12,7 +12,7 @@ namespace RulesEngine.UnitTest;
 /// <inheritdoc />
 [Trait("Category", "Unit")]
 [ExcludeFromCodeCoverage]
-public sealed  class CustomTypeProviderTests : IDisposable
+public sealed class CustomTypeProviderTests : IDisposable
 {
     private readonly MockRepository _mockRepository;
     private bool _disposed;

@@ -11,7 +11,7 @@ public class RuleTestClass
 {
     [JsonProperty("country")] public string Country { get; set; }
 
-    [JsonProperty("loyaltyFactor")] public int loyaltyFactor { get; set; }
+    [JsonProperty("loyaltyFactor")] public int LoyaltyFactor { get; set; }
 
     public int TotalPurchasesToDate { get; set; }
 }

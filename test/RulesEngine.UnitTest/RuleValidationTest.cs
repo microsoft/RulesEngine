@@ -19,10 +19,9 @@ public class RuleValidationTest
     {
         var workflow = GetNullExpressionithLambdaExpressionWorkflow();
         var reSettings = new ReSettings();
-        var rulesEngine = new RulesEngine();
 
         var action = () => {
-            new RulesEngine(workflow, reSettings);
+            _ = new RulesEngine(workflow, reSettings);
             return Task.CompletedTask;
         };
 
@@ -36,10 +35,9 @@ public class RuleValidationTest
     {
         var workflow = GetEmptyOperatorWorkflow();
         var reSettings = new ReSettings();
-        var rulesEngine = new RulesEngine();
 
         var action = () => {
-            new RulesEngine(workflow, reSettings);
+            _ = new RulesEngine(workflow, reSettings);
             return Task.CompletedTask;
         };
 

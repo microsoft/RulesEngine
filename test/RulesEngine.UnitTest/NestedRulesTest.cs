@@ -41,9 +41,9 @@ public class NestedRulesTest
         if (mode == NestedRuleExecutionMode.All)
         {
             Assert.All(andResults,
-                c => Assert.Equal(c.Rule.Rules.Count(), c.ChildResults.Count()));
+                c => Assert.Equal(c.Rule.GetNestedRules().Count(), c.ChildResults.Count()));
             Assert.All(orResults,
-                c => Assert.Equal(c.Rule.Rules.Count(), c.ChildResults.Count()));
+                c => Assert.Equal(c.Rule.GetNestedRules().Count(), c.ChildResults.Count()));
         }
         else if (mode == NestedRuleExecutionMode.Performance)
         {
@@ -58,7 +58,7 @@ public class NestedRulesTest
                 c => {
                     Assert.Equal(c.IsSuccess, c.ChildResults.Last().IsSuccess);
                     Assert.Single(c.ChildResults.Where(d => c.IsSuccess == d.IsSuccess));
-                    Assert.True(c.ChildResults.SkipLast(1).All(d => d.IsSuccess == false));
+                    Assert.True(c.ChildResults.SkipLast(1).All(d => !d.IsSuccess));
                 });
         }
     }
