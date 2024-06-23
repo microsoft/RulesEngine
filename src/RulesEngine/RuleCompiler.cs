@@ -4,6 +4,7 @@
 using RulesEngine.Exceptions;
 using RulesEngine.ExpressionBuilders;
 using RulesEngine.HelperFunctions;
+using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -22,40 +23,41 @@ internal class RuleCompiler
     /// </summary>
     private readonly RuleExpressionBuilderFactory _expressionBuilderFactory;
 
-    private readonly ReSettings _reSettings;
-
     /// <summary>
     ///     The nested operators
     /// </summary>
-    private readonly ExpressionType[] nestedOperators = {
+    private readonly ExpressionType[] _nestedOperators = {
         ExpressionType.And, ExpressionType.AndAlso, ExpressionType.Or, ExpressionType.OrElse
     };
+
+    private readonly ReSettings _reSettings;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="RuleCompiler" /> class.
     /// </summary>
-    /// <param name="expressionBuilderFactory">The expression builder factory.</param>
+    /// <param name="expressionBuilderFactory">The <see cref="RuleExpressionBuilderFactory" />.</param>
+    /// <param name="reSettings">The <see cref="ReSettings" />.</param>
     /// <exception cref="ArgumentNullException">expressionBuilderFactory</exception>
     internal RuleCompiler(RuleExpressionBuilderFactory expressionBuilderFactory, ReSettings reSettings)
     {
         _expressionBuilderFactory = expressionBuilderFactory ??
-                                    throw new ArgumentNullException(
-                                        $"{nameof(expressionBuilderFactory)} can't be null.");
+                                    throw new ArgumentNullException(nameof(expressionBuilderFactory),
+                                        $"The {nameof(expressionBuilderFactory)} can't be null.");
         _reSettings = reSettings;
     }
 
     /// <summary>
     ///     Compiles the rule
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="rule"></param>
-    /// <param name="input"></param>
-    /// <param name="ruleParam"></param>
+    /// <param name="rule">The rule to compile</param>
+    /// <param name="ruleExpressionType">The rule expression type</param>
+    /// <param name="ruleParams">The <see cref="RuleParameter" />[] for the rule</param>
+    /// <param name="globalParams">The global <see cref="T:Lazy{RuleExpressionParameter[]}" /> parameters</param>
     /// <returns>Compiled func delegate</returns>
-    internal RuleFunc<RuleResultTree> CompileRule(Rule rule, RuleExpressionType ruleExpressionType,
+    internal RuleFunc<RuleResultTree> CompileRule(IRule rule, RuleExpressionType ruleExpressionType,
         RuleParameter[] ruleParams, Lazy<RuleExpressionParameter[]> globalParams)
     {
-        if (rule == null)
+        if (rule is null)
         {
             var ex = new ArgumentNullException(nameof(rule));
             throw ex;
@@ -84,12 +86,11 @@ internal class RuleCompiler
     ///     Gets the expression for rule.
     /// </summary>
     /// <param name="rule">The rule.</param>
-    /// <param name="typeParameterExpressions">The type parameter expressions.</param>
-    /// <param name="ruleInputExp">The rule input exp.</param>
+    /// <param name="ruleParams">The rule params </param>
     /// <returns></returns>
-    private RuleFunc<RuleResultTree> GetDelegateForRule(Rule rule, RuleParameter[] ruleParams)
+    private RuleFunc<RuleResultTree> GetDelegateForRule(IRule rule, RuleParameter[] ruleParams)
     {
-        var scopedParamList = GetRuleExpressionParameters(rule.RuleExpressionType, rule?.LocalParams, ruleParams);
+        var scopedParamList = GetRuleExpressionParameters(rule.RuleExpressionType, rule.LocalParams, ruleParams);
 
         var extendedRuleParams = ruleParams.Concat(scopedParamList.Select(c =>
                 new RuleParameter(c.ParameterExpression.Name, c.ParameterExpression.Type)))
@@ -98,8 +99,8 @@ internal class RuleCompiler
         RuleFunc<RuleResultTree> ruleFn;
 
         if (Enum.TryParse(rule.Operator, out ExpressionType nestedOperator) &&
-            nestedOperators.Contains(nestedOperator) &&
-            rule.Rules != null && rule.Rules.Any())
+            _nestedOperators.Contains(nestedOperator) &&
+            rule.GetNestedRules() is not null && rule.GetNestedRules().Any())
         {
             ruleFn = BuildNestedRuleFunc(rule, nestedOperator, extendedRuleParams);
         }
@@ -116,35 +117,43 @@ internal class RuleCompiler
     {
         if (!_reSettings.EnableScopedParams)
         {
-            return new RuleExpressionParameter[] { };
+            return [];
         }
 
         var ruleExpParams = new List<RuleExpressionParameter>();
 
-        if (localParams?.Any() == true)
+        if (localParams is null)
         {
-            var parameters = ruleParams.Select(c => c.ParameterExpression)
-                .ToList();
+            return ruleExpParams.ToArray();
+        }
 
-            var expressionBuilder = GetExpressionBuilder(ruleExpressionType);
+        var scopedParams = localParams as ScopedParam[] ?? localParams.ToArray();
+        if (scopedParams.Length <= 0)
+        {
+            return ruleExpParams.ToArray();
+        }
 
-            foreach (var lp in localParams)
+        var parameters = ruleParams.Select(c => c.ParameterExpression)
+            .ToList();
+
+        var expressionBuilder = GetExpressionBuilder(ruleExpressionType);
+
+        foreach (var lp in scopedParams)
+        {
+            try
             {
-                try
-                {
-                    var lpExpression = expressionBuilder.Parse(lp.Expression, parameters.ToArray(), null);
-                    var ruleExpParam = new RuleExpressionParameter {
-                        ParameterExpression = Expression.Parameter(lpExpression.Type, lp.Name),
-                        ValueExpression = lpExpression
-                    };
-                    parameters.Add(ruleExpParam.ParameterExpression);
-                    ruleExpParams.Add(ruleExpParam);
-                }
-                catch (Exception ex)
-                {
-                    var message = $"{ex.Message}, in ScopedParam: {lp.Name}";
-                    throw new RuleException(message);
-                }
+                var lpExpression = expressionBuilder.Parse(lp.Expression, parameters.ToArray(), null);
+                var ruleExpParam = new RuleExpressionParameter {
+                    ParameterExpression = Expression.Parameter(lpExpression.Type, lp.Name),
+                    ValueExpression = lpExpression
+                };
+                parameters.Add(ruleExpParam.ParameterExpression);
+                ruleExpParams.Add(ruleExpParam);
+            }
+            catch (Exception ex)
+            {
+                var message = $"{ex.Message}, in ScopedParam: {lp.Name}";
+                throw new RuleException(message);
             }
         }
 
@@ -155,11 +164,10 @@ internal class RuleCompiler
     ///     Builds the expression.
     /// </summary>
     /// <param name="rule">The rule.</param>
-    /// <param name="typeParameterExpressions">The type parameter expressions.</param>
-    /// <param name="ruleInputExp">The rule input exp.</param>
+    /// <param name="ruleParams"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    private RuleFunc<RuleResultTree> BuildRuleFunc(Rule rule, RuleParameter[] ruleParams)
+    private RuleFunc<RuleResultTree> BuildRuleFunc(IRule rule, RuleParameter[] ruleParams)
     {
         var ruleExpressionBuilder = GetExpressionBuilder(rule.RuleExpressionType);
 
@@ -172,17 +180,15 @@ internal class RuleCompiler
     ///     Builds the nested expression.
     /// </summary>
     /// <param name="parentRule">The parent rule.</param>
-    /// <param name="childRules">The child rules.</param>
     /// <param name="operation">The operation.</param>
-    /// <param name="typeParameterExpressions">The type parameter expressions.</param>
-    /// <param name="ruleInputExp">The rule input exp.</param>
+    /// <param name="ruleParams"></param>
     /// <returns>Expression of func delegate</returns>
     /// <exception cref="InvalidCastException"></exception>
-    private RuleFunc<RuleResultTree> BuildNestedRuleFunc(Rule parentRule, ExpressionType operation,
+    private RuleFunc<RuleResultTree> BuildNestedRuleFunc(IRule parentRule, ExpressionType operation,
         RuleParameter[] ruleParams)
     {
         var ruleFuncList = new List<RuleFunc<RuleResultTree>>();
-        foreach (var r in parentRule.Rules.Where(c => c.Enabled))
+        foreach (var r in parentRule.GetNestedRules().Where(c => c.Enabled))
         {
             ruleFuncList.Add(GetDelegateForRule(r, ruleParams));
         }
@@ -190,13 +196,13 @@ internal class RuleCompiler
         return paramArray => {
             var (isSuccess, resultList) = ApplyOperation(paramArray, ruleFuncList, operation);
 
-            bool isSuccessFn(object[] p)
+            var result = Helpers.ToResultTree(_reSettings, parentRule, resultList, IsSuccessFn);
+            return result(paramArray);
+
+            bool IsSuccessFn(object[] p)
             {
                 return isSuccess;
             }
-
-            var result = Helpers.ToResultTree(_reSettings, parentRule, resultList, isSuccessFn);
-            return result(paramArray);
         };
     }
 
@@ -204,20 +210,21 @@ internal class RuleCompiler
     private (bool isSuccess, IEnumerable<RuleResultTree> result) ApplyOperation(RuleParameter[] paramArray,
         IEnumerable<RuleFunc<RuleResultTree>> ruleFuncList, ExpressionType operation)
     {
-        if (ruleFuncList?.Any() != true)
+        if (ruleFuncList is null)
+        {
+            return (false, new List<RuleResultTree>());
+        }
+
+        var ruleFuncs = ruleFuncList as RuleFunc<RuleResultTree>[] ?? ruleFuncList.ToArray();
+        if (ruleFuncs.Length <= 0)
         {
             return (false, new List<RuleResultTree>());
         }
 
         var resultList = new List<RuleResultTree>();
-        var isSuccess = false;
+        var isSuccess = operation is ExpressionType.And or ExpressionType.AndAlso;
 
-        if (operation == ExpressionType.And || operation == ExpressionType.AndAlso)
-        {
-            isSuccess = true;
-        }
-
-        foreach (var ruleFunc in ruleFuncList)
+        foreach (var ruleFunc in ruleFuncs)
         {
             var ruleResult = ruleFunc(paramArray);
             resultList.Add(ruleResult);
@@ -226,12 +233,10 @@ internal class RuleCompiler
                 case ExpressionType.And:
                 case ExpressionType.AndAlso:
                     isSuccess = isSuccess && ruleResult.IsSuccess;
-                    if (_reSettings.NestedRuleExecutionMode == NestedRuleExecutionMode.Performance &&
-                        isSuccess == false)
+                    if (_reSettings.NestedRuleExecutionMode == NestedRuleExecutionMode.Performance && !isSuccess)
                     {
-                        return (isSuccess, resultList);
+                        return (false, resultList);
                     }
-
                     break;
 
                 case ExpressionType.Or:
@@ -239,9 +244,8 @@ internal class RuleCompiler
                     isSuccess = isSuccess || ruleResult.IsSuccess;
                     if (_reSettings.NestedRuleExecutionMode == NestedRuleExecutionMode.Performance && isSuccess)
                     {
-                        return (isSuccess, resultList);
+                        return (true, resultList);
                     }
-
                     break;
             }
         }
@@ -255,7 +259,7 @@ internal class RuleCompiler
         return GetExpressionBuilder(ruleExpressionType).CompileScopedParams(ruleParameters, ruleExpParams);
     }
 
-    private RuleFunc<RuleResultTree> GetWrappedRuleFunc(Rule rule, RuleFunc<RuleResultTree> ruleFunc,
+    private RuleFunc<RuleResultTree> GetWrappedRuleFunc(IRule rule, RuleFunc<RuleResultTree> ruleFunc,
         RuleParameter[] ruleParameters, RuleExpressionParameter[] ruleExpParams)
     {
         if (ruleExpParams.Length == 0)

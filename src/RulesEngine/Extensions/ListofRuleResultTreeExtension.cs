@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,17 +18,19 @@ public static class ListofRuleResultTreeExtension
     /// <summary>
     ///     Calls the Success Func for the first rule which succeeded among the ruleResults
     /// </summary>
-    /// <param name="ruleResultTrees"></param>
-    /// <param name="onSuccessFunc"></param>
+    /// <param name="ruleResultTrees">The <see cref="RuleResultTree" /> of the <see cref="IRule" /> which was running</param>
+    /// <param name="onSuccessFunc">The function to be called on success</param>
     /// <returns></returns>
     public static List<RuleResultTree> OnSuccess(this List<RuleResultTree> ruleResultTrees, OnSuccessFunc onSuccessFunc)
     {
-        var successfulRuleResult = ruleResultTrees.FirstOrDefault(ruleResult => ruleResult.IsSuccess);
-        if (successfulRuleResult != null)
+        var successfulRuleResult = ruleResultTrees.Find(ruleResult => ruleResult.IsSuccess);
+        if (successfulRuleResult is null)
         {
-            var eventName = successfulRuleResult.Rule.SuccessEvent ?? successfulRuleResult.Rule.RuleName;
-            onSuccessFunc(eventName);
+            return ruleResultTrees;
         }
+
+        var eventName = successfulRuleResult.Rule.SuccessEvent ?? successfulRuleResult.Rule.RuleName;
+        onSuccessFunc(eventName);
 
         return ruleResultTrees;
     }
@@ -40,7 +43,7 @@ public static class ListofRuleResultTreeExtension
     /// <returns></returns>
     public static List<RuleResultTree> OnFail(this List<RuleResultTree> ruleResultTrees, OnFailureFunc onFailureFunc)
     {
-        var allFailure = ruleResultTrees.All(ruleResult => ruleResult.IsSuccess == false);
+        var allFailure = ruleResultTrees.TrueForAll(ruleResult => !ruleResult.IsSuccess);
         if (allFailure)
         {
             onFailureFunc();

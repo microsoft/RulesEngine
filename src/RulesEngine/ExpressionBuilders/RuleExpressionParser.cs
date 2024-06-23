@@ -117,7 +117,7 @@ public class RuleExpressionParser
     }
 
     // <summary>
-    ///      Gets the parameter expression.
+    /// Gets the parameter expression.
     /// </summary>
     /// <param name="ruleParams">The types.</param>
     /// <returns></returns>

@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using RulesEngine.Interfaces;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace RulesEngine.Models;
 
 /// <summary>
-///     Rule result class with child result heirarchy
+///     Rule result class with child result hierarchy
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class RuleResultTree
@@ -18,7 +19,7 @@ public class RuleResultTree
     /// <value>
     ///     The rule.
     /// </value>
-    public Rule Rule { get; set; }
+    public IRule Rule { get; set; }
 
     /// <summary>
     ///     Gets or sets a value indicating whether this instance is success.
@@ -60,8 +61,8 @@ public class RuleResultMessage
     /// </summary>
     public RuleResultMessage()
     {
-        ErrorMessages = new List<string>();
-        WarningMessages = new List<string>();
+        ErrorMessages = [];
+        WarningMessages = [];
     }
 
     /// <summary>

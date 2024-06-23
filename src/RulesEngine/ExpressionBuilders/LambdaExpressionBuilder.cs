@@ -3,6 +3,7 @@
 
 using RulesEngine.Exceptions;
 using RulesEngine.HelperFunctions;
+using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ internal sealed class LambdaExpressionBuilder : RuleExpressionBuilderBase
         _ruleExpressionParser = ruleExpressionParser;
     }
 
-    internal override RuleFunc<RuleResultTree> BuildDelegateForRule(Rule rule, RuleParameter[] ruleParams)
+    internal override RuleFunc<RuleResultTree> BuildDelegateForRule(IRule rule, RuleParameter[] ruleParams)
     {
         try
         {
@@ -33,16 +34,16 @@ internal sealed class LambdaExpressionBuilder : RuleExpressionBuilderBase
         {
             Helpers.HandleRuleException(ex, rule, _reSettings);
 
-            var exceptionMessage = Helpers.GetExceptionMessage(
+            var exceptionMessage = Helpers.TryGetExceptionMessage(
                 $"Exception while parsing expression `{rule?.Expression}` - {ex.Message}",
                 _reSettings);
 
-            bool func(object[] param)
+            return Helpers.ToResultTree(_reSettings, rule, null, Func, exceptionMessage);
+
+            bool Func(object[] param)
             {
                 return false;
             }
-
-            return Helpers.ToResultTree(_reSettings, rule, null, func, exceptionMessage);
         }
     }
 

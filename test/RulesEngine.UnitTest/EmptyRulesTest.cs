@@ -28,7 +28,7 @@ public class EmptyRulesTest
 
         Exception ex = await Assert.ThrowsAsync<RuleValidationException>(action);
 
-        Assert.Contains("Atleast one of Rules or WorkflowsToInject must be not empty", ex.Message);
+        Assert.Contains("At least one of Rules or WorkflowsToInject must be not empty", ex.Message);
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public class EmptyRulesTest
 
         Exception ex = await Assert.ThrowsAsync<RuleValidationException>(action);
 
-        Assert.Contains("Atleast one of Rules or WorkflowsToInject must be not empty", ex.Message);
+        Assert.Contains("At least one of Rules or WorkflowsToInject must be not empty", ex.Message);
     }
 
     private Workflow[] GetEmptyWorkflow()

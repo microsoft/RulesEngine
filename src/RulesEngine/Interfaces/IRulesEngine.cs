@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using RulesEngine.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -31,8 +32,15 @@ public interface IRulesEngine
     /// <summary>
     ///     Adds new workflows to RulesEngine
     /// </summary>
-    /// <param name="workflow"></param>
-    void AddWorkflow(params Workflow[] Workflows);
+    /// <param name="workflows">The workflows to add</param>
+    void AddWorkflow(params IWorkflow[] workflows);
+
+    /// <summary>
+    ///     Adds new workflows to RulesEngine
+    /// </summary>
+    /// <param name="workflows">The workflows to add</param>
+    [Obsolete("Use AddWorkflow(params IWorkflow[] workflows) instead")]
+    void AddWorkflow(params Workflow[] workflows);
 
     /// <summary>
     ///     Removes all registered workflows from RulesEngine
@@ -58,5 +66,16 @@ public interface IRulesEngine
     /// <returns></returns>
     List<string> GetAllRegisteredWorkflowNames();
 
-    void AddOrUpdateWorkflow(params Workflow[] Workflows);
+    /// <summary>
+    ///     Adds or updates the workflow in the RulesEngine
+    /// </summary>
+    /// <param name="workflows">The workflows to add or update</param>
+    void AddOrUpdateWorkflow(params IWorkflow[] workflows);
+
+    /// <summary>
+    ///     Adds or updates the workflow in the RulesEngine
+    /// </summary>
+    /// <param name="workflows">The workflows to add or update</param>
+    [Obsolete("Use AddWorkflow(params IWorkflow[] workflows) instead")]
+    void AddOrUpdateWorkflow(params Workflow[] workflows);
 }

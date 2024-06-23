@@ -3,8 +3,8 @@
 [![Nuget download][download-image]][download-url]
 
 [download-image]: https://img.shields.io/nuget/dt/timophe.RulesEngine
-[download-url]: https://www.nuget.org/packages/timophe.RulesEngine/
 
+[download-url]: https://www.nuget.org/packages/timophe.RulesEngine/
 
 # Rules Engine
 
@@ -25,7 +25,9 @@ that any change in rules don't affect the core system.
 
 ## Installation
 
-To install this library, download the latest version of [NuGet Package](https://www.nuget.org/packages/timophe.RulesEngine/) from [nuget.org](https://www.nuget.org/) and refer it into your project.  
+To install this library, download the latest version
+of [NuGet Package](https://www.nuget.org/packages/timophe.RulesEngine/) from [nuget.org](https://www.nuget.org/) and
+refer it into your project.
 
 ## How to use it
 

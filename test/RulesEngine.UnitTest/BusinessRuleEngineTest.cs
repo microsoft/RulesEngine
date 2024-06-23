@@ -781,8 +781,7 @@ public class RulesEngineTest
         var result1 = await re.ExecuteAllRulesAsync("Test", new RuleParameter("input1", value: null));
         Assert.True(result1.TrueForAll(c => c.IsSuccess));
 
-        // (object) otherwise it will fail with null reference exception
-        var result2 = await re.ExecuteAllRulesAsync("Test", [(object)null]);
+        var result2 = await re.ExecuteAllRulesAsync("Test", new object[] { null });
         Assert.True(result2.TrueForAll(c => c.IsSuccess));
 
         dynamic input1 = new ExpandoObject();
