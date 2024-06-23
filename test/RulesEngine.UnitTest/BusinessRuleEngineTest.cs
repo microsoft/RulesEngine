@@ -835,7 +835,6 @@ public class RulesEngineTest
     {
         var classType = typeof(RulesEngine);
         var interfaceType = typeof(IRulesEngine);
-        var interfaceExtendedType = typeof(IRulesEngineExtended);
 
         var classMethods = classType.GetMethods(BindingFlags.DeclaredOnly |
                                                 BindingFlags.Public |
@@ -843,12 +842,7 @@ public class RulesEngineTest
 
 
         var interfaceMethods = interfaceType.GetMethods();
-        var interfaceExtensionMethods = interfaceExtendedType.GetMethods();
-
-        var combinedMethods = interfaceMethods.Concat(interfaceExtensionMethods);
-
-
-        Assert.Equal(combinedMethods.Count(), classMethods.Length);
+        Assert.Equal(interfaceMethods.Count(), classMethods.Length);
     }
 
 

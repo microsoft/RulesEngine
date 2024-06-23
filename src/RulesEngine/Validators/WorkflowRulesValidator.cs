@@ -1,11 +1,12 @@
 ﻿using FluentValidation;
 using RulesEngine.HelperFunctions;
 using RulesEngine.Interfaces;
+using RulesEngine.Models;
 using System.Linq;
 
 namespace RulesEngine.Validators;
 
-internal class WorkflowsValidator : AbstractValidator<IWorkflow>
+internal class WorkflowsValidator : AbstractValidator<Workflow>
 {
     /// <summary>
     ///     Validates the workflow object.
@@ -16,11 +17,11 @@ internal class WorkflowsValidator : AbstractValidator<IWorkflow>
     public WorkflowsValidator()
     {
         RuleFor(c => c.WorkflowName).NotEmpty().WithMessage(Constants.WORKFLOW_NAME_NULL_ERRMSG);
-        When(c => c.GetRules()?.Any() != true, () => {
+        When(c => c.Rules?.Any() != true, () => {
             RuleFor(c => c.WorkflowsToInject).NotEmpty().WithMessage(Constants.INJECT_WORKFLOW_RULES_ERRMSG);
         }).Otherwise(() => {
             var ruleValidator = new RuleValidator();
-            RuleForEach(c => c.GetRules()).SetValidator(ruleValidator).OverridePropertyName("C");
+            RuleForEach(c => c.Rules).SetValidator(ruleValidator);
         });
     }
 }

@@ -23,7 +23,7 @@ internal sealed class LambdaExpressionBuilder : RuleExpressionBuilderBase
         _ruleExpressionParser = ruleExpressionParser;
     }
 
-    internal override RuleFunc<RuleResultTree> BuildDelegateForRule(IRule rule, RuleParameter[] ruleParams)
+    internal override RuleFunc<RuleResultTree> BuildDelegateForRule(Rule rule, RuleParameter[] ruleParams)
     {
         try
         {

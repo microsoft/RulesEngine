@@ -28,7 +28,7 @@ public static class ListofRuleResultTreeExtension
             return ruleResultTrees;
         }
 
-        var eventName = successfulRuleResult.ResultRule.SuccessEvent ?? successfulRuleResult.ResultRule.RuleName;
+        var eventName = successfulRuleResult.Rule.SuccessEvent ?? successfulRuleResult.Rule.RuleName;
         onSuccessFunc(eventName);
 
         return ruleResultTrees;

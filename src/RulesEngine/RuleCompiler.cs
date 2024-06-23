@@ -54,7 +54,7 @@ internal class RuleCompiler
     /// <param name="ruleParams">The <see cref="RuleParameter" />[] for the rule</param>
     /// <param name="globalParams">The global <see cref="T:Lazy{RuleExpressionParameter[]}" /> parameters</param>
     /// <returns>Compiled func delegate</returns>
-    internal RuleFunc<RuleResultTree> CompileRule(IRule rule, RuleExpressionType ruleExpressionType,
+    internal RuleFunc<RuleResultTree> CompileRule(Rule rule, RuleExpressionType ruleExpressionType,
         RuleParameter[] ruleParams, Lazy<RuleExpressionParameter[]> globalParams)
     {
         if (rule is null)
@@ -88,7 +88,7 @@ internal class RuleCompiler
     /// <param name="rule">The rule.</param>
     /// <param name="ruleParams">The rule params </param>
     /// <returns></returns>
-    private RuleFunc<RuleResultTree> GetDelegateForRule(IRule rule, RuleParameter[] ruleParams)
+    private RuleFunc<RuleResultTree> GetDelegateForRule(Rule rule, RuleParameter[] ruleParams)
     {
         var scopedParamList = GetRuleExpressionParameters(rule.RuleExpressionType, rule.LocalParams, ruleParams);
 
@@ -100,7 +100,7 @@ internal class RuleCompiler
 
         if (Enum.TryParse(rule.Operator, out ExpressionType nestedOperator) &&
             _nestedOperators.Contains(nestedOperator) &&
-            rule.GetNestedRules() is not null && rule.GetNestedRules().Any())
+            rule.Rules is not null && rule.Rules.Any())
         {
             ruleFn = BuildNestedRuleFunc(rule, nestedOperator, extendedRuleParams);
         }
@@ -167,7 +167,7 @@ internal class RuleCompiler
     /// <param name="ruleParams"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    private RuleFunc<RuleResultTree> BuildRuleFunc(IRule rule, RuleParameter[] ruleParams)
+    private RuleFunc<RuleResultTree> BuildRuleFunc(Rule rule, RuleParameter[] ruleParams)
     {
         var ruleExpressionBuilder = GetExpressionBuilder(rule.RuleExpressionType);
 
@@ -184,11 +184,11 @@ internal class RuleCompiler
     /// <param name="ruleParams"></param>
     /// <returns>Expression of func delegate</returns>
     /// <exception cref="InvalidCastException"></exception>
-    private RuleFunc<RuleResultTree> BuildNestedRuleFunc(IRule parentRule, ExpressionType operation,
+    private RuleFunc<RuleResultTree> BuildNestedRuleFunc(Rule parentRule, ExpressionType operation,
         RuleParameter[] ruleParams)
     {
         var ruleFuncList = new List<RuleFunc<RuleResultTree>>();
-        foreach (var r in parentRule.GetNestedRules().Where(c => c.Enabled))
+        foreach (var r in parentRule.Rules.Where(c => c.Enabled))
         {
             ruleFuncList.Add(GetDelegateForRule(r, ruleParams));
         }
@@ -261,7 +261,7 @@ internal class RuleCompiler
         return GetExpressionBuilder(ruleExpressionType).CompileScopedParams(ruleParameters, ruleExpParams);
     }
 
-    private RuleFunc<RuleResultTree> GetWrappedRuleFunc(IRule rule, RuleFunc<RuleResultTree> ruleFunc,
+    private RuleFunc<RuleResultTree> GetWrappedRuleFunc(Rule rule, RuleFunc<RuleResultTree> ruleFunc,
         RuleParameter[] ruleParameters, RuleExpressionParameter[] ruleExpParams)
     {
         if (ruleExpParams.Length == 0)

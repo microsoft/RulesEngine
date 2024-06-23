@@ -20,7 +20,7 @@ internal abstract class RuleExpressionBuilderBase
     /// <param name="rule">The rule to build expression for.</param>
     /// <param name="ruleParams">The rule parameters.</param>
     /// <returns>Expression type</returns>
-    internal abstract RuleFunc<RuleResultTree> BuildDelegateForRule(IRule rule, RuleParameter[] ruleParams);
+    internal abstract RuleFunc<RuleResultTree> BuildDelegateForRule(Rule rule, RuleParameter[] ruleParams);
 
     internal abstract Expression Parse(string expression, ParameterExpression[] parameters, Type returnType);
 

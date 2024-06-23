@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using RulesEngine.Interfaces;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -19,16 +18,8 @@ public class RuleResultTree
     /// <value>
     ///     The rule.
     /// </value>
-    public Rule Rule {
-        get => ResultRule as Rule;
-        set => ResultRule = value;
-    }
+    public Rule Rule { get; set; }
 
-    /// <summary>
-    ///     For interface compatibility
-    /// </summary>
-    /// <returns>For interface compatibility</returns>
-    public IRule ResultRule { get; set; }
 
     /// <summary>
     ///     Gets or sets a value indicating whether this instance is success.

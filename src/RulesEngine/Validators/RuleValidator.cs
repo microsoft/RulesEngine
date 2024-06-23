@@ -12,7 +12,7 @@ using System.Linq.Expressions;
 
 namespace RulesEngine.Validators;
 
-internal class RuleValidator : AbstractValidator<IRule>
+internal class RuleValidator : AbstractValidator<Rule>
 {
     /// <summary>
     ///     List of supported operators.
@@ -36,14 +36,13 @@ internal class RuleValidator : AbstractValidator<IRule>
                 .NotNull().WithMessage(Constants.OPERATOR_NULL_ERRMSG)
                 .Must(op => _nestedOperators.Exists(x => x.ToString().Equals(op, StringComparison.OrdinalIgnoreCase)))
                 .WithMessage(Constants.OPERATOR_INCORRECT_ERRMSG)
-                .OverridePropertyName($"Method: {nameof(IRule.GetNestedRules)}");
+                .OverridePropertyName($"Method: {nameof(Rule.Rules)}");
 
-            When(c => c.GetNestedRules()?.Any() != true, () => {
+            When(c => c.Rules?.Any() != true, () => {
                     RuleFor(c => c.WorkflowsToInject).NotEmpty().WithMessage(Constants.INJECT_WORKFLOW_RULES_ERRMSG);
                 })
                 .Otherwise(() => {
-                    RuleFor(c => c.GetNestedRules()).Must(BeValidRulesList)
-                        .OverridePropertyName($"Method: {nameof(IRule.GetNestedRules)}");
+                    RuleFor(c => c.Rules).Must(BeValidRulesList);
                 });
         });
         RegisterExpressionTypeRules();
@@ -53,13 +52,13 @@ internal class RuleValidator : AbstractValidator<IRule>
     {
         When(c => c.Operator == null && c.RuleExpressionType == RuleExpressionType.LambdaExpression, () => {
             RuleFor(c => c.Expression).NotEmpty().WithMessage(Constants.LAMBDA_EXPRESSION_EXPRESSION_NULL_ERRMSG);
-            RuleFor(c => c.GetNestedRules()).Empty().WithMessage(Constants.OPERATOR_RULES_ERRMSG);
+            RuleFor(c => c.Rules).Empty().WithMessage(Constants.OPERATOR_RULES_ERRMSG);
         });
     }
 
-    private bool BeValidRulesList(IEnumerable<IRule> rules)
+    private bool BeValidRulesList(IEnumerable<Rule> rules)
     {
-        var enumerable = rules as IRule[] ?? rules.ToArray();
+        var enumerable = rules as Rule[] ?? rules.ToArray();
         if (enumerable.Length <= 0)
         {
             return false;
