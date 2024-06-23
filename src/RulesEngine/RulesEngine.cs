@@ -166,7 +166,7 @@ public class RulesEngine : IRulesEngineExtended
     private async ValueTask<ActionRuleResult> ExecuteActionForRuleResult(RuleResultTree resultTree,
         bool includeRuleResults = false)
     {
-        var ruleActions = resultTree?.Rule?.Actions;
+        var ruleActions = resultTree?.ResultRule?.Actions;
         var actionInfo = resultTree?.IsSuccess == true ? ruleActions?.OnSuccess : ruleActions?.OnFailure;
 
         if (actionInfo != null)
@@ -434,7 +434,7 @@ public class RulesEngine : IRulesEngineExtended
         var formatErrorMessages = ruleResultList;
         foreach (var ruleResult in formatErrorMessages.Where(r => !r.IsSuccess))
         {
-            var errorMessage = ruleResult.Rule?.ErrorMessage;
+            var errorMessage = ruleResult.ResultRule?.ErrorMessage;
             if (!string.IsNullOrWhiteSpace(ruleResult.ExceptionMessage) || errorMessage == null)
             {
                 continue;

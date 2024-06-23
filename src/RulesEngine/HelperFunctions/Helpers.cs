@@ -45,7 +45,7 @@ internal static class Helpers
             }
 
             return new RuleResultTree {
-                Rule = rule,
+                ResultRule = rule,
                 Inputs = inputsDict,
                 IsSuccess = isSuccess,
                 ChildResults = childRuleResults,
