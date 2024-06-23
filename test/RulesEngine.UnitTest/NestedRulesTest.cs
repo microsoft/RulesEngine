@@ -76,7 +76,7 @@ public class NestedRulesTest
 
         Assert.False(result[0].IsSuccess);
         Assert.Equal(input1.trueValue, result[0].ActionResult.Output);
-        await Assert.AllAsync(result[0].ChildResults,
+        Assert.All(result[0].ChildResults,
             childResult => Assert.Equal(input1.trueValue, childResult.ActionResult.Output));
     }
 
@@ -100,7 +100,7 @@ public class NestedRulesTest
 
         Assert.False(result[0].IsSuccess);
         Assert.Equal(input1.trueValue, result[0].ActionResult.Output);
-        await Assert.AllAsync(result[0].ChildResults,
+        Assert.All(result[0].ChildResults,
             childResult => Assert.Equal(input1.trueValue, childResult.ActionResult.Output));
     }
 
