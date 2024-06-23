@@ -12,14 +12,14 @@ using System.Threading.Tasks;
 
 namespace DemoApp.Demos
 {
-    internal class ListItem
-    {
-        public int Id { get; set; }
-        public string Value { get; set; }
-    }
-
     public class NestedInput
     {
+        internal class ListItem
+        {
+            public int Id { get; set; }
+            public string Value { get; set; }
+        }
+
         public async Task Run(CancellationToken ct = default)
         {
             Console.WriteLine($"Running {nameof(NestedInput)}....");

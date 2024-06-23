@@ -45,10 +45,10 @@ namespace DemoApp.Demos
             var input = new AppData() {
                 Details = new List<Detail>
                 {
-                new Detail { Amount = 1.0m },
-                new Detail { Amount = 2.0m },
-                new Detail { Amount = 3.0m }
-            }
+                    new Detail { Amount = 1.0m },
+                    new Detail { Amount = 2.0m },
+                    new Detail { Amount = 3.0m }
+                }
             };
 
             var appData = new RuleParameter("AppData", input);

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1</TargetFrameworks>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <Version>6.0.0</Version>
     <Copyright>Copyright (c) Microsoft Corporation.</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
