@@ -24,7 +24,7 @@ namespace RulesEngine;
 ///     The Rules Engine itself
 /// </summary>
 /// <seealso cref="IRulesEngine" />
-public class RulesEngine : IRulesEngine
+public class RulesEngine : IRulesEngineExtended
 {
     #region Variables
 
@@ -56,15 +56,22 @@ public class RulesEngine : IRulesEngine
     /// </summary>
     /// <param name="jsonConfig">The json configuration.</param>
     /// <param name="type">The type to deserialize the json to, must implement <see cref="IWorkflow" /></param>
-    /// <param name="settings">The <see cref="JsonSerializerSettings"/> to use for deserialization</param>
-    /// <param name="reSettings">The <see cref="ReSettings"/> to use for the rules engine</param>
-    public RulesEngine(string[] jsonConfig, Type type, JsonSerializerSettings settings = null, ReSettings reSettings = null) : this(reSettings)
+    /// <param name="settings">The <see cref="JsonSerializerSettings" /> to use for deserialization</param>
+    /// <param name="reSettings">The <see cref="ReSettings" /> to use for the rules engine</param>
+    public RulesEngine(string[] jsonConfig, Type type, JsonSerializerSettings settings = null,
+        ReSettings reSettings = null) : this(reSettings)
     {
-        var workflow = jsonConfig.Select(item => JsonConvert.DeserializeObject(item, type, settings)).OfType<IWorkflow>().ToArray();
+        var workflow = jsonConfig.Select(item => JsonConvert.DeserializeObject(item, type, settings))
+            .OfType<IWorkflow>().ToArray();
         AddWorkflow(workflow);
     }
 
     public RulesEngine(IWorkflow[] workflows, ReSettings reSettings = null) : this(reSettings)
+    {
+        AddWorkflow(workflows);
+    }
+
+    public RulesEngine(Workflow[] workflows, ReSettings reSettings = null) : this(reSettings)
     {
         AddWorkflow(workflows);
     }
@@ -346,7 +353,6 @@ public class RulesEngine : IRulesEngine
 
         _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, dictFunc);
         return true;
-
     }
 
 
@@ -388,7 +394,7 @@ public class RulesEngine : IRulesEngine
     {
         var result = new List<RuleResultTree>();
         var compiledRulesCacheKey = GetCompiledRulesKey(workflowName, ruleParameters);
-        foreach (var compiledRule in _rulesCache.GetCompiledRules(compiledRulesCacheKey)?.Values ?? [] )
+        foreach (var compiledRule in _rulesCache.GetCompiledRules(compiledRulesCacheKey)?.Values ?? [])
         {
             var resultTree = compiledRule(ruleParameters);
             result.Add(resultTree);

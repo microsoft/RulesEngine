@@ -4,7 +4,6 @@
 using RulesEngine.Interfaces;
 using RulesEngine.Models;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace RulesEngine.Extensions;
 

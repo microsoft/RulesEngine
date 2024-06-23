@@ -830,19 +830,25 @@ public class RulesEngineTest
         Assert.False(re.ContainsWorkflow(notExistedWorkflowName));
     }
 
-    [Theory]
-    [InlineData(typeof(RulesEngine), typeof(IRulesEngine))]
-    public void Class_PublicMethods_ArePartOfInterface(Type classType, Type interfaceType)
+    [Fact]
+    public void Class_PublicMethods_ArePartOfInterface()
     {
+        var classType = typeof(RulesEngine);
+        var interfaceType = typeof(IRulesEngine);
+        var interfaceExtendedType = typeof(IRulesEngineExtended);
+
         var classMethods = classType.GetMethods(BindingFlags.DeclaredOnly |
                                                 BindingFlags.Public |
                                                 BindingFlags.Instance);
 
 
         var interfaceMethods = interfaceType.GetMethods();
+        var interfaceExtensionMethods = interfaceExtendedType.GetMethods();
+
+        var combinedMethods = interfaceMethods.Concat(interfaceExtensionMethods);
 
 
-        Assert.Equal(interfaceMethods.Count(), classMethods.Count());
+        Assert.Equal(combinedMethods.Count(), classMethods.Length);
     }
 
 

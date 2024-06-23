@@ -120,7 +120,6 @@ internal class RulesCache
         }
 
         return workflow;
-
     }
 
 

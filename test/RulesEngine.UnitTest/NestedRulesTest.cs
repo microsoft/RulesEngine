@@ -58,7 +58,7 @@ public class NestedRulesTest
                 c => {
                     Assert.Equal(c.IsSuccess, c.ChildResults.Last().IsSuccess);
                     Assert.Single(c.ChildResults.Where(d => c.IsSuccess == d.IsSuccess));
-                    Assert.True(c.ChildResults.SkipLast(1).All(d => d.IsSuccess == false));
+                    Assert.True(c.ChildResults.SkipLast(1).All(d => !d.IsSuccess));
                 });
         }
     }
@@ -76,7 +76,7 @@ public class NestedRulesTest
 
         Assert.False(result[0].IsSuccess);
         Assert.Equal(input1.trueValue, result[0].ActionResult.Output);
-        Assert.All(result[0].ChildResults,
+        await Assert.AllAsync(result[0].ChildResults,
             childResult => Assert.Equal(input1.trueValue, childResult.ActionResult.Output));
     }
 
@@ -100,7 +100,7 @@ public class NestedRulesTest
 
         Assert.False(result[0].IsSuccess);
         Assert.Equal(input1.trueValue, result[0].ActionResult.Output);
-        Assert.All(result[0].ChildResults,
+        await Assert.AllAsync(result[0].ChildResults,
             childResult => Assert.Equal(input1.trueValue, childResult.ActionResult.Output));
     }
 

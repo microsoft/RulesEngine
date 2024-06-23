@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using RulesEngine.Models;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -26,6 +25,13 @@ public interface IRulesEngine
     /// <returns>List of rule results</returns>
     ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params RuleParameter[] ruleParams);
 
+    /// <summary>
+    ///     This will execute all the rules of the specified workflow
+    /// </summary>
+    /// <param name="workflowName"></param>
+    /// <param name="ruleName"></param>
+    /// <param name="ruleParameters"></param>
+    /// <returns></returns>
     ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName,
         RuleParameter[] ruleParameters);
 
@@ -33,13 +39,6 @@ public interface IRulesEngine
     ///     Adds new workflows to RulesEngine
     /// </summary>
     /// <param name="workflows">The workflows to add</param>
-    void AddWorkflow(params IWorkflow[] workflows);
-
-    /// <summary>
-    ///     Adds new workflows to RulesEngine
-    /// </summary>
-    /// <param name="workflows">The workflows to add</param>
-    [Obsolete("Use AddWorkflow(params IWorkflow[] workflows) instead")]
     void AddWorkflow(params Workflow[] workflows);
 
     /// <summary>
@@ -67,15 +66,8 @@ public interface IRulesEngine
     List<string> GetAllRegisteredWorkflowNames();
 
     /// <summary>
-    ///     Adds or updates the workflow in the RulesEngine
+    ///     Adds or updates the workflow.
     /// </summary>
-    /// <param name="workflows">The workflows to add or update</param>
-    void AddOrUpdateWorkflow(params IWorkflow[] workflows);
-
-    /// <summary>
-    ///     Adds or updates the workflow in the RulesEngine
-    /// </summary>
-    /// <param name="workflows">The workflows to add or update</param>
-    [Obsolete("Use AddWorkflow(params IWorkflow[] workflows) instead")]
+    /// <param name="workflows">The workflows.</param>
     void AddOrUpdateWorkflow(params Workflow[] workflows);
 }

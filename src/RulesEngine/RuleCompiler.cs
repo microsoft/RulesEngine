@@ -237,6 +237,7 @@ internal class RuleCompiler
                     {
                         return (false, resultList);
                     }
+
                     break;
 
                 case ExpressionType.Or:
@@ -246,6 +247,7 @@ internal class RuleCompiler
                     {
                         return (true, resultList);
                     }
+
                     break;
             }
         }

@@ -17,8 +17,6 @@ public class RuleCompilerTest
     public void RuleCompiler_NullCheck()
     {
         Assert.Throws<ArgumentNullException>(() => new RuleCompiler(null, null));
-        var reSettings = new ReSettings();
-        var parser = new RuleExpressionParser(reSettings);
         Assert.Throws<ArgumentNullException>(() => new RuleCompiler(null, null));
     }
 

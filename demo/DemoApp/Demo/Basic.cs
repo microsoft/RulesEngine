@@ -5,13 +5,14 @@ using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Threading.Tasks;
 using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
 
 namespace DemoApp.Demo;
 
 public class Basic
 {
-    public void Run()
+    public async Task Run()
     {
         Console.WriteLine($"Running {nameof(Basic)}....");
         var workflows = new List<Workflow>();
@@ -39,9 +40,9 @@ public class Basic
         datas.count = 1;
         var inputs = new[] { datas };
 
-        var resultList = bre.ExecuteAllRulesAsync("Test Workflow Rule 1", inputs).Result;
+        var resultList = await bre.ExecuteAllRulesAsync("Test Workflow Rule 1", inputs);
 
-        var outcome = false;
+        bool outcome;
 
         //Different ways to show test results:
         outcome = resultList.TrueForAll(r => r.IsSuccess);

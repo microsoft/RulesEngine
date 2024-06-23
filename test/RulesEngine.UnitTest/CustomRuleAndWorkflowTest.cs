@@ -44,7 +44,6 @@ public class CustomRuleAndWorkflowTest
             Rules = new[] { customRule }
         };
 
-        var json2 = JsonConvert.SerializeObject(customWorkflow);
 
         var re = new RulesEngine([customWorkflow]);
         var input1 = GetInput1();
@@ -77,7 +76,7 @@ public class CustomRuleAndWorkflowTest
                                        "RuleName": "CustomRule",
                                        "Operator": "And",
                                        "RuleExpressionType": 0,
-
+                           
                                    }
                                ],
                                "WorkflowName": "CustomWorkflow",

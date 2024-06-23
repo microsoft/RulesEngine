@@ -11,13 +11,14 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
 
 namespace DemoApp.Demo;
 
 public class Ef
 {
-    public void Run()
+    public async Task Run()
     {
         Console.WriteLine($"Running {nameof(Ef)}....");
         var basicInfo =
@@ -55,7 +56,7 @@ public class Ef
 
         var discountOffered = "No discount offered.";
 
-        var resultList = bre.ExecuteAllRulesAsync("Discount", inputs).Result;
+        var resultList = await bre.ExecuteAllRulesAsync("Discount", inputs);
 
         resultList.OnSuccess(eventName => {
             discountOffered = $"Discount offered is {eventName} % over MRP.";

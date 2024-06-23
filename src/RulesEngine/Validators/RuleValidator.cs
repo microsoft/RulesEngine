@@ -35,13 +35,15 @@ internal class RuleValidator : AbstractValidator<IRule>
             RuleFor(c => c.Operator)
                 .NotNull().WithMessage(Constants.OPERATOR_NULL_ERRMSG)
                 .Must(op => _nestedOperators.Exists(x => x.ToString().Equals(op, StringComparison.OrdinalIgnoreCase)))
-                .WithMessage(Constants.OPERATOR_INCORRECT_ERRMSG).OverridePropertyName($"Method: {nameof(IRule.GetNestedRules)}");
+                .WithMessage(Constants.OPERATOR_INCORRECT_ERRMSG)
+                .OverridePropertyName($"Method: {nameof(IRule.GetNestedRules)}");
 
             When(c => c.GetNestedRules()?.Any() != true, () => {
                     RuleFor(c => c.WorkflowsToInject).NotEmpty().WithMessage(Constants.INJECT_WORKFLOW_RULES_ERRMSG);
                 })
                 .Otherwise(() => {
-                    RuleFor(c => c.GetNestedRules()).Must(BeValidRulesList).OverridePropertyName($"Method: {nameof(IRule.GetNestedRules)}");
+                    RuleFor(c => c.GetNestedRules()).Must(BeValidRulesList)
+                        .OverridePropertyName($"Method: {nameof(IRule.GetNestedRules)}");
                 });
         });
         RegisterExpressionTypeRules();
