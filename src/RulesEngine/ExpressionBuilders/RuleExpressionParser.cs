@@ -36,7 +36,7 @@ public class RuleExpressionParser
     {
         var dictAdd = typeof(Dictionary<string, object>).GetMethod("Add",
             BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static, null,
-            [typeof(string), typeof(object), typeof(Enumerable)], null);
+            [typeof(string), typeof(object)], null);
         _methodInfo.Add("dict_add", dictAdd);
     }
 
