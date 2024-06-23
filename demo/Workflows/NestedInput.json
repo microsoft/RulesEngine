@@ -23,7 +23,6 @@
       }
     ]
   },
-
   {
     "WorkflowName": "NestedInputDemoWorkflow3",
     "Rules": [
