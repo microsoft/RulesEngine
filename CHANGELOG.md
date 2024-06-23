@@ -3,17 +3,15 @@
 All notable changes to this project will be documented in this file.
 
 ## [Future]
- - WorkflowName and RuleName being changed to Name
+ - WorkflowName and RuleName will be changed to Name
    - redundant to say Workflow.WorkflowName or Rule.RuleName
 
 ## [6.0.0]
-- methods that are obsolete have been removed
+- methods that were marked obsolete, in prior version, have been removed
 - ALL issues in [master](https://github.com/microsoft/RulesEngine/issues) fork have been resolved, usually with a demo app supporting solution
 - only targeting netstandard2.0
-
-### Breaking Changes
-- CancellationToken for all RulesEngine Execute... methods
-- RulesEngine Execute... Methods must specify an array (object[] or RuleParameter[]), no longer params (CancellationToken)
+- Methods with CancellationToken added for all RulesEngine Execute... methods
+- RulesEngine Execute... Methods using params marked obsolete in favor of CancellationToken supported methods
 
 ## [5.0.4]
 - Refactoring code, big time
