@@ -80,14 +80,6 @@ namespace RulesEngine
 
         #region Public Methods
 
-        public async IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(object[] inputs, [EnumeratorCancellation] CancellationToken ct = default)
-        {
-            foreach (var wf_nam in _rulesCache.GetAllWorkflowNames())
-            {
-                if(!ct.IsCancellationRequested)
-                    yield return await ExecuteWorkflow(wf_nam, inputs, ct);
-            }
-        }
         public async IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(RuleParameter[] inputs, [EnumeratorCancellation] CancellationToken ct = default)
         {
             foreach (var wf_nam in _rulesCache.GetAllWorkflowNames())
@@ -95,23 +87,6 @@ namespace RulesEngine
                 if (!ct.IsCancellationRequested)
                     yield return await ExecuteWorkflow(wf_nam, inputs, ct);
             }
-        }
-
-        public async Task<List<RuleResultTree>> ExecuteWorkflow(string workflow_name, object[] inputs, CancellationToken ct = default)
-        {
-            //TODO: tightly coupled with inputX as a string
-            var ruleParams = new List<RuleParameter>();
-
-            for (var i = 0; i < inputs.Length; i++)
-            {
-                if (ct.IsCancellationRequested)
-                    break;
-
-                var input = inputs[i];
-                ruleParams.Add(new RuleParameter($"input{i + 1}", input));
-            }
-
-            return await ExecuteWorkflow(workflow_name, ruleParams.ToArray(), ct);
         }
         public async Task<List<RuleResultTree>> ExecuteWorkflow(string workflow_name, RuleParameter[] inputs, CancellationToken ct = default)
         {
@@ -127,7 +102,6 @@ namespace RulesEngine
             
             return result;
         }
-
         public async Task<RuleResultTree> ExecuteRule(string workflow_name, string rule_name, RuleParameter[] ruleParams, CancellationToken ct = default)
         {
             RuleResultTree ruleResultTree = null;
@@ -159,7 +133,6 @@ namespace RulesEngine
 
             return ruleResultTree;
         }
-        
         public async Task<ActionRuleResult> ExecuteRuleActions(string workflow_name, string rule_name, RuleParameter[] inputs, CancellationToken ct = default)
         {
             var compiledRule = CompileRule(workflow_name, rule_name, inputs);
