@@ -1,4 +1,4 @@
-dcfzas// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
 using RulesEngine.Models;
 using System;
@@ -9,7 +9,6 @@ using Xunit;
 
 namespace RulesEngine.UnitTest
 {
-
     [ExcludeFromCodeCoverage]
     public class RulesEngineWithActionsTests
     {
