@@ -9,16 +9,16 @@ All notable changes to this project will be documented in this file.
 ## [6.0.1]
  - All previous RulesEngine public methods have labeled obsolete (but still exist for backwards compatibility)
  - Replacement methods created which prevent confusion [Example](https://github.com/asulwer/RulesEngine/blob/main/demo/DemoApp/Demos/MultipleWorkflows.cs)
-	- public async IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(object[] inputs, [EnumeratorCancellation] CancellationToken ct = default)
-	- public async IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(RuleParameter[] inputs, [EnumeratorCancellation] CancellationToken ct = default)
+	- `public async IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(object[] inputs, [EnumeratorCancellation] CancellationToken ct = default)`
+	- `public async IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(RuleParameter[] inputs, [EnumeratorCancellation] CancellationToken ct = default)`
 	  - interates workflows and calls ExecuteWorkflow for each interation
 	  - yield return for each workflow
-	- public async Task<List<RuleResultTree>> ExecuteWorkflow(string workflow_name, object[] inputs, CancellationToken ct = default)
-	- public async Task<List<RuleResultTree>> ExecuteWorkflow(string workflow_name, RuleParameter[] inputs, CancellationToken ct = default
+	- `public async Task<List<RuleResultTree>> ExecuteWorkflow(string workflow_name, object[] inputs, CancellationToken ct = default)`
+	- `public async Task<List<RuleResultTree>> ExecuteWorkflow(string workflow_name, RuleParameter[] inputs, CancellationToken ct = default)`
 	  - interates rules in workflow and calls ExecuteRule for each iteration
-	- public async Task<RuleResultTree> ExecuteRule(string workflow_name, string rule_name, RuleParameter[] ruleParams, CancellationToken ct = default)
+	- `public async Task<RuleResultTree> ExecuteRule(string workflow_name, string rule_name, RuleParameter[] ruleParams, CancellationToken ct = default)`
 	  - executes a rule and/or action, if applicable
-	- public async Task<ActionRuleResult> ExecuteRuleActions(string workflow_name, string rule_name, RuleParameter[] inputs, CancellationToken ct = default)
+	- `public async Task<ActionRuleResult> ExecuteRuleActions(string workflow_name, string rule_name, RuleParameter[] inputs, CancellationToken ct = default)`
 	  - execute the actions of a rule
 	 
 ## [6.0.0]
