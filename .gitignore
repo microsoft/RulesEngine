@@ -333,6 +333,6 @@ ASALocalRun/
 /assets/RulesEnginePackageFile.xml
 coveragereport/
 
-src/**/*.snk
+RulesEngine/*.snk
 
 dist

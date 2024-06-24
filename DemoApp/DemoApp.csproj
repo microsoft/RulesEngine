@@ -12,11 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/RulesEngine/RulesEngine.csproj" />
+    <ProjectReference Include="..\RulesEngine\RulesEngine.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /y $(SolutionDir)demo\Workflows\Discount.json $(ProjectDir)$(OutDir)&#xD;&#xA;xcopy /y $(SolutionDir)demo\Workflows\NestedInput.json $(ProjectDir)$(OutDir)" />
+    <Exec Command="xcopy $(SolutionDir)Workflows\Discount.json $(ProjectDir)$(OutDir) /d /i /y&#xD;&#xA;xcopy $(SolutionDir)Workflows\NestedInput.json $(ProjectDir)$(OutDir) /d /i /y" />
   </Target>
 
 </Project>

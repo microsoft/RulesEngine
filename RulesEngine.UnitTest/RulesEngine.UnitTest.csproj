@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\signing\public.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(SolutionDir)public.snk</AssemblyOriginatorKeyFile>
     <DelaySign>True</DelaySign>
   </PropertyGroup>
   <ItemGroup>
@@ -21,6 +21,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RulesEngine\RulesEngine.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="TestData\rules1.json">
