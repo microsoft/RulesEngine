@@ -50,7 +50,8 @@ namespace DemoApp.Demos
 
             var async_ret = await bre.ExecuteWorkflow("UseFastExpressionCompilerTest", appData, ct);
             
-            Console.WriteLine(async_ret[0].IsSuccess);
+            if(async_ret != null && async_ret.Count > 0)
+                Console.WriteLine(async_ret[0].IsSuccess);
         }
 
         internal class AppData

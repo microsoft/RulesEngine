@@ -22,7 +22,7 @@ namespace RulesEngine.Extensions
         /// <returns></returns>
         public static List<RuleResultTree> OnSuccess(this List<RuleResultTree> ruleResultTrees, OnSuccessFunc onSuccessFunc)
         {
-            var successfulRuleResult = ruleResultTrees.FirstOrDefault(ruleResult => ruleResult.IsSuccess == true);
+            var successfulRuleResult = ruleResultTrees.FirstOrDefault(ruleResult => ruleResult?.IsSuccess == true);
             if (successfulRuleResult != null)
             {
                 var eventName = successfulRuleResult.Rule.SuccessMessage ?? successfulRuleResult.Rule.RuleName;
@@ -40,7 +40,7 @@ namespace RulesEngine.Extensions
         /// <returns></returns>
         public static List<RuleResultTree> OnFail(this List<RuleResultTree> ruleResultTrees, OnFailureFunc onFailureFunc)
         {
-            bool allFailure = ruleResultTrees.All(ruleResult => ruleResult.IsSuccess == false);
+            bool allFailure = ruleResultTrees.All(ruleResult => ruleResult?.IsSuccess == false);
             if (allFailure)
                 onFailureFunc();
             return ruleResultTrees;

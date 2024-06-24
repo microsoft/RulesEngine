@@ -7,6 +7,7 @@ using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -47,7 +48,8 @@ namespace DemoApp.Demos
                 })
             };
 
-            var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "NestedInput.json", SearchOption.AllDirectories);
+            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\Workflows";
+            var files = Directory.GetFiles(dir, "NestedInput.json", SearchOption.AllDirectories);
             if (files == null || files.Length == 0)
                 throw new Exception("Rules not found.");
             

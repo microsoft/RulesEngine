@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
@@ -28,7 +29,7 @@ namespace DemoApp.Demos
                 new RuleParameter("input3", new { noOfVisitsPerMonth = 10, percentageOfBuyingToVisit = 15 })
             };
 
-            var dir = Directory.GetCurrentDirectory();
+            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\Workflows";
             var files = Directory.GetFiles(dir, "Discount.json", SearchOption.AllDirectories);
             if (files == null || files.Length == 0)
                 throw new Exception("Rules not found.");
@@ -41,8 +42,8 @@ namespace DemoApp.Demos
             {
                 if (db.Database.EnsureCreated())
                 {
-                    db.Workflows.AddRange(workflow);
-                    await db.SaveChangesAsync();
+                    await db.Workflows.AddRangeAsync(workflow, ct);
+                    await db.SaveChangesAsync(ct);
                 }
 
                 wfr = db.Workflows.Include(i => i.Rules).ThenInclude(i => i.Rules).ToArray();
@@ -54,17 +55,13 @@ namespace DemoApp.Demos
 
                 await foreach (var rrt in bre.ExecuteAllWorkflows(rp, ct))
                 {
-                    string discountOffered = "No discount offered.";
-
                     rrt.OnSuccess((eventName) => {
-                        discountOffered = $"Discount offered is {eventName} % over MRP.";
+                        Console.WriteLine($"Discount offered is {eventName} % over MRP.");
                     });
 
                     rrt.OnFail(() => {
-                        discountOffered = "The user is not eligible for any discount.";
+                        Console.WriteLine("The user is not eligible for any discount.");
                     });
-
-                    Console.WriteLine(discountOffered);
                 }
             }
         }

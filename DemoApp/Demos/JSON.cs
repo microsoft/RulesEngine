@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
@@ -26,7 +27,8 @@ namespace DemoApp.Demos
                 new RuleParameter("input3", new { noOfVisitsPerMonth = 10, percentageOfBuyingToVisit = 15 })
             };
 
-            var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "Discount.json", SearchOption.AllDirectories);
+            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\Workflows";
+            var files = Directory.GetFiles(dir, "Discount.json", SearchOption.AllDirectories);
             if (files == null || files.Length == 0)
                 throw new Exception("Rules not found.");
 
@@ -35,19 +37,18 @@ namespace DemoApp.Demos
 
             var bre = new RulesEngine.RulesEngine(workflow, null);
 
-            var discountOffered = "No discount offered.";
-
             var resultList = await bre.ExecuteWorkflow("Discount", rp, ct);
 
-            resultList.OnSuccess((eventName) => {
-                discountOffered = $"Discount offered is {eventName} % over MRP.";
-            });
+            if (resultList != null && resultList.Count > 0)
+            {
+                resultList.OnSuccess((eventName) => {
+                    Console.WriteLine($"Discount offered is {eventName} % over MRP.");
+                });
 
-            resultList.OnFail(() => {
-                discountOffered = "The user is not eligible for any discount.";
-            });
-
-            Console.WriteLine(discountOffered);
+                resultList.OnFail(() => {
+                    Console.WriteLine("The user is not eligible for any discount.");
+                });
+            }
         }
     }
 }

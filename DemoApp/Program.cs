@@ -16,8 +16,7 @@ namespace DemoApp
             using (var cts = new CancellationTokenSource())
             {
                 //initiate cancel, set to something lower than time it takes for program to complete to initiate cancel
-                //cts.CancelAfter(TimeSpan.FromMilliseconds(94));
-
+                //cts.CancelAfter(TimeSpan.FromMilliseconds(97));
                 await new Demos.Basic().Run(cts.Token);
                 await new Demos.BasicWithCustomTypes().Run(cts.Token);
                 await new Demos.JSON().Run(cts.Token);

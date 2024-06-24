@@ -82,6 +82,9 @@ namespace RulesEngine
 
             foreach (var rule in _rulesCache.GetWorkflow(workflow_name).Rules)
             {
+                if (ct.IsCancellationRequested)
+                    break;
+
                 var resultTree = await ExecuteRule(workflow_name, rule.RuleName, inputs, ct);
                 result.Add(resultTree);
             }
@@ -92,29 +95,32 @@ namespace RulesEngine
         {
             RuleResultTree ruleResultTree = null;
 
-            if (RegisterRule(workflow_name, ruleParams))
+            if (!ct.IsCancellationRequested)
             {
-                var compiledRulesCacheKey = GetCompiledRulesKey(workflow_name, ruleParams);
+                if (RegisterRule(workflow_name, ruleParams))
+                {
+                    var compiledRulesCacheKey = GetCompiledRulesKey(workflow_name, ruleParams);
 
-                var compiledRule = _rulesCache.GetCompiledRules(compiledRulesCacheKey)[rule_name];
-                ruleResultTree = compiledRule(ruleParams);
-                
-                FormatErrorMessages(ruleResultTree);
-                                
-                if (ruleResultTree.ChildResults != null)
-                    await ExecuteActionAsync(ruleResultTree.ChildResults, ct);
-                
-                var actionResult = await ExecuteActionForRuleResult(ruleResultTree, true, ct);
+                    var compiledRule = _rulesCache.GetCompiledRules(compiledRulesCacheKey)[rule_name];
+                    ruleResultTree = compiledRule(ruleParams);
 
-                ruleResultTree.ActionResult = new ActionResult {
-                    Output = actionResult.Output,
-                    Exception = actionResult.Exception
-                };
-            }
-            else
-            {
-                // if rules are not registered with Rules Engine
-                throw new ArgumentException($"Rule config file is not present for the {workflow_name} workflow");
+                    FormatErrorMessages(ruleResultTree);
+
+                    if (ruleResultTree.ChildResults != null)
+                        await ExecuteActionAsync(ruleResultTree.ChildResults, ct);
+
+                    var actionResult = await ExecuteActionForRuleResult(ruleResultTree, true, ct);
+
+                    ruleResultTree.ActionResult = new ActionResult {
+                        Output = actionResult.Output,
+                        Exception = actionResult.Exception
+                    };
+                }
+                else
+                {
+                    // if rules are not registered with Rules Engine
+                    throw new ArgumentException($"Rule config file is not present for the {workflow_name} workflow");
+                }
             }
 
             return ruleResultTree;
