@@ -22,7 +22,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\signing\RulesEngine-publicKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\signing\public.snk</AssemblyOriginatorKeyFile>
     <DelaySign>True</DelaySign>
     <Deterministic>true</Deterministic>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -41,5 +41,9 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.4.1" />    
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
+    <Exec Command="powershell -ExecutionPolicy Unrestricted $(SolutionDir)deployment\build-signed.ps1 -dll &quot;$(ProjectDir)$(OutDir)$(AssemblyName).dll&quot; -snk &quot;$(ProjectDir)sgKey.snk&quot;" />
+  </Target>
 
 </Project>

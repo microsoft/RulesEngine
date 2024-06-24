@@ -1,15 +1,5 @@
-param(
-    [Parameter(Mandatory)]
-    [string] $csprojFilePath,
-    [Parameter(Mandatory)]
-    [string] $signingKey
+param (
+	[string]$dll,
+	[string]$snk
 )
-
-# sign and build the project
-$directory = Split-Path $csprojFilePath;
-$signKeyFile = Join-Path $directory "signKey.snk";
-
-$bytes = [Convert]::FromBase64String($signingKey)
-[IO.File]::WriteAllBytes($signKeyFile, $bytes)
-
-dotnet build $csprojFilePath -c Release -p:ContinuousIntegrationBuild=true -p:DelaySign=false -p:AssemblyOriginatorKeyFile=$signKeyFile 
+& "C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\sn.exe" -R $dll $snk

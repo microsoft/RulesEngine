@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\signing\RulesEngine-publicKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\signing\public.snk</AssemblyOriginatorKeyFile>
     <DelaySign>True</DelaySign>
   </PropertyGroup>
   <ItemGroup>

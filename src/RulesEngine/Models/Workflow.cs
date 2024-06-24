@@ -9,11 +9,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace RulesEngine.Models
 {
-    [Obsolete("WorkflowRules class is deprecated. Use Workflow class instead.")]
-    [ExcludeFromCodeCoverage]
-    public class WorkflowRules : Workflow {
-    }
-
     /// <summary>
     /// Workflow rules class for deserialization  the json config file
     /// </summary>
