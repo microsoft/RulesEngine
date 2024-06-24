@@ -19,7 +19,7 @@ namespace DemoApp.Demos
         {
             Console.WriteLine($"Running {nameof(MultipleWorkflows)}....");
 
-            var workflows = new List<Workflow> {
+            var workflows = new Workflow[] {
                 new Workflow {
                     WorkflowName = "Test Workflow1",
                     Rules = new List<Rule> {
@@ -84,15 +84,11 @@ namespace DemoApp.Demos
                 }
             };
 
-            var bre = new RulesEngine.RulesEngine(workflows.ToArray(), null);
+            var bre = new RulesEngine.RulesEngine(workflows, null);
 
             var inputs = new RuleParameter[] {
                 new RuleParameter("input1", new { count = 1 })
             };
-
-            //var inputs = new[] {
-            //    new { count = 1 }
-            //};
 
             await foreach (var async_rrt in bre.ExecuteAllWorkflows(inputs, ct))
             {

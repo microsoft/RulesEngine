@@ -23,44 +23,45 @@ namespace DemoApp.Demos
         public async Task Run(CancellationToken ct = default)
         {
             Console.WriteLine($"Running {nameof(NestedInput)}....");
-            var nestedInput = new {
-                SimpleProp = "simpleProp",
-                NestedProp = new {
-                    SimpleProp = "nestedSimpleProp",
-                    ListProp = new List<ListItem>
-                    {
-                        new ListItem
+
+            var rp = new RuleParameter[] {
+                new RuleParameter("input1", new 
+                {
+                    SimpleProp = "simpleProp",
+                    NestedProp = new {
+                        SimpleProp = "nestedSimpleProp",
+                        ListProp = new List<ListItem>
                         {
-                            Id = 1,
-                            Value = "first"
-                        },
-                        new ListItem
-                        {
-                            Id = 2,
-                            Value = "second"
+                            new ListItem
+                            {
+                                Id = 1,
+                                Value = "first"
+                            },
+                            new ListItem
+                            {
+                                Id = 2,
+                                Value = "second"
+                            }
                         }
                     }
-                }
+                })
             };
 
             var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "NestedInput.json", SearchOption.AllDirectories);
             if (files == null || files.Length == 0)
-            {
                 throw new Exception("Rules not found.");
-            }
-
+            
             var fileData = await File.ReadAllTextAsync(files[0]);
             var Workflows = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
             var bre = new RulesEngine.RulesEngine(Workflows.ToArray(), null);
-            foreach (var workflow in Workflows)
-            {
-                var resultList = await bre.ExecuteAllRulesAsync(workflow.WorkflowName, [nestedInput], ct);
 
-                resultList.OnSuccess((eventName) => {
-                    Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in success - {eventName}");
+            await foreach (var async_ret in bre.ExecuteAllWorkflows(rp, ct))
+            {
+                async_ret.OnSuccess((eventName) => {
+                    Console.WriteLine($"evaluation resulted in success - {eventName}");
                 }).OnFail(() => {
-                    Console.WriteLine($"{workflow.WorkflowName} evaluation resulted in failure");
+                    Console.WriteLine($"evaluation resulted in failure");
                 });
             }
         }

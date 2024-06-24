@@ -41,12 +41,9 @@ namespace RulesEngine
 
         #region Constructor
 
-        public RulesEngine(string[] jsonConfig, ReSettings reSettings = null) : this(reSettings)
-        {
-            var workflow = jsonConfig.Select(item => JsonConvert.DeserializeObject<Workflow>(item)).ToArray();
-            AddWorkflow(workflow);
-        }
-
+        [Obsolete("Json is a method of storing workflows/rules. We do not want to be tightly coupled to one method of storing")]
+        public RulesEngine(string[] jsonConfig, ReSettings reSettings = null) : this(jsonConfig.Select(item => JsonConvert.DeserializeObject<Workflow>(item)).ToArray(), reSettings) { }
+        
         public RulesEngine(Workflow[] Workflows, ReSettings reSettings = null) : this(reSettings)
         {
             AddWorkflow(Workflows);
@@ -63,17 +60,6 @@ namespace RulesEngine
             _ruleExpressionParser = new RuleExpressionParser(_reSettings);
             _ruleCompiler = new RuleCompiler(new RuleExpressionBuilderFactory(_reSettings, _ruleExpressionParser),_reSettings);
             _actionFactory = new ActionFactory(GetActionRegistry(_reSettings));
-        }
-
-        private IDictionary<string, Func<ActionBase>> GetActionRegistry(ReSettings reSettings)
-        {
-            var actionDictionary = GetDefaultActionRegistry();
-            var customActions = reSettings.CustomActions ?? new Dictionary<string, Func<ActionBase>>();
-            foreach (var customAction in customActions)
-            {
-                actionDictionary.Add(customAction);
-            }
-            return actionDictionary;
         }
 
         #endregion
@@ -141,6 +127,8 @@ namespace RulesEngine
             return await ExecuteActionForRuleResult(resultTree, true, ct);
         }
 
+        #region Obsolete Methods
+
         [Obsolete]
         public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowname, params object[] inputs)
         {
@@ -188,6 +176,8 @@ namespace RulesEngine
             var resultTree = compiledRule(ruleParameters);
             return await ExecuteActionForRuleResult(resultTree, true, ct);
         }
+
+        #endregion
 
         /// <summary>
         /// Adds the workflow if the workflow name is not already added. Ignores the rest.
@@ -279,6 +269,17 @@ namespace RulesEngine
         #endregion
 
         #region Private Methods
+
+        private IDictionary<string, Func<ActionBase>> GetActionRegistry(ReSettings reSettings)
+        {
+            var actionDictionary = GetDefaultActionRegistry();
+            var customActions = reSettings.CustomActions ?? new Dictionary<string, Func<ActionBase>>();
+            foreach (var customAction in customActions)
+            {
+                actionDictionary.Add(customAction);
+            }
+            return actionDictionary;
+        }
 
         private async ValueTask ExecuteActionAsync(IEnumerable<RuleResultTree> ruleResultList, CancellationToken ct = default)
         {

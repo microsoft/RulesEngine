@@ -28,46 +28,40 @@ namespace DemoApp.Demos
         public async Task Run(CancellationToken ct = default)
         {
             Console.WriteLine($"Running {nameof(BasicWithCustomTypes)}....");
-            var workflows = new List<Workflow>();
-            var workflow = new Workflow();
-            workflow.WorkflowName = "Test Workflow Rule 1";
 
-            var rules = new List<Rule> {
-                new Rule() {
-                    RuleName = "Test Rule",
-                    SuccessMessage = "doSomething ran successfully",
-                    ErrorMessage = "doSomething failed",
-                    Expression = "Utils.CheckContains(string1, \"bye,seeya,hello\") == true",
-                    RuleExpressionType = RuleExpressionType.LambdaExpression
+            var workflows = new Workflow[] {
+                new Workflow {
+                    WorkflowName = "Test Workflow Rule 1",
+                    Rules = new List<Rule> {
+                        new Rule {
+                            RuleName = "Test Rule",
+                            SuccessMessage = "doSomething ran successfully",
+                            ErrorMessage = "doSomething failed",
+                            Expression = "Utils.CheckContains(string1, \"bye,seeya,hello\") == true"
+                        }
+                    }
                 }
             };
-            
-            workflow.Rules = rules;
-            workflows.Add(workflow);
 
             var reSettings = new ReSettings {
                 CustomTypes = [ typeof(Utils) ]
             };
 
-            var bre = new RulesEngine.RulesEngine(workflows.ToArray(), reSettings);
+            var bre = new RulesEngine.RulesEngine(workflows, reSettings);
 
-            var string1 = new RuleParameter("string1", "hello");
-            
-            var ruleResultTree = await bre.ExecuteAllRulesAsync("Test Workflow Rule 1", [string1], ct);
-            ruleResultTree.OnSuccess((eventName) => {
-                Console.WriteLine($"Result '{eventName}' is as expected.");
-            });
-            ruleResultTree.OnFail(() => {
-                Console.WriteLine($"Test outcome: false");
-            });
+            var rp = new RuleParameter[] {
+                new RuleParameter("string1", "hello")
+            };
 
-            var actionRuleResult = await bre.ExecuteActionWorkflowAsync("Test Workflow Rule 1", "Test Rule", [string1], ct);
-            actionRuleResult.Results.OnSuccess((eventName) => {
-                Console.WriteLine($"Result '{eventName}' is as expected.");
-            });
-            actionRuleResult.Results.OnFail(() => {
-                Console.WriteLine($"Test outcome: false");
-            });
+            await foreach(var async_rrt in bre.ExecuteAllWorkflows(rp, ct))
+            {
+                async_rrt.OnSuccess((eventName) => {
+                    Console.WriteLine($"Result '{eventName}' is as expected.");
+                });
+                async_rrt.OnFail(() => {
+                    Console.WriteLine($"Test outcome: false");
+                });
+            }
         }
     }
 }

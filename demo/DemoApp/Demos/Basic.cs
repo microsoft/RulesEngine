@@ -16,51 +16,45 @@ namespace DemoApp.Demos
         public async Task Run(CancellationToken ct = default)
         {
             Console.WriteLine($"Running {nameof(Basic)}....");
-            var workflows = new List<Workflow>();
-            var workflow = new Workflow();
-            workflow.WorkflowName = "Test Workflow Rule 1";
 
-            var rules = new List<Rule>();
+            var workflows = new Workflow[] {
+                new Workflow {
+                    WorkflowName = "Test Workflow Rule 1",
+                    Rules = new List<Rule> {
+                        new Rule {
+                            RuleName = "Test Rule",
+                            SuccessMessage = "Count is within tolerance",
+                            ErrorMessage = "Over expected",
+                            Expression = "count < 3"
+                        }
+                    }
+                }
+            };
+            
+            var bre = new RulesEngine.RulesEngine(workflows, null);
 
-            var rule = new Rule();
-            rule.RuleName = "Test Rule";
-            rule.SuccessMessage = "Count is within tolerance.";
-            rule.ErrorMessage = "Over expected.";
-            rule.Expression = "count < 3";
-            rule.RuleExpressionType = RuleExpressionType.LambdaExpression;
-
-            rules.Add(rule);
-
-            workflow.Rules = rules;
-
-            workflows.Add(workflow);
-
-            var bre = new RulesEngine.RulesEngine(workflows.ToArray(), null);
-
-            dynamic datas = new ExpandoObject();
-            datas.count = 1;
-            var inputs = new dynamic[]
-            {
-                datas
+            var rp = new RuleParameter[] {
+                new RuleParameter("input1", new { count = 1 })
             };
 
-            var resultList = await bre.ExecuteAllRulesAsync("Test Workflow Rule 1", inputs, ct);
+            await foreach (var async_rrt in bre.ExecuteAllWorkflows(rp, ct))
+            {
+                var outcome = false;
 
-            var outcome = false;
+                //Different ways to show test results:
+                outcome = async_rrt.TrueForAll(r => r.IsSuccess);
 
-            //Different ways to show test results:
-            outcome = resultList.TrueForAll(r => r.IsSuccess);
+                async_rrt.OnSuccess((eventName) => {
+                    Console.WriteLine($"Result '{eventName}' is as expected.");
+                    outcome = true;
+                });
 
-            resultList.OnSuccess((eventName) => {
-                Console.WriteLine($"Result '{eventName}' is as expected.");
-                outcome = true;
-            });
+                async_rrt.OnFail(() => {
+                    outcome = false;
+                });
 
-            resultList.OnFail(() => {
-                outcome = false;
-            });
-
-            Console.WriteLine($"Test outcome: {outcome}.");
+                Console.WriteLine($"Test outcome: {outcome}.");
+            }
         }
     }
 }
