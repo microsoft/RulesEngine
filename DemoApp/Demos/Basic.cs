@@ -20,18 +20,18 @@ namespace DemoApp.Demos
             var workflows = new Workflow[] {
                 new Workflow {
                     WorkflowName = "Test Workflow Rule 1",
-                    Rules = new List<Rule> {
+                    Rules = [
                         new Rule {
                             RuleName = "Test Rule",
                             SuccessMessage = "Count is within tolerance",
                             ErrorMessage = "Over expected",
                             Expression = "count < 3"
                         }
-                    }
+                    ]
                 }
             };
             
-            var bre = new RulesEngine.RulesEngine(workflows, null);
+            var bre = new RulesEngine.RulesEngine(workflows);
 
             var rp = new RuleParameter[] {
                 new RuleParameter("input1", new { count = 1 })
