@@ -5,7 +5,11 @@ All notable changes to this project will be documented in this file.
 ## [Future]
  - WorkflowName and RuleName will be changed to Name
 	- seems redundant to say Workflow.WorkflowName or Rule.RuleName
-   
+
+## [6.0.2]
+ - CancellationToken was not completely implemented
+ - Release builds are strongly signed
+
 ## [6.0.1]
  - All previous RulesEngine public methods have labeled obsolete (but still exist for backwards compatibility)
  - Replacement methods created which prevent confusion [Example](https://github.com/asulwer/RulesEngine/blob/main/demo/DemoApp/Demos/MultipleWorkflows.cs)
