@@ -4,12 +4,27 @@ All notable changes to this project will be documented in this file.
 
 ## [Future]
  - WorkflowName and RuleName will be changed to Name
-   - redundant to say Workflow.WorkflowName or Rule.RuleName
-
+	- seems redundant to say Workflow.WorkflowName or Rule.RuleName
+   
+## [6.0.1]
+ - All previous RulesEngine public methods have labeled obsolete (but still exist for backwards compatibility)
+ - Replacement methods created which prevent confusion [Example](https://github.com/asulwer/RulesEngine/blob/main/demo/DemoApp/Demos/MultipleWorkflows.cs)
+	- public async IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(object[] inputs, [EnumeratorCancellation] CancellationToken ct = default)
+	- public async IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(RuleParameter[] inputs, [EnumeratorCancellation] CancellationToken ct = default)
+	  - interates workflows and calls ExecuteWorkflow for each interation
+	  - yield return for each workflow
+	- public async Task<List<RuleResultTree>> ExecuteWorkflow(string workflow_name, object[] inputs, CancellationToken ct = default)
+	- public async Task<List<RuleResultTree>> ExecuteWorkflow(string workflow_name, RuleParameter[] inputs, CancellationToken ct = default
+	  - interates rules in workflow and calls ExecuteRule for each iteration
+	- public async Task<RuleResultTree> ExecuteRule(string workflow_name, string rule_name, RuleParameter[] ruleParams, CancellationToken ct = default)
+	  - executes a rule and/or action, if applicable
+	- public async Task<ActionRuleResult> ExecuteRuleActions(string workflow_name, string rule_name, RuleParameter[] inputs, CancellationToken ct = default)
+	  - execute the actions of a rule
+	 
 ## [6.0.0]
 - methods that were marked obsolete, in prior version, have been removed
 - ALL issues in [master](https://github.com/microsoft/RulesEngine/issues) fork have been resolved, usually with a demo app supporting solution
-- only targeting netstandard2.0
+- only targeting netstandard2.1
 - Methods with CancellationToken added for all RulesEngine Execute... methods
 - RulesEngine Execute... Methods using params marked obsolete in favor of CancellationToken supported methods
 
