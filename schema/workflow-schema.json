@@ -30,7 +30,7 @@
         "ErrorMessage": {
           "type": "string"
         },
-        "SuccessEvent": {
+        "SuccessMessage": {
           "type": "string"
         },
         "Rules": {
@@ -90,7 +90,7 @@
         "ErrorMessage": {
           "type": "string"
         },
-        "SuccessEvent": {
+        "SuccessMessage": {
           "type": "string"
         },
         "Properties": {
@@ -128,7 +128,6 @@
         }
       }
     }
-
   },
   "properties": {
     "WorkflowName": {
