@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <Nullable>disable</Nullable>
-    <Version>6.0.2.1</Version>
+    <Version>6.0.3</Version>
     <PackageId>RulesEngineEx</PackageId>
     <Copyright>Copyright (c) Aaron Sulwer.</Copyright>
     <Company>ACCLS Company</Company>
@@ -48,7 +48,7 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />    
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.4.1" />    
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.4.2" />    
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">

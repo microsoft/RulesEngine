@@ -2,24 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [6.0.3]
+- updated System.Linq.Dynamic.Core to fix a bug [614](https://github.com/microsoft/RulesEngine/issues/614) 
+- created test CachingLiteralsDictionary to verify bug has been fixed
+
 ## [6.0.2]
- - CancellationToken was not completely implemented
- - Release builds are strongly signed
+- CancellationToken was not completely implemented
+- Release builds are strongly signed
 
 ## [6.0.1]
- - All previous RulesEngine public methods have labeled obsolete (but still exist for backwards compatibility)
- - Replacement methods created which prevent confusion [Example](https://github.com/asulwer/RulesEngine/blob/main/demo/DemoApp/Demos/MultipleWorkflows.cs)
+- All previous RulesEngine public methods have labeled obsolete (but still exist for backwards compatibility)
+- Replacement methods created which prevent confusion [Example](https://github.com/asulwer/RulesEngine/blob/main/demo/DemoApp/Demos/MultipleWorkflows.cs)
 	- `public async IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(object[] inputs, [EnumeratorCancellation] CancellationToken ct = default)`
 	- `public async IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(RuleParameter[] inputs, [EnumeratorCancellation] CancellationToken ct = default)`
-	  - interates workflows and calls ExecuteWorkflow for each interation
-	  - yield return for each workflow
+		- interates workflows and calls ExecuteWorkflow for each interation
+		- yield return for each workflow
 	- `public async Task<List<RuleResultTree>> ExecuteWorkflow(string workflow_name, object[] inputs, CancellationToken ct = default)`
 	- `public async Task<List<RuleResultTree>> ExecuteWorkflow(string workflow_name, RuleParameter[] inputs, CancellationToken ct = default)`
-	  - interates rules in workflow and calls ExecuteRule for each iteration
+		- interates rules in workflow and calls ExecuteRule for each iteration
 	- `public async Task<RuleResultTree> ExecuteRule(string workflow_name, string rule_name, RuleParameter[] ruleParams, CancellationToken ct = default)`
-	  - executes a rule and/or action, if applicable
+		- executes a rule and/or action, if applicable
 	- `public async Task<ActionRuleResult> ExecuteRuleActions(string workflow_name, string rule_name, RuleParameter[] inputs, CancellationToken ct = default)`
-	  - execute the actions of a rule
+		- execute the actions of a rule
 	 
 ## [6.0.0]
 - methods that were marked obsolete, in prior version, have been removed

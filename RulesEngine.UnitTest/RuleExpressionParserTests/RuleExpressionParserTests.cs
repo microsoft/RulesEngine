@@ -3,8 +3,11 @@
 
 using Newtonsoft.Json.Linq;
 using RulesEngine.ExpressionBuilders;
+using RulesEngine.Models;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using Xunit;
+using static FastExpressionCompiler.ExpressionCompiler;
 
 namespace RulesEngine.UnitTest.RuleExpressionParserTests
 {
@@ -48,6 +51,33 @@ namespace RulesEngine.UnitTest.RuleExpressionParserTests
             var value3= ruleParser.Evaluate<object>("string.Concat(input.list[0].item1,input.list[1].item2)", new[] { new Models.RuleParameter("input", input) });
 
             Assert.Equal("helloworld", value3);
+        }
+
+        [Fact]
+        public void CachingLiteralsDictionary()
+        {
+            var board = new { NumberOfMembers = default(decimal?) };
+
+            var parameters = new RuleParameter[] {
+                RuleParameter.Create("Board", board) 
+            };
+
+            var parser = new RuleExpressionParser();
+
+            try
+            {
+                const string expression1 = "Board.NumberOfMembers = 0.2d";
+                var result1 = parser.Evaluate<bool>(expression1, parameters);
+                Assert.False(result1);
+            }
+            catch (Exception)
+            {
+                // passing it over.
+            }
+
+            const string expression2 = "Board.NumberOfMembers = 0.2"; //literal notation incorrect, should be 0.2m
+            var result2 = parser.Evaluate<bool>(expression2, parameters);
+            Assert.False(result2);
         }
 
         [Theory]
