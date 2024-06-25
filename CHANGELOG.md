@@ -2,10 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Future]
- - WorkflowName and RuleName will be changed to Name
-	- seems redundant to say Workflow.WorkflowName or Rule.RuleName
-
 ## [6.0.2]
  - CancellationToken was not completely implemented
  - Release builds are strongly signed
@@ -31,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - only targeting netstandard2.1
 - Methods with CancellationToken added for all RulesEngine Execute... methods
 - RulesEngine Execute... Methods using params marked obsolete in favor of CancellationToken supported methods
+- original project is no longer being maintained
 
 ## [5.0.4]
 - Refactoring code, big time
