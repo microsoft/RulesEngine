@@ -8,12 +8,11 @@ This is the Roadmap of this RulesEngine fork.
 - Refactor Code and add comments for readability
 - Fix Issues from the original project
 - Go From Moq to NSubstitute 
+- Add LogicalRule and LeafRule as classes for easier use
 
 
 Somewhat later:
 Probably braking changes:
 - Migrate from Newtonsoft.Json to System.Text.Json
-- Split Rule into LogicalRule and ExpressionRule for easier use
--- With migration script
 
 More to come .. :)
