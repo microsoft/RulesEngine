@@ -52,7 +52,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
-    <Exec Command="powershell -ExecutionPolicy Unrestricted ..\build-signed.ps1 -dll &quot;$(ProjectDir)$(OutDir)$(AssemblyName).dll&quot; -snk &quot;$(ProjectDir)sgKey.snk&quot;" />
+    <Exec Command="powershell -ExecutionPolicy Unrestricted $(ProjectDir)build-signed.ps1 -dll &quot;$(ProjectDir)$(OutDir)$(AssemblyName).dll&quot; -snk &quot;$(ProjectDir)sgKey.snk&quot;" />
   </Target>
 
 </Project>

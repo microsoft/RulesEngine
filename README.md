@@ -6,7 +6,7 @@ Rules Engine is a library (not yet NuGet package) for abstracting business logic
 
 ## How to use it
 
-### [Basic Exmample](https://github.com/asulwer/RulesEngine/blob/v6.0.2/DemoApp/Demos/Basic.cs)
+### [Basic Example](https://github.com/asulwer/RulesEngine/blob/v6.0.2/DemoApp/Demos/Basic.cs)
 
 ### 1. Create the Workflow and add a Rule to it
 
