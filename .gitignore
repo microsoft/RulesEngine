@@ -93,7 +93,6 @@ publish/
 
 nuget-packages
 RulesEngine/*.snk
-RulesEngine/*.ps1
 *.ps1
 
 dist
