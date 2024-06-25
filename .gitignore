@@ -91,6 +91,7 @@ publish/
 *.ldf
 *.ndf
 
+nuget-packages
 RulesEngine/*.snk
 RulesEngine/*.ps1
 *.ps1

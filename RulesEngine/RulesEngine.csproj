@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <Nullable>disable</Nullable>
-    <Version>6.0.2</Version>
+    <Version>6.0.2.1</Version>
     <PackageId>RulesEngineEx</PackageId>
     <Copyright>Copyright (c) Aaron Sulwer.</Copyright>
     <Company>ACCLS Company</Company>
@@ -51,7 +51,15 @@
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.4.1" />    
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
+  <Target Name="PostBuildMacros">
+    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="Assemblies" ItemName="Targets" />
+    </GetAssemblyIdentity>
+    <ItemGroup>
+      <VersionNumber Include="@(Targets->'%(Version)')" />
+    </ItemGroup>
+  </Target>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'" DependsOnTargets="PostBuildMacros">
     <Exec Command="powershell -ExecutionPolicy Unrestricted $(ProjectDir)build-signed.ps1 -dll &quot;$(ProjectDir)$(OutDir)$(AssemblyName).dll&quot; -snk &quot;$(ProjectDir)sgKey.snk&quot;" />
   </Target>
 
