@@ -11,11 +11,7 @@ namespace RulesEngine.UnitTest.RuleExpressionParserTests
     [ExcludeFromCodeCoverage]
     public class RuleExpressionParserTests
     {
-        public RuleExpressionParserTests() { 
-           
-        
-        }
-
+        public RuleExpressionParserTests() { }
 
         [Fact]
         public void TestExpressionWithJObject()
@@ -63,7 +59,5 @@ namespace RulesEngine.UnitTest.RuleExpressionParserTests
             var result = ruleParser.Evaluate<bool>("d1 < 20", new[] { Models.RuleParameter.Create("d1", d1) });
             Assert.False(result);
         }
-    }
-
-    
+    }    
 }
