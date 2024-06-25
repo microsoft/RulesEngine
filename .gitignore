@@ -93,6 +93,7 @@ publish/
 
 nuget-packages/
 RulesEngine/sgKey.snk
+RulesEngine/build-signed.ps1
 nuget-push.ps1
 
 dist

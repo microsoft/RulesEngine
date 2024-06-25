@@ -20,7 +20,7 @@ jobs:
       run: dotnet restore RulesEngine.sln
     
     - name: Build
-      run: dotnet build RulesEngine.sln --configuration Release --no-restore
+      run: dotnet build RulesEngine.sln --configuration Debug --no-restore
     
     - name: Test
-      run: dotnet test RulesEngine.sln --collect:"XPlat Code Coverage" --no-build --configuration Release --verbosity m
+      run: dotnet test RulesEngine.sln --collect:"XPlat Code Coverage" --no-build --configuration Debug --verbosity m
