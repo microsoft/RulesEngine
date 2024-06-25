@@ -91,8 +91,8 @@ publish/
 *.ldf
 *.ndf
 
-nuget-packages
-RulesEngine/*.snk
-*.ps1
+nuget-packages/
+RulesEngine/sgKey.snk
+nuget-push.ps1
 
 dist
