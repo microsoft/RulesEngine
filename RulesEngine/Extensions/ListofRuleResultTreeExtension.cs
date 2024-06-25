@@ -13,7 +13,6 @@ namespace RulesEngine.Extensions
         public delegate void OnSuccessFunc(string eventName);
         public delegate void OnFailureFunc();
 
-
         /// <summary>
         /// Calls the Success Func for the first rule which succeeded among the ruleResults
         /// </summary>
