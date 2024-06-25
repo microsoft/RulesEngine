@@ -33,7 +33,7 @@ public class RulesEngine : IRulesEngine
     private readonly RuleExpressionParser _ruleExpressionParser;
     private readonly RuleCompiler _ruleCompiler;
     private readonly ActionFactory _actionFactory;
-    private const string PARAM_PARSE_REGEX = "(\\$\\(.*?\\))";
+    private readonly static Regex ParamParseRegex = new("(\\$\\(.*?\\))", RegexOptions.Compiled);
 
     #endregion
 
@@ -111,9 +111,8 @@ public class RulesEngine : IRulesEngine
     public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName,
         params RuleParameter[] ruleParams)
     {
-        var sortedRuleParams = ruleParams.ToList();
-        sortedRuleParams.Sort((a, b) => string.Compare(a.Name, b.Name));
-        var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, sortedRuleParams.ToArray());
+        Array.Sort(ruleParams, (a, b) => string.Compare(a.Name, b.Name));
+        var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, ruleParams.ToArray());
         await ExecuteActionAsync(ruleResultList);
         return ruleResultList;
     }
@@ -398,15 +397,20 @@ public class RulesEngine : IRulesEngine
         }
 
         var formatErrorMessages = ruleResultList;
-        foreach (var ruleResult in formatErrorMessages.Where(r => !r.IsSuccess))
+        foreach (var ruleResult in formatErrorMessages)
         {
-            var errorMessage = ruleResult.Rule?.ErrorMessage;
-            if (!string.IsNullOrWhiteSpace(ruleResult.ExceptionMessage) || errorMessage == null)
+            if (!ruleResult.IsSuccess)
             {
                 continue;
             }
 
-            var errorParameters = Regex.Matches(errorMessage, PARAM_PARSE_REGEX);
+            var errorMessage = ruleResult.Rule?.ErrorMessage;
+            if (!string.IsNullOrWhiteSpace(ruleResult.ExceptionMessage) || errorMessage is null)
+            {
+                continue;
+            }
+
+            var errorParameters = ParamParseRegex.Matches(errorMessage);
 
             var inputs = ruleResult.Inputs;
             foreach (var param in errorParameters)
