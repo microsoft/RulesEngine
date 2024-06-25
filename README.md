@@ -8,8 +8,7 @@ Rules Engine is a library (not yet NuGet package) for abstracting business logic
 
 ### [Basic Exmample](https://github.com/asulwer/RulesEngine/blob/v6.0.2/DemoApp/Demos/Basic.cs)
 
-<details>
-<summary>1. Create the Workflow and add a Rule to it</summary>
+### 1. Create the Workflow and add a Rule to it
 
 ```
 var workflows = new Workflow[] {
@@ -26,28 +25,22 @@ var workflows = new Workflow[] {
     }
 };
 ```
-</details>
 
-<details>
-<summary>2. Create instance of RulesEngine, parameter Workflows (optional ReSettings)</summary>
+### 2. Create instance of RulesEngine, parameter Workflows (optional ReSettings)
 
 ```
 var rulesEngine = new RulesEngine.RulesEngine(workflows);
 ```
-</details>
 
-<details>
-<summary>3. Create RuleParameters to pass as parameter to instance of RulesEngine</summary>
+### 3. Create RuleParameters to pass as parameter to instance of RulesEngine
 
 ```
 var ruleParameters = new RuleParameter[] {
     new RuleParameter("input1", new { count = 1 })
 };
 ```
-</details>
 
-<details>
-<summary>4. Excute all Workflows and associated Rules (parameters RuleParameters and CancellationToken)</summary>
+### 4. Excute all Workflows and associated Rules (parameters RuleParameters and CancellationToken)
 
 ```
 await foreach (var async_rrt in rulesEngine.ExecuteAllWorkflows(ruleParameters, ct))
@@ -61,7 +54,6 @@ await foreach (var async_rrt in rulesEngine.ExecuteAllWorkflows(ruleParameters, 
     });
 }
 ```
-</details>
 
 [Additional Examples](https://github.com/asulwer/RulesEngine/tree/main/DemoApp)
 
