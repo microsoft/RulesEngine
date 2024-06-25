@@ -99,7 +99,7 @@ namespace RulesEngine.ExpressionBuilders
             });
         }
 
-        // <summary>
+        /// <summary>
         /// Gets the parameter expression.
         /// </summary>
         /// <param name="ruleParams">The types.</param>

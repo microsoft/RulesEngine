@@ -43,7 +43,7 @@ namespace DemoApp.Demos
             };
 
             var reSettingsWithCustomTypes = new ReSettings {
-                UseFastExpressionCompiler = true
+                UseFastExpressionCompiler = true //default setting is true
             };
 
             var bre = new RulesEngine.RulesEngine(worflow, reSettingsWithCustomTypes);
