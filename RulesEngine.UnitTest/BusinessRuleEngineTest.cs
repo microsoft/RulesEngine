@@ -164,7 +164,6 @@ namespace RulesEngine.UnitTest
             dynamic input14 = GetInput2();
             dynamic input15 = GetInput3();
 
-
             dynamic input16 = GetInput1();
             dynamic input17 = GetInput2();
             dynamic input18 = GetInput3();
@@ -173,7 +172,6 @@ namespace RulesEngine.UnitTest
             Assert.IsType<List<RuleResultTree>>(result);
             Assert.Contains(result, c => c.IsSuccess);
         }
-
 
         [Theory]
         [InlineData("rules2.json")]
@@ -198,8 +196,6 @@ namespace RulesEngine.UnitTest
             var expected = result1.Select(c => new { c.Rule.RuleName, c.IsSuccess });
             var actual = result2.Select(c => new { c.Rule.RuleName, c.IsSuccess });
             Assert.Equal(expected, actual);
-
-
         }
 
         [Theory]
@@ -233,7 +229,6 @@ namespace RulesEngine.UnitTest
             Assert.False(string.IsNullOrEmpty(result[0].ExceptionMessage) || string.IsNullOrWhiteSpace(result[0].ExceptionMessage));
         }
 
-
         [Fact]
         public void RulesEngine_New_IncorrectJSON_ThrowsException()
         {
@@ -247,7 +242,6 @@ namespace RulesEngine.UnitTest
                 var re = CreateRulesEngine(workflow);
             });
         }
-
 
         [Fact]
         public void RulesEngine_AddOrUpdate_IncorrectJSON_ThrowsException()
@@ -264,7 +258,6 @@ namespace RulesEngine.UnitTest
                 re.AddOrUpdateWorkflow(workflow);
             });
         }
-
 
         [Theory]
         [InlineData("rules1.json")]
@@ -291,7 +284,6 @@ namespace RulesEngine.UnitTest
 
             await Assert.ThrowsAsync<ArgumentException>(async () => await re.ExecuteAllRulesAsync("inputWorkflow", new[] { input1, input2, input3 }));
         }
-
 
         [Theory]
         [InlineData("rules1.json")]
@@ -506,7 +498,6 @@ namespace RulesEngine.UnitTest
             Assert.NotNull(result);
             Assert.False(result[1].ExceptionMessage.StartsWith("Exception while parsing expression"));
         }
-
 
         [Theory]
         [InlineData("rules10.json")]
@@ -802,12 +793,9 @@ namespace RulesEngine.UnitTest
             Assert.True(result[1].IsSuccess);
         }
 
-
-
         [Fact]
         public async Task ExecuteRule_RuntimeError_ShouldReturnAsErrorMessage()
         {
-
             var workflow = new Workflow {
                 WorkflowName = "TestWorkflow",
                 Rules = new[] {
@@ -830,11 +818,43 @@ namespace RulesEngine.UnitTest
             Assert.All(result, rule => Assert.StartsWith("Error while executing rule :", rule.ExceptionMessage));
         }
 
+        [Fact]
+        public async Task ExecuteRule_RuntimeErrorInPreviousRun_ShouldReturnEmptyErrorMessage()
+        {
+            var workflow = new Workflow
+            {
+                WorkflowName = "TestWorkflow",
+                Rules = new[] {
+                    new Rule {
+                        RuleName = "ruleWithRuntimeError",
+                        Expression = "input1.Country.ToLower() == \"india\""
+                    }
+                }
+            };
+
+            var re = new RulesEngine(new[] { workflow }, null);
+            var input = new RuleTestClass
+            {
+                Country = null
+            };
+
+            var result = await re.ExecuteAllRulesAsync("TestWorkflow", input);
+
+            Assert.NotNull(result);
+            Assert.All(result, rule => Assert.False(rule.IsSuccess));
+            Assert.All(result, rule => Assert.StartsWith("Error while executing rule :", rule.ExceptionMessage));
+
+            input.Country = "india";
+            result = await re.ExecuteAllRulesAsync("TestWorkflow", input);
+
+            Assert.NotNull(result);
+            Assert.All(result, rule => Assert.True(rule.IsSuccess));
+            Assert.All(result, rule => Assert.Empty(rule.ExceptionMessage));
+        }
 
         [Fact]
         public async Task ExecuteRule_RuntimeError_ThrowsException()
         {
-
             var workflow = new Workflow {
                 WorkflowName = "TestWorkflow",
                 Rules = new[] {
@@ -853,13 +873,11 @@ namespace RulesEngine.UnitTest
             };
 
             _ = await Assert.ThrowsAsync<RuleException>(async () => await re.ExecuteAllRulesAsync("TestWorkflow", [input]));
-
         }
 
         [Fact]
         public async Task ExecuteRule_RuntimeError_IgnoreException_DoesNotReturnException()
         {
-
             var workflow = new Workflow {
                 WorkflowName = "TestWorkflow",
                 Rules = new[] {
@@ -883,7 +901,6 @@ namespace RulesEngine.UnitTest
             Assert.All(result, rule => Assert.False(rule.IsSuccess));
             Assert.All(result, rule => Assert.Empty(rule.ExceptionMessage));
         }
-
 
         [Fact]
         public async Task RemoveWorkFlow_ShouldRemoveAllCompiledCache()
@@ -983,7 +1000,6 @@ namespace RulesEngine.UnitTest
 
             List<RuleResultTree> result3 = await re.ExecuteAllRulesAsync("Test", new[] { input1 });
             Assert.True(result3.All(c => c.IsSuccess));
-
         }
 
         [Fact]
@@ -1011,7 +1027,6 @@ namespace RulesEngine.UnitTest
 
             List<RuleResultTree> result3 = await re.ExecuteAllRulesAsync("Exámple", new[] { input1 });
             Assert.True(result3.All(c => c.IsSuccess));
-
         }
 
         [Fact]
@@ -1038,10 +1053,6 @@ namespace RulesEngine.UnitTest
             Assert.False(re.ContainsWorkflow(NotExistedWorkflowName));
         }
 
-      
-
-
-
         [Theory]
         [InlineData(typeof(RulesEngine), typeof(IRulesEngine))]
         public void Class_PublicMethods_ArePartOfInterface(Type classType, Type interfaceType)
@@ -1050,14 +1061,10 @@ namespace RulesEngine.UnitTest
                         BindingFlags.Public |
                         BindingFlags.Instance);
 
-
             var interfaceMethods = interfaceType.GetMethods();
-
 
             Assert.Equal(interfaceMethods.Count(), classMethods.Count());
         }
-
-
 
         private RulesEngine CreateRulesEngine(Workflow workflow)
         {
@@ -1155,8 +1162,6 @@ namespace RulesEngine.UnitTest
 
                 return false;
             }
-
         }
-
     }
 }
