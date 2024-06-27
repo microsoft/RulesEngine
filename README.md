@@ -8,7 +8,7 @@
 
 ### [Basic Example](https://github.com/asulwer/RulesEngine/blob/v6.0.2/DemoApp/Demos/Basic.cs)
 
-### 1. Create the Workflow and add a Rule to it
+### 1. Create the Workflow and add a Rule
 
 ```
 var workflows = new Workflow[] {
