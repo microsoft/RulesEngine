@@ -8,6 +8,7 @@ namespace RulesEngine.HelperFunctions
 {
     public static class ExpressionUtils
     {
+        //TODO: add more helper functions
         public static bool CheckContains(string check, string valList)
         {
             if (string.IsNullOrEmpty(check) || string.IsNullOrEmpty(valList))
