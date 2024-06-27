@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using RulesEngine.Exceptions;
@@ -15,7 +14,6 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
 
