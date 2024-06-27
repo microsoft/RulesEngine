@@ -24,6 +24,7 @@ namespace DemoApp
                 await new Demos.EF().Run(cts.Token);
                 await new Demos.UseFastExpressionCompiler().Run(cts.Token);
                 await new Demos.MultipleWorkflows().Run(cts.Token);
+                await new Demos.CustomParameterName().Run(cts.Token);
             }
 
             DateTime end = DateTime.Now;
