@@ -515,10 +515,9 @@ namespace RulesEngine.UnitTest
         public async Task ExecuteRuleWithJsonElement(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName, new ReSettings() {
-                                        EnableExceptionAsErrorMessage = true,
-                                        CustomTypes = new Type[] { typeof(System.Text.Json.JsonElement) }
-            
-                                            });
+                EnableExceptionAsErrorMessage = true,
+                CustomTypes = new Type[] { typeof(System.Text.Json.JsonElement) }
+            });
 
             var input1 = new {
                 Data = System.Text.Json.JsonSerializer.SerializeToElement(new {

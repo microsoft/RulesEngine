@@ -16,7 +16,6 @@ namespace RulesEngine.UnitTest
     [ExcludeFromCodeCoverage]
     public class NestedRulesTest
     {
-
         [Theory]
         [InlineData(NestedRuleExecutionMode.All)]
         [InlineData(NestedRuleExecutionMode.Performance)]
@@ -59,10 +58,7 @@ namespace RulesEngine.UnitTest
                         Assert.Single(c.ChildResults.Where(d => c.IsSuccess == d.IsSuccess));
                         Assert.True(c.ChildResults.SkipLast(1).All(d => d.IsSuccess == false));
                     });
-
             }
-
-
         }
 
         [Fact]
@@ -86,10 +82,7 @@ namespace RulesEngine.UnitTest
         {
             var workflow = GetWorkflow();
             var workflowStr = JsonConvert.SerializeObject(workflow);
-
             var serializationOptions = new System.Text.Json.JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
-
-
             var workflowViaTextJson = System.Text.Json.JsonSerializer.Deserialize<Workflow[]>(workflowStr, serializationOptions);
 
             var reSettings = new ReSettings { };
@@ -102,11 +95,7 @@ namespace RulesEngine.UnitTest
             Assert.False(result[0].IsSuccess);
             Assert.Equal(input1.trueValue, result[0].ActionResult.Output);
             Assert.All(result[0].ChildResults, (childResult) => Assert.Equal(input1.trueValue, childResult.ActionResult.Output));
-
-
         }
-
-
 
         private Workflow[] GetWorkflow()
         {
@@ -126,7 +115,6 @@ namespace RulesEngine.UnitTest
                                     RuleName = "falseRule1",
                                     Expression = "input1.TrueValue == false"
                                 }
-
                             }
                         },
                         new Rule {
@@ -141,7 +129,6 @@ namespace RulesEngine.UnitTest
                                     RuleName = "falseRule2",
                                     Expression = "input1.TrueValue == false"
                                 }
-
                             }
                         },
                         new Rule {
@@ -156,10 +143,9 @@ namespace RulesEngine.UnitTest
                                     RuleName = "falseRule4",
                                     Expression = "input1.TrueValue == true"
                                 }
-
                             }
                         },
-                         new Rule {
+                        new Rule {
                             RuleName = "OrRuleFalseTrue",
                             Operator = "Or",
                             Rules = new Rule[] {
@@ -171,9 +157,8 @@ namespace RulesEngine.UnitTest
                                     RuleName = "falseRule4",
                                     Expression = "input1.TrueValue == true"
                                 }
-
                             }
-                         }
+                        }
                     }
                 },
                 new Workflow {
@@ -209,17 +194,16 @@ namespace RulesEngine.UnitTest
                                 }
                             },
                             Actions =  new RuleActions {
-                                        OnFailure = new ActionInfo{
-                                            Name = "OutputExpression",
-                                            Context = new Dictionary<string, object> {
-                                                { "Expression", "input1.TrueValue" }
-                                            }
-                                        }
+                                OnFailure = new ActionInfo{
+                                    Name = "OutputExpression",
+                                    Context = new Dictionary<string, object> {
+                                        { "Expression", "input1.TrueValue" }
                                     }
+                                }
+                            }
                         }
                     }
                 }
-
             };
         }
     }

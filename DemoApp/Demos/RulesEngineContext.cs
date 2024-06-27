@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Newtonsoft.Json;
 using RulesEngine.Models;
 
 namespace DemoApp.Demos
@@ -35,8 +35,6 @@ namespace DemoApp.Demos
 
             modelBuilder.Entity<Rule>().HasOne<Rule>().WithMany(r => r.Rules).HasForeignKey("RuleNameFK");
 
-            var serializationOptions = new JsonSerializerOptions(JsonSerializerDefaults.General);
-
             modelBuilder.Entity<Rule>(entity => {
                 entity.HasKey(k => k.RuleName);
 
@@ -45,17 +43,15 @@ namespace DemoApp.Demos
                     c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                     c => c);
 
-                entity.Property(b => b.Properties)
-                .HasConversion(
-                    v => JsonSerializer.Serialize(v, serializationOptions),
-                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, serializationOptions))
-                    .Metadata
-                    .SetValueComparer(valueComparer);
+                entity.Property(b => b.Properties).HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<Dictionary<string, object>>(v))
+                .Metadata
+                .SetValueComparer(valueComparer);
 
-                entity.Property(p => p.Actions)
-                .HasConversion(
-                    v => JsonSerializer.Serialize(v, serializationOptions),
-                   v => JsonSerializer.Deserialize<RuleActions>(v, serializationOptions));
+                entity.Property(p => p.Actions).HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<RuleActions>(v));
 
                 entity.Ignore(b => b.WorkflowsToInject);
             });

@@ -23,26 +23,77 @@ namespace DemoApp.Demos
         {
             Console.WriteLine($"Running {nameof(EF)}....");
             
-            var rp = new RuleParameter[] {
-                new RuleParameter("input1", new { name = "hello", email = "abcy@xyz.com", creditHistory = "good", country = "canada", loyaltyFactor = 3, totalPurchasesToDate = 10000 }),
-                new RuleParameter("input2", new { totalOrders = 5 , recurringItems = 2 }),
-                new RuleParameter("input3", new { noOfVisitsPerMonth = 10, percentageOfBuyingToVisit = 15 })
+            var workflows = new Workflow[] {
+                new Workflow {
+                    WorkflowName = "Test Workflow1",
+                    Rules = new List<Rule> {
+                        new Rule {
+                            RuleName = "Test Rule1",
+                            SuccessMessage = "Count is less",
+                            ErrorMessage = "Over Expected",
+                            Expression = "count < 3",
+                        },
+                        new Rule {
+                            RuleName = "Test Rule2",
+                            SuccessMessage = "Count is more",
+                            ErrorMessage = "Under Expected",
+                            Expression = "count > 3",
+                        }
+                    }
+                },
+                new Workflow {
+                    WorkflowName = "Test Workflow2",
+                    Rules = new List<Rule> {
+                        new Rule {
+                            RuleName = "Test Rule3",
+                            SuccessMessage = "Count is greater",
+                            ErrorMessage = "Under Expected",
+                            Expression = "count > 3",
+                        }
+                    }
+                },
+                new Workflow {
+                    WorkflowName = "Test Workflow3",
+                    Rules = new List<Rule> {
+                        new Rule {
+                            RuleName = "Test Rule4",
+                            Expression = "1 == 1",
+                            Actions = new RuleActions() {
+                                OnSuccess = new ActionInfo {
+                                    Name = "OutputExpression",
+                                    Context =  new Dictionary<string, object> {
+                                        {"expression", "2*2"}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                new Workflow {
+                    WorkflowName = "Test Workflow4",
+                    Rules = new List<Rule> {
+                        new Rule {
+                            RuleName = "Test Rule5",
+                            Expression = "1 == 1",
+                            Actions = new RuleActions() {
+                                OnSuccess = new ActionInfo {
+                                    Name = "OutputExpression",
+                                    Context =  new Dictionary<string, object> {
+                                        {"expression", "4*4"}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             };
-
-            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\Workflows";
-            var files = Directory.GetFiles(dir, "Discount.json", SearchOption.AllDirectories);
-            if (files == null || files.Length == 0)
-                throw new Exception("Rules not found.");
-
-            var fileData = await File.ReadAllTextAsync(files[0]);
-            var workflow = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
             Workflow[] wfr = null;
             using (RulesEngineContext db = new RulesEngineContext())
             {
-                if (db.Database.EnsureCreated())
+                if (await db.Database.EnsureCreatedAsync(ct))
                 {
-                    await db.Workflows.AddRangeAsync(workflow, ct);
+                    await db.Workflows.AddRangeAsync(workflows, ct);
                     await db.SaveChangesAsync(ct);
                 }
 
@@ -51,6 +102,10 @@ namespace DemoApp.Demos
 
             if (wfr != null)
             {
+                var rp = new RuleParameter[] {
+                    new RuleParameter("input1", new { count = 1 })
+                };
+
                 var bre = new RulesEngine.RulesEngine(wfr, null);
 
                 await foreach (var rrt in bre.ExecuteAllWorkflows(rp, ct))

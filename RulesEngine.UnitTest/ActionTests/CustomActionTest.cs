@@ -29,15 +29,13 @@ namespace RulesEngine.UnitTest.ActionTests
             var result = await re.ExecuteAllRulesAsync("successReturnContextAction", [true]);
         }
 
-
         [Fact]
-        public async Task CustomAction_WithSystemTextJsobOnRuleMustHaveContextValues()
+        public async Task CustomAction_WithSystemTextJsonOnRuleMustHaveContextValues()
         {
             var workflow = GetWorkflow();
             var workflowStr = JsonConvert.SerializeObject(workflow);
             var serializationOptions = new System.Text.Json.JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
             var workflowViaTextJson = System.Text.Json.JsonSerializer.Deserialize<Workflow[]>(workflowStr,serializationOptions);
-
 
             var re = new RulesEngine(workflow, reSettings: new ReSettings {
                 CustomActions = new Dictionary<string, System.Func<Actions.ActionBase>> {
@@ -45,8 +43,6 @@ namespace RulesEngine.UnitTest.ActionTests
                     { "ReturnContext", () => new ReturnContextAction() }
                 }
             });
-
-
 
             var result = await re.ExecuteAllRulesAsync("successReturnContextAction", [true]);
         }
@@ -69,18 +65,11 @@ namespace RulesEngine.UnitTest.ActionTests
                                         {"objectContext", new { a = "hello", b = 123 } }
                                     }
                                 }
-
                             }
-
-                        },
-                        
-
+                        }
                     }
                 }
-
             };
         }
-
-
     }
 }

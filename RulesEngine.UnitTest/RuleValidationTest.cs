@@ -1,15 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Newtonsoft.Json;
 using RulesEngine.HelperFunctions;
 using RulesEngine.Models;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Dynamic;
-using System.Linq;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Xunit;
 
