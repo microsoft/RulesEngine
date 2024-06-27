@@ -74,34 +74,34 @@ namespace RulesEngine
                     yield return await ExecuteWorkflow(wf_nam, inputs, ct);
             }
         }
-        public async Task<List<RuleResultTree>> ExecuteWorkflow(string workflow_name, RuleParameter[] inputs, CancellationToken ct = default)
+        public async Task<List<RuleResultTree>> ExecuteWorkflow(string workflowName, RuleParameter[] inputs, CancellationToken ct = default)
         {
             Array.Sort(inputs, (RuleParameter a, RuleParameter b) => string.Compare(a.Name, b.Name));
 
             var result = new List<RuleResultTree>();
 
-            foreach (var rule in _rulesCache.GetWorkflow(workflow_name).Rules)
+            foreach (var rule in _rulesCache.GetWorkflow(workflowName).Rules)
             {
                 if (ct.IsCancellationRequested)
                     break;
 
-                var resultTree = await ExecuteRule(workflow_name, rule.RuleName, inputs, ct);
+                var resultTree = await ExecuteRule(workflowName, rule.RuleName, inputs, ct);
                 result.Add(resultTree);
             }
             
             return result;
         }
-        public async Task<RuleResultTree> ExecuteRule(string workflow_name, string rule_name, RuleParameter[] ruleParams, CancellationToken ct = default)
+        public async Task<RuleResultTree> ExecuteRule(string workflowName, string ruleName, RuleParameter[] ruleParams, CancellationToken ct = default)
         {
             RuleResultTree ruleResultTree = null;
 
             if (!ct.IsCancellationRequested)
             {
-                if (RegisterRule(workflow_name, ruleParams))
+                if (RegisterRule(workflowName, ruleParams))
                 {
-                    var compiledRulesCacheKey = GetCompiledRulesKey(workflow_name, ruleParams);
+                    var compiledRulesCacheKey = GetCompiledRulesKey(workflowName, ruleParams);
 
-                    var compiledRule = _rulesCache.GetCompiledRules(compiledRulesCacheKey)[rule_name];
+                    var compiledRule = _rulesCache.GetCompiledRules(compiledRulesCacheKey)[ruleName];
                     ruleResultTree = compiledRule(ruleParams);
 
                     FormatErrorMessages(ruleResultTree);
@@ -119,15 +119,15 @@ namespace RulesEngine
                 else
                 {
                     // if rules are not registered with Rules Engine
-                    throw new ArgumentException($"Rule config file is not present for the {workflow_name} workflow");
+                    throw new ArgumentException($"Rule config file is not present for the {workflowName} workflow");
                 }
             }
 
             return ruleResultTree;
         }
-        public async Task<ActionRuleResult> ExecuteRuleActions(string workflow_name, string rule_name, RuleParameter[] inputs, CancellationToken ct = default)
+        public async Task<ActionRuleResult> ExecuteRuleActions(string workflowName, string ruleName, RuleParameter[] inputs, CancellationToken ct = default)
         {
-            var compiledRule = CompileRule(workflow_name, rule_name, inputs);
+            var compiledRule = CompileRule(workflowName, ruleName, inputs);
             var resultTree = compiledRule(inputs);
 
             return await ExecuteActionForRuleResult(resultTree, true, ct);

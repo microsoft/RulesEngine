@@ -13,9 +13,9 @@ namespace RulesEngine.Interfaces
     public interface IRulesEngine
     {
         IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(RuleParameter[] inputs, CancellationToken ct = default);
-        Task<List<RuleResultTree>> ExecuteWorkflow(string workflow_name, RuleParameter[] inputs, CancellationToken ct = default);
-        Task<RuleResultTree> ExecuteRule(string workflow_name, string rule_name, RuleParameter[] ruleParams, CancellationToken ct = default);
-        Task<ActionRuleResult> ExecuteRuleActions(string workflow_name, string rule_name, RuleParameter[] inputs, CancellationToken ct = default);
+        Task<List<RuleResultTree>> ExecuteWorkflow(string workflowName, RuleParameter[] inputs, CancellationToken ct = default);
+        Task<RuleResultTree> ExecuteRule(string workflowName, string ruleName, RuleParameter[] ruleParams, CancellationToken ct = default);
+        Task<ActionRuleResult> ExecuteRuleActions(string workflowName, string ruleName, RuleParameter[] inputs, CancellationToken ct = default);
 
         #region Obsolete Methods
 

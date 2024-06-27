@@ -33,6 +33,12 @@ All notable changes to this project will be documented in this file.
 - RulesEngine Execute... Methods using params marked obsolete in favor of CancellationToken supported methods
 - original project is no longer being maintained
 
+### Breaking Changes
+
+- **ActionBase Class Update**: Actions extending from `ActionBase` must now pass a `CancellationToken` parameter. The `Run` method in `ActionBase` requires a `CancellationToken` parameter without a default value.
+This ensures that all derived classes handle cancellation requests properly, improving resource management and responsiveness.
+Make sure to update all derived classes to include the `CancellationToken` parameter in their `Run` method implementations. This change may break existing implementations that don't currently handle `CancellationToken`.
+
 ## [5.0.4]
 - Refactoring code, big time
 - Upgraded dependencies to latest

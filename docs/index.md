@@ -473,7 +473,7 @@ RulesEngine allows registering custom actions which can be used in the rules wor
             ....
         }
 
-        public override ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters)
+        public override ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters, CancellationToken ct = default)
         {
             var customInput = context.GetContext<string>("customContextInput");
             //Add your custom logic here and return a ValueTask
@@ -489,7 +489,7 @@ Actions can have async code as well
             ....
         }
 
-        public override async ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters)
+        public override async ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters, CancellationToken ct = default)
         {
             var customInput = context.GetContext<string>("customContextInput");
             //Add your custom logic here
