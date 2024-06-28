@@ -58,11 +58,15 @@ namespace DemoApp.Demos
 
             var bre = new RulesEngine.RulesEngine(Workflows.ToArray(), null);
 
-            await foreach (var async_ret in bre.ExecuteAllWorkflows(rp, ct))
+            foreach (var workflow in Workflows)
             {
-                async_ret.OnSuccess((eventName) => {
+                var ret = await bre.ExecuteAllRulesAsync(workflow.WorkflowName, rp);
+
+                ret.OnSuccess((eventName) =>
+                {
                     Console.WriteLine($"evaluation resulted in success - {eventName}");
-                }).OnFail(() => {
+                }).OnFail(() =>
+                {
                     Console.WriteLine($"evaluation resulted in failure");
                 });
             }

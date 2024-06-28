@@ -32,24 +32,25 @@ namespace DemoApp.Demos
                 new RuleParameter("myValue", new { Value1 = "Fabrikam" })
             };
 
-            await foreach (var async_rrt in bre.ExecuteAllWorkflows(rp, ct))
+            var ret = await bre.ExecuteAllRulesAsync("my_workflow", rp);
+
+            var outcome = false;
+
+            //Different ways to show test results:
+            outcome = ret.TrueForAll(r => r.IsSuccess);
+
+            ret.OnSuccess((eventName) =>
             {
-                var outcome = false;
+                Console.WriteLine($"Result '{eventName}' is as expected.");
+                outcome = true;
+            });
 
-                //Different ways to show test results:
-                outcome = async_rrt.TrueForAll(r => r.IsSuccess);
+            ret.OnFail(() =>
+            {
+                outcome = false;
+            });
 
-                async_rrt.OnSuccess((eventName) => {
-                    Console.WriteLine($"Result '{eventName}' is as expected.");
-                    outcome = true;
-                });
-
-                async_rrt.OnFail(() => {
-                    outcome = false;
-                });
-
-                Console.WriteLine($"Test outcome: {outcome}.");
-            }
+            Console.WriteLine($"Test outcome: {outcome}.");
         }
     }
 }

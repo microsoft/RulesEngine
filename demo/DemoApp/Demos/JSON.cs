@@ -37,18 +37,17 @@ namespace DemoApp.Demos
 
             var bre = new RulesEngine.RulesEngine(workflow, null);
 
-            var resultList = await bre.ExecuteWorkflow("Discount", rp, ct);
+            var ret = await bre.ExecuteAllRulesAsync("Discount", rp);
 
-            if (resultList != null && resultList.Count > 0)
+            ret.OnSuccess((eventName) =>
             {
-                resultList.OnSuccess((eventName) => {
-                    Console.WriteLine($"Discount offered is {eventName} % over MRP.");
-                });
+                Console.WriteLine($"Discount offered is {eventName} % over MRP.");
+            });
 
-                resultList.OnFail(() => {
-                    Console.WriteLine("The user is not eligible for any discount.");
-                });
-            }
+            ret.OnFail(() =>
+            {
+                Console.WriteLine("The user is not eligible for any discount.");
+            });
         }
     }
 }

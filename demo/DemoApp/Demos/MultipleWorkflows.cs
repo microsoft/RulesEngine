@@ -90,19 +90,23 @@ namespace DemoApp.Demos
                 new RuleParameter("input1", new { count = 1 })
             };
 
-            await foreach (var async_rrt in bre.ExecuteAllWorkflows(inputs, ct))
+            foreach(var workflow in workflows)
             {
+                var ret = await bre.ExecuteAllRulesAsync(workflow.WorkflowName, inputs);
+
                 var outcome = false;
 
                 //Different ways to show test results:
-                outcome = async_rrt.TrueForAll(r => r.IsSuccess);
+                outcome = ret.TrueForAll(r => r.IsSuccess);
 
-                async_rrt.OnSuccess((eventName) => {
+                ret.OnSuccess((eventName) =>
+                {
                     Console.WriteLine($"Result '{eventName}' is as expected.");
                     outcome = true;
                 });
 
-                async_rrt.OnFail(() => {
+                ret.OnFail(() =>
+                {
                     outcome = false;
                 });
 

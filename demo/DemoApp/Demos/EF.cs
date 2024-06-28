@@ -108,13 +108,17 @@ namespace DemoApp.Demos
 
                 var bre = new RulesEngine.RulesEngine(wfr, null);
 
-                await foreach (var rrt in bre.ExecuteAllWorkflows(rp, ct))
+                foreach (var workflow in wfr)
                 {
-                    rrt.OnSuccess((eventName) => {
+                    var ret = await bre.ExecuteAllRulesAsync(workflow.WorkflowName, rp);
+
+                    ret.OnSuccess((eventName) =>
+                    {
                         Console.WriteLine($"Discount offered is {eventName} % over MRP.");
                     });
 
-                    rrt.OnFail(() => {
+                    ret.OnFail(() =>
+                    {
                         Console.WriteLine("The user is not eligible for any discount.");
                     });
                 }

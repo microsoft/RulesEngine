@@ -41,9 +41,12 @@ namespace RulesEngine
 
         #region Constructor
 
-        [Obsolete("Json is a method of storing workflows/rules. We do not want to be tightly coupled to one method of storing")]
-        public RulesEngine(string[] jsonConfig, ReSettings reSettings = null) : this(jsonConfig.Select(item => JsonConvert.DeserializeObject<Workflow>(item)).ToArray(), reSettings) { }
-        
+        public RulesEngine(string[] jsonConfig, ReSettings reSettings = null) : this(reSettings)
+        {
+            var workflow = jsonConfig.Select(item => JsonConvert.DeserializeObject<Workflow>(item)).ToArray();
+            AddWorkflow(workflow);
+        }
+
         public RulesEngine(Workflow[] Workflows, ReSettings reSettings = null) : this(reSettings)
         {
             AddWorkflow(Workflows);
@@ -64,7 +67,6 @@ namespace RulesEngine
 
         #endregion
 
-        #region Public Methods
         /*
         public async IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(RuleParameter[] inputs, [EnumeratorCancellation] CancellationToken ct = default)
         {
@@ -133,7 +135,9 @@ namespace RulesEngine
             return await ExecuteActionForRuleResult(resultTree, true, ct);
         }
         */
-        
+
+        #region Public
+
         public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowname, params object[] inputs)
         {
             return await ExecuteAllRulesAsync(workflowname, inputs, CancellationToken.None);

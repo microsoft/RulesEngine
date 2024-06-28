@@ -48,10 +48,10 @@ namespace DemoApp.Demos
 
             var bre = new RulesEngine.RulesEngine(worflow, reSettingsWithCustomTypes);
 
-            var async_ret = await bre.ExecuteWorkflow("UseFastExpressionCompilerTest", appData, ct);
-            
-            if(async_ret != null && async_ret.Count > 0)
-                Console.WriteLine(async_ret[0].IsSuccess);
+            var ret = await bre.ExecuteAllRulesAsync("UseFastExpressionCompilerTest", appData, ct);
+
+            if (ret != null && ret.Count > 0)
+                Console.WriteLine(ret[0].IsSuccess);
         }
 
         internal class AppData
