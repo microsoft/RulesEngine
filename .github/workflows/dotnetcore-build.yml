@@ -27,11 +27,11 @@ jobs:
 
     - name: Generate Report
       shell: pwsh
-      run: ./scripts/generate-coverage-report.ps1
+      run: ../scripts/generate-coverage-report.ps1
 
     - name: Check Coverage
       shell: pwsh
-      run: ./scripts/check-coverage.ps1 -reportPath coveragereport/Cobertura.xml -threshold 96
+      run: ../scripts/check-coverage.ps1 -reportPath coveragereport/Cobertura.xml -threshold 96
     
     - name: Coveralls GitHub Action
       uses: coverallsapp/github-action@v2.2.1
