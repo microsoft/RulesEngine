@@ -3,7 +3,7 @@
     "Rules": [
       {
         "RuleName": "GiveDiscount10",
-        "SuccessEvent": "10",
+        "SuccessMessage": "10",
         "RuleExpressionType": "LambdaExpression",
         "Expression": "input1.Data.GetProperty(\"category\").GetString() == \"abc\""
       }
