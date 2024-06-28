@@ -15,13 +15,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{2E8DCFB4-0505-407B-9972-292F75AFD639}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp", "DemoApp\DemoApp.csproj", "{53B50361-EDE0-41E9-83D4-3077765D1A41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp", "demo\DemoApp.csproj", "{53B50361-EDE0-41E9-83D4-3077765D1A41}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RulesEngine", "RulesEngine\RulesEngine.csproj", "{C0F0316B-3F6B-4C07-93D6-FB9DC9542FDC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RulesEngine", "src\RulesEngine\RulesEngine.csproj", "{C0F0316B-3F6B-4C07-93D6-FB9DC9542FDC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RulesEngine.UnitTest", "RulesEngine.UnitTest\RulesEngine.UnitTest.csproj", "{75F6BA7A-AA14-4A42-A375-B753390CEB87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RulesEngine.UnitTest", "tests\RulesEngine.UnitTest\RulesEngine.UnitTest.csproj", "{75F6BA7A-AA14-4A42-A375-B753390CEB87}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RulesEngineBenchmark", "RulesEngineBenchmark\RulesEngineBenchmark.csproj", "{10B463C2-4C20-405E-8F21-487B5F564630}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RulesEngineBenchmark", "benchmark\RulesEngineBenchmark\RulesEngineBenchmark.csproj", "{10B463C2-4C20-405E-8F21-487B5F564630}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

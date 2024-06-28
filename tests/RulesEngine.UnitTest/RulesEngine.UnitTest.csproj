@@ -18,7 +18,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RulesEngine\RulesEngine.csproj" />
+	  <ProjectReference Include="..\..\src\RulesEngine\RulesEngine.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="TestData\rules1.json">
