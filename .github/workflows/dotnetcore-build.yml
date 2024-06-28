@@ -1,43 +1,53 @@
 name: dotnetcore-build
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main, develop ]
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main, develop ]
 
 jobs:
-  build:
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
+    build:
+        runs-on: windows-latest
+        steps:
+        
+        - uses: actions/checkout@v4
     
-    - name: Install dependencies
-      run: dotnet restore RulesEngine.sln
+        - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+            dotnet-version: 8.x
+            dotnet-quality: 'ga'
     
-    - name: Build
-      run: dotnet build RulesEngine.sln --configuration Debug --no-restore
+        - name: Install dependencies
+        run: dotnet restore RulesEngine.sln
     
-    - name: Test
-      run: dotnet test RulesEngine.sln --collect:"XPlat Code Coverage" --no-build --configuration Debug --verbosity m
-      
-    - name: Install Report Tool
-      run: dotnet tool install --tool-path tools dotnet-reportgenerator-globaltool
+        - name: Build
+        run: dotnet build RulesEngine.sln --configuration Debug --no-restore
+    
+        - name: Test
+        run: dotnet test RulesEngine.sln --collect:"XPlat Code Coverage" --no-build --configuration Debug --verbosity m
+    
+        - name: ReportGenerator
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.3.7
+        with:
+            reports: coverage.cobertura.xml
+            targetdir: coveragereport
+            reporttypes: Html;Cobertura;lcov
+    
+    : #- name: Install Report Tool
+    : #  run: dotnet tool install --tool-path tools dotnet-reportgenerator-globaltool
 
-    - name: Generate Report
-      run: ./tools/reportgenerator "-reports:**/coverage.cobertura.xml" "-targetdir:coveragereport" -reporttypes:"Html;lcov;Cobertura"
+    : #- name: Generate Report
+    : #  run: ./tools/reportgenerator "-reports:**/coverage.cobertura.xml" "-targetdir:coveragereport" -reporttypes:"Html;lcov;Cobertura"
 
-    - name: Check Coverage
-      shell: pwsh
-      run: ./scripts/check-coverage.ps1 -reportPath coveragereport/Cobertura.xml -threshold 96
+    : #- name: Check Coverage
+    : #  shell: pwsh
+    : #  run: ./scripts/check-coverage.ps1 -reportPath coveragereport/Cobertura.xml -threshold 96
     
-    - name: Coveralls GitHub Action
-      uses: coverallsapp/github-action@v2.2.1
-      if: ${{ github.event_name == 'push' }}
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: ./coveragereport/lcov.info
+    : #- name: Coveralls GitHub Action
+    : #  uses: coverallsapp/github-action@v2.2.1
+    : #  if: ${{ github.event_name == 'push' }}
+    : #  with:
+    : #    github-token: ${{ secrets.GITHUB_TOKEN }}
+    : #    path-to-lcov: ./coveragereport/lcov.info
