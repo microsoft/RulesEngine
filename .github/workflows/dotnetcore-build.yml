@@ -30,7 +30,7 @@ jobs:
     - name: ReportGenerator
       uses: danielpalme/ReportGenerator-GitHub-Action@5.3.7
       with:
-        reports: tests\RulesEngine.UnitTest\TestResults\{guid}\coverage.cobertura.xml
+        reports: tests\*\TestResults\*\coverage.cobertura.xml
         targetdir: coveragereport
         reporttypes: Html;Cobertura;lcov
     
