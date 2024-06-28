@@ -91,7 +91,9 @@ publish/
 *.ldf
 *.ndf
 
+coveragereport/
 nuget-packages/
-nuget-push.ps1
+tests/**/TestResults/
 /src/RulesEngine/build-signed.ps1
 /src/RulesEngine/sgKey.snk
+nuget-push.ps1
