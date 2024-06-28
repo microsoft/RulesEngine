@@ -65,7 +65,7 @@ namespace RulesEngine
         #endregion
 
         #region Public Methods
-
+        /*
         public async IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(RuleParameter[] inputs, [EnumeratorCancellation] CancellationToken ct = default)
         {
             foreach (var wf_nam in _rulesCache.GetAllWorkflowNames())
@@ -132,15 +132,12 @@ namespace RulesEngine
 
             return await ExecuteActionForRuleResult(resultTree, true, ct);
         }
-
-        #region Obsolete Methods
-
-        [Obsolete]
+        */
+        
         public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowname, params object[] inputs)
         {
             return await ExecuteAllRulesAsync(workflowname, inputs, CancellationToken.None);
         }
-        [Obsolete]
         public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, object[] inputs, CancellationToken ct = default)
         {
             //TODO: tightly coupled with inputX as a string
@@ -157,12 +154,10 @@ namespace RulesEngine
 
             return await ExecuteAllRulesAsync(workflowName, ruleParams.ToArray(), ct);
         }
-        [Obsolete]
         public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params RuleParameter[] ruleParams)
         {
             return await ExecuteAllRulesAsync(workflowName , ruleParams, CancellationToken.None);
         }
-        [Obsolete]
         public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, RuleParameter[] ruleParams, CancellationToken ct = default)
         {
             Array.Sort(ruleParams, (RuleParameter a, RuleParameter b) => string.Compare(a.Name, b.Name));
@@ -170,21 +165,17 @@ namespace RulesEngine
             await ExecuteActionAsync(ruleResultList, ct);
             return ruleResultList;
         }
-        [Obsolete]
         public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters)
         {
             return await ExecuteActionWorkflowAsync(workflowName, ruleName, ruleParameters, CancellationToken.None);
         }
-        [Obsolete]
         public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters, CancellationToken ct = default)
         {
             var compiledRule = CompileRule(workflowName, ruleName, ruleParameters);
             var resultTree = compiledRule(ruleParameters);
             return await ExecuteActionForRuleResult(resultTree, true, ct);
         }
-
-        #endregion
-
+        
         /// <summary>
         /// Adds the workflow if the workflow name is not already added. Ignores the rest.
         /// </summary>
