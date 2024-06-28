@@ -23,11 +23,13 @@ jobs:
       run: dotnet build RulesEngine.sln --configuration Debug --no-restore
     
     - name: Test
-      run: dotnet test RulesEngine.sln --collect:"XPlat Code Coverage" --no-build --configuration Debug --verbosity m 
+      run: dotnet test RulesEngine.sln --collect:"XPlat Code Coverage" --no-build --configuration Debug --verbosity m
+      
+    - name: Install Report Tool
+      run: dotnet tool install --tool-path tools dotnet-reportgenerator-globaltool
 
     - name: Generate Report
-      shell: pwsh
-      run: ./scripts/generate-coverage-report.ps1
+      run: ./tools/reportgenerator "-reports:**/coverage.cobertura.xml" "-targetdir:coveragereport" -reporttypes:"Html;lcov;Cobertura"
 
     - name: Check Coverage
       shell: pwsh
