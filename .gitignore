@@ -92,6 +92,6 @@ publish/
 *.ndf
 
 nuget-packages/
-/src/RulesEngine/sgKey.snk
-/src/RulesEngine/build-signed.ps1
 nuget-push.ps1
+/src/RulesEngine/build-signed.ps1
+/src/RulesEngine/sgKey.snk
