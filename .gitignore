@@ -91,6 +91,7 @@ publish/
 *.ldf
 *.ndf
 
+coveragereport/
 nuget-packages/
 nuget-push.ps1
 /src/RulesEngine/build-signed.ps1
