@@ -3,7 +3,7 @@
     "Rules": [
       {
         "RuleName": "GiveDiscount10",
-        "SuccessEvent": "10",
+        "SuccessMessage": "10",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
@@ -11,7 +11,7 @@
       },
       {
         "RuleName": "GiveDiscount20",
-        "SuccessEvent": "20",
+        "SuccessMessage": "20",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",

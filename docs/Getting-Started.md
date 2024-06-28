@@ -17,7 +17,7 @@ Rules schema is available in the [schema file](https://github.com/microsoft/Rule
     "Rules": [
       {
         "RuleName": "GiveDiscount10",
-        "SuccessEvent": "10",
+        "SuccessMessage": "10",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
@@ -25,7 +25,7 @@ Rules schema is available in the [schema file](https://github.com/microsoft/Rule
       },
       {
         "RuleName": "GiveDiscount20",
-        "SuccessEvent": "20",
+        "SuccessMessage": "20",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
@@ -33,7 +33,7 @@ Rules schema is available in the [schema file](https://github.com/microsoft/Rule
       },
       {
         "RuleName": "GiveDiscount25",
-        "SuccessEvent": "25",
+        "SuccessMessage": "25",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
@@ -41,7 +41,7 @@ Rules schema is available in the [schema file](https://github.com/microsoft/Rule
       },
       {
         "RuleName": "GiveDiscount30",
-        "SuccessEvent": "30",
+        "SuccessMessage": "30",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
@@ -49,7 +49,7 @@ Rules schema is available in the [schema file](https://github.com/microsoft/Rule
       },
       {
         "RuleName": "GiveDiscount35",
-        "SuccessEvent": "35",
+        "SuccessMessage": "35",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
@@ -207,7 +207,7 @@ Here,
 #### Success/Failure
 For the rules to make sense, there are always success and failure scenarios. This library gives the user an inbuilt scenario where in success and failure scenario an event can be created.
 ##### Success
-In case of success, there could be one or more than one rules which passed based on the given input(s). The success event will be triggered and will be run based on the first rule which was true and give you the success event which was initialized as SuccessEvent in the RulesSchema section.
+In case of success, there could be one or more than one rules which passed based on the given input(s). The success event will be triggered and will be run based on the first rule which was true and give you the success event which was initialized as SuccessMessage in the RulesSchema section.
 
 
 Example – 

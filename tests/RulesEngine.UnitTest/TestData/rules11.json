@@ -26,7 +26,7 @@
       ],
       "Expression": "input1.Count \u003E= ruleCount \u0026\u0026 input1.Where(x =\u003E x.Value \u003E= threshold).Count() \u003E= ruleCount",
       "Actions": null,
-      "SuccessEvent": null
+      "SuccessMessage": null
     },
     {
       "RuleName": "Deactivation",
@@ -45,7 +45,7 @@
       ],
       "Expression": "input1.Count \u003E= ruleCount \u0026\u0026 input1.OrderByDescending(o =\u003E o.ChangeDateTime).Take(ruleCount).All(a =\u003E a.Value \u003C threshold)",
       "Actions": null,
-      "SuccessEvent": null
+      "SuccessMessage": null
     }
   ]
 }
