@@ -69,12 +69,10 @@ namespace RulesEngineBenchmark
         [Benchmark]
         public void RuleExecutionDefault()
         {
-            _ = Task.Run(async () => {
-                await foreach (var async_rrt in rulesEngine.ExecuteAllWorkflows(ruleInputs, CancellationToken.None))
-                {
-                    _ = async_rrt;
-                }
-            });
+            foreach (var workflow in workflow)
+            {
+                _ = rulesEngine.ExecuteAllRulesAsync(workflow.WorkflowName, ruleInputs).Result;
+            }
         }
     }
     public class Program
