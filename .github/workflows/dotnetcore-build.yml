@@ -24,3 +24,20 @@ jobs:
     
     - name: Test
       run: dotnet test RulesEngine.sln --collect:"XPlat Code Coverage" --no-build --configuration Debug --verbosity m
+      
+    - name: Install Report Tool
+      run: dotnet tool install --tool-path tools dotnet-reportgenerator-globaltool
+
+    - name: Generate Report
+      run: ./tools/reportgenerator "-reports:**/coverage.cobertura.xml" "-targetdir:coveragereport" -reporttypes:"Html;lcov;Cobertura"
+
+    - name: Check Coverage
+      shell: pwsh
+      run: ./scripts/check-coverage.ps1 -reportPath coveragereport/Cobertura.xml -threshold 96
+    
+    - name: Coveralls GitHub Action
+      uses: coverallsapp/github-action@v2.2.1
+      if: ${{ github.event_name == 'push' }}
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: ./coveragereport/lcov.info
