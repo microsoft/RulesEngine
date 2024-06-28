@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RulesEngine\RulesEngine.csproj" />
+    <ProjectReference Include="..\..\src\RulesEngine\RulesEngine.csproj" />
   </ItemGroup>
 
   <ItemGroup>
