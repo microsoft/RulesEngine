@@ -31,7 +31,16 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <Title>Rules Engine</Title>
   </PropertyGroup>
-
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FastExpressionCompiler" Version="4.2.0" />
     <PackageReference Include="FluentValidation" Version="11.9.2" />
