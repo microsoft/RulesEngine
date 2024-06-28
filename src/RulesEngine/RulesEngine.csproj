@@ -32,6 +32,10 @@
     <Title>Rules Engine</Title>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="build-signed.ps1" />
+    <None Remove="sgKey.snk" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="..\..\LICENSE">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
