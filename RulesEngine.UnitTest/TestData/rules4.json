@@ -4,7 +4,7 @@
     "Rules": [
       {
         "RuleName": "GiveDiscount10",
-        "SuccessEvent": "10",
+        "SuccessMessage": "10",
         "ErrorMessage": "One or more adjust rules failed, with loyaltyFactor : $(model1.loyaltyFactor), country : $(model1.country), totalPurchasesToDate : $(model1.totalPurchasesToDate), model2 : $(model2)",
         "ErrorType": "Error",
         "localParams": [
@@ -22,7 +22,7 @@
       },
       {
         "RuleName": "GiveDiscount100",
-        "SuccessEvent": "10",
+        "SuccessMessage": "10",
         "ErrorType": "Error",
         "localParams": [
           {
@@ -39,7 +39,7 @@
       },
       {
         "RuleName": "GiveDiscount25",
-        "SuccessEvent": "25",
+        "SuccessMessage": "25",
         "ErrorMessage": "One or more adjust rules failed, country : $(input4.country), loyaltyFactor : $(input4.loyaltyFactor), totalPurchasesToDate : $(input4.totalPurchasesToDate), totalOrders : $(input5.totalOrders), noOfVisitsPerMonth : $(input30.noOfVisitsPerMonth), $(model2)",
         "ErrorType": "Error",
         "localParams": [
@@ -57,7 +57,7 @@
       },
       {
         "RuleName": "GiveDiscount30",
-        "SuccessEvent": "30",
+        "SuccessMessage": "30",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
@@ -65,7 +65,7 @@
       },
       {
         "RuleName": "GiveDiscount35",
-        "SuccessEvent": "35",
+        "SuccessMessage": "35",
         "ErrorMessage": "One or more adjust rules failed, totalPurchasesToDate : $(input4.totalPurchasesToDate), totalOrders : $(input5.totalOrders)",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
