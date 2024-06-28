@@ -34,7 +34,6 @@ All notable changes to this project will be documented in this file.
 - original project is no longer being maintained
 
 ### Breaking Changes
-
 - **Rule Class Update** changed SuccessEvent to [SuccessMessage](https://github.com/asulwer/RulesEngine/issues/6)
 - **ActionBase Class Update**: Actions extending from `ActionBase` must now pass a `CancellationToken` parameter. The `Run` method in `ActionBase` requires a `CancellationToken`.
 This ensures that all derived classes handle cancellation requests properly, improving resource management and responsiveness.
