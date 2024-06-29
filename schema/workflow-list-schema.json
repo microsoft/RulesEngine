@@ -2,6 +2,6 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "array",
   "items": {
-    "$ref": "https://raw.githubusercontent.com/asulwer/RulesEngine/main/schema/workflow-schema.json"
+    "$ref": "https://raw.githubusercontent.com/microsoft/RulesEngine/main/schema/workflow-schema.json"
   }
 }

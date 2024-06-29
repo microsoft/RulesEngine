@@ -33,11 +33,12 @@ namespace RulesEngine.ExpressionBuilders
         }
         public Expression Parse(string expression, ParameterExpression[] parameters, Type returnType)
         {
-            var config = new ParsingConfig {
+            var config = new ParsingConfig { 
                 CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes),
                 IsCaseSensitive = _reSettings.IsExpressionCaseSensitive
             };
             return new ExpressionParser(parameters, expression, new object[] { }, config).Parse(returnType);
+
         }
 
         public Func<object[], T> Compile<T>(string expression, RuleParameter[] ruleParams)
@@ -57,13 +58,15 @@ namespace RulesEngine.ExpressionBuilders
             var expressionBody = new List<Expression>() { e };
             var wrappedExpression = WrapExpression<T>(expressionBody, parameterExpressions, new ParameterExpression[] { });
             return CompileExpression(wrappedExpression);
+
         }
 
         private Func<object[], T> CompileExpression<T>(Expression<Func<object[], T>> expression)
         {
             if(_reSettings.UseFastExpressionCompiler)
+            {
                 return expression.CompileFast();
-            
+            }
             return expression.Compile();
         }
 
@@ -99,7 +102,7 @@ namespace RulesEngine.ExpressionBuilders
             });
         }
 
-        /// <summary>
+        // <summary>
         /// Gets the parameter expression.
         /// </summary>
         /// <param name="ruleParams">The types.</param>

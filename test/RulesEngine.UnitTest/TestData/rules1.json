@@ -1,0 +1,13 @@
+{
+  "WorkflowName": "inputWorkflow",
+  "Rules": [
+    {
+      "RuleName": "GiveDiscount10",
+      "SuccessEvent": "10",
+      "ErrorMessage": "One or more adjust rules failed.",
+      "ErrorType": "Error",
+      "RuleExpressionType": "LambdaExpression",
+      "Expression": "input1.country == \"canada\" AND input1.loyaltyFactor <= 4"
+    }
+  ]
+}

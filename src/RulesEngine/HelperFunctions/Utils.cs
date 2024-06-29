@@ -51,6 +51,7 @@ namespace RulesEngine.HelperFunctions
                             var internalType = CreateAbstractClassType(((IList)expando.Value)[0]);
                             value = new List<object>().Cast(internalType).ToList(internalType).GetType();
                         }
+
                     }
                     else
                     {
@@ -123,4 +124,6 @@ namespace RulesEngine.HelperFunctions
             return genericMethod.Invoke(null, new[] { self }) as IList;
         }
     }
+
+
 }

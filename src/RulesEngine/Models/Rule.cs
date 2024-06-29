@@ -40,7 +40,7 @@ namespace RulesEngine.Models
         public IEnumerable<ScopedParam> LocalParams { get; set; }
         public string Expression { get; set; }
         public RuleActions Actions { get; set; }
-        public string SuccessMessage { get; set; }
+        public string SuccessEvent { get; set; }
 
     }
 }

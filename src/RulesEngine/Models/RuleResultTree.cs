@@ -49,6 +49,7 @@ namespace RulesEngine.Models
         /// Gets the exception message in case an error is thrown during rules calculation.
         /// </summary>
         public string ExceptionMessage { get; set; }
+
     }
 
     /// <summary>

@@ -8,8 +8,6 @@ using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RulesEngineBenchmark
 {
@@ -17,7 +15,7 @@ namespace RulesEngineBenchmark
     public class REBenchmark
     {
         private readonly RulesEngine.RulesEngine rulesEngine;
-        private readonly RuleParameter[] ruleInputs;
+        private readonly object ruleInput;
         private readonly List<Workflow> workflow;
 
         private class ListItem
@@ -26,12 +24,15 @@ namespace RulesEngineBenchmark
             public string Value { get; set; }
         }
 
+
         public REBenchmark()
         {
             var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "NestedInputDemo.json", SearchOption.AllDirectories);
             if (files == null || files.Length == 0)
+            {
                 throw new Exception("Rules not found.");
-            
+            }
+
             var fileData = File.ReadAllText(files[0]);
             workflow = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
 
@@ -40,26 +41,25 @@ namespace RulesEngineBenchmark
                 EnableScopedParams = false
             });
 
-            ruleInputs = new RuleParameter[] {
-                new RuleParameter("input1", new {
-                    SimpleProp = "simpleProp",
-                    NestedProp = new {
-                        SimpleProp = "nestedSimpleProp",
-                        ListProp = new List<ListItem>
+            ruleInput = new {
+                SimpleProp = "simpleProp",
+                NestedProp = new {
+                    SimpleProp = "nestedSimpleProp",
+                    ListProp = new List<ListItem>
+                    {
+                        new ListItem
                         {
-                            new ListItem
-                            {
-                                Id = 1,
-                                Value = "first"
-                            },
-                            new ListItem
-                            {
-                                Id = 2,
-                                Value = "second"
-                            }
+                            Id = 1,
+                            Value = "first"
+                        },
+                        new ListItem
+                        {
+                            Id = 2,
+                            Value = "second"
                         }
                     }
-                })
+                }
+
             };
         }
 
@@ -71,7 +71,7 @@ namespace RulesEngineBenchmark
         {
             foreach (var workflow in workflow)
             {
-                _ = rulesEngine.ExecuteAllRulesAsync(workflow.WorkflowName, ruleInputs).Result;
+                _ = rulesEngine.ExecuteAllRulesAsync(workflow.WorkflowName, ruleInput).Result;
             }
         }
     }

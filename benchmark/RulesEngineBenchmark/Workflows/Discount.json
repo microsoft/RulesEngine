@@ -4,7 +4,7 @@
     "Rules": [
       {
         "RuleName": "GiveDiscount10",
-        "SuccessMessage": "10",
+        "SuccessEvent": "10",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
@@ -12,7 +12,7 @@
       },
       {
         "RuleName": "GiveDiscount20",
-        "SuccessMessage": "20",
+        "SuccessEvent": "20",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
@@ -20,7 +20,7 @@
       },
       {
         "RuleName": "GiveDiscount25",
-        "SuccessMessage": "25",
+        "SuccessEvent": "25",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
@@ -28,7 +28,7 @@
       },
       {
         "RuleName": "GiveDiscount30",
-        "SuccessMessage": "30",
+        "SuccessEvent": "30",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
@@ -36,11 +36,11 @@
       },
       {
         "RuleName": "GiveDiscount30NestedOrExample",
-        "SuccessMessage": "30",
+        "SuccessEvent": "30",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "Operator": "OrElse",
-        "Rules": [
+        "Rules":[
           {
             "RuleName": "IsLoyalAndHasGoodSpend",
             "ErrorMessage": "One or more adjust rules failed.",
@@ -59,7 +59,7 @@
       },
       {
         "RuleName": "GiveDiscount35NestedAndExample",
-        "SuccessMessage": "35",
+        "SuccessEvent": "35",
         "ErrorMessage": "One or more adjust rules failed.",
         "ErrorType": "Error",
         "Operator": "AndAlso",

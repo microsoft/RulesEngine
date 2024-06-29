@@ -4,19 +4,18 @@
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace RulesEngine.Actions
 {
     public abstract class ActionBase
     {
-        internal async virtual ValueTask<ActionRuleResult> ExecuteAndReturnResultAsync(ActionContext context, RuleParameter[] ruleParameters, bool includeRuleResults = false, CancellationToken ct = default)
+        internal async virtual ValueTask<ActionRuleResult> ExecuteAndReturnResultAsync(ActionContext context, RuleParameter[] ruleParameters, bool includeRuleResults = false)
         {
             var result = new ActionRuleResult();
             try
             {
-                result.Output = await Run(context, ruleParameters, ct);
+                result.Output = await Run(context, ruleParameters);
             }
             catch (Exception ex)
             {
@@ -34,6 +33,6 @@ namespace RulesEngine.Actions
             }
             return result;
         }
-        public abstract ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters, CancellationToken ct = default);
+        public abstract ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters);
     }
 }

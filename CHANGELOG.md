@@ -2,47 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## [6.0.3]
-- updated System.Linq.Dynamic.Core to fix a bug [614](https://github.com/microsoft/RulesEngine/issues/614) 
-- created test CachingLiteralsDictionary to verify bug has been fixed
-
-## [6.0.2]
-- CancellationToken was not completely implemented
-- Release builds are strongly signed
-
-## [6.0.1]
-- All previous RulesEngine public methods have labeled obsolete (but still exist for backwards compatibility)
-- Replacement methods created which prevent confusion [Example](https://github.com/asulwer/RulesEngine/blob/main/demo/DemoApp/Demos/MultipleWorkflows.cs)
-	- `public async IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(object[] inputs, [EnumeratorCancellation] CancellationToken ct = default)`
-	- `public async IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(RuleParameter[] inputs, [EnumeratorCancellation] CancellationToken ct = default)`
-		- interates workflows and calls ExecuteWorkflow for each interation
-		- yield return for each workflow
-	- `public async Task<List<RuleResultTree>> ExecuteWorkflow(string workflow_name, object[] inputs, CancellationToken ct = default)`
-	- `public async Task<List<RuleResultTree>> ExecuteWorkflow(string workflow_name, RuleParameter[] inputs, CancellationToken ct = default)`
-		- interates rules in workflow and calls ExecuteRule for each iteration
-	- `public async Task<RuleResultTree> ExecuteRule(string workflow_name, string rule_name, RuleParameter[] ruleParams, CancellationToken ct = default)`
-		- executes a rule and/or action, if applicable
-	- `public async Task<ActionRuleResult> ExecuteRuleActions(string workflow_name, string rule_name, RuleParameter[] inputs, CancellationToken ct = default)`
-		- execute the actions of a rule
-	 
-## [6.0.0]
-- methods that were marked obsolete, in prior version, have been removed
-- ALL issues in [master](https://github.com/microsoft/RulesEngine/issues) fork have been resolved, usually with a demo app supporting solution
-- only targeting netstandard2.1
-- Methods with CancellationToken added for all RulesEngine Execute... methods
-- RulesEngine Execute... Methods using params marked obsolete in favor of CancellationToken supported methods
-- original project is no longer being maintained
-
-### Breaking Changes
-- **Rule Class Update** changed SuccessEvent to [SuccessMessage](https://github.com/asulwer/RulesEngine/issues/6)
-- **ActionBase Class Update**: Actions extending from `ActionBase` must now pass a `CancellationToken` parameter. The `Run` method in `ActionBase` requires a `CancellationToken`.
-This ensures that all derived classes handle cancellation requests properly, improving resource management and responsiveness.
-Make sure to update all derived classes to include the `CancellationToken` parameter in their `Run` method implementations.
-
-## [5.0.4]
-- Refactoring code, big time
-- Upgraded dependencies to latest
-
 ## [5.0.3]
 - Updated dependencies to latest
 - Fixed RulesEngine throwing exception when type name is same as input name
@@ -61,6 +20,7 @@ Make sure to update all derived classes to include the `CancellationToken` param
 
 ### Breaking Changes
 - As a part of security bug fix, method call for only registered types via reSettings will be allowed. This only impacts strongly typed inputs and nested types
+
 
 ## [4.0.0]
 - RulesEngine is now available in both dotnet 6 and netstandard 2.0

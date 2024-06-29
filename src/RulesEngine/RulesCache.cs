@@ -19,10 +19,12 @@ namespace RulesEngine
         /// <summary>The workflow rules</summary>
         private readonly ConcurrentDictionary<string, (Workflow, long)> _workflow = new ConcurrentDictionary<string, (Workflow, long)>();
 
+
         public RulesCache(ReSettings reSettings)
         {
             _compileRules = new MemCache(reSettings.CacheConfig);
         }
+
 
         /// <summary>Determines whether [contains workflow rules] [the specified workflow name].</summary>
         /// <param name="workflowName">Name of the workflow.</param>
@@ -115,6 +117,7 @@ namespace RulesEngine
                 return null;
             }
         }
+
 
         /// <summary>Gets the compiled rules.</summary>
         /// <param name="compiledRulesKey">The compiled rules key.</param>

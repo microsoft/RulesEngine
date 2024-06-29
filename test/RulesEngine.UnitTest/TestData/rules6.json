@@ -1,0 +1,29 @@
+{
+    "WorkflowName": "inputWorkflow",
+    "Rules": [
+        {
+            "RuleName": "GiveDiscount10",
+            "SuccessEvent": "10",
+            "ErrorMessage": "One or more adjust rules failed.",
+            "ErrorType": "Error",
+            "RuleExpressionType": "LambdaExpression",
+            "Expression": "input1.Property1.Contains(\"hell\")"
+        },
+        {
+            "RuleName": "GiveDiscount20",
+            "SuccessEvent": "20",
+            "ErrorMessage": "One or more adjust rules failed.",
+            "ErrorType": "Error",
+            "RuleExpressionType": "LambdaExpression",
+            "Expression": "input1.Property1.Contains(\"hell\") && !input1.Boolean"
+        },
+        {
+            "RuleName": "GiveDiscount30",
+            "SuccessEvent": "30",
+            "ErrorMessage": "One or more adjust rules failed.",
+            "ErrorType": "Error",
+            "RuleExpressionType": "LambdaExpression",
+            "Expression": "input1.Method.Invoke()"
+        }
+    ]
+}

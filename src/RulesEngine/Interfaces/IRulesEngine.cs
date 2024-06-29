@@ -2,29 +2,29 @@
 // Licensed under the MIT License.
 
 using RulesEngine.Models;
-using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace RulesEngine.Interfaces
 {
     public interface IRulesEngine
     {
-        /*
-        IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(RuleParameter[] inputs, CancellationToken ct = default);
-        Task<List<RuleResultTree>> ExecuteWorkflow(string workflowName, RuleParameter[] inputs, CancellationToken ct = default);
-        Task<RuleResultTree> ExecuteRule(string workflowName, string ruleName, RuleParameter[] ruleParams, CancellationToken ct = default);
-        Task<ActionRuleResult> ExecuteRuleActions(string workflowName, string ruleName, RuleParameter[] inputs, CancellationToken ct = default);
-        */
-
+        /// <summary>
+        /// This will execute all the rules of the specified workflow
+        /// </summary>
+        /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
+        /// <param name="inputs">A variable number of inputs</param>
+        /// <returns>List of rule results</returns>
         ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params object[] inputs);
-        ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, object[] inputs, CancellationToken ct = default);
+
+        /// <summary>
+        /// This will execute all the rules of the specified workflow
+        /// </summary>
+        /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
+        /// <param name="ruleParams">A variable number of rule parameters</param>
+        /// <returns>List of rule results</returns>
         ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params RuleParameter[] ruleParams);
-        ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, RuleParameter[] ruleParams, CancellationToken ct = default);
         ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters);
-        ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters, CancellationToken ct = default);
 
         /// <summary>
         /// Adds new workflows to RulesEngine
