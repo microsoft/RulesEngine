@@ -1,10 +1,10 @@
 # Rules Engine
-![build](https://github.com/microsoft/RulesEngine/workflows/build/badge.svg?branch=main)
-[![Coverage Status](https://coveralls.io/repos/github/microsoft/RulesEngine/badge.svg?branch=main)](https://coveralls.io/github/microsoft/RulesEngine?branch=main)
+![build](https://github.com/asulwer/RulesEngine/workflows/build/badge.svg?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/asulwer/RulesEngineEx/badge.svg?branch=main)](https://coveralls.io/github/asulwer/RulesEngine?branch=main)
 [![Nuget download][download-image]][download-url]
 
-[download-image]: https://img.shields.io/nuget/dt/RulesEngine
-[download-url]: https://www.nuget.org/packages/RulesEngine/
+[download-image]: https://img.shields.io/nuget/dt/RulesEngineEx
+[download-url]: https://www.nuget.org/packages/RulesEngineEx/
 
 ## Overview
 
@@ -20,7 +20,7 @@ To install this library, download the latest version of [NuGet Package](https://
 
 There are several ways to populate workflows for the Rules Engine as listed below.
 
-You need to store the rules based on the [schema definition](https://github.com/microsoft/RulesEngine/blob/main/schema/workflow-schema.json) given and they can be stored in any store as deemed appropriate like Azure Blob Storage, Cosmos DB, Azure App Configuration, [Entity Framework](https://github.com/microsoft/RulesEngine#entity-framework), SQL Servers, file systems etc. For RuleExpressionType `LambdaExpression`, the rule is written as a [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
+You need to store the rules based on the [schema definition](https://github.com/asulwer/RulesEngine/blob/main/schema/workflow-schema.json) given and they can be stored in any store as deemed appropriate like Azure Blob Storage, Cosmos DB, Azure App Configuration, [Entity Framework](https://github.com/asulwer/RulesEngine#entity-framework), SQL Servers, file systems etc. For RuleExpressionType `LambdaExpression`, the rule is written as a [lambda expressions](https://docs.asulwer.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions).
 
 An example rule:
 
@@ -64,11 +64,11 @@ List<RuleResultTree> response = await rulesEngine.ExecuteAllRulesAsync(workflowN
 
 Here, *workflowName* is the name of the workflow, which is *Discount* in the above mentioned example. And *input* is the object which needs to be checked against the rules,  which itself may consist of a list of class instances.
 
-The *response* will contain a list of [*RuleResultTree*](https://github.com/microsoft/RulesEngine/wiki/Getting-Started#ruleresulttree) which gives information if a particular rule passed or failed. 
+The *response* will contain a list of [*RuleResultTree*](https://github.com/asulwer/RulesEngine/wiki/Getting-Started#ruleresulttree) which gives information if a particular rule passed or failed. 
 
-_Note: A detailed example showcasing how to use Rules Engine is explained in [Getting Started page](https://github.com/microsoft/RulesEngine/wiki/Getting-Started) of [Rules Engine Wiki](https://github.com/microsoft/RulesEngine/wiki)._
+_Note: A detailed example showcasing how to use Rules Engine is explained in [Getting Started page](https://github.com/asulwer/RulesEngine/wiki/Getting-Started) of [Rules Engine Wiki](https://github.com/asulwer/RulesEngine/wiki)._
 
-_A demo app for the is available at [this location](https://github.com/microsoft/RulesEngine/tree/main/demo)._
+_A demo app for the is available at [this location](https://github.com/asulwer/RulesEngine/tree/main/demo)._
 
 ### Basic
 
@@ -97,7 +97,7 @@ var bre = new RulesEngine.RulesEngine(workflows.ToArray());
 ```
 ### Entity Framework
 
-Consuming Entity Framework and populating the Rules Engine is shown in the [EFDemo class](https://github.com/microsoft/RulesEngine/blob/main/demo/DemoApp/EFDemo.cs) with Workflow rules populating the array and passed to the Rules Engine, The Demo App includes an example [RulesEngineDemoContext](https://github.com/microsoft/RulesEngine/blob/main/demo/DemoApp.EFDataExample/RulesEngineDemoContext.cs) using SQLite and could be swapped out for another provider.
+Consuming Entity Framework and populating the Rules Engine is shown in the [EFDemo class](https://github.com/asulwer/RulesEngine/blob/main/demo/DemoApp/EFDemo.cs) with Workflow rules populating the array and passed to the Rules Engine, The Demo App includes an example [RulesEngineDemoContext](https://github.com/asulwer/RulesEngine/blob/main/demo/DemoApp.EFDataExample/RulesEngineDemoContext.cs) using SQLite and could be swapped out for another provider.
 
 ```c#
 var wfr = db.Workflows.Include(i => i.Rules).ThenInclude(i => i.Rules).ToArray();
@@ -108,13 +108,13 @@ var bre = new RulesEngine.RulesEngine(wfr, null);
 
 ## How it works
 
-![](https://github.com/microsoft/RulesEngine/blob/main/assets/BlockDiagram.png)
+![](https://github.com/asulwer/RulesEngine/blob/main/assets/BlockDiagram.png)
 
-The rules can be stored in any store and be fed to the system in a structure which adheres to the [schema](https://github.com/microsoft/RulesEngine/blob/main/schema/workflow-schema.json) of WorkFlow model.
+The rules can be stored in any store and be fed to the system in a structure which adheres to the [schema](https://github.com/asulwer/RulesEngine/blob/main/schema/workflow-schema.json) of WorkFlow model.
 
 A wrapper needs to be created over the Rules Engine package, which will get the rules and input message(s) from any store that your system dictates and put it into the Engine. The wrapper then handles the output using appropriate means.
 
-_Note: To know in detail of the workings of Rules Engine, please visit [How it works section](https://github.com/microsoft/RulesEngine/wiki/Introduction#how-it-works) in [Rules Engine Wiki](https://github.com/microsoft/RulesEngine/wiki)._
+_Note: To know in detail of the workings of Rules Engine, please visit [How it works section](https://github.com/asulwer/RulesEngine/wiki/Introduction#how-it-works) in [Rules Engine Wiki](https://github.com/asulwer/RulesEngine/wiki)._
 
 ## 3rd Party Tools
 
@@ -132,12 +132,8 @@ https://alexreich.github.io/RulesEngineEditor/demo
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+the rights to use your contribution. For details, visit https://cla.opensource.asulwer.com.
 
 ---
 
-_For more details please check out [Rules Engine Wiki](https://github.com/microsoft/RulesEngine/wiki)._
+_For more details please check out [Rules Engine Wiki](https://github.com/asulwer/RulesEngine/wiki)._
