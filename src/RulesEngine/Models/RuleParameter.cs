@@ -17,7 +17,8 @@ namespace RulesEngine.Models
             Init(name, Value?.GetType());
         }
 
-        internal RuleParameter(string name, Type type, object value = null)
+       
+        internal RuleParameter(string name, Type type,object value = null)
         {
             Value = Utils.GetTypedObject(value);
             Init(name, type);
@@ -39,7 +40,9 @@ namespace RulesEngine.Models
         {
             var typedValue = Utils.GetTypedObject(value);
             var type = typedValue?.GetType() ?? typeof(T);
-            return new RuleParameter(name, type, value);
+            return new RuleParameter(name,type,value);
         }
+
+
     }
 }

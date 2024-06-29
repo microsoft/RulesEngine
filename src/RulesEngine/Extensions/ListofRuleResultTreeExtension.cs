@@ -13,6 +13,7 @@ namespace RulesEngine.Extensions
         public delegate void OnSuccessFunc(string eventName);
         public delegate void OnFailureFunc();
 
+
         /// <summary>
         /// Calls the Success Func for the first rule which succeeded among the ruleResults
         /// </summary>
@@ -21,10 +22,10 @@ namespace RulesEngine.Extensions
         /// <returns></returns>
         public static List<RuleResultTree> OnSuccess(this List<RuleResultTree> ruleResultTrees, OnSuccessFunc onSuccessFunc)
         {
-            var successfulRuleResult = ruleResultTrees.FirstOrDefault(ruleResult => ruleResult?.IsSuccess == true);
+            var successfulRuleResult = ruleResultTrees.FirstOrDefault(ruleResult => ruleResult.IsSuccess == true);
             if (successfulRuleResult != null)
             {
-                var eventName = successfulRuleResult.Rule.SuccessMessage ?? successfulRuleResult.Rule.RuleName;
+                var eventName = successfulRuleResult.Rule.SuccessEvent ?? successfulRuleResult.Rule.RuleName;
                 onSuccessFunc(eventName);
             }
 
@@ -39,7 +40,7 @@ namespace RulesEngine.Extensions
         /// <returns></returns>
         public static List<RuleResultTree> OnFail(this List<RuleResultTree> ruleResultTrees, OnFailureFunc onFailureFunc)
         {
-            bool allFailure = ruleResultTrees.All(ruleResult => ruleResult?.IsSuccess == false);
+            bool allFailure = ruleResultTrees.All(ruleResult => ruleResult.IsSuccess == false);
             if (allFailure)
                 onFailureFunc();
             return ruleResultTrees;

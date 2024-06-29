@@ -1,0 +1,11 @@
+{
+    "WorkflowName": "inputWorkflow",
+    "Rules": [
+      {
+        "RuleName": "GiveDiscount10",
+        "SuccessEvent": "10",
+        "RuleExpressionType": "LambdaExpression",
+        "Expression": "input1.Data.GetProperty(\"category\").GetString() == \"abc\""
+      }
+    ]
+  } 

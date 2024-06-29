@@ -1,0 +1,39 @@
+﻿[
+  {
+    "WorkflowName": "NestedInputDemoWorkflow1",
+    "Rules": [
+      {
+        "RuleName": "CheckNestedSimpleProp",
+        "ErrorMessage": "One or more adjust rules failed.",
+        "ErrorType": "Error",
+        "RuleExpressionType": "LambdaExpression",
+        "Expression": "input1.NestedProp.SimpleProp == \"nestedSimpleProp\""
+      }
+    ]
+  },
+  {
+    "WorkflowName": "NestedInputDemoWorkflow2",
+    "Rules": [
+      {
+        "RuleName": "CheckNestedListProp",
+        "ErrorMessage": "One or more adjust rules failed.",
+        "ErrorType": "Error",
+        "RuleExpressionType": "LambdaExpression",
+        "Expression": "input1.NestedProp.ListProp[0].Id == 1 && input1.NestedProp.ListProp[1].Value == \"second\""
+      }
+    ]
+  },
+
+  {
+    "WorkflowName": "NestedInputDemoWorkflow3",
+    "Rules": [
+      {
+        "RuleName": "CheckNestedListPropFunctions",
+        "ErrorMessage": "One or more adjust rules failed.",
+        "ErrorType": "Error",
+        "RuleExpressionType": "LambdaExpression",
+        "Expression": "input1.NestedProp.ListProp[1].Value.ToUpper() = \"SECOND\""
+      }
+    ]
+  }
+]

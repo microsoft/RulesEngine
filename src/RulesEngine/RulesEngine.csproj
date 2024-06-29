@@ -3,14 +3,12 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <Nullable>disable</Nullable>
-    <Version>6.0.3</Version>
+    <Version>6.0.0</Version>
     <PackageId>RulesEngineEx</PackageId>
-    <Copyright>Copyright (c) Aaron Sulwer.</Copyright>
-    <Company>ACCLS Company</Company>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+	<PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/asulwer/RulesEngine</PackageProjectUrl>
     <RepositoryUrl>https://github.com/asulwer/RulesEngine</RepositoryUrl>
-    <Authors>Aaron Sulwer</Authors>
+    <Authors>Aaron Sulwer, Renan Pereira</Authors>
     <Description>Rules Engine is a package for abstracting business logic/rules/policies out of the system. This works in a very simple way by giving you an ability to put your rules in a store outside the core logic of the system thus ensuring that any change in rules doesn't affect the core system.</Description>
 	  <PackageReleaseNotes>https://github.com/asulwer/RulesEngine/blob/main/CHANGELOG.md</PackageReleaseNotes>
 	  <PackageTags>BRE, Rules Engine, Abstraction</PackageTags>
@@ -25,33 +23,24 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\public.snk</AssemblyOriginatorKeyFile>
+	<AssemblyOriginatorKeyFile>..\..\signing\RulesEngine-publicKey.snk</AssemblyOriginatorKeyFile>
     <DelaySign>True</DelaySign>
     <Deterministic>true</Deterministic>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <Title>Rules Engine</Title>
   </PropertyGroup>
-  <ItemGroup>
-    <None Include="..\..\LICENSE">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="FastExpressionCompiler" Version="4.2.0" />
     <PackageReference Include="FluentValidation" Version="11.9.2" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />    
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.4.2" />    
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.4.2" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
-    <Exec Command="powershell -ExecutionPolicy Unrestricted $(ProjectDir)build-signed.ps1 -dll &quot;$(ProjectDir)$(OutDir)$(AssemblyName).dll&quot; -snk &quot;$(ProjectDir)sgKey.snk&quot;" />
-  </Target>
 
 </Project>

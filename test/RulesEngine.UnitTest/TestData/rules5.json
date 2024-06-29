@@ -1,0 +1,21 @@
+{
+  "WorkflowName": "inputWorkflow",
+  "Rules": [
+    {
+      "RuleName": "upperCaseAccess",
+      "SuccessEvent": "10",
+      "ErrorMessage": "One or more adjust rules failed.",
+      "ErrorType": "Error",
+      "RuleExpressionType": "LambdaExpression",
+      "Expression": "utils.CheckExists(String(input1.Property1)) == true"
+    },
+    {
+      "RuleName": "lowerCaseAccess",
+      "SuccessEvent": "10",
+      "ErrorMessage": "One or more adjust rules failed.",
+      "ErrorType": "Error",
+      "RuleExpressionType": "LambdaExpression",
+      "Expression": "utils.CheckExists(String(input1.property1)) == true"
+    }
+  ]
+} 

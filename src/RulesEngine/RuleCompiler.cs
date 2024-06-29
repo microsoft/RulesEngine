@@ -71,6 +71,8 @@ namespace RulesEngine
             }
         }
 
+
+
         /// <summary>
         /// Gets the expression for rule.
         /// </summary>
@@ -135,8 +137,8 @@ namespace RulesEngine
                     }
                 }
             }
-
             return ruleExpParams.ToArray();
+
         }
 
         /// <summary>
@@ -182,6 +184,7 @@ namespace RulesEngine
             };
         }
 
+
         private (bool isSuccess ,IEnumerable<RuleResultTree> result) ApplyOperation(RuleParameter[] paramArray,IEnumerable<RuleFunc<RuleResultTree>> ruleFuncList, ExpressionType operation)
         {
             if (ruleFuncList?.Any() != true)
@@ -223,13 +226,13 @@ namespace RulesEngine
                 }
                 
             }
-
             return (isSuccess, resultList);
         }
 
         internal Func<object[],Dictionary<string,object>> CompileScopedParams(RuleExpressionType ruleExpressionType, RuleParameter[] ruleParameters,RuleExpressionParameter[] ruleExpParams)
         {
             return GetExpressionBuilder(ruleExpressionType).CompileScopedParams(ruleParameters, ruleExpParams);
+
         }
 
         private RuleFunc<RuleResultTree> GetWrappedRuleFunc(Rule rule, RuleFunc<RuleResultTree> ruleFunc,RuleParameter[] ruleParameters,RuleExpressionParameter[] ruleExpParams)
@@ -238,7 +241,7 @@ namespace RulesEngine
             {
                 return ruleFunc;
             }
-            var paramDelegate = CompileScopedParams(rule.RuleExpressionType, ruleParameters, ruleExpParams);
+            var paramDelegate = CompileScopedParams(rule.RuleExpressionType,ruleParameters, ruleExpParams);
 
             return (ruleParams) => {
                 var inputs = ruleParams.Select(c => c.Value).ToArray();

@@ -7,19 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.6" />
+    <ProjectReference Include="../../src/RulesEngine/RulesEngine.csproj" />
+    <ProjectReference Include="..\DemoApp.EFDataExample\DemoApp.EFDataExample.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\RulesEngine\RulesEngine.csproj" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <None Update="Workflows\Discount.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Workflows\NestedInput.json">
+    <None Update="Workflows\NestedInputDemo.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

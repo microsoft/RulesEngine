@@ -15,7 +15,6 @@ using RulesEngine.Validators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,18 +28,15 @@ namespace RulesEngine
     public class RulesEngine : IRulesEngine
     {
         #region Variables
-
         private readonly ReSettings _reSettings;
         private readonly RulesCache _rulesCache;
         private readonly RuleExpressionParser _ruleExpressionParser;
         private readonly RuleCompiler _ruleCompiler;
         private readonly ActionFactory _actionFactory;
         private const string ParamParseRegex = "(\\$\\(.*?\\))";
-
         #endregion
 
         #region Constructor
-
         public RulesEngine(string[] jsonConfig, ReSettings reSettings = null) : this(reSettings)
         {
             var workflow = jsonConfig.Select(item => JsonConvert.DeserializeObject<Workflow>(item)).ToArray();
@@ -65,52 +61,139 @@ namespace RulesEngine
             _actionFactory = new ActionFactory(GetActionRegistry(_reSettings));
         }
 
+        private IDictionary<string, Func<ActionBase>> GetActionRegistry(ReSettings reSettings)
+        {
+            var actionDictionary = GetDefaultActionRegistry();
+            var customActions = reSettings.CustomActions ?? new Dictionary<string, Func<ActionBase>>();
+            foreach (var customAction in customActions)
+            {
+                actionDictionary.Add(customAction);
+            }
+            return actionDictionary;
+
+        }
         #endregion
 
-        #region Public
+        #region Public Methods
 
-        public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowname, params object[] inputs)
+        /// <summary>
+        /// This will execute all the rules of the specified workflow
+        /// </summary>
+        /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
+        /// <param name="inputs">A variable number of inputs</param>
+        /// <returns>List of rule results</returns>
+        public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params object[] inputs)
         {
-            return await ExecuteAllRulesAsync(workflowname, inputs, CancellationToken.None);
-        }
-        public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, object[] inputs, CancellationToken ct = default)
-        {
-            //TODO: tightly coupled with inputX as a string
             var ruleParams = new List<RuleParameter>();
 
             for (var i = 0; i < inputs.Length; i++)
             {
-                if (ct.IsCancellationRequested)
-                    break;
-
                 var input = inputs[i];
                 ruleParams.Add(new RuleParameter($"input{i + 1}", input));
             }
 
-            return await ExecuteAllRulesAsync(workflowName, ruleParams.ToArray(), ct);
+            return await ExecuteAllRulesAsync(workflowName, ruleParams.ToArray());
         }
+
+        /// <summary>
+        /// This will execute all the rules of the specified workflow
+        /// </summary>
+        /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
+        /// <param name="cancellationToken">cancel the request</param>
+        /// <param name="inputs">A variable number of inputs</param>
+        /// <returns>List of rule results</returns>
+        public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, CancellationToken cancellationToken, params object[] inputs)
+        {
+            var ruleParams = new List<RuleParameter>();
+
+            for (var i = 0; i < inputs.Length; i++)
+            {
+                var input = inputs[i];
+                ruleParams.Add(new RuleParameter($"input{i + 1}", input));
+            }
+
+            return await ExecuteAllRulesAsync(workflowName, cancellationToken, ruleParams.ToArray());
+        }
+
+        /// <summary>
+        /// This will execute all the rules of the specified workflow
+        /// </summary>
+        /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
+        /// <param name="ruleParams">A variable number of rule parameters</param>
+        /// <returns>List of rule results</returns>
         public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params RuleParameter[] ruleParams)
         {
-            return await ExecuteAllRulesAsync(workflowName , ruleParams, CancellationToken.None);
-        }
-        public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, RuleParameter[] ruleParams, CancellationToken ct = default)
-        {
-            Array.Sort(ruleParams, (RuleParameter a, RuleParameter b) => string.Compare(a.Name, b.Name));
-            var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, ruleParams);
-            await ExecuteActionAsync(ruleResultList, ct);
+            var sortedRuleParams = ruleParams.ToList();
+            sortedRuleParams.Sort((RuleParameter a, RuleParameter b) => string.Compare(a.Name, b.Name));
+            var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, sortedRuleParams.ToArray());
+            await ExecuteActionAsync(ruleResultList);
             return ruleResultList;
         }
-        public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters)
+
+        public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, CancellationToken cancellationToken, params RuleParameter[] ruleParams)
         {
-            return await ExecuteActionWorkflowAsync(workflowName, ruleName, ruleParameters, CancellationToken.None);
+            var sortedRuleParams = ruleParams.ToList();
+            sortedRuleParams.Sort((RuleParameter a, RuleParameter b) => string.Compare(a.Name, b.Name));
+            var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, sortedRuleParams.ToArray());
+            await ExecuteActionAsync(ruleResultList, cancellationToken);
+            return ruleResultList;
         }
-        public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters, CancellationToken ct = default)
+
+        internal async ValueTask ExecuteActionAsync(IEnumerable<RuleResultTree> ruleResultList, CancellationToken cancellationToken = default)
+        {
+            foreach (var ruleResult in ruleResultList)
+            {
+                if(ruleResult.ChildResults !=  null)
+                {
+                    await ExecuteActionAsync(ruleResult.ChildResults);
+                }
+                var actionResult = await ExecuteActionForRuleResult(ruleResult, false, cancellationToken);
+                ruleResult.ActionResult = new ActionResult {
+                    Output = actionResult.Output,
+                    Exception = actionResult.Exception
+                };
+            }
+        }
+
+        public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters)
         {
             var compiledRule = CompileRule(workflowName, ruleName, ruleParameters);
             var resultTree = compiledRule(ruleParameters);
-            return await ExecuteActionForRuleResult(resultTree, true, ct);
+            return await ExecuteActionForRuleResult(resultTree, true);
         }
-        
+
+        public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters, CancellationToken cancellationToken)
+        {
+            var compiledRule = CompileRule(workflowName, ruleName, ruleParameters);
+            var resultTree = compiledRule(ruleParameters);
+            return await ExecuteActionForRuleResult(resultTree, true, cancellationToken);
+        }
+
+        private async ValueTask<ActionRuleResult> ExecuteActionForRuleResult(RuleResultTree resultTree, bool includeRuleResults = false, CancellationToken cancellationToken = default)
+        {
+            var ruleActions = resultTree?.Rule?.Actions;
+            var actionInfo = resultTree?.IsSuccess == true ? ruleActions?.OnSuccess : ruleActions?.OnFailure;
+
+            if (actionInfo != null)
+            {
+                var action = _actionFactory.Get(actionInfo.Name);
+                var ruleParameters = resultTree.Inputs.Select(kv => new RuleParameter(kv.Key, kv.Value)).ToArray();
+                return await action.ExecuteAndReturnResultAsync(new ActionContext(actionInfo.Context, resultTree, cancellationToken), ruleParameters, includeRuleResults);
+            }
+            else
+            {
+                //If there is no action,return output as null and return the result for rule
+                return new ActionRuleResult {
+                    Output = null,
+                    Results = includeRuleResults ? new List<RuleResultTree>() { resultTree } : null
+                };
+            }
+        }
+
+        #endregion
+
+        #region Private Methods
+
         /// <summary>
         /// Adds the workflow if the workflow name is not already added. Ignores the rest.
         /// </summary>
@@ -121,7 +204,7 @@ namespace RulesEngine
             try
             {
                 foreach (var workflow in workflows)
-                {
+                {                    
                     var validator = new WorkflowsValidator();
                     validator.ValidateAndThrow(workflow);
                     if (!_rulesCache.ContainsWorkflows(workflow.WorkflowName))
@@ -198,61 +281,6 @@ namespace RulesEngine
             }
         }
 
-        #endregion
-
-        #region Private Methods
-
-        private IDictionary<string, Func<ActionBase>> GetActionRegistry(ReSettings reSettings)
-        {
-            var actionDictionary = GetDefaultActionRegistry();
-            var customActions = reSettings.CustomActions ?? new Dictionary<string, Func<ActionBase>>();
-            foreach (var customAction in customActions)
-            {
-                actionDictionary.Add(customAction);
-            }
-            return actionDictionary;
-        }
-
-        private async ValueTask ExecuteActionAsync(IEnumerable<RuleResultTree> ruleResultList, CancellationToken ct = default)
-        {
-            foreach (var ruleResult in ruleResultList)
-            {
-                if (ct.IsCancellationRequested)
-                    break;
-
-                if (ruleResult.ChildResults != null)
-                {
-                    await ExecuteActionAsync(ruleResult.ChildResults, ct);
-                }
-                var actionResult = await ExecuteActionForRuleResult(ruleResult, false, ct);
-                ruleResult.ActionResult = new ActionResult {
-                    Output = actionResult.Output,
-                    Exception = actionResult.Exception
-                };
-            }
-        }
-
-        private async ValueTask<ActionRuleResult> ExecuteActionForRuleResult(RuleResultTree resultTree, bool includeRuleResults = false, CancellationToken ct = default)
-        {
-            var ruleActions = resultTree?.Rule?.Actions;
-            var actionInfo = resultTree?.IsSuccess == true ? ruleActions?.OnSuccess : ruleActions?.OnFailure;
-
-            if (actionInfo != null && !ct.IsCancellationRequested)
-            {
-                var action = _actionFactory.Get(actionInfo.Name);
-                var ruleParameters = resultTree?.Inputs.Select(kv => new RuleParameter(kv.Key, kv.Value)).ToArray();
-                return await action.ExecuteAndReturnResultAsync(new ActionContext(actionInfo.Context, resultTree), ruleParameters, includeRuleResults, ct);
-            }
-            else
-            {
-                //If there is no action,return output as null and return the result for rule
-                return new ActionRuleResult {
-                    //Output = null,
-                    Results = includeRuleResults ? new List<RuleResultTree>() { resultTree } : null
-                };
-            }
-        }
-
         /// <summary>
         /// This will validate workflow rules then call execute method
         /// </summary>
@@ -260,7 +288,7 @@ namespace RulesEngine
         /// <param name="input">input</param>
         /// <param name="workflowName">workflow name</param>
         /// <returns>list of rule result set</returns>
-        private List<RuleResultTree> ValidateWorkflowAndExecuteRule(string workflowName, RuleParameter[] ruleParams)
+        internal List<RuleResultTree> ValidateWorkflowAndExecuteRule(string workflowName, RuleParameter[] ruleParams)
         {
             List<RuleResultTree> result;
 
@@ -320,6 +348,7 @@ namespace RulesEngine
             }
         }
 
+
         private RuleFunc<RuleResultTree> CompileRule(string workflowName, string ruleName, RuleParameter[] ruleParameters)
         {
             var workflow = _rulesCache.GetWorkflow(workflowName);
@@ -342,6 +371,8 @@ namespace RulesEngine
         {
             return _ruleCompiler.CompileRule(rule, ruleExpressionType, ruleParams, scopedParams);
         }
+
+
 
         /// <summary>
         /// This will execute the compiled rules 
@@ -415,12 +446,12 @@ namespace RulesEngine
                         }
                         ruleResult.ExceptionMessage = errorMessage;
                     }
+
                 }
             }
-
             return ruleResultList;
         }
-        
+
         /// <summary>
         /// Updates the error message.
         /// </summary>
@@ -445,7 +476,6 @@ namespace RulesEngine
 
             return errorMessage;
         }
-
         #endregion
     }
 }

@@ -2,46 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
-## [6.0.3]
-- updated System.Linq.Dynamic.Core to fix a bug [614](https://github.com/microsoft/RulesEngine/issues/614) 
-- created test CachingLiteralsDictionary to verify bug has been fixed
-
-## [6.0.2]
-- CancellationToken was not completely implemented
-- Release builds are strongly signed
-
-## [6.0.1]
-- All previous RulesEngine public methods have labeled obsolete (but still exist for backwards compatibility)
-- Replacement methods created which prevent confusion [Example](https://github.com/asulwer/RulesEngine/blob/main/demo/DemoApp/Demos/MultipleWorkflows.cs)
-	- `public async IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(object[] inputs, [EnumeratorCancellation] CancellationToken ct = default)`
-	- `public async IAsyncEnumerable<List<RuleResultTree>> ExecuteAllWorkflows(RuleParameter[] inputs, [EnumeratorCancellation] CancellationToken ct = default)`
-		- interates workflows and calls ExecuteWorkflow for each interation
-		- yield return for each workflow
-	- `public async Task<List<RuleResultTree>> ExecuteWorkflow(string workflow_name, object[] inputs, CancellationToken ct = default)`
-	- `public async Task<List<RuleResultTree>> ExecuteWorkflow(string workflow_name, RuleParameter[] inputs, CancellationToken ct = default)`
-		- interates rules in workflow and calls ExecuteRule for each iteration
-	- `public async Task<RuleResultTree> ExecuteRule(string workflow_name, string rule_name, RuleParameter[] ruleParams, CancellationToken ct = default)`
-		- executes a rule and/or action, if applicable
-	- `public async Task<ActionRuleResult> ExecuteRuleActions(string workflow_name, string rule_name, RuleParameter[] inputs, CancellationToken ct = default)`
-		- execute the actions of a rule
-	 
 ## [6.0.0]
-- methods that were marked obsolete, in prior version, have been removed
 - ALL issues in [master](https://github.com/microsoft/RulesEngine/issues) fork have been resolved, usually with a demo app supporting solution
-- only targeting netstandard2.1
-- Methods with CancellationToken added for all RulesEngine Execute... methods
-- RulesEngine Execute... Methods using params marked obsolete in favor of CancellationToken supported methods
-- original project is no longer being maintained
+- Only targeting netstandard2.1
+- Added new overloads for `ExecuteAllRulesAsync` to support cancellation tokens:
+  - `ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, CancellationToken cancellationToken, params RuleParameter[] ruleParams);`
+  - `ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, CancellationToken cancellationToken, params object[] inputs);`
 
-### Breaking Changes
-- **Rule Class Update** changed SuccessEvent to [SuccessMessage](https://github.com/asulwer/RulesEngine/issues/6)
-- **ActionBase Class Update**: Actions extending from `ActionBase` must now pass a `CancellationToken` parameter. The `Run` method in `ActionBase` requires a `CancellationToken`.
-This ensures that all derived classes handle cancellation requests properly, improving resource management and responsiveness.
-Make sure to update all derived classes to include the `CancellationToken` parameter in their `Run` method implementations.
+- Added new overload for `ExecuteActionWorkflowAsync` to support cancellation tokens:
+  - `ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters, CancellationToken cancellationToken);`
 
-## [5.0.4]
-- Refactoring code, big time
-- Upgraded dependencies to latest
+- Added a `GetCancellationToken` method in `ActionContext` to get the cancellation token:
+  - `public CancellationToken GetCancellationToken();`
+
+These changes let you cancel long-running rule execution processes, making the `RulesEngine` more flexible and responsive.
 
 ## [5.0.3]
 - Updated dependencies to latest

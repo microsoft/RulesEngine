@@ -9,6 +9,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace RulesEngine.Models
 {
+    [Obsolete("WorkflowRules class is deprecated. Use Workflow class instead.")]
+    [ExcludeFromCodeCoverage]
+    public class WorkflowRules : Workflow {
+    }
+
     /// <summary>
     /// Workflow rules class for deserialization  the json config file
     /// </summary>
@@ -20,6 +25,12 @@ namespace RulesEngine.Models
         /// </summary>
         public string WorkflowName { get; set; }
 
+        /// <summary>Gets or sets the workflow rules to inject.</summary>
+        /// <value>The workflow rules to inject.</value>
+        [Obsolete("WorkflowRulesToInject is deprecated. Use WorkflowsToInject instead.")]
+        public IEnumerable<string> WorkflowRulesToInject {
+          set { WorkflowsToInject = value; }
+        }
         public IEnumerable<string> WorkflowsToInject { get; set; }
 
         public RuleExpressionType RuleExpressionType { get; set; } = RuleExpressionType.LambdaExpression;

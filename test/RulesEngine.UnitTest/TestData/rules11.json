@@ -1,0 +1,51 @@
+{
+  "WorkflowName": "MyWorkflow",
+  "WorkflowsToInject": null,
+  "RuleExpressionType": 0,
+  "GlobalParams": [
+    {
+      "Name": "threshold",
+      "Expression": "double.Parse(\u00220.25\u0022)"
+    }
+  ],
+  "Rules": [
+    {
+      "RuleName": "Activation",
+      "Properties": null,
+      "Operator": null,
+      "ErrorMessage": null,
+      "Enabled": true,
+      "RuleExpressionType": 0,
+      "WorkflowsToInject": null,
+      "Rules": null,
+      "LocalParams": [
+        {
+          "Name": "ruleCount",
+          "Expression": "int.Parse(\u002215\u0022)"
+        }
+      ],
+      "Expression": "input1.Count \u003E= ruleCount \u0026\u0026 input1.Where(x =\u003E x.Value \u003E= threshold).Count() \u003E= ruleCount",
+      "Actions": null,
+      "SuccessEvent": null
+    },
+    {
+      "RuleName": "Deactivation",
+      "Properties": null,
+      "Operator": null,
+      "ErrorMessage": null,
+      "Enabled": true,
+      "RuleExpressionType": 0,
+      "WorkflowsToInject": null,
+      "Rules": null,
+      "LocalParams": [
+        {
+          "Name": "ruleCount",
+          "Expression": "int.Parse(\u002230\u0022)"
+        }
+      ],
+      "Expression": "input1.Count \u003E= ruleCount \u0026\u0026 input1.OrderByDescending(o =\u003E o.ChangeDateTime).Take(ruleCount).All(a =\u003E a.Value \u003C threshold)",
+      "Actions": null,
+      "SuccessEvent": null
+    }
+  ]
+}
