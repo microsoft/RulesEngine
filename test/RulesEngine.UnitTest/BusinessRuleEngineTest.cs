@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -1045,8 +1046,22 @@ namespace RulesEngine.UnitTest
             Assert.False(re.ContainsWorkflow(NotExistedWorkflowName));
         }
 
-      
 
+        [Fact]
+        public async Task ExecuteAllRulesAsync_ShouldPassCancellationToken()
+        {
+            // Arrange
+            var mockRulesEngine = new Mock<IRulesEngine>();
+            var cancellationToken = new CancellationTokenSource().Token;
+            var workflowName = "TestWorkflow";
+            var inputs = new object[] { "input1" };
+
+            // Act
+            await mockRulesEngine.Object.ExecuteAllRulesAsync(workflowName, cancellationToken, inputs);
+
+            // Assert
+            mockRulesEngine.Verify(engine => engine.ExecuteAllRulesAsync(workflowName, cancellationToken, inputs), Times.Once);
+        }
 
 
         [Theory]

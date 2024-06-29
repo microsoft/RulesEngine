@@ -4,6 +4,7 @@ using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -81,6 +82,75 @@ namespace RulesEngine.UnitTest
             var result = await engine.ExecuteActionWorkflowAsync("WorkflowWithGlobalsAndSelfRefActions", "RuleReferencingSameWorkflowWithInputFilter", new RuleParameter[0]);
             Assert.NotNull(result);
             Assert.Equal(4,result.Output);
+        }
+
+        [Fact]
+        public async Task WhenExpressionIsSuccess_CancellationToken_OutputExpressionAction_ReturnsExpressionEvaluation()
+        {
+            var engine = new RulesEngine(GetWorkflowWithActions());
+            var result = await engine.ExecuteActionWorkflowAsync("ActionWorkflow", "ExpressionOutputRuleTest", Array.Empty<RuleParameter>(), CancellationToken.None);
+            Assert.NotNull(result);
+            Assert.Equal(2 * 2, result.Output);
+        }
+
+        [Fact]
+        public async Task WhenExpressionIsSuccess_CancellationToken_ComplexOutputExpressionAction_ReturnsExpressionEvaluation()
+        {
+            var engine = new RulesEngine(GetWorkflowWithActions());
+            var result = await engine.ExecuteActionWorkflowAsync("ActionWorkflow", "ComplexOutputRuleTest", Array.Empty<RuleParameter>(), CancellationToken.None);
+            Assert.NotNull(result);
+            dynamic output = result.Output;
+            Assert.Equal(2, output.test);
+        }
+
+        [Fact]
+        public async Task WhenExpressionIsSuccess_EvaluateRuleActionCancellationToken_ReturnsExpressionEvaluation()
+        {
+            var engine = new RulesEngine(GetWorkflowWithActions());
+            var result = await engine.ExecuteActionWorkflowAsync("ActionWorkflow", "EvaluateRuleTest", Array.Empty<RuleParameter>(), CancellationToken.None);
+            Assert.NotNull(result);
+            Assert.Equal(2 * 2, result.Output);
+            Assert.Contains(result.Results, c => c.Rule.RuleName == "ExpressionOutputRuleTest");
+        }
+
+        [Fact]
+        public async Task ExecuteActionWorkflowAsync_CancellationToken_CalledWithIncorrectWorkflowOrRuleName_ThrowsArgumentException()
+        {
+            var engine = new RulesEngine(GetWorkflowWithActions());
+            await Assert.ThrowsAsync<ArgumentException>(async () => await engine.ExecuteActionWorkflowAsync("WrongWorkflow", "ExpressionOutputRuleTest", Array.Empty<RuleParameter>(), CancellationToken.None));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await engine.ExecuteActionWorkflowAsync("ActionWorkflow", "WrongRule", Array.Empty<RuleParameter>(), CancellationToken.None));
+        }
+
+
+        [Fact]
+        public async Task ExecuteActionWorkflowAsync_CancellationToken_CalledWithNoActionsInWorkflow_ExecutesSuccessfully()
+        {
+
+            var engine = new RulesEngine(GetWorkflowsWithoutActions());
+            var result = await engine.ExecuteActionWorkflowAsync("NoActionWorkflow", "NoActionTest", Array.Empty<RuleParameter>(), CancellationToken.None);
+            Assert.NotNull(result);
+            Assert.Null(result.Output);
+        }
+
+
+        [Fact]
+        public async Task ExecuteActionWorkflowAsync_CancellationToken_SelfReferencingAction_NoFilter_ExecutesSuccessfully()
+        {
+
+            var engine = new RulesEngine(GetWorkflowWithActions());
+            var result = await engine.ExecuteActionWorkflowAsync("WorkflowWithGlobalsAndSelfRefActions", "RuleReferencingSameWorkflow", Array.Empty<RuleParameter>(), CancellationToken.None);
+            Assert.NotNull(result);
+            Assert.Null(result.Output);
+        }
+
+        [Fact]
+        public async Task ExecuteActionWorkflowAsync_CancellationToken_SelfReferencingAction_WithFilter_ExecutesSuccessfully()
+        {
+
+            var engine = new RulesEngine(GetWorkflowWithActions());
+            var result = await engine.ExecuteActionWorkflowAsync("WorkflowWithGlobalsAndSelfRefActions", "RuleReferencingSameWorkflowWithInputFilter", Array.Empty<RuleParameter>(), CancellationToken.None);
+            Assert.NotNull(result);
+            Assert.Equal(4, result.Output);
         }
 
         private Workflow[] GetWorkflowsWithoutActions()

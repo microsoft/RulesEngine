@@ -3,6 +3,7 @@
 
 using RulesEngine.Models;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RulesEngine.Interfaces
@@ -24,8 +25,30 @@ namespace RulesEngine.Interfaces
         /// <param name="ruleParams">A variable number of rule parameters</param>
         /// <returns>List of rule results</returns>
         ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params RuleParameter[] ruleParams);
+
+        /// <summary>
+        /// This will execute all the rules of the specified workflow
+        /// </summary>
+        /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
+        /// <param name="cancellationToken">token to enable canceling the request</param>
+        /// <param name="ruleParams">A variable number of rule parameters</param>
+        /// <returns>List of rule results</returns>
+        ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, CancellationToken cancellationToken, params RuleParameter[] ruleParams);
+
+        /// <summary>
+        /// This will execute all the rules of the specified workflow
+        /// </summary>
+        /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
+        /// <param name="cancellationToken">token to enable canceling the request</param>
+        /// <param name="inputs">A variable number of inputs</param>
+        /// <returns>List of rule results</returns>
+        ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, CancellationToken cancellationToken, params object[] inputs);
+
+
         ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters);
 
+        ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters, CancellationToken cancellationToken);
+        
         /// <summary>
         /// Adds new workflows to RulesEngine
         /// </summary>

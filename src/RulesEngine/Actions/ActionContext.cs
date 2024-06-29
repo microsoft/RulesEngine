@@ -5,13 +5,20 @@ using Newtonsoft.Json;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace RulesEngine.Actions
 {
     public class ActionContext
     {
         private readonly IDictionary<string, string> _context;
+        private readonly CancellationToken _token = CancellationToken.None;
         private readonly RuleResultTree _parentResult;
+
+        public ActionContext(IDictionary<string, object> context, RuleResultTree parentResult, CancellationToken cancellationToken) : this(context, parentResult)
+        {
+           _token = cancellationToken;
+        }
 
         public ActionContext(IDictionary<string, object> context, RuleResultTree parentResult)
         {
@@ -24,7 +31,7 @@ namespace RulesEngine.Actions
                 {
                     case "String":
                     case "JsonElement":
-                        value =  kv.Value.ToString();
+                        value = kv.Value.ToString();
                         break;
                     default:
                         value = JsonConvert.SerializeObject(kv.Value);
@@ -35,6 +42,7 @@ namespace RulesEngine.Actions
             }
             _parentResult = parentResult;
         }
+
 
         public RuleResultTree GetParentRuleResult()
         {
@@ -73,6 +81,11 @@ namespace RulesEngine.Actions
             {
                 throw new ArgumentException($"Failed to convert argument `{name}` to type `{typeof(T).Name}` in the action context");
             }
+        }
+
+        public CancellationToken GetCancellationToken()
+        {
+            return _token;
         }
     }
 }

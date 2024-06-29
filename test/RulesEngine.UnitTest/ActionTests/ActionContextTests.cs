@@ -7,6 +7,7 @@ using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using Xunit;
 
 namespace RulesEngine.UnitTest
@@ -180,6 +181,51 @@ namespace RulesEngine.UnitTest
 
             // Act
             Assert.Throws<ArgumentException>(() => actionContext.GetContext<RuleResultTree>(name));
+        }
+
+        [Fact]
+        public void Constructor_ShouldInitializeCancellationToken()
+        {
+            // Arrange
+            var context = new Dictionary<string, object> {{"Key1", "Value1"}};
+            var parentResult = new RuleResultTree();
+            var cancellationToken = new CancellationTokenSource().Token;
+
+            // Act
+            var actionContext = new ActionContext(context, parentResult, cancellationToken);
+
+            // Assert
+            Assert.Equal(cancellationToken, actionContext.GetCancellationToken());
+        }
+
+        [Fact]
+        public void GetCancellationToken_ShouldReturnCancellationToken()
+        {
+            // Arrange
+            var context = new Dictionary<string, object> {{"Key1", "Value1"}};
+            var parentResult = new RuleResultTree();
+            var cancellationToken = new CancellationTokenSource().Token;
+            var actionContext = new ActionContext(context, parentResult, cancellationToken);
+
+            // Act
+            var token = actionContext.GetCancellationToken();
+
+            // Assert
+            Assert.Equal(cancellationToken, token);
+        }
+
+        [Fact]
+        public void Constructor_ShouldInitializeDefaultCancellationToken_WhenNotProvided()
+        {
+            // Arrange
+            var context = new Dictionary<string, object> {{"Key1", "Value1"}};
+            var parentResult = new RuleResultTree();
+
+            // Act
+            var actionContext = new ActionContext(context, parentResult);
+
+            // Assert
+            Assert.Equal(CancellationToken.None, actionContext.GetCancellationToken());
         }
     }
 }

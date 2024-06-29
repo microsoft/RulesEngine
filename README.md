@@ -8,6 +8,8 @@
 
 ## Overview
 
+[forked from](https://github.com/microsoft/RulesEngine) which does not appear to be maintained anymore
+
 Rules Engine is a library/NuGet package for abstracting business logic/rules/policies out of a system. It provides a simple way of giving you the ability to put your rules in a store outside the core logic of the system, thus ensuring that any change in rules don't affect the core system.
 
 ## Installation
