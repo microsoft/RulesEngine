@@ -4,6 +4,7 @@
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using RulesEngine.Actions;
 using RulesEngine.Exceptions;
 using RulesEngine.HelperFunctions;
 using RulesEngine.Interfaces;
@@ -412,7 +413,7 @@ namespace RulesEngine.UnitTest
             Func<bool> func = () => true;
 
             var re = GetRulesEngine(ruleFileName, new ReSettings {
-               CustomTypes = new[] { typeof(Func<bool>) }
+                CustomTypes = new[] { typeof(Func<bool>) }
             });
 
             dynamic input1 = new ExpandoObject();
@@ -519,10 +520,10 @@ namespace RulesEngine.UnitTest
         public async Task ExecuteRuleWithJsonElement(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName, new ReSettings() {
-                                        EnableExceptionAsErrorMessage = true,
-                                        CustomTypes = new Type[] { typeof(System.Text.Json.JsonElement) }
-            
-                                            });
+                EnableExceptionAsErrorMessage = true,
+                CustomTypes = new Type[] { typeof(System.Text.Json.JsonElement) }
+
+            });
 
             var input1 = new {
                 Data = System.Text.Json.JsonSerializer.SerializeToElement(new {
@@ -809,7 +810,52 @@ namespace RulesEngine.UnitTest
             Assert.True(result[1].IsSuccess);
         }
 
+        [Theory]
+        [InlineData("rules12.json")]
+        public async Task ExecuteAllRulesAsync_WithCancellationToken_CancelsProperly(string ruleFileName)
+        {
+            var settings = new ReSettings {
+                CustomActions = new()
+                {
+                    {
+                        nameof(ReturnTrueIfCancellationRequestedAction), () => new ReturnTrueIfCancellationRequestedAction()
+                    }
+                }
+            };
+            var re = GetRulesEngine(ruleFileName, settings);
+            var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMilliseconds(500));
 
+            var result = await re.ExecuteAllRulesAsync("inputWorkflowReference", cancellationTokenSource.Token, Array.Empty<RuleParameter>());
+            Assert.NotNull(result);
+
+            var exceptionruleOne = result[0].ActionResult?.Exception;
+            var exceptionruleTwo = result[1].ActionResult?.Exception;
+
+            Assert.Null(exceptionruleOne);
+            Assert.IsType<TaskCanceledException>(exceptionruleTwo?.InnerException);
+        }
+
+        [Theory]
+        [InlineData("rules12.json")]
+        public async Task ExecuteActionWorkflowAsync_WithCancellationToken_CancelsProperly(string ruleFileName)
+        {
+            var settings = new ReSettings {
+                CustomActions = new()
+                {
+                    {
+                        nameof(ReturnTrueIfCancellationRequestedAction), () => new ReturnTrueIfCancellationRequestedAction()
+                    }
+                }
+            };
+            var re = GetRulesEngine(ruleFileName, settings);
+            var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMilliseconds(200));
+
+            var actionResult = await re.ExecuteActionWorkflowAsync("inputWorkflowReference", "OneEqualsOneRule", Array.Empty<RuleParameter>(), cancellationTokenSource.Token);
+
+            var exception = actionResult.Exception;
+
+            Assert.IsType<TaskCanceledException>(exception?.InnerException);
+        }
 
         [Fact]
         public async Task ExecuteRule_RuntimeError_ShouldReturnAsErrorMessage()
@@ -1177,7 +1223,16 @@ namespace RulesEngine.UnitTest
 
                 return false;
             }
+        }
 
+        public class ReturnTrueIfCancellationRequestedAction : ActionBase
+        {
+            public async override ValueTask<object> Run(ActionContext context, RuleParameter[] ruleParameters)
+            {
+                var cancellationToken = context.GetCancellationToken();
+                await Task.Delay(TimeSpan.FromMilliseconds(400), cancellationToken);
+                return cancellationToken.IsCancellationRequested;
+            }
         }
 
     }

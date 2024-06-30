@@ -1,0 +1,32 @@
+{
+  "WorkflowName": "inputWorkflow",
+  "Rules": [
+    {
+      "RuleName": "OneEqualsOneRule",
+      "ErrorMessage": "One or more adjust rules failed.",
+      "ErrorType": "Error",
+      "RuleExpressionType": "LambdaExpression",
+      "Expression": "1==1",
+      "Actions": {
+        "OnSuccess": {
+          "Name": "ReturnTrueIfCancellationRequestedAction",
+          "Context": {}
+        }
+      }
+    },
+    {
+      "RuleName": "TwoEqualsTwoRule",
+      "ErrorMessage": "One or more adjust rules failed.",
+      "ErrorType": "Error",
+      "RuleExpressionType": "LambdaExpression",
+      "Expression": "2==2",
+      "Actions": {
+        "OnSuccess": {
+          "Name": "ReturnTrueIfCancellationRequestedAction",
+          "Context": {}
+        }
+      }
+    }
+
+  ]
+}
