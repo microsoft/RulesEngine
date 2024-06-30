@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Newtonsoft.Json;
+using System.Text.Json;
 using RulesEngine.Models;
 
 namespace DemoApp.Demos
@@ -47,14 +47,14 @@ namespace DemoApp.Demos
                     c => c);
 
                 entity.Property(b => b.Properties).HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<Dictionary<string, object>>(v))
+                    v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, JsonSerializerOptions.Default))
                 .Metadata
                 .SetValueComparer(valueComparer);
 
                 entity.Property(p => p.Actions).HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<RuleActions>(v));
+                    v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                    v => JsonSerializer.Deserialize<RuleActions>(v, JsonSerializerOptions.Default));
 
                 entity.Ignore(b => b.WorkflowsToInject);
             });

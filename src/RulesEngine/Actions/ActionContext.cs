@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
 
-using Newtonsoft.Json;
+using System.Text.Json;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -34,7 +34,7 @@ namespace RulesEngine.Actions
                         value = kv.Value.ToString();
                         break;
                     default:
-                        value = JsonConvert.SerializeObject(kv.Value);
+                        value = JsonSerializer.Serialize(kv.Value);
                         break;
 
                 }
@@ -71,7 +71,7 @@ namespace RulesEngine.Actions
                 {
                     return (T)Convert.ChangeType(_context[name], typeof(T));
                 }
-                return JsonConvert.DeserializeObject<T>(_context[name]);
+                return JsonSerializer.Deserialize<T>(_context[name]);
             }
             catch (KeyNotFoundException)
             {

@@ -1,8 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -35,7 +34,7 @@ namespace DemoApp.Demos
             }
 
             var fileData = await File.ReadAllTextAsync(files[0], ct);
-            var workflow = JsonConvert.DeserializeObject<Workflow[]>(fileData);
+            var workflow = JsonSerializer.Deserialize<Workflow[]>(fileData);
 
             var bre = new RulesEngine.RulesEngine(workflow, null);
 
