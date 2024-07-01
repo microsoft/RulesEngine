@@ -11,65 +11,54 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DemoApp.Demos
+namespace DemoApp;
+
+public class NestedInput : IDemo
 {
-    public class NestedInput
+    public async Task Run(CancellationToken cancellationToken = default)
     {
-        internal class ListItem
-        {
-            public int Id { get; set; }
-            public string Value { get; set; }
-        }
+        Console.WriteLine($"Running {nameof(NestedInput)}....");
 
-        public async Task Run(CancellationToken ct = default)
-        {
-            Console.WriteLine($"Running {nameof(NestedInput)}....");
-
-            var rp = new RuleParameter[] {
-                new RuleParameter("input1", new 
-                {
+        var rp = new RuleParameter[] {
+            new("input1",
+                new {
                     SimpleProp = "simpleProp",
                     NestedProp = new {
                         SimpleProp = "nestedSimpleProp",
-                        ListProp = new List<ListItem>
-                        {
-                            new ListItem
-                            {
-                                Id = 1,
-                                Value = "first"
-                            },
-                            new ListItem
-                            {
-                                Id = 2,
-                                Value = "second"
-                            }
+                        ListProp = new List<ListItem> {
+                            new() {Id = 1, Value = "first"}, new() {Id = 2, Value = "second"}
                         }
                     }
                 })
-            };
+        };
 
-            var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\Workflows";
-            var files = Directory.GetFiles(dir, "NestedInput.json", SearchOption.AllDirectories);
-            if (files == null || files.Length == 0)
-                throw new Exception("Rules not found.");
-            
-            var fileData = await File.ReadAllTextAsync(files[0], ct);
-            var Workflows = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
-
-            var bre = new RulesEngine.RulesEngine(Workflows.ToArray(), null);
-
-            foreach (var workflow in Workflows)
-            {
-                var ret = await bre.ExecuteAllRulesAsync(workflow.WorkflowName, rp);
-
-                ret.OnSuccess((eventName) =>
-                {
-                    Console.WriteLine($"evaluation resulted in success - {eventName}");
-                }).OnFail(() =>
-                {
-                    Console.WriteLine($"evaluation resulted in failure");
-                });
-            }
+        var dir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "Workflows");
+        var files = Directory.GetFiles(dir, "NestedInput.json", SearchOption.AllDirectories);
+        if (files == null || files.Length == 0)
+        {
+            throw new FileNotFoundException("Rules not found.");
         }
+
+        var fileData = await File.ReadAllTextAsync(files[0], cancellationToken);
+        var workflows = JsonConvert.DeserializeObject<List<Workflow>>(fileData)!;
+
+        var bre = new RulesEngine.RulesEngine(workflows.ToArray());
+
+        foreach (var workflow in workflows)
+        {
+            var ret = await bre.ExecuteAllRulesAsync(workflow.WorkflowName, cancellationToken, rp);
+
+            ret.OnSuccess(eventName => {
+                Console.WriteLine($"evaluation resulted in success - {eventName}");
+            }).OnFail(() => {
+                Console.WriteLine("evaluation resulted in failure");
+            });
+        }
+    }
+
+    internal class ListItem
+    {
+        public int Id { get; set; }
+        public string Value { get; set; }
     }
 }
