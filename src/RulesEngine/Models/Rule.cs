@@ -1,8 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json.Serialization;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -33,7 +32,7 @@ namespace RulesEngine.Models
         /// </summary>
         public bool Enabled { get; set; } = true;
 
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public RuleExpressionType RuleExpressionType { get; set; } = RuleExpressionType.LambdaExpression;
         public IEnumerable<string> WorkflowsToInject { get; set; }
         public IEnumerable<Rule> Rules { get; set; }

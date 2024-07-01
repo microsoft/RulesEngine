@@ -3,7 +3,7 @@
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-using Newtonsoft.Json;
+using System.Text.Json;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
@@ -34,7 +34,7 @@ namespace RulesEngineBenchmark
             }
 
             var fileData = File.ReadAllText(files[0]);
-            workflow = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
+            workflow = JsonSerializer.Deserialize<List<Workflow>>(fileData);
 
             rulesEngine = new RulesEngine.RulesEngine(workflow.ToArray(), new ReSettings {
                 EnableFormattedErrorMessage = false,

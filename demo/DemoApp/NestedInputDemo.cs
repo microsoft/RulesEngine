@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
 
-using Newtonsoft.Json;
+using System.Text.Json;
 using RulesEngine.Extensions;
 using RulesEngine.Models;
 using System;
@@ -49,7 +49,7 @@ namespace DemoApp
             }
 
             var fileData = File.ReadAllText(files[0]);
-            var Workflows = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
+            var Workflows = JsonSerializer.Deserialize<List<Workflow>>(fileData);
 
             var bre = new RulesEngine.RulesEngine(Workflows.ToArray(), null);
             foreach (var workflow in Workflows)

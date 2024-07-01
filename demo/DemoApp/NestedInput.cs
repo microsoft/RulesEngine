@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
 
-using Newtonsoft.Json;
+using System.Text.Json;
 using RulesEngine.Extensions;
 using RulesEngine.Models;
 using System;
@@ -54,7 +54,7 @@ namespace DemoApp.Demos
                 throw new Exception("Rules not found.");
             
             var fileData = await File.ReadAllTextAsync(files[0], ct);
-            var Workflows = JsonConvert.DeserializeObject<List<Workflow>>(fileData);
+            var Workflows = JsonSerializer.Deserialize<List<Workflow>>(fileData);
 
             var bre = new RulesEngine.RulesEngine(Workflows.ToArray(), null);
 

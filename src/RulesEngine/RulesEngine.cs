@@ -2,8 +2,7 @@
 // Licensed under the MIT License.
 
 using FluentValidation;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 using RulesEngine.Actions;
 using RulesEngine.Exceptions;
 using RulesEngine.ExpressionBuilders;
@@ -39,7 +38,7 @@ namespace RulesEngine
         #region Constructor
         public RulesEngine(string[] jsonConfig, ReSettings reSettings = null) : this(reSettings)
         {
-            var workflow = jsonConfig.Select(item => JsonConvert.DeserializeObject<Workflow>(item)).ToArray();
+            var workflow = jsonConfig.Select(item => JsonSerializer.Deserialize<Workflow>(item)).ToArray();
             AddWorkflow(workflow);
         }
 
@@ -440,7 +439,7 @@ namespace RulesEngine
                             {
                                 var arrParams = inputs?.Select(c => new { Name = c.Key, c.Value });
                                 var model = arrParams?.Where(a => string.Equals(a.Name, property))?.FirstOrDefault();
-                                var value = model?.Value != null ? JsonConvert.SerializeObject(model?.Value) : null;
+                                var value = model?.Value != null ? JsonSerializer.Serialize(model?.Value) : null;
                                 errorMessage = errorMessage?.Replace($"$({property})", value ?? $"$({property})");
                             }
                         }
@@ -456,22 +455,21 @@ namespace RulesEngine
         /// Updates the error message.
         /// </summary>
         /// <param name="errorMessage">The error message.</param>
-        /// <param name="evaluatedParams">The evaluated parameters.</param>
+        /// <param name="inputs">The evaluated parameters.</param>
         /// <param name="property">The property.</param>
         /// <param name="typeName">Name of the type.</param>
         /// <param name="propertyName">Name of the property.</param>
         /// <returns>Updated error message.</returns>
         private static string UpdateErrorMessage(string errorMessage, IDictionary<string, object> inputs, string property, string typeName, string propertyName)
         {
-            var arrParams = inputs?.Select(c => new { Name = c.Key, c.Value });
-            var model = arrParams?.Where(a => string.Equals(a.Name, typeName))?.FirstOrDefault();
+            var model = inputs?.FirstOrDefault(c => string.Equals(c.Key, typeName)).Value;
+
             if (model != null)
             {
-                var modelJson = JsonConvert.SerializeObject(model?.Value);
-                var jObj = JObject.Parse(modelJson);
-                JToken jToken = null;
-                var val = jObj?.TryGetValue(propertyName, StringComparison.OrdinalIgnoreCase, out jToken);
-                errorMessage = errorMessage.Replace($"$({property})", jToken != null ? jToken?.ToString() : $"({property})");
+                using var jDoc = JsonSerializer.SerializeToDocument(model);
+                errorMessage = jDoc.RootElement.TryGetProperty(propertyName, out var jElement) ? 
+                    errorMessage.Replace($"$({property})", jElement.GetRawText() ?? $"({property})") : 
+                    errorMessage.Replace($"$({property})", $"({property})");
             }
 
             return errorMessage;
