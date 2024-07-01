@@ -42,8 +42,3 @@ public static class Program
         Console.WriteLine($"running time: {stopwatch.Elapsed}");
     }
 }
-
-public interface IDemo
-{
-    Task Run(CancellationToken cancellationToken = default);
-}

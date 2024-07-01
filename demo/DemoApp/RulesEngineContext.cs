@@ -51,15 +51,15 @@ public class RulesEngineContext : DbContext
                 c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                 c => c);
 
-            entity.Property(b => b.Properties).HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<Dictionary<string, object>>(v))
+                entity.Property(b => b.Properties).HasConversion(
+                    v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, JsonSerializerOptions.Default))
                 .Metadata
                 .SetValueComparer(valueComparer);
 
-            entity.Property(p => p.Actions).HasConversion(
-                v => JsonConvert.SerializeObject(v),
-                v => JsonConvert.DeserializeObject<RuleActions>(v));
+                entity.Property(p => p.Actions).HasConversion(
+                    v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                    v => JsonSerializer.Deserialize<RuleActions>(v, JsonSerializerOptions.Default));
 
             entity.Ignore(b => b.WorkflowsToInject);
         });
