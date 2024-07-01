@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Newtonsoft.Json;
+using System.Text.Json;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;

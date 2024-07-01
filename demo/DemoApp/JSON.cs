@@ -40,7 +40,6 @@ public class JSON : IDemo
 
         var fileData = await File.ReadAllTextAsync(files[0], cancellationToken);
         var workflow = JsonConvert.DeserializeObject<Workflow[]>(fileData);
-
         var bre = new RulesEngine.RulesEngine(workflow);
 
         var ret = await bre.ExecuteAllRulesAsync("Discount", cancellationToken, rp);
