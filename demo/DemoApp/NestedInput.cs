@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
 
-using Newtonsoft.Json;
+using System.Text.Json;
 using RulesEngine.Extensions;
 using RulesEngine.Models;
 using System;
@@ -40,7 +40,7 @@ public class NestedInput : IDemo
         }
 
         var fileData = await File.ReadAllTextAsync(files[0], cancellationToken);
-        var workflows = JsonConvert.DeserializeObject<List<Workflow>>(fileData)!;
+        var workflows = JsonSerializer.Deserialize<List<Workflow>>(fileData)!;
 
         var bre = new RulesEngine.RulesEngine(workflows.ToArray());
 

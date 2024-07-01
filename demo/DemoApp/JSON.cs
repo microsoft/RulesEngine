@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
 
-using Newtonsoft.Json;
 using RulesEngine.Extensions;
 using RulesEngine.Models;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,7 +39,7 @@ public class JSON : IDemo
         }
 
         var fileData = await File.ReadAllTextAsync(files[0], cancellationToken);
-        var workflow = JsonConvert.DeserializeObject<Workflow[]>(fileData);
+        var workflow = JsonSerializer.Deserialize<Workflow[]>(fileData);
 
         var bre = new RulesEngine.RulesEngine(workflow);
 
