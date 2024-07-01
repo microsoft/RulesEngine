@@ -1,55 +1,50 @@
-﻿using RulesEngine.Models;
+﻿using RulesEngine.Extensions;
+using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
 
-namespace DemoApp.Demos
+namespace DemoApp;
+
+public class CustomParameterName : IDemo
 {
-    public class CustomParameterName
+    public async Task Run(CancellationToken cancellationToken = default)
     {
-        public async Task Run(CancellationToken ct = default)
-        {
-            Console.WriteLine($"Running {nameof(Basic)}....");
+        Console.WriteLine($"Running {nameof(Basic)}....");
 
-            var workflows = new Workflow[] {
-                new Workflow {
-                    WorkflowName = "my_workflow",
-                    Rules =  new List<Rule>(){
-                        new Rule {
-                            RuleName = "MatchesFabrikam",
-                            SuccessEvent = "does match",
-                            ErrorMessage = "does not match",
-                            Expression = "myValue.Value1 == \"Fabrikam\""
-                        }
+        var workflows = new Workflow[] {
+            new() {
+                WorkflowName = "my_workflow",
+                Rules = new List<Rule> {
+                    new() {
+                        RuleName = "MatchesFabrikam",
+                        SuccessEvent = "does match",
+                        ErrorMessage = "does not match",
+                        Expression = @"myValue.Value1 == ""Fabrikam\"""
                     }
                 }
-            };
+            }
+        };
 
-            var bre = new RulesEngine.RulesEngine(workflows);
+        var bre = new RulesEngine.RulesEngine(workflows);
 
-            var rp = new RuleParameter[] {
-                new RuleParameter("myValue", new { Value1 = "Fabrikam" })
-            };
+        var rp = new RuleParameter[] {new("myValue", new {Value1 = "Fabrikam"})};
 
-            var ret = await bre.ExecuteAllRulesAsync("my_workflow", rp);
+        var ret = await bre.ExecuteAllRulesAsync("my_workflow", cancellationToken, rp);
 
-            var outcome = false;
+        //Different ways to show test results:
+        var outcome = ret.TrueForAll(r => r.IsSuccess);
 
-            //Different ways to show test results:
-            outcome = ret.TrueForAll(r => r.IsSuccess);
+        ret.OnSuccess(eventName => {
+            Console.WriteLine($"Result '{eventName}' is as expected.");
+            outcome = true;
+        });
 
-            ret.OnSuccess((eventName) => {
-                Console.WriteLine($"Result '{eventName}' is as expected.");
-                outcome = true;
-            });
+        ret.OnFail(() => {
+            outcome = false;
+        });
 
-            ret.OnFail(() => {
-                outcome = false;
-            });
-
-            Console.WriteLine($"Test outcome: {outcome}.");
-        }
+        Console.WriteLine($"Test outcome: {outcome}.");
     }
 }

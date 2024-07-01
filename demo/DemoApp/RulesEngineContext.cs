@@ -1,66 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Text.Json;
 using RulesEngine.Models;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 
-namespace DemoApp.Demos
+namespace DemoApp;
+
+public class RulesEngineContext : DbContext
 {
-    public class RulesEngineContext : DbContext
+    public RulesEngineContext()
     {
-        public string DbPath { get; private set; }
+        var folder = Assembly.GetExecutingAssembly().Location;
+        var path = Path.GetDirectoryName(folder);
+        DbPath = $"{path}{Path.DirectorySeparatorChar}RulesEngineDemo.db";
+    }
 
-        public RulesEngineContext()
-        {
-            var folder = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            var path = System.IO.Path.GetDirectoryName(folder);
-            DbPath = $"{path}{System.IO.Path.DirectorySeparatorChar}RulesEngineDemo.db";
-        }
+    public string DbPath { get; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-        {
-            options.UseSqlite($"Data Source={DbPath}");
-        }
+    public DbSet<Workflow> Workflows { get; set; }
+    public DbSet<Rule> Rules { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlite($"Data Source={DbPath}");
+    }
 
-            modelBuilder.Entity<ScopedParam>()
-              .HasKey(k => k.Name);
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Workflow>(entity => {
-                entity.HasKey(k => k.WorkflowName);
-                entity.Ignore(b => b.WorkflowsToInject);
-            });
+        modelBuilder.Entity<ScopedParam>()
+            .HasKey(k => k.Name);
 
-            modelBuilder.Entity<Rule>().HasOne<Rule>().WithMany(r => r.Rules).HasForeignKey("RuleNameFK");
+        modelBuilder.Entity<Workflow>(entity => {
+            entity.HasKey(k => k.WorkflowName);
+            entity.Ignore(b => b.WorkflowsToInject);
+        });
 
-            modelBuilder.Entity<Rule>(entity => {
-                entity.HasKey(k => k.RuleName);
+        modelBuilder.Entity<Rule>().HasOne<Rule>().WithMany(r => r.Rules).HasForeignKey("RuleNameFK");
 
-                var valueComparer = new ValueComparer<Dictionary<string, object>>(
-                    (c1, c2) => c1.SequenceEqual(c2),
-                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                    c => c);
+        modelBuilder.Entity<Rule>(entity => {
+            entity.HasKey(k => k.RuleName);
 
-                entity.Property(b => b.Properties).HasConversion(
-                    v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
-                    v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, JsonSerializerOptions.Default))
+            var valueComparer = new ValueComparer<Dictionary<string, object>>(
+                (c1, c2) => c1.SequenceEqual(c2),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => c);
+
+            entity.Property(b => b.Properties).HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<Dictionary<string, object>>(v))
                 .Metadata
                 .SetValueComparer(valueComparer);
 
-                entity.Property(p => p.Actions).HasConversion(
-                    v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
-                    v => JsonSerializer.Deserialize<RuleActions>(v, JsonSerializerOptions.Default));
+            entity.Property(p => p.Actions).HasConversion(
+                v => JsonConvert.SerializeObject(v),
+                v => JsonConvert.DeserializeObject<RuleActions>(v));
 
-                entity.Ignore(b => b.WorkflowsToInject);
-            });
-        }
-
-        public DbSet<Workflow> Workflows { get; set; }
-        public DbSet<Rule> Rules { get; set; }
+            entity.Ignore(b => b.WorkflowsToInject);
+        });
     }
 }

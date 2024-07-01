@@ -1,23 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <StartupObject>DemoApp.Program</StartupObject>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<StartupObject>DemoApp.Program</StartupObject>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="../../src/RulesEngine/RulesEngine.csproj" />
-    <ProjectReference Include="..\DemoApp.EFDataExample\DemoApp.EFDataExample.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Update="Workflows\Discount.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Workflows\NestedInputDemo.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="../../src/RulesEngine/RulesEngine.csproj" />
+		<ProjectReference Include="..\DemoApp.EFDataExample\DemoApp.EFDataExample.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Workflows\*.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 </Project>

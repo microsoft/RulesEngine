@@ -2,120 +2,108 @@
 // Licensed under the MIT License.
 
 using Microsoft.EntityFrameworkCore;
+using RulesEngine.Extensions;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
 
-namespace DemoApp.Demos
+namespace DemoApp;
+
+public class EF : IDemo
 {
-    public class EF
+    public async Task Run(CancellationToken cancellationToken = default)
     {
-        public async Task Run(CancellationToken ct = default)
+        Console.WriteLine($"Running {nameof(EF)}....");
+
+        var workflows = new Workflow[] {
+            new() {
+                WorkflowName = "Test Workflow1",
+                Rules = new List<Rule> {
+                    new() {
+                        RuleName = "Test Rule1",
+                        SuccessEvent = "Count is less",
+                        ErrorMessage = "Over Expected",
+                        Expression = "count < 3"
+                    },
+                    new() {
+                        RuleName = "Test Rule2",
+                        SuccessEvent = "Count is more",
+                        ErrorMessage = "Under Expected",
+                        Expression = "count > 3"
+                    }
+                }
+            },
+            new() {
+                WorkflowName = "Test Workflow2",
+                Rules = new List<Rule> {
+                    new() {
+                        RuleName = "Test Rule3",
+                        SuccessEvent = "Count is greater",
+                        ErrorMessage = "Under Expected",
+                        Expression = "count > 3"
+                    }
+                }
+            },
+            new() {
+                WorkflowName = "Test Workflow3",
+                Rules = new List<Rule> {
+                    new() {
+                        RuleName = "Test Rule4",
+                        Expression = "1 == 1",
+                        Actions = new RuleActions {
+                            OnSuccess = new ActionInfo {
+                                Name = "OutputExpression",
+                                Context = new Dictionary<string, object> {{"expression", "2*2"}}
+                            }
+                        }
+                    }
+                }
+            },
+            new() {
+                WorkflowName = "Test Workflow4",
+                Rules = new List<Rule> {
+                    new() {
+                        RuleName = "Test Rule5",
+                        Expression = "1 == 1",
+                        Actions = new RuleActions {
+                            OnSuccess = new ActionInfo {
+                                Name = "OutputExpression",
+                                Context = new Dictionary<string, object> {{"expression", "4*4"}}
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        await using var db = new RulesEngineContext();
+
+        if (await db.Database.EnsureCreatedAsync(cancellationToken))
         {
-            Console.WriteLine($"Running {nameof(EF)}....");
+            await db.Workflows.AddRangeAsync(workflows, cancellationToken);
+            await db.SaveChangesAsync(cancellationToken);
+        }
 
-            var workflows = new Workflow[] {
-                new Workflow {
-                    WorkflowName = "Test Workflow1",
-                    Rules = new List<Rule> {
-                        new Rule {
-                            RuleName = "Test Rule1",
-                            SuccessEvent = "Count is less",
-                            ErrorMessage = "Over Expected",
-                            Expression = "count < 3",
-                        },
-                        new Rule {
-                            RuleName = "Test Rule2",
-                            SuccessEvent = "Count is more",
-                            ErrorMessage = "Under Expected",
-                            Expression = "count > 3",
-                        }
-                    }
-                },
-                new Workflow {
-                    WorkflowName = "Test Workflow2",
-                    Rules = new List<Rule> {
-                        new Rule {
-                            RuleName = "Test Rule3",
-                            SuccessEvent = "Count is greater",
-                            ErrorMessage = "Under Expected",
-                            Expression = "count > 3",
-                        }
-                    }
-                },
-                new Workflow {
-                    WorkflowName = "Test Workflow3",
-                    Rules = new List<Rule> {
-                        new Rule {
-                            RuleName = "Test Rule4",
-                            Expression = "1 == 1",
-                            Actions = new RuleActions() {
-                                OnSuccess = new ActionInfo {
-                                    Name = "OutputExpression",
-                                    Context =  new Dictionary<string, object> {
-                                        {"expression", "2*2"}
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                new Workflow {
-                    WorkflowName = "Test Workflow4",
-                    Rules = new List<Rule> {
-                        new Rule {
-                            RuleName = "Test Rule5",
-                            Expression = "1 == 1",
-                            Actions = new RuleActions() {
-                                OnSuccess = new ActionInfo {
-                                    Name = "OutputExpression",
-                                    Context =  new Dictionary<string, object> {
-                                        {"expression", "4*4"}
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };
+        var wfr = db.Workflows.Include(i => i.Rules).ThenInclude(i => i.Rules).ToArray();
 
-            Workflow[] wfr = null;
-            await using (var db = new RulesEngineContext())
-            {
-                if (await db.Database.EnsureCreatedAsync(ct))
-                {
-                    await db.Workflows.AddRangeAsync(workflows, ct);
-                    await db.SaveChangesAsync(ct);
-                }
+        var rp = new RuleParameter[] {new("input1", new {count = 1})};
 
-                wfr = db.Workflows.Include(i => i.Rules).ThenInclude(i => i.Rules).ToArray();
-            }
+        var bre = new RulesEngine.RulesEngine(wfr);
 
-            if (wfr != null)
-            {
-                var rp = new RuleParameter[] {
-                    new RuleParameter("input1", new { count = 1 })
-                };
+        foreach (var workflow in wfr)
+        {
+            var ret = await bre.ExecuteAllRulesAsync(workflow.WorkflowName, cancellationToken, rp);
 
-                var bre = new RulesEngine.RulesEngine(wfr, null);
+            ret.OnSuccess(eventName => {
+                Console.WriteLine($"Discount offered is {eventName} % over MRP.");
+            });
 
-                foreach (var workflow in wfr)
-                {
-                    var ret = await bre.ExecuteAllRulesAsync(workflow.WorkflowName, rp);
-
-                    ret.OnSuccess((eventName) => {
-                        Console.WriteLine($"Discount offered is {eventName} % over MRP.");
-                    });
-
-                    ret.OnFail(() => {
-                        Console.WriteLine("The user is not eligible for any discount.");
-                    });
-                }
-            }
+            ret.OnFail(() => {
+                Console.WriteLine("The user is not eligible for any discount.");
+            });
         }
     }
 }

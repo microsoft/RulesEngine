@@ -2,32 +2,48 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DemoApp
+namespace DemoApp;
+
+public static class Program
 {
-    public static class Program
+    public static async Task Main(string[] args)
     {
-        public static async Task Main(string[] args)
+        var stopwatch = Stopwatch.StartNew();
+
+        using (var cts = new CancellationTokenSource())
         {
-            DateTime start = DateTime.Now;
+            var assembly = Assembly.GetExecutingAssembly();
 
-            using (var cts = new CancellationTokenSource())
+            var demoTypes = assembly.GetTypes()
+                .Where(t => typeof(IDemo).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract).ToList();
+
+            foreach (var type in demoTypes)
             {
-                await new Demos.Basic().Run(cts.Token);
-                await new Demos.BasicWithCustomTypes().Run(cts.Token);
-                await new Demos.JSON().Run(cts.Token);
-                await new Demos.NestedInput().Run(cts.Token);
-                await new Demos.EF().Run(cts.Token);
-                await new Demos.UseFastExpressionCompiler().Run(cts.Token);
-                await new Demos.MultipleWorkflows().Run(cts.Token);
-                await new Demos.CustomParameterName().Run(cts.Token);
+                try
+                {
+                    if (Activator.CreateInstance(type) is IDemo demo)
+                    {
+                        await demo.Run(cts.Token);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error executing Run on {type.Name}: {ex.Message}");
+                }
             }
-
-            DateTime end = DateTime.Now;
-
-            Console.WriteLine($"running time: {end-start}");
         }
+
+        Console.WriteLine($"running time: {stopwatch.Elapsed}");
     }
+}
+
+public interface IDemo
+{
+    Task Run(CancellationToken cancellationToken = default);
 }
