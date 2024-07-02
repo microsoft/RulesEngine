@@ -30,7 +30,7 @@ namespace RulesEngine.HelperFunctions
             List<DynamicProperty> props = new List<DynamicProperty>();
 
             if (input is JsonElement jsonElement)
-            {jsonElement.ValueKind
+            {
                 input = jsonElement.ToExpandoObject();
             }
             if (input == null)
