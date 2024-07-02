@@ -44,8 +44,7 @@ public class UseFastExpressionCompiler : IDemo
 
         var bre = new RulesEngine.RulesEngine(worflow, reSettingsWithCustomTypes);
 
-        var ret = await bre.ExecuteAllRulesAsync("UseFastExpressionCompilerTest", cancellationToken, appData,
-            cancellationToken);
+        var ret = await bre.ExecuteAllRulesAsync("UseFastExpressionCompilerTest", cancellationToken, appData);
 
         if (ret is {Count: > 0})
         {

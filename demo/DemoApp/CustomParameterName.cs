@@ -21,7 +21,7 @@ public class CustomParameterName : IDemo
                         RuleName = "MatchesFabrikam",
                         SuccessEvent = "does match",
                         ErrorMessage = "does not match",
-                        Expression = @"myValue.Value1 == ""Fabrikam\"""
+                        Expression = @"myValue.Value1 == ""Fabrikam"""
                     }
                 }
             }
@@ -29,7 +29,7 @@ public class CustomParameterName : IDemo
 
         var bre = new RulesEngine.RulesEngine(workflows);
 
-        var rp = new RuleParameter[] {new("myValue", new {Value1 = "Fabrikam"})};
+        var rp = new RuleParameter[] { new("myValue", new { Value1 = "Fabrikam" }) };
 
         var ret = await bre.ExecuteAllRulesAsync("my_workflow", cancellationToken, rp);
 

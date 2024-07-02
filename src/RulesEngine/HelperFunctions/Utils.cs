@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Text.Json;
 
 namespace RulesEngine.HelperFunctions
 {
@@ -28,6 +29,10 @@ namespace RulesEngine.HelperFunctions
         {
             List<DynamicProperty> props = new List<DynamicProperty>();
 
+            if (input is JsonElement jsonElement)
+            {jsonElement.ValueKind
+                input = jsonElement.ToExpandoObject();
+            }
             if (input == null)
             {
                 return typeof(object);
@@ -99,6 +104,10 @@ namespace RulesEngine.HelperFunctions
                         };
                         val = newList;
                     }
+                    else if (expando.Value is JsonElement expandoElement)
+                    {
+                        val = expandoElement.ToExpandoObject();
+                    }
                     else
                     {
                         val = expando.Value;
@@ -124,6 +133,4 @@ namespace RulesEngine.HelperFunctions
             return genericMethod.Invoke(null, new[] { self }) as IList;
         }
     }
-
-
 }
