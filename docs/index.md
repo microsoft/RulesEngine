@@ -162,7 +162,7 @@ Add it in your ReSettings and pass in RulesEngine constructor
 ```c#
   var reSettings = new ReSettings{
       CustomTypes = new Type[] { typeof(Utils) }
-  }
+  };
 
   var rulesEngine = new RulesEngine.RulesEngine(workflowRules,reSettings);
 ```
