@@ -275,7 +275,7 @@ LocalParams are defined at rule level and can be used by the rule and its child 
 
 These rules when executed with the below input will return success
 ```c#
-  var input = new RuleParameter("myInput",new {
+  var rp = new RuleParameter("myInput",new {
     hello = "HELLO"
   });
 
