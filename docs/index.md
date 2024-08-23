@@ -162,7 +162,7 @@ Add it in your ReSettings and pass in RulesEngine constructor
 ```c#
   var reSettings = new ReSettings{
       CustomTypes = new Type[] { typeof(Utils) }
-  }
+  };
 
   var rulesEngine = new RulesEngine.RulesEngine(workflowRules,reSettings);
 ```
@@ -275,7 +275,7 @@ LocalParams are defined at rule level and can be used by the rule and its child 
 
 These rules when executed with the below input will return success
 ```c#
-  var input = new RuleParameter("myInput",new {
+  var rp = new RuleParameter("myInput",new {
     hello = "HELLO"
   });
 
@@ -404,7 +404,7 @@ Define OnSuccess or OnFailure Action for your Rule:
            "OnFailure": { // This will execute if the Rule evaluates to failure
                "Name": "EvaluateRule",
                "Context": {
-                   "WorkflowName": "inputWorkflow",
+                   "workflowName": "inputWorkflow",
                    "ruleName": "GiveDiscount10Percent"
                }
            }
@@ -443,7 +443,7 @@ EvaluateRule also supports passing filtered inputs and computed inputs to chaine
          "OnSuccess": {
             "Name": "EvaluateRule",
                "Context": {
-                   "WorkflowName": "inputWorkflow",
+                   "workflowName": "inputWorkflow",
                    "ruleName": "GiveDiscount10Percent",
                    "inputFilter": ["input2"], //will only pass input2 from existing inputs,scopedparams to the chained rule
                    "additionalInputs":[ // will pass a new input named currentDiscount with the result of the expression to the chained rule
