@@ -45,6 +45,13 @@ namespace RulesEngine.Actions
         {
             try
             {
+                //key not found return
+                //Returning a KeyNotFoundException has a significant impact on performance.
+                if (!_context.ContainsKey(name))
+                {
+                    output = default(T);
+                    return false;
+                }
                 output =  GetContext<T>(name);
                 return true;
             }
