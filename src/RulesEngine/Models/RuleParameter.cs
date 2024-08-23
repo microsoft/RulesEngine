@@ -36,6 +36,11 @@ namespace RulesEngine.Models
             ParameterExpression = Expression.Parameter(Type, Name);
         }
 
+        public static RuleParameter Create(string name, Type type)
+        {
+            return new RuleParameter(name, type);
+        }
+      
         public static RuleParameter Create<T>(string name, T value)
         {
             var typedValue = Utils.GetTypedObject(value);
