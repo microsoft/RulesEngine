@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 6.0.x
     
@@ -34,7 +34,7 @@ jobs:
       run: ./scripts/check-coverage.ps1 -reportPath coveragereport/Cobertura.xml -threshold 96
     
     - name: Coveralls GitHub Action
-      uses: coverallsapp/github-action@v2.2.1
+      uses: coverallsapp/github-action@v2.3.0
       if: ${{ github.event_name == 'push' }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}

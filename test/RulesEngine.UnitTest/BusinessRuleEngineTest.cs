@@ -338,8 +338,9 @@ namespace RulesEngine.UnitTest
         }
 
         [Theory]
-        [InlineData("rules4.json")]
-        public async Task RulesEngine_Execute_Rule_For_Nested_Rule_Params_Returns_Success(string ruleFileName)
+        [InlineData("rules4.json", true)]
+        [InlineData("rules4.json", false)]
+        public async Task RulesEngine_Execute_Rule_For_Nested_Rule_Params_Returns_Success(string ruleFileName,bool fastExpressionEnabled)
         {
             var inputs = GetInputs4();
 
@@ -359,7 +360,9 @@ namespace RulesEngine.UnitTest
             }
 
             var fileData = File.ReadAllText(files[0]);
-            var bre = new RulesEngine(JsonConvert.DeserializeObject<Workflow[]>(fileData), null);
+            var bre = new RulesEngine(JsonConvert.DeserializeObject<Workflow[]>(fileData), new ReSettings {
+                UseFastExpressionCompiler = fastExpressionEnabled
+            });
             var result = await bre.ExecuteAllRulesAsync("inputWorkflow", ruleParams?.ToArray());
             var ruleResult = result?.FirstOrDefault(r => string.Equals(r.Rule.RuleName, "GiveDiscount10", StringComparison.OrdinalIgnoreCase));
             Assert.True(ruleResult.IsSuccess);

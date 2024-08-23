@@ -18,7 +18,6 @@ namespace RulesEngine.UnitTest
         [Theory]
         [InlineData(true,true,false)]
         [InlineData(false,true,true)]
-
         public async Task CaseSensitiveTest(bool caseSensitive, bool expected1, bool expected2)
         {
             var reSettings = new ReSettings {
@@ -46,5 +45,9 @@ namespace RulesEngine.UnitTest
             Assert.Equal(expected1, result[0].IsSuccess);
             Assert.Equal(expected2, result[1].IsSuccess);
         }
+
+
+
+
     }
 }

@@ -17,14 +17,11 @@ namespace RulesEngine.Models
             Init(name, Value?.GetType());
         }
 
-        internal RuleParameter(string name, Type type)
+       
+        internal RuleParameter(string name, Type type,object value = null)
         {
+            Value = Utils.GetTypedObject(value);
             Init(name, type);
-        }
-
-        public static RuleParameter Create(string name, Type type)
-        {
-            return new RuleParameter(name, type);
         }
 
         public Type Type { get; private set; }
@@ -38,6 +35,19 @@ namespace RulesEngine.Models
             Type = type ?? typeof(object);
             ParameterExpression = Expression.Parameter(Type, Name);
         }
+
+        public static RuleParameter Create(string name, Type type)
+        {
+            return new RuleParameter(name, type);
+        }
+      
+        public static RuleParameter Create<T>(string name, T value)
+        {
+            var typedValue = Utils.GetTypedObject(value);
+            var type = typedValue?.GetType() ?? typeof(T);
+            return new RuleParameter(name,type,value);
+        }
+
 
     }
 }
