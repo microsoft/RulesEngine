@@ -18,9 +18,9 @@ namespace RulesEngine.HelperFunctions
         internal static RuleFunc<RuleResultTree> ToResultTree(ReSettings reSettings, Rule rule, IEnumerable<RuleResultTree> childRuleResults, Func<object[], bool> isSuccessFunc, string exceptionMessage = "")
         {
             return (inputs) => {
-
                 var isSuccess = false;
                 var inputsDict = new Dictionary<string, object>();
+                string finalMessage = exceptionMessage;
                 try
                 {
                     inputsDict = inputs.ToDictionary(c => c.Name, c => c.Value);
@@ -28,7 +28,7 @@ namespace RulesEngine.HelperFunctions
                 }
                 catch (Exception ex)
                 {
-                    exceptionMessage = GetExceptionMessage($"Error while executing rule : {rule?.RuleName} - {ex.Message}", reSettings);
+                    finalMessage = GetExceptionMessage($"Error while executing rule : {rule?.RuleName} - {ex.Message}", reSettings);
                     HandleRuleException(new RuleException(exceptionMessage,ex), rule, reSettings);
                     isSuccess = false;
                 }
@@ -38,11 +38,10 @@ namespace RulesEngine.HelperFunctions
                     Inputs = inputsDict,
                     IsSuccess = isSuccess,
                     ChildResults = childRuleResults,
-                    ExceptionMessage = exceptionMessage
+                    ExceptionMessage = finalMessage
                 };
 
             };
-            
         }
 
         internal static RuleFunc<RuleResultTree> ToRuleExceptionResult(ReSettings reSettings, Rule rule,Exception ex)
