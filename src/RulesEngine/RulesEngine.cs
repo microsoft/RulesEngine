@@ -116,7 +116,7 @@ namespace RulesEngine
                 {
                     await ExecuteActionAsync(ruleResult.ChildResults);
                 }
-                var actionResult = await ExecuteActionForRuleResult(ruleResult, false);
+                var actionResult = await ExecuteActionForRuleResult(ruleResult, true);
                 ruleResult.ActionResult = actionResult;
             }
         }
@@ -127,7 +127,7 @@ namespace RulesEngine
             {
                 await ExecuteActionAsync(ruleResult.ChildResults);
             }
-            var actionResult = await ExecuteActionForRuleResult(ruleResult, false);
+            var actionResult = await ExecuteActionForRuleResult(ruleResult, true);
             ruleResult.ActionResult = actionResult;
         }
 

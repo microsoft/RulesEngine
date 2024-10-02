@@ -118,25 +118,27 @@ namespace RulesEngine
 
                 foreach (var lp in localParams)
                 {
-                    try
+                    if (!ruleExpParams.Any(e => e.ParameterExpression.Name == lp.Name))
                     {
-                        var lpExpression = expressionBuilder.Parse(lp.Expression, parameters.ToArray(), null);
-                        var ruleExpParam = new RuleExpressionParameter() {
-                            ParameterExpression = Expression.Parameter(lpExpression.Type, lp.Name),
-                            ValueExpression = lpExpression
-                        };
-                        parameters.Add(ruleExpParam.ParameterExpression);
-                        ruleExpParams.Add(ruleExpParam);
-                    }
-                    catch(Exception ex)
-                    {
-                        var message = $"{ex.Message}, in ScopedParam: {lp.Name}";
-                        throw new RuleException(message, ex);
+                        try
+                        {
+                            var lpExpression = expressionBuilder.Parse(lp.Expression, parameters.ToArray(), null);
+                            var ruleExpParam = new RuleExpressionParameter() {
+                                ParameterExpression = Expression.Parameter(lpExpression.Type, lp.Name),
+                                ValueExpression = lpExpression
+                            };
+                            parameters.Add(ruleExpParam.ParameterExpression);
+                            ruleExpParams.Add(ruleExpParam);
+                        }
+                        catch (Exception ex)
+                        {
+                            var message = $"{ex.Message}, in ScopedParam: {lp.Name}";
+                            throw new RuleException(message, ex);
+                        }
                     }
                 }
             }
             return ruleExpParams.ToArray();
-
         }
 
         /// <summary>
