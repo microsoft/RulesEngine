@@ -13,7 +13,7 @@ namespace RulesEngine.HelperFunctions
     public static class Utils
     {
         /* valid only for netstandard 2.0 */
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NETSTANDARD2_1
 
         public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
         {
