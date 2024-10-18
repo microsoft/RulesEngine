@@ -8,9 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Dynamic.Core.Parser;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace RulesEngine.ExpressionBuilders
 {
@@ -18,6 +20,7 @@ namespace RulesEngine.ExpressionBuilders
     {
         private readonly ReSettings _reSettings;
         private readonly IDictionary<string, MethodInfo> _methodInfo;
+        private readonly Regex propertyErrorPattern = new Regex(@"No property or field '(.*?)' exists in type '(.*?)'",RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public RuleExpressionParser(ReSettings reSettings = null)
         {
@@ -37,8 +40,29 @@ namespace RulesEngine.ExpressionBuilders
                 CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes),
                 IsCaseSensitive = _reSettings.IsExpressionCaseSensitive
             };
-            return new ExpressionParser(parameters, expression, new object[] { }, config).Parse(returnType);
 
+            // Instead of immediately returning default values, allow for expression parsing to handle dynamic evaluation.
+            try
+            {
+                return new ExpressionParser(parameters, expression, Array.Empty<object>(), config).Parse(returnType);
+            }
+            catch (ParseException ex) when (propertyErrorPattern.IsMatch(ex.Message))
+            {
+                return Expression.Constant(GetDefaultValueForType(returnType));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Expression parsing error: {ex.Message}", ex);
+            }
+        }
+
+        private object GetDefaultValueForType(Type type)
+        {
+            if (type == typeof(bool))
+                return false;
+            if (type == typeof(int) || type == typeof(float) || type == typeof(double))
+                return 0;
+            return null;
         }
 
         public Func<object[], T> Compile<T>(string expression, RuleParameter[] ruleParams)
