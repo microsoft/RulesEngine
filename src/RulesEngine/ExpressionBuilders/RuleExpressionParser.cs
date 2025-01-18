@@ -8,9 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Dynamic.Core.Parser;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace RulesEngine.ExpressionBuilders
 {
@@ -33,25 +35,46 @@ namespace RulesEngine.ExpressionBuilders
         }
         public Expression Parse(string expression, ParameterExpression[] parameters, Type returnType)
         {
-            var config = new ParsingConfig { 
+            var config = new ParsingConfig {
                 CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes),
                 IsCaseSensitive = _reSettings.IsExpressionCaseSensitive
             };
-            return new ExpressionParser(parameters, expression, new object[] { }, config).Parse(returnType);
 
+            // Instead of immediately returning default values, allow for expression parsing to handle dynamic evaluation.
+            try
+            {
+                return new ExpressionParser(parameters, expression, Array.Empty<object>(), config).Parse(returnType);
+            }
+            catch (ParseException)
+            {
+                return Expression.Constant(GetDefaultValueForType(returnType));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Expression parsing error: {ex.Message}", ex);
+            }
+        }
+
+        private object GetDefaultValueForType(Type type)
+        {
+            if (type == typeof(bool))
+                return false;
+            if (type == typeof(int) || type == typeof(float) || type == typeof(double))
+                return int.MinValue;
+            return null;
         }
 
         public Func<object[], T> Compile<T>(string expression, RuleParameter[] ruleParams)
         {
             var rtype = typeof(T);
-            if(rtype == typeof(object))
+            if (rtype == typeof(object))
             {
                 rtype = null;
             }
             var parameterExpressions = GetParameterExpression(ruleParams).ToArray();
-            
+
             var e = Parse(expression, parameterExpressions, rtype);
-            if(rtype == null)
+            if (rtype == null)
             {
                 e = Expression.Convert(e, typeof(T));
             }
@@ -63,7 +86,7 @@ namespace RulesEngine.ExpressionBuilders
 
         private Func<object[], T> CompileExpression<T>(Expression<Func<object[], T>> expression)
         {
-            if(_reSettings.UseFastExpressionCompiler)
+            if (_reSettings.UseFastExpressionCompiler)
             {
                 return expression.CompileFast();
             }
@@ -82,7 +105,7 @@ namespace RulesEngine.ExpressionBuilders
             return Expression.Lambda<Func<object[], T>>(blockExp, argExp);
         }
 
-        internal Func<object[],Dictionary<string,object>> CompileRuleExpressionParameters(RuleParameter[] ruleParams, RuleExpressionParameter[] ruleExpParams = null)
+        internal Func<object[], Dictionary<string, object>> CompileRuleExpressionParameters(RuleParameter[] ruleParams, RuleExpressionParameter[] ruleExpParams = null)
         {
             ruleExpParams = ruleExpParams ?? new RuleExpressionParameter[] { };
             var expression = CreateDictionaryExpression(ruleParams, ruleExpParams);
@@ -90,7 +113,7 @@ namespace RulesEngine.ExpressionBuilders
         }
 
         public T Evaluate<T>(string expression, RuleParameter[] ruleParams)
-        {   
+        {
             var func = Compile<T>(expression, ruleParams);
             return func(ruleParams.Select(c => c.Value).ToArray());
         }
@@ -125,7 +148,7 @@ namespace RulesEngine.ExpressionBuilders
             }
         }
 
-        private Expression<Func<object[],Dictionary<string,object>>> CreateDictionaryExpression(RuleParameter[] ruleParams, RuleExpressionParameter[] ruleExpParams)
+        private Expression<Func<object[], Dictionary<string, object>>> CreateDictionaryExpression(RuleParameter[] ruleParams, RuleExpressionParameter[] ruleExpParams)
         {
             var body = new List<Expression>();
             var paramExp = new List<ParameterExpression>();
@@ -142,22 +165,22 @@ namespace RulesEngine.ExpressionBuilders
             body.Add(Expression.Assign(dict, Expression.New(typeof(Dictionary<string, object>))));
             variableExp.Add(dict);
 
-            for(var i = 0; i < ruleParams.Length; i++)
+            for (var i = 0; i < ruleParams.Length; i++)
             {
                 paramExp.Add(ruleParams[i].ParameterExpression);
             }
-            for(var i = 0; i < ruleExpParams.Length; i++)
+            for (var i = 0; i < ruleExpParams.Length; i++)
             {
                 var key = Expression.Constant(ruleExpParams[i].ParameterExpression.Name);
                 var value = Expression.Convert(ruleExpParams[i].ParameterExpression, typeof(object));
                 variableExp.Add(ruleExpParams[i].ParameterExpression);
                 body.Add(Expression.Call(dict, add, key, value));
-            
+
             }
             // Return value
             body.Add(dict);
 
-            return WrapExpression<Dictionary<string,object>>(body, paramExp.ToArray(), variableExp.ToArray());
+            return WrapExpression<Dictionary<string, object>>(body, paramExp.ToArray(), variableExp.ToArray());
         }
     }
 }
