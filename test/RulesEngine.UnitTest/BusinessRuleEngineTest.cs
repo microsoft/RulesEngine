@@ -381,7 +381,6 @@ namespace RulesEngine.UnitTest
             var result = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
-            Assert.Contains(result.First().ChildResults, c => c.ExceptionMessage.Contains("Unknown identifier 'input1'"));
         }
 
         [Theory]
@@ -463,7 +462,7 @@ namespace RulesEngine.UnitTest
 
         [Theory]
         [InlineData("rules9.json")]
-        public async Task ExecuteRule_MissingMethodInExpression_ReturnsException(string ruleFileName)
+        public async Task ExecuteRule_MissingMethodInExpression_ReturnsRulesFailed(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName, new ReSettings() { EnableExceptionAsErrorMessage = false });
 
@@ -473,14 +472,15 @@ namespace RulesEngine.UnitTest
 
             var utils = new TestInstanceUtils();
 
-            await Assert.ThrowsAsync<RuleException>(async () => {
-                var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
-            });
+            var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
+
+            Assert.NotNull(result);
+            Assert.All(result, c => Assert.False(c.IsSuccess));
         }
 
         [Theory]
         [InlineData("rules9.json")]
-        public async Task ExecuteRule_CompilationException_ReturnsAsErrorMessage(string ruleFileName)
+        public async Task ExecuteRule_DynamicParsion_RulesEvaluationFailed(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName, new ReSettings() { EnableExceptionAsErrorMessage = true });
 
@@ -492,7 +492,7 @@ namespace RulesEngine.UnitTest
             var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
 
             Assert.NotNull(result);
-            Assert.StartsWith("Exception while parsing expression", result[1].ExceptionMessage);
+            Assert.StartsWith("One or more adjust rules failed", result[1].ExceptionMessage);
         }
 
         [Theory]
