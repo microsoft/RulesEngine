@@ -36,7 +36,7 @@
     <PackageReference Include="FastExpressionCompiler" Version="4.1.0" />
     <PackageReference Include="FluentValidation" Version="11.9.0" />
 
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.4.3" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0" />
 
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
@@ -52,7 +52,7 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
 
     <PackageReference Include="System.Text.Json" Version="8.0.0" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0"/>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 
   </ItemGroup>
 
