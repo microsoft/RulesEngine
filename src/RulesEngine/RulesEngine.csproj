@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net6.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0;netstandard2.0</TargetFrameworks>
     <Version>5.0.4</Version>
     <Copyright>Copyright (c) Microsoft Corporation.</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -33,27 +33,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FastExpressionCompiler" Version="4.1.0" />
-    <PackageReference Include="FluentValidation" Version="11.9.0" />
-
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.4.3" />
-
+    <PackageReference Include="FastExpressionCompiler" Version="5.0.2" />
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <PackageReference Include="System.Text.Json" Version="9.0.1" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="System.Text.Json" Version="6.0.9" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <PackageReference Include="System.Text.Json" Version="8.0.0" />
-  </ItemGroup>
   
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-
-    <PackageReference Include="System.Text.Json" Version="8.0.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0"/>
-
   </ItemGroup>
 
 </Project>

@@ -1,26 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
-	<!--<PackageReference Include="RulesEngine" Version="3.0.2" />-->
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
+		<!--<PackageReference Include="RulesEngine" Version="3.0.2" />-->
+	</ItemGroup>
 
-  <ItemGroup>
-     <ProjectReference Include="..\..\src\RulesEngine\RulesEngine.csproj" /> 
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\RulesEngine\RulesEngine.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="Workflows\Discount.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Workflows\NestedInputDemo.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="Workflows\Discount.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Workflows\NestedInputDemo.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 </Project>
