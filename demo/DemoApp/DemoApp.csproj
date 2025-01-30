@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <StartupObject>DemoApp.Program</StartupObject>
   </PropertyGroup>
 
@@ -10,7 +10,7 @@
     <ProjectReference Include="../../src/RulesEngine/RulesEngine.csproj" />
     <ProjectReference Include="..\DemoApp.EFDataExample\DemoApp.EFDataExample.csproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <None Update="Workflows\Discount.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

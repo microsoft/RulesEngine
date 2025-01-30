@@ -26,39 +26,46 @@ namespace RulesEngine.HelperFunctions
         }
         public static Type CreateAbstractClassType(dynamic input)
         {
-            List<DynamicProperty> props = new List<DynamicProperty>();
+            List<DynamicProperty> props = [];
 
-            if (input == null)
+            if (input is System.Text.Json.JsonElement jsonElement)
+            {
+                if (jsonElement.ValueKind == System.Text.Json.JsonValueKind.Null)
+                {
+                    return typeof(object);
+                }
+            }
+            else if (input == null)
             {
                 return typeof(object);
             }
-            if (!(input is ExpandoObject))
+
+            if (input is not ExpandoObject expandoObject)
             {
                 return input.GetType();
             }
 
-            else
+            foreach (var expando in expandoObject)
             {
-                foreach (var expando in (IDictionary<string, object>)input)
+                Type value;
+                if (expando.Value is IList list)
                 {
-                    Type value;
-                    if (expando.Value is IList)
+                    if (list.Count == 0)
                     {
-                        if (((IList)expando.Value).Count == 0)
-                            value = typeof(List<object>);
-                        else
-                        {
-                            var internalType = CreateAbstractClassType(((IList)expando.Value)[0]);
-                            value = new List<object>().Cast(internalType).ToList(internalType).GetType();
-                        }
-
+                        value = typeof(List<object>);
                     }
                     else
                     {
-                        value = CreateAbstractClassType(expando.Value);
+                        var internalType = CreateAbstractClassType(list[0]);
+                        value = new List<object>().Cast(internalType).ToList(internalType).GetType();
                     }
-                    props.Add(new DynamicProperty(expando.Key, value));
+
                 }
+                else
+                {
+                    value = CreateAbstractClassType(expando.Value);
+                }
+                props.Add(new DynamicProperty(expando.Key, value));
             }
 
             var type = DynamicClassFactory.CreateType(props);
@@ -67,15 +74,15 @@ namespace RulesEngine.HelperFunctions
 
         public static object CreateObject(Type type, dynamic input)
         {
-            if (!(input is ExpandoObject))
+            if (input is not ExpandoObject expandoObject)
             {
                 return Convert.ChangeType(input, type);
             }
-            object obj = Activator.CreateInstance(type);
+            var obj = Activator.CreateInstance(type);
 
             var typeProps = type.GetProperties().ToDictionary(c => c.Name);
 
-            foreach (var expando in (IDictionary<string, object>)input)
+            foreach (var expando in expandoObject)
             {
                 if (typeProps.ContainsKey(expando.Key) &&
                     expando.Value != null && (expando.Value.GetType().Name != "DBNull" || expando.Value != DBNull.Value))
@@ -87,14 +94,13 @@ namespace RulesEngine.HelperFunctions
                         var propType = propInfo.PropertyType;
                         val = CreateObject(propType, expando.Value);
                     }
-                    else if (expando.Value is IList)
+                    else if (expando.Value is IList temp)
                     {
                         var internalType = propInfo.PropertyType.GenericTypeArguments.FirstOrDefault() ?? typeof(object);
-                        var temp = (IList)expando.Value;
                         var newList = new List<object>().Cast(internalType).ToList(internalType);
-                        for (int i = 0; i < temp.Count; i++)
+                        foreach (var t in temp)
                         {
-                            var child = CreateObject(internalType, temp[i]);
+                            var child = CreateObject(internalType, t);
                             newList.Add(child);
                         };
                         val = newList;

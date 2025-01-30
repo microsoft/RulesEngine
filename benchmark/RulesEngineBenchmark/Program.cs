@@ -7,12 +7,16 @@ using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using BenchmarkDotNet.Jobs;
+using System.Text.Json;
 
 namespace RulesEngineBenchmark
 {
-    using System.Text.Json;
 
     [MemoryDiagnoser]
+    [SimpleJob(RuntimeMoniker.Net60)]
+    [SimpleJob(RuntimeMoniker.Net80)]
+    [SimpleJob(RuntimeMoniker.Net90)]
     public class REBenchmark
     {
         private readonly RulesEngine.RulesEngine rulesEngine;
