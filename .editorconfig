@@ -1,4 +1,4 @@
-# Rules in this file were initially inferred by Visual Studio IntelliCode from the C:\Users\abcy\source\repos\RulesEngine codebase based on best match to current usage at 22-12-2020
+# Rules in this file were initially inferred by Visual Studio IntelliCode from the C:\Users\purunjaybhal\source\repos\RulesEngine codebase based on best match to current usage at 22-12-2020
 # You can modify the rules from these initially generated values to suit your own policies
 # You can learn more about editorconfig here: https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference
 [*.cs]
