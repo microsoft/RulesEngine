@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation.
 //  Licensed under the MIT License.
 
-using Newtonsoft.Json;
 using RulesEngine.Models;
 using System;
 using System.Collections.Generic;
 
 namespace RulesEngine.Actions
 {
+    using System.Text.Json;
+
     public class ActionContext
     {
         private readonly IDictionary<string, string> _context;
@@ -27,7 +28,7 @@ namespace RulesEngine.Actions
                         value =  kv.Value.ToString();
                         break;
                     default:
-                        value = JsonConvert.SerializeObject(kv.Value);
+                        value = JsonSerializer.Serialize(kv.Value);
                         break;
 
                 }
@@ -45,6 +46,13 @@ namespace RulesEngine.Actions
         {
             try
             {
+                //key not found return
+                //Returning a KeyNotFoundException has a significant impact on performance.
+                if (!_context.ContainsKey(name))
+                {
+                    output = default(T);
+                    return false;
+                }
                 output =  GetContext<T>(name);
                 return true;
             }
@@ -63,7 +71,7 @@ namespace RulesEngine.Actions
                 {
                     return (T)Convert.ChangeType(_context[name], typeof(T));
                 }
-                return JsonConvert.DeserializeObject<T>(_context[name]);
+                return JsonSerializer.Deserialize<T>(_context[name]);
             }
             catch (KeyNotFoundException)
             {

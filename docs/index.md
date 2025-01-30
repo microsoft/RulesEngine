@@ -9,6 +9,7 @@ RulesEngine is a highly extensible library to build rule based system using C# e
 - Extending expression via custom class/type injection
 - Scoped parameters
 - Post rule execution actions
+- Standalone expression evaluator
 
 **Table Of Content**
 - [Installation](#installation)
@@ -18,11 +19,13 @@ RulesEngine is a highly extensible library to build rule based system using C# e
   - [Execute the workflow rules with input:](#execute-the-workflow-rules-with-input)
   - [Using custom names for inputs](#using-custom-names-for-inputs)
 - [C# Expression support](#c-expression-support)
+- [Extending expression via custom class/type injection](#extending-expression-via-custom-classtype-injection)
+  - [Example](#example)
 - [ScopedParams](#scopedparams)
   - [GlobalParams](#globalparams)
-    - [Example](#example)
-  - [LocalParams](#localparams)
     - [Example](#example-1)
+  - [LocalParams](#localparams)
+    - [Example](#example-2)
   - [Referencing ScopedParams in other ScopedParams](#referencing-scopedparams-in-other-scopedparams)
 - [Post rule execution actions](#post-rule-execution-actions)
   - [Inbuilt Actions](#inbuilt-actions)
@@ -32,6 +35,10 @@ RulesEngine is a highly extensible library to build rule based system using C# e
       - [Usage](#usage-1)
   - [Custom Actions](#custom-actions)
     - [Steps to use a custom Action](#steps-to-use-a-custom-action)
+- [Standalone Expression Evaluator](#standalone-expression-evaluator)
+  - [Usage](#usage-2)
+- [Settings](#settings)
+  - [NestedRuleExecutionMode](#nestedruleexecutionmode)
 
 
 
@@ -121,6 +128,59 @@ The lambda expression allows you to use most of C# constructs and along with som
 For more details on supported expression language refer - [expression language](https://dynamic-linq.net/expression-language)
 
 For supported linq operations refer - [sequence operators](https://dynamic-linq.net/expression-language#sequence-operators)
+
+
+## Extending expression via custom class/type injection
+Although RulesEngine supports C# expressions, you may need to perform more complex operation.
+
+RulesEngine supports injecting custom classes/types via `ReSettings` which can allow you to call properties and methods of your custom class in expressions
+
+### Example
+Create a custom static class
+```c#
+using System;
+using System.Linq;
+
+namespace RE.HelperFunctions
+{
+    public static class Utils
+    {
+        public static bool CheckContains(string check, string valList)
+        {
+            if (String.IsNullOrEmpty(check) || String.IsNullOrEmpty(valList))
+                return false;
+
+            var list = valList.Split(',').ToList();
+            return list.Contains(check);
+        }
+    }
+}
+```
+
+Add it in your ReSettings and pass in RulesEngine constructor
+
+```c#
+  var reSettings = new ReSettings{
+      CustomTypes = new Type[] { typeof(Utils) }
+  };
+
+  var rulesEngine = new RulesEngine.RulesEngine(workflowRules,reSettings);
+```
+
+With this you can call Utils class in your Rules
+
+```json
+{
+    "WorkflowName": "DiscountWithCustomInputNames",
+    "Rules": [
+      {
+        "RuleName": "GiveDiscount10",
+        "Expression": "Utils.CheckContains(input1.country, \"india,usa,canada,France\") == true"
+      }
+    ]
+}
+
+```
 
 
 ## ScopedParams
@@ -215,7 +275,7 @@ LocalParams are defined at rule level and can be used by the rule and its child 
 
 These rules when executed with the below input will return success
 ```c#
-  var input = new RuleParameter("myInput",new {
+  var rp = new RuleParameter("myInput",new {
     hello = "HELLO"
   });
 
@@ -344,7 +404,7 @@ Define OnSuccess or OnFailure Action for your Rule:
            "OnFailure": { // This will execute if the Rule evaluates to failure
                "Name": "EvaluateRule",
                "Context": {
-                   "WorkflowName": "inputWorkflow",
+                   "workflowName": "inputWorkflow",
                    "ruleName": "GiveDiscount10Percent"
                }
            }
@@ -383,7 +443,7 @@ EvaluateRule also supports passing filtered inputs and computed inputs to chaine
          "OnSuccess": {
             "Name": "EvaluateRule",
                "Context": {
-                   "WorkflowName": "inputWorkflow",
+                   "workflowName": "inputWorkflow",
                    "ruleName": "GiveDiscount10Percent",
                    "inputFilter": ["input2"], //will only pass input2 from existing inputs,scopedparams to the chained rule
                    "additionalInputs":[ // will pass a new input named currentDiscount with the result of the expression to the chained rule
@@ -471,5 +531,56 @@ Actions can have async code as well
 }
 ```
 
+## Standalone Expression Evaluator
+If you are not looking for a full fledged RulesEngine and need only an expression evaluator. RulesEngine offers `RuleExpressionParser` which handles expression parsing and evaluation.
 
-_For more details please check out [Rules Engine Wiki](https://github.com/microsoft/RulesEngine/wiki)._
+### Usage
+```c#
+using System;
+using RulesEngine.Models;
+using RulesEngine.ExpressionBuilders;
+					
+public class Program
+{
+	public static void Main()
+	{
+		var reParser = new RuleExpressionParser(new ReSettings());
+		var result = reParser.Evaluate<string>("a+b", new RuleParameter[]{
+			new RuleParameter("a","Hello "),
+			new RuleParameter("b","World")
+		});
+		Console.WriteLine(result);
+	}
+}
+```
+This will output "Hello World"
+
+For more advanced usage, refer - https://dotnetfiddle.net/KSX8i0
+
+## Settings
+RulesEngine allows you to pass optional `ReSettings` in constructor to specify certain configuration for RulesEngine.
+
+Here are the all the options available:-
+
+
+| Property | Type | Default Value | Description |
+| --- | --- | --- | --- |
+| `CustomTypes` | `Type[]` | N/A | Custom types to be used in rule expressions. |
+| `CustomActions` | `Dictionary<string, Func<ActionBase>>` | N/A | Custom actions that can be used in the rules. |
+| `EnableExceptionAsErrorMessage` | `bool` | `true` | If `true`, returns any exception occurred while rule execution as an error message. Otherwise, throws an exception. This setting is only applicable if `IgnoreException` is set to `false`. |
+| `IgnoreException` | `bool` | `false` | If `true`, it will ignore any exception thrown with rule compilation/execution. |
+| `EnableFormattedErrorMessage` | `bool` | `true` | Enables error message formatting. |
+| `EnableScopedParams` | `bool` | `true` | Enables global parameters and local parameters for rules. |
+| `IsExpressionCaseSensitive` | `bool` | `false` | Sets whether expressions are case sensitive. |
+| `AutoRegisterInputType` | `bool` | `true` | Auto registers input type in custom type to allow calling method on type. |
+| `NestedRuleExecutionMode` | `NestedRuleExecutionMode` | `All` | Sets the mode for nested rule execution. |
+| `CacheConfig` | `MemCacheConfig` | N/A | Configures the memory cache. |
+| `UseFastExpressionCompiler` | `bool` | `true` | Whether to use FastExpressionCompiler for rule compilation. |
+
+
+### NestedRuleExecutionMode 
+
+| Value | Description |
+| --- | --- |
+| `All` | Executes all nested rules. |
+| `Performance` | Skips nested rules whose execution does not impact parent rule's result. |
