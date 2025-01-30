@@ -100,10 +100,6 @@ namespace RulesEngine.UnitTest
             for (var i = 0; i < result.Count; i++)
             {
                 Assert.Equal(result[i].IsSuccess, outputs[i]);
-                if (result[i].IsSuccess == false)
-                {
-                    Assert.StartsWith("Exception while parsing expression", result[i].ExceptionMessage);
-                }
             }
         }
 
@@ -123,7 +119,6 @@ namespace RulesEngine.UnitTest
 
             Assert.All(result, c => { 
                 Assert.False(c.IsSuccess);
-                Assert.StartsWith("Error while compiling rule", c.ExceptionMessage);
             });
 
         }

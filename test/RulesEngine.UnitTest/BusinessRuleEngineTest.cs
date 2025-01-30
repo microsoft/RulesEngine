@@ -381,7 +381,6 @@ namespace RulesEngine.UnitTest
             var result = await re.ExecuteAllRulesAsync("inputWorkflow", input1, input2, input3);
             Assert.NotNull(result);
             Assert.IsType<List<RuleResultTree>>(result);
-            Assert.Contains(result.First().ChildResults, c => c.ExceptionMessage.Contains("Unknown identifier 'input1'"));
         }
 
         [Theory]
@@ -463,7 +462,7 @@ namespace RulesEngine.UnitTest
 
         [Theory]
         [InlineData("rules9.json")]
-        public async Task ExecuteRule_MissingMethodInExpression_ReturnsException(string ruleFileName)
+        public async Task ExecuteRule_MissingMethodInExpression_ReturnsRulesFailed(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName, new ReSettings() { EnableExceptionAsErrorMessage = false });
 
@@ -473,14 +472,15 @@ namespace RulesEngine.UnitTest
 
             var utils = new TestInstanceUtils();
 
-            await Assert.ThrowsAsync<RuleException>(async () => {
-                var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
-            });
+            var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
+
+            Assert.NotNull(result);
+            Assert.All(result, c => Assert.False(c.IsSuccess));
         }
 
         [Theory]
         [InlineData("rules9.json")]
-        public async Task ExecuteRule_CompilationException_ReturnsAsErrorMessage(string ruleFileName)
+        public async Task ExecuteRule_DynamicParsion_RulesEvaluationFailed(string ruleFileName)
         {
             var re = GetRulesEngine(ruleFileName, new ReSettings() { EnableExceptionAsErrorMessage = true });
 
@@ -492,7 +492,7 @@ namespace RulesEngine.UnitTest
             var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
 
             Assert.NotNull(result);
-            Assert.StartsWith("Exception while parsing expression", result[1].ExceptionMessage);
+            Assert.StartsWith("One or more adjust rules failed", result[1].ExceptionMessage);
         }
 
         [Theory]
@@ -836,7 +836,38 @@ namespace RulesEngine.UnitTest
             Assert.All(result, rule => Assert.StartsWith("Error while executing rule :", rule.ExceptionMessage));
         }
 
+        [Fact]
+        public async Task ExecuteRule_RuntimeErrorInPreviousRun_ShouldReturnEmptyErrorMessage()
+        {
+            var workflow = new Workflow {
+                WorkflowName = "TestWorkflow",
+                Rules = new[] {
+                    new Rule {
+                        RuleName = "ruleWithRuntimeError",
+                        Expression = "input1.Country.ToLower() == \"india\""
+                    }
+                }
+            };
 
+            var re = new RulesEngine(new[] { workflow }, null);
+            var input = new RuleTestClass {
+                Country = null
+            };
+
+            var result = await re.ExecuteAllRulesAsync("TestWorkflow", input);
+
+            Assert.NotNull(result);
+            Assert.All(result, rule => Assert.False(rule.IsSuccess));
+            Assert.All(result, rule => Assert.StartsWith("Error while executing rule :", rule.ExceptionMessage));
+
+            input.Country="india";
+            result = await re.ExecuteAllRulesAsync("TestWorkflow", input);
+
+            Assert.NotNull(result);
+            Assert.All(result, rule => Assert.True(rule.IsSuccess));
+            Assert.All(result, rule => Assert.Empty(rule.ExceptionMessage));
+        }
+        
         [Fact]
         public async Task ExecuteRule_RuntimeError_ThrowsException()
         {

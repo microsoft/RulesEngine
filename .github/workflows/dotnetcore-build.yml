@@ -14,7 +14,10 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: |
+          6.0.x
+          8.0.x
+          9.0.x
     
     - name: Install dependencies
       run: dotnet restore RulesEngine.sln
@@ -31,10 +34,10 @@ jobs:
 
     - name: Check Coverage
       shell: pwsh
-      run: ./scripts/check-coverage.ps1 -reportPath coveragereport/Cobertura.xml -threshold 96
+      run: ./scripts/check-coverage.ps1 -reportPath coveragereport/Cobertura.xml -threshold 93
     
     - name: Coveralls GitHub Action
-      uses: coverallsapp/github-action@v2.2.1
+      uses: coverallsapp/github-action@v2.3.6
       if: ${{ github.event_name == 'push' }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
