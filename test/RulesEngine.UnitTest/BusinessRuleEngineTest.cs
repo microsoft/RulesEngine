@@ -388,7 +388,11 @@ namespace RulesEngine.UnitTest
         [InlineData("rules5.json", null, false)]
         public async Task ExecuteRule_WithInjectedUtils_ReturnsListOfRuleResultTree(string ruleFileName, string propValue, bool expectedResult)
         {
-            var re = GetRulesEngine(ruleFileName);
+            var reSettings = new ReSettings() {
+                CustomTypes = new Type[] { typeof(TestInstanceUtils) }
+            };
+
+            var re = GetRulesEngine(ruleFileName, reSettings);
 
             dynamic input1 = new ExpandoObject();
 
