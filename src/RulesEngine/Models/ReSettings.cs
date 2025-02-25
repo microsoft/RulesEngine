@@ -28,6 +28,7 @@ namespace RulesEngine.Models
             IsExpressionCaseSensitive = reSettings.IsExpressionCaseSensitive;
             AutoRegisterInputType = reSettings.AutoRegisterInputType;
             UseFastExpressionCompiler = reSettings.UseFastExpressionCompiler;
+            EnableExceptionAsErrorMessageForRuleExpressionParsing = reSettings.EnableExceptionAsErrorMessageForRuleExpressionParsing;
         }
 
 
@@ -84,6 +85,11 @@ namespace RulesEngine.Models
         /// Whether to use FastExpressionCompiler for rule compilation
         /// </summary>
         public bool UseFastExpressionCompiler { get; set; } = true;
+        /// <summary>
+        /// Sets the mode for ParsingException to cascade to child elements and result in a expression parser
+        /// Default: true
+        /// </summary>
+        public bool EnableExceptionAsErrorMessageForRuleExpressionParsing { get; set; } = true;
     }
 
     public enum NestedRuleExecutionMode
