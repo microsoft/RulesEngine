@@ -33,6 +33,7 @@ namespace RulesEngine.ExpressionBuilders
             var dict_add = typeof(Dictionary<string, object>).GetMethod("Add", BindingFlags.Public | BindingFlags.Instance, null, new[] { typeof(string), typeof(object) }, null);
             _methodInfo.Add("dict_add", dict_add);
         }
+
         public Expression Parse(string expression, ParameterExpression[] parameters, Type returnType)
         {
             var config = new ParsingConfig {
@@ -47,11 +48,15 @@ namespace RulesEngine.ExpressionBuilders
             }
             catch (ParseException)
             {
+                if (_reSettings.EnableExceptionAsErrorMessageForRuleExpressionParsing)
+                {
+                    throw;
+                }
                 return Expression.Constant(GetDefaultValueForType(returnType));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception($"Expression parsing error: {ex.Message}", ex);
+                throw;
             }
         }
 

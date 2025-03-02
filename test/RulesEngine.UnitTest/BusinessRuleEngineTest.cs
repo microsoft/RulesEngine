@@ -388,7 +388,11 @@ namespace RulesEngine.UnitTest
         [InlineData("rules5.json", null, false)]
         public async Task ExecuteRule_WithInjectedUtils_ReturnsListOfRuleResultTree(string ruleFileName, string propValue, bool expectedResult)
         {
-            var re = GetRulesEngine(ruleFileName);
+            var reSettings = new ReSettings() {
+                CustomTypes = new Type[] { typeof(TestInstanceUtils) }
+            };
+
+            var re = GetRulesEngine(ruleFileName, reSettings);
 
             dynamic input1 = new ExpandoObject();
 
@@ -472,10 +476,9 @@ namespace RulesEngine.UnitTest
 
             var utils = new TestInstanceUtils();
 
-            var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
-
-            Assert.NotNull(result);
-            Assert.All(result, c => Assert.False(c.IsSuccess));
+            await Assert.ThrowsAsync<RuleException>(async () => {
+                var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
+            });
         }
 
         [Theory]
@@ -492,7 +495,7 @@ namespace RulesEngine.UnitTest
             var result = await re.ExecuteAllRulesAsync("inputWorkflow", new RuleParameter("input1", input1));
 
             Assert.NotNull(result);
-            Assert.StartsWith("One or more adjust rules failed", result[1].ExceptionMessage);
+            Assert.StartsWith("Exception while parsing expression", result[1].ExceptionMessage);
         }
 
         [Theory]
