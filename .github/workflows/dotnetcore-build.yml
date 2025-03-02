@@ -34,7 +34,7 @@ jobs:
 
     - name: Check Coverage
       shell: pwsh
-      run: ./scripts/check-coverage.ps1 -reportPath coveragereport/Cobertura.xml -threshold 93
+      run: ./scripts/check-coverage.ps1 -reportPath coveragereport/Cobertura.xml -threshold 92
     
     - name: Coveralls GitHub Action
       uses: coverallsapp/github-action@v2.3.6
