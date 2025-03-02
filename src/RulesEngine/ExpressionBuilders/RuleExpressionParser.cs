@@ -38,7 +38,7 @@ namespace RulesEngine.ExpressionBuilders
         {
             var config = new ParsingConfig {
                 CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes),
-                IsCaseSensitive = _reSettings.IsExpressionCaseSensitive,
+                IsCaseSensitive = _reSettings.IsExpressionCaseSensitive
             };
 
             // Instead of immediately returning default values, allow for expression parsing to handle dynamic evaluation.
