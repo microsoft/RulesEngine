@@ -111,7 +111,7 @@ namespace RulesEngine
         }
 
         /// <summary>
-        /// This will executea specific rule of the specified workflow
+        /// This will execute a specific rule of the specified workflow
         /// </summary>
         /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
         /// <param name="ruleName">The name of the rule to execute</param>
