@@ -142,6 +142,13 @@ namespace RulesEngine
             }
         }
 
+        public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters)
+        {
+            var compiledRule = CompileRule(workflowName, ruleName, ruleParameters);
+            var resultTree = compiledRule(ruleParameters);
+            return await ExecuteActionForRuleResult(resultTree, true);
+        }
+
         private async ValueTask<ActionRuleResult> ExecuteActionForRuleResult(RuleResultTree resultTree, bool includeRuleResults = false)
         {
             var ruleActions = resultTree?.Rule?.Actions;
