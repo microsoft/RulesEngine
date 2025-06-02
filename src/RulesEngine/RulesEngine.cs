@@ -290,10 +290,16 @@ namespace RulesEngine
                 var dictFunc = new Dictionary<string, RuleFunc<RuleResultTree>>();
                 if (_reSettings.AutoRegisterInputType)
                 {
-                    //Disabling fast expression compiler if custom types are used
-                    _reSettings.UseFastExpressionCompiler = (_reSettings.CustomTypes?.Length > 0) ? false : _reSettings.UseFastExpressionCompiler;
-                    _reSettings.CustomTypes.Safe().Union(ruleParams.Select(c => c.Type)).ToArray();
+                    var collector = new HashSet<Type>(_reSettings.CustomTypes.Safe());
+
+                    foreach (var rp in ruleParams)
+                    {
+                        CollectAllElementTypes(rp.Type, collector);
+                    }
+
+                    _reSettings.CustomTypes = collector.ToArray();
                 }
+
                 // add separate compilation for global params
 
                 var globalParamExp = new Lazy<RuleExpressionParameter[]>(
@@ -338,7 +344,29 @@ namespace RulesEngine
             return _ruleCompiler.CompileRule(rule, ruleExpressionType, ruleParams, scopedParams);
         }
 
+        private static void CollectAllElementTypes(Type t, ISet<Type> collector)
+        {
+            if (t == null || collector.Contains(t))
+                return;
 
+            collector.Add(t);
+
+            if (t.IsGenericType)
+            {
+                foreach (var ga in t.GetGenericArguments())
+                    CollectAllElementTypes(ga, collector);
+            }
+
+            if (t.IsArray)
+            {
+                CollectAllElementTypes(t.GetElementType(), collector);
+            }
+
+            if (Nullable.GetUnderlyingType(t) is Type underly && !collector.Contains(underly))
+            {
+                CollectAllElementTypes(underly, collector);
+            }
+        }
 
         /// <summary>
         /// This will execute the compiled rules 
