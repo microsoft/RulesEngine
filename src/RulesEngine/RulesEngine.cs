@@ -292,7 +292,7 @@ namespace RulesEngine
                 {
                     //Disabling fast expression compiler if custom types are used
                     _reSettings.UseFastExpressionCompiler = (_reSettings.CustomTypes?.Length > 0) ? false : _reSettings.UseFastExpressionCompiler;
-                    _reSettings.CustomTypes.Safe().Union(ruleParams.Select(c => c.Type)).ToArray();
+                    _reSettings.CustomTypes = _reSettings.CustomTypes.Safe().Union(ruleParams.Select(c => c.Type)).ToArray();
                 }
                 // add separate compilation for global params
 
