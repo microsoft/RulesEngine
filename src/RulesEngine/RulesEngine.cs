@@ -110,6 +110,22 @@ namespace RulesEngine
             return ruleResultList;
         }
 
+        /// <summary>
+        /// This will execute a specific rule of the specified workflow
+        /// </summary>
+        /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
+        /// <param name="ruleName">The name of the rule to execute</param>
+        /// <param name="ruleParams">A variable number of rule parameters</param>
+        /// <returns>A rule result</returns>
+        public async ValueTask<RuleResultTree>> ExecuteRuleAsync(string workflowName, string ruleName, params RuleParameter[] ruleParams)
+        {
+            var sortedRuleParams = ruleParams.ToList();
+            sortedRuleParams.Sort((RuleParameter a, RuleParameter b) => string.Compare(a.Name, b.Name));
+            var ruleResultTree = ValidateWorkflowAndExecuteRule(workflowName, ruleName, sortedRuleParams.ToArray());
+            await ExecuteActionAsync([ruleResultTree]);
+            return ruleResultTree;
+        }
+
         private async ValueTask ExecuteActionAsync(IEnumerable<RuleResultTree> ruleResultList)
         {
             foreach (var ruleResult in ruleResultList)
@@ -266,6 +282,29 @@ namespace RulesEngine
                 throw new ArgumentException($"Rule config file is not present for the {workflowName} workflow");
             }
             return result;
+        }
+
+                /// <summary>
+        /// This will validate workflow rules then call execute method
+        /// </summary>
+        /// <typeparam name="T">type of entity</typeparam>
+        /// <param name="input">input</param>
+        /// <param name="workflowName">workflow name</param>
+        /// <returns>list of rule result set</returns>
+        private RuleResultTree ValidateWorkflowAndExecuteRule(string workflowName, string ruleName, RuleParameter[] ruleParams)
+        {
+            if (RegisterRule(workflowName, ruleParams))
+            {
+                var compiledRulesCacheKey = GetCompiledRulesKey(workflowName, ruleParameters);
+                IDictionary<string, RuleFunc<RuleResultTree>> compiledRules = _rulesCache.GetCompiledRules(compiledRulesCacheKey);
+                if (compiledRules.TryGetValue(ruleName, out var compiledRule))
+                {
+                    return compiledRule(ruleParams);
+                }
+            }
+
+            // if rules are not registered with Rules Engine
+            throw new ArgumentException($"Rule config file is not present for the {workflowName} workflow");
         }
 
         /// <summary>
