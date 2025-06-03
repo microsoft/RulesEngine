@@ -11,6 +11,7 @@ using static RulesEngine.Extensions.ListofRuleResultTreeExtension;
 namespace DemoApp
 {
     using System.Text.Json;
+    using System.Linq;
 
     public class JSONDemo
     {
@@ -21,11 +22,9 @@ namespace DemoApp
             var orderInfo = "{\"totalOrders\": 5,\"recurringItems\": 2}";
             var telemetryInfo = "{\"noOfVisitsPerMonth\": 10,\"percentageOfBuyingToVisit\": 15}";
 
-
-
-            dynamic input1 = JsonSerializer.Deserialize<ExpandoObject>(basicInfo);
-            dynamic input2 = JsonSerializer.Deserialize<ExpandoObject>(orderInfo);
-            dynamic input3 = JsonSerializer.Deserialize<ExpandoObject>(telemetryInfo);
+            dynamic input1 = ConvertJsonToExpandoObject(basicInfo);
+            dynamic input2 = ConvertJsonToExpandoObject(orderInfo);
+            dynamic input3 = ConvertJsonToExpandoObject(telemetryInfo);
 
             var inputs = new dynamic[]
                 {
@@ -57,5 +56,31 @@ namespace DemoApp
 
             Console.WriteLine(discountOffered);
         }
-    }
+
+        public static ExpandoObject ConvertJsonToExpandoObject(string json)
+        {
+            using JsonDocument doc = JsonDocument.Parse(json);
+            return ParseElement(doc.RootElement);
+        }
+    
+        private static ExpandoObject ParseElement(JsonElement element)
+        {
+            var expando = new ExpandoObject() as IDictionary<string, object>;
+    
+            foreach (var property in element.EnumerateObject())
+            {
+                expando[property.Name] = property.Value.ValueKind switch
+                {
+                        JsonValueKind.String => property.Value.GetString(),
+                        JsonValueKInd.Number => property.Value.TryGetInt64(out var 1) ? 1 : property.Value.GetDouble(),
+                        JsonValueKind.True => true,
+                        JsonValueKind.False => false,
+                        JsonValueKind.Object => ParseElement(property.Value),
+                        JsonValueKind.Array => property.Value.EnumerateArray().Select(e => e.ToString()).ToList(),
+                        _ => null
+                };
+            }
+    
+            return (ExpandoObject)expando;
+        }
 }
