@@ -3,6 +3,7 @@
 
 using Newtonsoft.Json.Linq;
 using RulesEngine.ExpressionBuilders;
+using RulesEngine.Models;
 using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
@@ -20,38 +21,43 @@ namespace RulesEngine.UnitTest.RuleExpressionParserTests
         [Fact]
         public void TestExpressionWithJObject()
         {
-            var ruleParser = new RuleExpressionParser(new Models.ReSettings());
+            var settings = new ReSettings {
+                CustomTypes = new[]
+                {
+                    typeof(JObject),
+                    typeof(JToken),
+                    typeof(JArray)
+                }
+            };
+            var parser = new RuleExpressionParser(settings);
 
-            var inputStr = @"{
+            var json = @"{
                ""list"": [
-                    { ""item1"": ""hello"",
-                        ""item3"": 1
-                        },
-                    {
-                        ""item2"": ""world""
-                        }
-                ]
+                    { ""item1"": ""hello"", ""item3"": 1 },
+                    { ""item2"": ""world"" }
+               ]
             }";
+            var input = JObject.Parse(json);
 
+            var result1 = parser.Evaluate<object>(
+                "Convert.ToInt32(input[\"list\"][0][\"item3\"]) == 1",
+                new[] { new RuleParameter("input", input) }
+            );
+            Assert.True((bool)result1);
 
-            var input = JObject.Parse(inputStr);
+            var result2 = parser.Evaluate<object>(
+                "Convert.ToString(input[\"list\"][1][\"item2\"]) == \"world\"",
+                new[] { new RuleParameter("input", input) }
+            );
+            Assert.True((bool)result2);
 
-
-            var value = ruleParser.Evaluate<object>("input.list[0].item3 == 1", new[] { new Models.RuleParameter("input", input) });
-
-            Assert.Equal(true,
-                         value);
-
-
-            var value2 = ruleParser.Evaluate<object>("input.list[1].item2 == \"world\"", new[] { new Models.RuleParameter("input", input) });
-
-            Assert.Equal(true,
-                         value2);
-
-
-            var value3= ruleParser.Evaluate<object>("string.Concat(input.list[0].item1,input.list[1].item2)", new[] { new Models.RuleParameter("input", input) });
-
-            Assert.Equal("helloworld", value3);
+            var result3 = parser.Evaluate<object>(
+                "string.Concat(" +
+                  "Convert.ToString(input[\"list\"][0][\"item1\"]), " +
+                  "Convert.ToString(input[\"list\"][1][\"item2\"]))",
+                new[] { new RuleParameter("input", input) }
+            );
+            Assert.Equal("helloworld", result3);
         }
 
         [Theory]
