@@ -377,15 +377,149 @@ namespace RulesEngine
         private List<RuleResultTree> ExecuteAllRuleByWorkflow(string workflowName, RuleParameter[] ruleParameters)
         {
             var result = new List<RuleResultTree>();
-            var compiledRulesCacheKey = GetCompiledRulesKey(workflowName, ruleParameters);
-            foreach (var compiledRule in _rulesCache.GetCompiledRules(compiledRulesCacheKey)?.Values)
+            var workflow = _rulesCache.GetWorkflow(workflowName);
+            if (workflow == null)
             {
-                var resultTree = compiledRule(ruleParameters);
+                return result;
+            }
+
+            var extendedRuleParameters = new List<RuleParameter>(ruleParameters);
+            var ruleResults = new Dictionary<string, bool>();
+            var successEvents = new HashSet<string>();
+
+            foreach (var rule in workflow.Rules.Where(c => c.Enabled))
+            {
+                // Check if the rule expression contains rule references
+                var hasRuleReferences = ContainsRuleReferences(rule.Expression, ruleResults.Keys) || ContainsSuccessEventReferences(rule.Expression, successEvents);
+                
+                RuleFunc<RuleResultTree> compiledRule;
+                
+                if (hasRuleReferences && _reSettings.EnableScopedParams)
+                {
+                    // Compile rule with additional scoped parameters for rule results
+                    compiledRule = CompileRuleWithRuleResults(rule, workflow.RuleExpressionType, extendedRuleParameters.ToArray(), ruleResults, successEvents, workflow);
+                }
+                else
+                {
+                    // Use standard compilation
+                    var compiledRulesCacheKey = GetCompiledRulesKey(workflowName, ruleParameters);
+                    var cachedRules = _rulesCache.GetCompiledRules(compiledRulesCacheKey);
+                    compiledRule = cachedRules?.ContainsKey(rule.RuleName) == true ? cachedRules[rule.RuleName] : null;
+                    
+                    if (compiledRule == null)
+                    {
+                        // Fallback compilation if not in cache
+                        var globalParamExp = new Lazy<RuleExpressionParameter[]>(
+                            () => _ruleCompiler.GetRuleExpressionParameters(workflow.RuleExpressionType, workflow.GlobalParams, ruleParameters)
+                        );
+                        compiledRule = CompileRule(rule, workflow.RuleExpressionType, ruleParameters, globalParamExp);
+                    }
+                }
+
+                var resultTree = compiledRule(extendedRuleParameters.ToArray());
                 result.Add(resultTree);
+
+                // Add rule result for future rule references
+                ruleResults[rule.RuleName] = resultTree.IsSuccess;
+                
+                // Add success event if rule passed
+                if (resultTree.IsSuccess && !string.IsNullOrEmpty(rule.SuccessEvent))
+                {
+                    successEvents.Add(rule.SuccessEvent);
+                }
             }
 
             FormatErrorMessages(result);
             return result;
+        }
+
+        private bool ContainsRuleReferences(string expression, IEnumerable<string> availableRuleNames)
+        {
+            if (string.IsNullOrEmpty(expression))
+                return false;
+
+            foreach (var ruleName in availableRuleNames)
+            {
+                if (expression.Contains($"@{ruleName}"))
+                    return true;
+            }
+            return false;
+        }
+
+        private bool ContainsSuccessEventReferences(string expression, IEnumerable<string> availableSuccessEvents)
+        {
+            if (string.IsNullOrEmpty(expression))
+                return false;
+
+            foreach (var eventName in availableSuccessEvents)
+            {
+                if (expression.Contains(eventName))
+                    return true;
+            }
+            return false;
+        }
+
+        private RuleFunc<RuleResultTree> CompileRuleWithRuleResults(Rule rule, RuleExpressionType ruleExpressionType, RuleParameter[] ruleParameters, Dictionary<string, bool> ruleResults, HashSet<string> successEvents, Workflow workflow = null)
+        {
+            var globalParamExp = new Lazy<RuleExpressionParameter[]>(
+                () => _ruleCompiler.GetRuleExpressionParameters(ruleExpressionType, workflow?.GlobalParams, ruleParameters)
+            );
+
+            // Create additional scoped parameters for rule results and success events
+            var additionalScopedParams = new List<ScopedParam>();
+            
+            // Preprocess the expression to replace @RuleName with RuleName
+            var processedExpression = rule.Expression;
+            
+            // Add rule results as scoped parameters
+            foreach (var kvp in ruleResults)
+            {
+                additionalScopedParams.Add(new ScopedParam
+                {
+                    Name = kvp.Key,
+                    Expression = kvp.Value.ToString().ToLower()
+                });
+                
+                // Replace @RuleName references in the expression
+                processedExpression = processedExpression.Replace($"@{kvp.Key}", kvp.Key);
+            }
+
+            // Add success events as scoped parameters
+            foreach (var eventName in successEvents)
+            {
+                additionalScopedParams.Add(new ScopedParam
+                {
+                    Name = eventName,
+                    Expression = "true"
+                });
+            }
+
+            // Combine with existing local params
+            var combinedLocalParams = new List<ScopedParam>();
+            if (rule.LocalParams != null)
+            {
+                combinedLocalParams.AddRange(rule.LocalParams);
+            }
+            combinedLocalParams.AddRange(additionalScopedParams);
+
+            // Create a modified rule with the additional scoped parameters and processed expression
+            var modifiedRule = new Rule
+            {
+                RuleName = rule.RuleName,
+                Expression = processedExpression,
+                RuleExpressionType = rule.RuleExpressionType,
+                LocalParams = combinedLocalParams,
+                SuccessEvent = rule.SuccessEvent,
+                ErrorMessage = rule.ErrorMessage,
+                Enabled = rule.Enabled,
+                Actions = rule.Actions,
+                Operator = rule.Operator,
+                Properties = rule.Properties,
+                Rules = rule.Rules,
+                WorkflowsToInject = rule.WorkflowsToInject
+            };
+
+            return CompileRule(modifiedRule, ruleExpressionType, ruleParameters, globalParamExp);
         }
 
         private string GetCompiledRulesKey(string workflowName, RuleParameter[] ruleParams)
