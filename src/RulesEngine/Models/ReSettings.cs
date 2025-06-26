@@ -84,7 +84,7 @@ namespace RulesEngine.Models
         /// <summary>
         /// Whether to use FastExpressionCompiler for rule compilation
         /// </summary>
-        public bool UseFastExpressionCompiler { get; set; } = true;
+        public bool UseFastExpressionCompiler { get; set; } = false;
         /// <summary>
         /// Sets the mode for ParsingException to cascade to child elements and result in a expression parser
         /// Default: true
