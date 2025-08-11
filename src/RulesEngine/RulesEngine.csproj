@@ -37,7 +37,7 @@
   <ItemGroup>
     <PackageReference Include="FastExpressionCompiler" Version="5.3.0" />
     <PackageReference Include="FluentValidation" Version="11.11.0" />
-    <PackageReference Include="System.Text.Json" Version="9.0.7" />
+    <PackageReference Include="System.Text.Json" Version="9.0.8" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.7" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
