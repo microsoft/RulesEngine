@@ -43,7 +43,7 @@
   <Choose>
     <When Condition="'$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'netstandard2.0'">
       <ItemGroup>
-        <PackageReference Include="System.Text.Json" Version="6.0.11" />
+        <PackageReference Include="System.Text.Json" Version="9.0.8" />
       </ItemGroup>
     </When>
     <Otherwise>
