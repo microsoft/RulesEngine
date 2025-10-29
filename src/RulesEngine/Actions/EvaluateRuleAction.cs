@@ -28,8 +28,28 @@ namespace RulesEngine.Actions
             List<RuleResultTree> resultList = null;
             if (includeRuleResults)
             {
-                resultList = new List<RuleResultTree>(output?.Results ?? new List<RuleResultTree>() { });
-                resultList.AddRange(innerResult.Results);
+                // Avoid exponential copying by only including the immediate results from this execution
+                // The chained rule results are already included in output?.Results
+                resultList = new List<RuleResultTree>();
+                
+                // Add the chained rule results (from the EvaluateRule action execution)
+                if (output?.Results != null)
+                {
+                    resultList.AddRange(output.Results);
+                }
+                
+                // Add the parent rule that triggered this chain (but avoid duplicating it)
+                if (innerResult.Results != null)
+                {
+                    foreach (var result in innerResult.Results)
+                    {
+                        // Only add if it's not already in the output results to avoid duplication
+                        if (output?.Results == null || !output.Results.Any(r => ReferenceEquals(r, result)))
+                        {
+                            resultList.Add(result);
+                        }
+                    }
+                }
             }
             return new ActionRuleResult {
                 Output = output?.Output,
