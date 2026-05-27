@@ -81,7 +81,7 @@ namespace RulesEngine.HelperFunctions
             var firstElement = list[0];
             if (firstElement is ExpandoObject || firstElement is IDictionary<string, object>)
             {
-                var merged = MergeListElementSchemas(list);
+                var merged = MergeDictionaries(list.OfType<IDictionary<string, object>>());
                 var internalType = CreateAbstractClassTypeFromDictionary(merged);
                 return new List<object>().Cast(internalType).ToList(internalType).GetType();
             }
@@ -91,65 +91,38 @@ namespace RulesEngine.HelperFunctions
             return new List<object>().Cast(legacyType).ToList(legacyType).GetType();
         }
 
-        private static IDictionary<string, object> MergeListElementSchemas(IList list)
+        // Unions schemas from any number of dict-like inputs. Used both to merge sibling
+        // elements of a heterogeneous list (#704) and to merge nested dicts recursively.
+        private static IDictionary<string, object> MergeDictionaries(IEnumerable<IDictionary<string, object>> dictionaries)
         {
             var merged = new Dictionary<string, object>();
-            foreach (var elem in list)
+            foreach (var dict in dictionaries)
             {
-                if (elem is not IDictionary<string, object> elemDict)
+                foreach (var kvp in dict)
                 {
-                    continue;
-                }
-                foreach (var kvp in elemDict)
-                {
-                    if (!merged.TryGetValue(kvp.Key, out var existing))
-                    {
-                        merged[kvp.Key] = kvp.Value;
-                        continue;
-                    }
-
-                    if (existing is IDictionary<string, object> existingDict && kvp.Value is IDictionary<string, object> newDict)
-                    {
-                        merged[kvp.Key] = MergeTwoDictionaries(existingDict, newDict);
-                    }
-                    else if (existing is IList existingList && kvp.Value is IList newList)
-                    {
-                        var combined = new List<object>();
-                        foreach (var e in existingList) combined.Add(e);
-                        foreach (var e in newList) combined.Add(e);
-                        merged[kvp.Key] = combined;
-                    }
-                    else if (existing == null && kvp.Value != null)
-                    {
-                        merged[kvp.Key] = kvp.Value;
-                    }
-                    // Else keep existing (first non-null wins on type conflict).
+                    merged[kvp.Key] = merged.TryGetValue(kvp.Key, out var existing)
+                        ? MergeValues(existing, kvp.Value)
+                        : kvp.Value;
                 }
             }
             return merged;
         }
 
-        private static IDictionary<string, object> MergeTwoDictionaries(IDictionary<string, object> a, IDictionary<string, object> b)
+        private static object MergeValues(object existing, object incoming)
         {
-            var merged = new Dictionary<string, object>();
-            foreach (var kvp in a) merged[kvp.Key] = kvp.Value;
-            foreach (var kvp in b)
+            if (existing is IDictionary<string, object> a && incoming is IDictionary<string, object> b)
             {
-                if (!merged.TryGetValue(kvp.Key, out var existing))
-                {
-                    merged[kvp.Key] = kvp.Value;
-                    continue;
-                }
-                if (existing is IDictionary<string, object> ea && kvp.Value is IDictionary<string, object> eb)
-                {
-                    merged[kvp.Key] = MergeTwoDictionaries(ea, eb);
-                }
-                else if (existing == null && kvp.Value != null)
-                {
-                    merged[kvp.Key] = kvp.Value;
-                }
+                return MergeDictionaries(new[] { a, b });
             }
-            return merged;
+            if (existing is IList la && incoming is IList lb)
+            {
+                var combined = new List<object>();
+                foreach (var e in la) combined.Add(e);
+                foreach (var e in lb) combined.Add(e);
+                return combined;
+            }
+            // First non-null wins on type conflict.
+            return existing ?? incoming;
         }
 
         public static object CreateObject(Type type, dynamic input)

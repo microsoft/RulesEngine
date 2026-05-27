@@ -144,12 +144,33 @@ namespace RulesEngine
             {
                 return ruleParameters;
             }
+            var globalParamsDelegate = CompileGlobalParamsDelegate(workflow, ruleParameters);
+            return AppendGlobals(ruleParameters, globalParamsDelegate);
+        }
+
+        // Compiles a single delegate that evaluates all of a workflow's GlobalParams.
+        // Returns null if the workflow declares no globals.
+        private Func<object[], Dictionary<string, object>> CompileGlobalParamsDelegate(Workflow workflow, RuleParameter[] ruleParameters)
+        {
+            if (workflow?.GlobalParams == null || !workflow.GlobalParams.Any())
+            {
+                return null;
+            }
             var globalParamValues = _ruleCompiler.GetRuleExpressionParameters(workflow.RuleExpressionType, workflow.GlobalParams, ruleParameters);
             if (globalParamValues.Length == 0)
             {
+                return null;
+            }
+            return _ruleCompiler.CompileScopedParams(workflow.RuleExpressionType, ruleParameters, globalParamValues);
+        }
+
+        // Invokes the supplied globals delegate (if any) and appends the results as RuleParameters.
+        private static RuleParameter[] AppendGlobals(RuleParameter[] ruleParameters, Func<object[], Dictionary<string, object>> globalParamsDelegate)
+        {
+            if (globalParamsDelegate == null)
+            {
                 return ruleParameters;
             }
-            var globalParamsDelegate = _ruleCompiler.CompileScopedParams(workflow.RuleExpressionType, ruleParameters, globalParamValues);
             var inputs = ruleParameters.Select(c => c.Value).ToArray();
             var evaluated = globalParamsDelegate(inputs);
             var globals = evaluated.Select(kv => new RuleParameter(kv.Key, kv.Value));
@@ -479,15 +500,7 @@ namespace RulesEngine
 
         private RuleParameter[] ApplyGlobalParams(string compiledRulesCacheKey, RuleParameter[] ruleParameters)
         {
-            var globalParamsDelegate = _rulesCache.GetGlobalParamsDelegate(compiledRulesCacheKey);
-            if (globalParamsDelegate == null)
-            {
-                return ruleParameters;
-            }
-            var inputs = ruleParameters.Select(c => c.Value).ToArray();
-            var evaluated = globalParamsDelegate(inputs);
-            var globals = evaluated.Select(kv => new RuleParameter(kv.Key, kv.Value));
-            return ruleParameters.Concat(globals).ToArray();
+            return AppendGlobals(ruleParameters, _rulesCache.GetGlobalParamsDelegate(compiledRulesCacheKey));
         }
 
         private string GetCompiledRulesKey(string workflowName, RuleParameter[] ruleParams)
