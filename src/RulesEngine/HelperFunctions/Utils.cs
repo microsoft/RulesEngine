@@ -55,16 +55,7 @@ namespace RulesEngine.HelperFunctions
                 Type value;
                 if (expando.Value is IList list)
                 {
-                    if (list.Count == 0)
-                    {
-                        value = typeof(List<object>);
-                    }
-                    else
-                    {
-                        var internalType = CreateAbstractClassType(list[0]);
-                        value = new List<object>().Cast(internalType).ToList(internalType).GetType();
-                    }
-
+                    value = BuildListType(list);
                 }
                 else
                 {
@@ -75,6 +66,90 @@ namespace RulesEngine.HelperFunctions
 
             var type = DynamicClassFactory.CreateType(props);
             return type;
+        }
+
+        // Returns the CLR List<T> type that should represent a heterogeneous IList of ExpandoObject /
+        // IDictionary<string, object> elements. Walks every element so properties that only appear in
+        // later elements are still included in the generated type. See #704.
+        private static Type BuildListType(IList list)
+        {
+            if (list.Count == 0)
+            {
+                return typeof(List<object>);
+            }
+
+            var firstElement = list[0];
+            if (firstElement is ExpandoObject || firstElement is IDictionary<string, object>)
+            {
+                var merged = MergeListElementSchemas(list);
+                var internalType = CreateAbstractClassTypeFromDictionary(merged);
+                return new List<object>().Cast(internalType).ToList(internalType).GetType();
+            }
+
+            // Non-schema-like element: fall back to first-element type as before.
+            var legacyType = CreateAbstractClassType(firstElement);
+            return new List<object>().Cast(legacyType).ToList(legacyType).GetType();
+        }
+
+        private static IDictionary<string, object> MergeListElementSchemas(IList list)
+        {
+            var merged = new Dictionary<string, object>();
+            foreach (var elem in list)
+            {
+                if (elem is not IDictionary<string, object> elemDict)
+                {
+                    continue;
+                }
+                foreach (var kvp in elemDict)
+                {
+                    if (!merged.TryGetValue(kvp.Key, out var existing))
+                    {
+                        merged[kvp.Key] = kvp.Value;
+                        continue;
+                    }
+
+                    if (existing is IDictionary<string, object> existingDict && kvp.Value is IDictionary<string, object> newDict)
+                    {
+                        merged[kvp.Key] = MergeTwoDictionaries(existingDict, newDict);
+                    }
+                    else if (existing is IList existingList && kvp.Value is IList newList)
+                    {
+                        var combined = new List<object>();
+                        foreach (var e in existingList) combined.Add(e);
+                        foreach (var e in newList) combined.Add(e);
+                        merged[kvp.Key] = combined;
+                    }
+                    else if (existing == null && kvp.Value != null)
+                    {
+                        merged[kvp.Key] = kvp.Value;
+                    }
+                    // Else keep existing (first non-null wins on type conflict).
+                }
+            }
+            return merged;
+        }
+
+        private static IDictionary<string, object> MergeTwoDictionaries(IDictionary<string, object> a, IDictionary<string, object> b)
+        {
+            var merged = new Dictionary<string, object>();
+            foreach (var kvp in a) merged[kvp.Key] = kvp.Value;
+            foreach (var kvp in b)
+            {
+                if (!merged.TryGetValue(kvp.Key, out var existing))
+                {
+                    merged[kvp.Key] = kvp.Value;
+                    continue;
+                }
+                if (existing is IDictionary<string, object> ea && kvp.Value is IDictionary<string, object> eb)
+                {
+                    merged[kvp.Key] = MergeTwoDictionaries(ea, eb);
+                }
+                else if (existing == null && kvp.Value != null)
+                {
+                    merged[kvp.Key] = kvp.Value;
+                }
+            }
+            return merged;
         }
 
         public static object CreateObject(Type type, dynamic input)
@@ -152,17 +227,7 @@ namespace RulesEngine.HelperFunctions
                 }
                 else if (kvp.Value is IList list)
                 {
-                    if (list.Count == 0)
-                    {
-                        valueType = typeof(List<object>);
-                    }
-                    else
-                    {
-                        var internalType = list[0] is IDictionary<string, object> innerDict
-                            ? CreateAbstractClassTypeFromDictionary(innerDict)
-                            : (list[0] is ExpandoObject ? CreateAbstractClassType(list[0]) : list[0]?.GetType() ?? typeof(object));
-                        valueType = new List<object>().Cast(internalType).ToList(internalType).GetType();
-                    }
+                    valueType = BuildListType(list);
                 }
                 else
                 {

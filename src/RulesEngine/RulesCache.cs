@@ -16,6 +16,9 @@ namespace RulesEngine
         /// <summary>The compile rules</summary>
         private readonly MemCache _compileRules;
 
+        /// <summary>Per-workflow compiled delegate that evaluates all global params once.</summary>
+        private readonly MemCache _compiledGlobalParams;
+
         /// <summary>The workflow rules</summary>
         private readonly ConcurrentDictionary<string, (Workflow, long)> _workflow = new ConcurrentDictionary<string, (Workflow, long)>();
 
@@ -23,6 +26,19 @@ namespace RulesEngine
         public RulesCache(ReSettings reSettings)
         {
             _compileRules = new MemCache(reSettings.CacheConfig);
+            _compiledGlobalParams = new MemCache(reSettings.CacheConfig);
+        }
+
+        /// <summary>Adds or updates the workflow-level global-params delegate.</summary>
+        public void AddOrUpdateGlobalParamsDelegate(string compiledRuleKey, Func<object[], Dictionary<string, object>> globalParamsDelegate)
+        {
+            _compiledGlobalParams.Set(compiledRuleKey, globalParamsDelegate);
+        }
+
+        /// <summary>Gets the workflow-level global-params delegate, or null if the workflow has no globals.</summary>
+        public Func<object[], Dictionary<string, object>> GetGlobalParamsDelegate(string compiledRuleKey)
+        {
+            return _compiledGlobalParams.Get<Func<object[], Dictionary<string, object>>>(compiledRuleKey);
         }
 
 
@@ -81,6 +97,7 @@ namespace RulesEngine
         {
             _workflow.Clear();
             _compileRules.Clear();
+            _compiledGlobalParams.Clear();
         }
 
         /// <summary>Gets the work flow rules.</summary>
@@ -133,10 +150,11 @@ namespace RulesEngine
         {
             if (_workflow.TryRemove(workflowName, out var workflowObj))
             {
-                var compiledKeysToRemove = _compileRules.GetKeys().Where(key => key.StartsWith(workflowName));
+                var compiledKeysToRemove = _compileRules.GetKeys().Where(key => key.StartsWith(workflowName)).ToList();
                 foreach (var key in compiledKeysToRemove)
                 {
                     _compileRules.Remove(key);
+                    _compiledGlobalParams.Remove(key);
                 }
             }
         }
