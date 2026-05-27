@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [6.0.1-preview.1]
+
+### Performance
+- Restored the compiled-expression cache in `RuleExpressionParser` that was removed in 5.0.1, fixing a 10×–1900× regression on the direct parser, `ExecuteActionWorkflowAsync`, and fresh-engine paths. The cache is now instance-scoped with a settings fingerprint in the key, avoiding the latent cross-settings bug the original static cache had (#673, #727).
+
+### Fixes
+- `EnableExceptionAsErrorMessage = false` now correctly propagates exceptions thrown from custom actions' `Run()` — they were previously swallowed into `ActionRuleResult.Exception` (#624, #728).
+- `Utils.CreateAbstractClassType` now unions schemas across every element of an `ExpandoObject`/`Dictionary` list, so properties that appear only in later elements are no longer dropped (#704, #728).
+- `OutputExpressionAction` detects C#-style anonymous-object syntax (`new { X = ... }`) and replaces the cryptic "missing 'as' clause" Dynamic.Core error with a clear hint pointing at the correct `new (value as X, ...)` form (#711, #728).
+- Workflow `GlobalParams` are now evaluated **once per `ExecuteAllRulesAsync` call** instead of once per rule. A delegate is compiled at registration time and results are appended to each rule's inputs (#714, #728).
+- `LambdaExpressionBuilder` detects "exists in type 'Object'" / "'System.Object'" parse errors and appends a helpful hint when a custom method's `object` return type is the cause (#717, #728).
+- `ExecuteActionWorkflowAsync` now runs `FormatErrorMessages` like `ExecuteAllRulesAsync` does, so `Rule.ErrorMessage` templates are interpolated into `ExceptionMessage` consistently across both APIs (#519, #729).
+- `ActionContext` no longer NREs when a rule action's `Context` (or a nested value) is null — common for custom actions that don't need configuration (#576, #729).
+- `ErrorMessage` interpolation now walks arbitrary-depth dotted paths via `JsonNode`: `$(input.Inner.Name)` resolves to the leaf scalar instead of the raw JSON of the intermediate object (#696, #729).
+
+### Regression guards added (already fixed upstream, now covered by tests)
+- #581 — custom `RuleParameter` names not being honored (resolved by `AutoRegisterInputType` in 5.0.1).
+- #590 — exception state from one execution leaking into the next (resolved by #592 in 5.0.3).
+- #606 — lambda parameter on the left side of `=>` reported as unknown identifier (resolved by `System.Linq.Dynamic.Core` 1.4.3 → 1.6.7 bumps).
+- #608 — `UseFastExpressionCompiler = true` NRE on chained scoped-param `Sum()` (resolved by recent `FastExpressionCompiler` upgrades).
+
 ## [5.0.3]
 - Updated dependencies to latest
 - Fixed RulesEngine throwing exception when type name is same as input name
