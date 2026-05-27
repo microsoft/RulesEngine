@@ -69,6 +69,42 @@ namespace RulesEngine.UnitTest.RuleExpressionParserTests
             var result = ruleParser.Evaluate<bool>("d1 < 20", new[] { Models.RuleParameter.Create("d1", d1) });
             Assert.False(result);
         }
+
+        [Fact]
+        public void TestExpressionWithDictionaryParameter()
+        {
+            var parser = new RuleExpressionParser(new ReSettings());
+
+            var payload = new System.Collections.Generic.Dictionary<string, object>
+            {
+                { "Formule", "Essentielle" }
+            };
+
+            var ruleParameters = new[] { RuleParameter.Create("_", payload) };
+
+            var resultNotEqual = parser.Evaluate<bool>("Formule != \"Essentielle\"", ruleParameters);
+            Assert.False(resultNotEqual);
+
+            var resultEqual = parser.Evaluate<bool>("Formule == \"Essentielle\"", ruleParameters);
+            Assert.True(resultEqual);
+        }
+
+        [Fact]
+        public void TestExpressionWithDictionaryParameter_MultipleKeys()
+        {
+            var parser = new RuleExpressionParser(new ReSettings());
+
+            var payload = new System.Collections.Generic.Dictionary<string, object>
+            {
+                { "Name", "John" },
+                { "Age", 30 }
+            };
+
+            var ruleParameters = new[] { RuleParameter.Create("input", payload) };
+
+            var result = parser.Evaluate<bool>("Name == \"John\" && Age == 30", ruleParameters);
+            Assert.True(result);
+        }
     }
 
     

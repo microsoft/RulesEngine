@@ -103,6 +103,120 @@ namespace RulesEngine.UnitTest
 
         }
 
+        [Fact]
+        public void GetTypedObject_Dictionary_ReturnsTypedObject()
+        {
+            var dict = new Dictionary<string, object>
+            {
+                { "Name", "Alice" },
+                { "Age", 25 }
+            };
+
+            var result = Utils.GetTypedObject(dict);
+            Assert.IsNotType<Dictionary<string, object>>(result);
+            Assert.NotNull(result.GetType().GetProperty("Name"));
+            Assert.NotNull(result.GetType().GetProperty("Age"));
+        }
+
+        [Fact]
+        public void GetTypedObject_Dictionary_NestedDictionary()
+        {
+            var dict = new Dictionary<string, object>
+            {
+                { "Name", "Alice" },
+                { "Address", new Dictionary<string, object>
+                    {
+                        { "City", "Seattle" },
+                        { "Zip", "98101" }
+                    }
+                }
+            };
+
+            var result = Utils.GetTypedObject(dict);
+            Assert.IsNotType<Dictionary<string, object>>(result);
+            var addressProp = result.GetType().GetProperty("Address");
+            Assert.NotNull(addressProp);
+            var address = addressProp.GetValue(result);
+            Assert.NotNull(address.GetType().GetProperty("City"));
+            Assert.NotNull(address.GetType().GetProperty("Zip"));
+        }
+
+        [Fact]
+        public void GetTypedObject_Dictionary_WithList()
+        {
+            var dict = new Dictionary<string, object>
+            {
+                { "Name", "Alice" },
+                { "Scores", new List<object> { 90, 85, 92 } }
+            };
+
+            var result = Utils.GetTypedObject(dict);
+            Assert.IsNotType<Dictionary<string, object>>(result);
+            Assert.NotNull(result.GetType().GetProperty("Name"));
+            Assert.NotNull(result.GetType().GetProperty("Scores"));
+        }
+
+        [Fact]
+        public void GetTypedObject_Dictionary_WithEmptyList()
+        {
+            var dict = new Dictionary<string, object>
+            {
+                { "Items", new List<object>() }
+            };
+
+            var result = Utils.GetTypedObject(dict);
+            Assert.IsNotType<Dictionary<string, object>>(result);
+            Assert.NotNull(result.GetType().GetProperty("Items"));
+        }
+
+        [Fact]
+        public void GetTypedObject_Dictionary_WithNestedExpandoObject()
+        {
+            dynamic nested = new ExpandoObject();
+            nested.Value = "test";
+
+            var dict = new Dictionary<string, object>
+            {
+                { "Nested", (object)nested }
+            };
+
+            var result = Utils.GetTypedObject(dict);
+            Assert.IsNotType<Dictionary<string, object>>(result);
+            var nestedProp = result.GetType().GetProperty("Nested");
+            Assert.NotNull(nestedProp);
+        }
+
+        [Fact]
+        public void GetTypedObject_Dictionary_WithListOfDictionaries()
+        {
+            var dict = new Dictionary<string, object>
+            {
+                { "People", new List<object>
+                    {
+                        new Dictionary<string, object> { { "Name", "Alice" } },
+                        new Dictionary<string, object> { { "Name", "Bob" } }
+                    }
+                }
+            };
+
+            var result = Utils.GetTypedObject(dict);
+            Assert.IsNotType<Dictionary<string, object>>(result);
+            Assert.NotNull(result.GetType().GetProperty("People"));
+        }
+
+        [Fact]
+        public void GetTypedObject_Dictionary_WithNullValue()
+        {
+            var dict = new Dictionary<string, object>
+            {
+                { "Name", "Alice" },
+                { "Middle", null }
+            };
+
+            var result = Utils.GetTypedObject(dict);
+            Assert.IsNotType<Dictionary<string, object>>(result);
+            Assert.NotNull(result.GetType().GetProperty("Name"));
+        }
 
     }
 }
