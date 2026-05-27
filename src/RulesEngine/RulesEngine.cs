@@ -132,6 +132,9 @@ namespace RulesEngine
             var compiledRule = CompileRule(workflowName, ruleName, ruleParameters);
             var extendedRuleParameters = EvaluateGlobalsAdHoc(workflowName, ruleParameters);
             var resultTree = compiledRule(extendedRuleParameters);
+            // Mirror ExecuteAllRulesAsync's behavior: format the per-rule ErrorMessage template
+            // into ExceptionMessage before any action runs / before returning. See #519.
+            FormatErrorMessages(new[] { resultTree });
             var actionResult = await ExecuteActionForRuleResult(resultTree, true);
             ThrowIfActionExceptionShouldPropagate(actionResult, resultTree);
             return actionResult;
@@ -541,9 +544,7 @@ namespace RulesEngine
                             var property = paramVal?.Substring(2, paramVal.Length - 3);
                             if (property?.Split('.')?.Count() > 1)
                             {
-                                var typeName = property?.Split('.')?[0];
-                                var propertyName = property?.Split('.')?[1];
-                                errorMessage = UpdateErrorMessage(errorMessage, inputs, property, typeName, propertyName);
+                                errorMessage = UpdateErrorMessage(errorMessage, inputs, property);
                             }
                             else
                             {
@@ -562,28 +563,38 @@ namespace RulesEngine
         }
 
         /// <summary>
-        /// Updates the error message.
+        /// Resolves a dotted-path placeholder like $(input1.Inner.Name) against the rule inputs,
+        /// walking arbitrary depth. See #696.
         /// </summary>
-        /// <param name="errorMessage">The error message.</param>
-        /// <param name="evaluatedParams">The evaluated parameters.</param>
-        /// <param name="property">The property.</param>
-        /// <param name="typeName">Name of the type.</param>
-        /// <param name="propertyName">Name of the property.</param>
-        /// <returns>Updated error message.</returns>
-        private static string UpdateErrorMessage(string errorMessage, IDictionary<string, object> inputs, string property, string typeName, string propertyName)
+        private static string UpdateErrorMessage(string errorMessage, IDictionary<string, object> inputs, string property)
         {
-            var arrParams = inputs?.Select(c => new { Name = c.Key, c.Value });
-            var model = arrParams?.Where(a => string.Equals(a.Name, typeName))?.FirstOrDefault();
-            if (model != null)
+            var segments = property.Split('.');
+            var typeName = segments[0];
+            var model = inputs?.FirstOrDefault(c => string.Equals(c.Key, typeName));
+            if (model?.Value == null)
             {
-                var modelJson = JsonSerializer.Serialize(model?.Value);
-                var jObj = JsonObject.Parse(modelJson).AsObject();
-                JsonNode jToken = null;
-                var val = jObj?.TryGetPropertyValue(propertyName, out jToken);
-                errorMessage = errorMessage.Replace($"$({property})", jToken != null ? jToken?.ToString() : $"({property})");
+                return errorMessage;
             }
 
-            return errorMessage;
+            var modelJson = JsonSerializer.Serialize(model.Value.Value);
+            JsonNode current = JsonNode.Parse(modelJson);
+            for (var i = 1; i < segments.Length && current != null; i++)
+            {
+                current = current is JsonObject jObj && jObj.TryGetPropertyValue(segments[i], out var next)
+                    ? next
+                    : null;
+            }
+
+            if (current == null)
+            {
+                return errorMessage;
+            }
+
+            // JsonValue (leaf scalar) should render without quotes; objects/arrays render as JSON.
+            var replacement = current is JsonValue v && v.TryGetValue<string>(out var stringValue)
+                ? stringValue
+                : current.ToString();
+            return errorMessage.Replace($"$({property})", replacement);
         }
         #endregion
     }

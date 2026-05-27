@@ -17,22 +17,31 @@ namespace RulesEngine.Actions
         public ActionContext(IDictionary<string, object> context, RuleResultTree parentResult)
         {
             _context = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var kv in context)
+            if (context != null)
             {
-                string key = kv.Key;
-                string value;
-                switch (kv.Value.GetType().Name)
+                foreach (var kv in context)
                 {
-                    case "String":
-                    case "JsonElement":
-                        value =  kv.Value.ToString();
-                        break;
-                    default:
-                        value = JsonSerializer.Serialize(kv.Value);
-                        break;
-
+                    string key = kv.Key;
+                    string value;
+                    if (kv.Value == null)
+                    {
+                        value = null;
+                    }
+                    else
+                    {
+                        switch (kv.Value.GetType().Name)
+                        {
+                            case "String":
+                            case "JsonElement":
+                                value = kv.Value.ToString();
+                                break;
+                            default:
+                                value = JsonSerializer.Serialize(kv.Value);
+                                break;
+                        }
+                    }
+                    _context.Add(key, value);
                 }
-                _context.Add(key, value);
             }
             _parentResult = parentResult;
         }
