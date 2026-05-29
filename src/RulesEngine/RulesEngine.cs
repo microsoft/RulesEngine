@@ -129,8 +129,26 @@ namespace RulesEngine
 
         public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters)
         {
-            var compiledRule = CompileRule(workflowName, ruleName, ruleParameters);
-            var extendedRuleParameters = EvaluateGlobalsAdHoc(workflowName, ruleParameters);
+            // Sort to match the cache-key convention used by ExecuteAllRulesAsync.
+            var sortedRuleParams = ruleParameters.ToList();
+            sortedRuleParams.Sort((a, b) => string.Compare(a.Name, b.Name));
+            var sortedArr = sortedRuleParams.ToArray();
+
+            // Compile the whole workflow once and reuse — was previously recompiled every call,
+            // which was the hot path the reporter of #471 saw.
+            if (!RegisterRule(workflowName, sortedArr))
+            {
+                throw new ArgumentException($"Rule config file is not present for the {workflowName} workflow");
+            }
+
+            var compiledRulesCacheKey = GetCompiledRulesKey(workflowName, sortedArr);
+            var compiledRules = _rulesCache.GetCompiledRules(compiledRulesCacheKey);
+            if (compiledRules == null || !compiledRules.TryGetValue(ruleName, out var compiledRule))
+            {
+                throw new ArgumentException($"Workflow `{workflowName}` does not contain any rule named `{ruleName}`");
+            }
+
+            var extendedRuleParameters = ApplyGlobalParams(compiledRulesCacheKey, sortedArr);
             var resultTree = compiledRule(extendedRuleParameters);
             // Mirror ExecuteAllRulesAsync's behavior: format the per-rule ErrorMessage template
             // into ExceptionMessage before any action runs / before returning. See #519.
@@ -138,33 +156,6 @@ namespace RulesEngine
             var actionResult = await ExecuteActionForRuleResult(resultTree, true);
             ThrowIfActionExceptionShouldPropagate(actionResult, resultTree);
             return actionResult;
-        }
-
-        private RuleParameter[] EvaluateGlobalsAdHoc(string workflowName, RuleParameter[] ruleParameters)
-        {
-            var workflow = _rulesCache.GetWorkflow(workflowName);
-            if (workflow?.GlobalParams == null || !workflow.GlobalParams.Any())
-            {
-                return ruleParameters;
-            }
-            var globalParamsDelegate = CompileGlobalParamsDelegate(workflow, ruleParameters);
-            return AppendGlobals(ruleParameters, globalParamsDelegate);
-        }
-
-        // Compiles a single delegate that evaluates all of a workflow's GlobalParams.
-        // Returns null if the workflow declares no globals.
-        private Func<object[], Dictionary<string, object>> CompileGlobalParamsDelegate(Workflow workflow, RuleParameter[] ruleParameters)
-        {
-            if (workflow?.GlobalParams == null || !workflow.GlobalParams.Any())
-            {
-                return null;
-            }
-            var globalParamValues = _ruleCompiler.GetRuleExpressionParameters(workflow.RuleExpressionType, workflow.GlobalParams, ruleParameters);
-            if (globalParamValues.Length == 0)
-            {
-                return null;
-            }
-            return _ruleCompiler.CompileScopedParams(workflow.RuleExpressionType, ruleParameters, globalParamValues);
         }
 
         // Invokes the supplied globals delegate (if any) and appends the results as RuleParameters.
@@ -403,24 +394,6 @@ namespace RulesEngine
             }
         }
 
-
-        private RuleFunc<RuleResultTree> CompileRule(string workflowName, string ruleName, RuleParameter[] ruleParameters)
-        {
-            var workflow = _rulesCache.GetWorkflow(workflowName);
-            if(workflow == null)
-            {
-                throw new ArgumentException($"Workflow `{workflowName}` is not found");
-            }
-            var currentRule = workflow.Rules?.SingleOrDefault(c => c.RuleName == ruleName && c.Enabled);
-            if (currentRule == null)
-            {
-                throw new ArgumentException($"Workflow `{workflowName}` does not contain any rule named `{ruleName}`");
-            }
-            var globalParamExp = new Lazy<RuleExpressionParameter[]>(
-                  () => _ruleCompiler.GetRuleExpressionParameters(workflow.RuleExpressionType, workflow.GlobalParams, ruleParameters)
-              );
-            return CompileRule(currentRule,workflow.RuleExpressionType, ruleParameters, globalParamExp);
-        }
 
         private RuleFunc<RuleResultTree> CompileRule(Rule rule, RuleExpressionType ruleExpressionType, RuleParameter[] ruleParams, Lazy<RuleExpressionParameter[]> scopedParams)
         {
