@@ -7,7 +7,7 @@ param(
 
 # sign and build the project
 $directory = Split-Path $csprojFilePath;
-$signKeyFile = Join-Path $directory "signKey.snk";
+$signKeyFile = [System.IO.Path]::GetFullPath((Join-Path $directory "signKey.snk"))
 
 $bytes = [Convert]::FromBase64String($signingKey)
 [IO.File]::WriteAllBytes($signKeyFile, $bytes)
