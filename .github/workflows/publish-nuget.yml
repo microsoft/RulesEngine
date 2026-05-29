@@ -1,0 +1,74 @@
+name: publish-nuget
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      skip_duplicate:
+        description: 'Skip if package version already exists on nuget.org'
+        required: false
+        default: 'true'
+        type: boolean
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            6.0.x
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore src/RulesEngine/RulesEngine.csproj
+
+      - name: Build signed
+        shell: pwsh
+        env:
+          NUGET_SIGNING_KEY: ${{ secrets.NUGET_SIGNING_KEY }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:NUGET_SIGNING_KEY)) {
+            throw "Missing NUGET_SIGNING_KEY secret. The checked-in signing/RulesEngine-publicKey.snk does not include a private key."
+          }
+
+          ./deployment/build-signed.ps1 `
+            -csprojFilePath src/RulesEngine/RulesEngine.csproj `
+            -signingKey $env:NUGET_SIGNING_KEY
+
+      - name: Pack
+        run: >
+          dotnet pack src/RulesEngine/RulesEngine.csproj
+          --no-build
+          --configuration Release
+          -p:ContinuousIntegrationBuild=true
+          --output ./artifacts
+
+      - name: Push packages to nuget.org
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push "./artifacts/*.nupkg" \
+            --api-key "$NUGET_API_KEY" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+          # Push symbol packages if present
+          if ls ./artifacts/*.snupkg 1>/dev/null 2>&1; then
+            dotnet nuget push "./artifacts/*.snupkg" \
+              --api-key "$NUGET_API_KEY" \
+              --source https://api.nuget.org/v3/index.json \
+              --skip-duplicate
+          fi

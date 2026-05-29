@@ -123,14 +123,75 @@ namespace RulesEngine
                     Output = actionResult.Output,
                     Exception = actionResult.Exception
                 };
+                ThrowIfActionExceptionShouldPropagate(actionResult, ruleResult);
             }
         }
 
         public async ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters)
         {
             var compiledRule = CompileRule(workflowName, ruleName, ruleParameters);
-            var resultTree = compiledRule(ruleParameters);
-            return await ExecuteActionForRuleResult(resultTree, true);
+            var extendedRuleParameters = EvaluateGlobalsAdHoc(workflowName, ruleParameters);
+            var resultTree = compiledRule(extendedRuleParameters);
+            // Mirror ExecuteAllRulesAsync's behavior: format the per-rule ErrorMessage template
+            // into ExceptionMessage before any action runs / before returning. See #519.
+            FormatErrorMessages(new[] { resultTree });
+            var actionResult = await ExecuteActionForRuleResult(resultTree, true);
+            ThrowIfActionExceptionShouldPropagate(actionResult, resultTree);
+            return actionResult;
+        }
+
+        private RuleParameter[] EvaluateGlobalsAdHoc(string workflowName, RuleParameter[] ruleParameters)
+        {
+            var workflow = _rulesCache.GetWorkflow(workflowName);
+            if (workflow?.GlobalParams == null || !workflow.GlobalParams.Any())
+            {
+                return ruleParameters;
+            }
+            var globalParamsDelegate = CompileGlobalParamsDelegate(workflow, ruleParameters);
+            return AppendGlobals(ruleParameters, globalParamsDelegate);
+        }
+
+        // Compiles a single delegate that evaluates all of a workflow's GlobalParams.
+        // Returns null if the workflow declares no globals.
+        private Func<object[], Dictionary<string, object>> CompileGlobalParamsDelegate(Workflow workflow, RuleParameter[] ruleParameters)
+        {
+            if (workflow?.GlobalParams == null || !workflow.GlobalParams.Any())
+            {
+                return null;
+            }
+            var globalParamValues = _ruleCompiler.GetRuleExpressionParameters(workflow.RuleExpressionType, workflow.GlobalParams, ruleParameters);
+            if (globalParamValues.Length == 0)
+            {
+                return null;
+            }
+            return _ruleCompiler.CompileScopedParams(workflow.RuleExpressionType, ruleParameters, globalParamValues);
+        }
+
+        // Invokes the supplied globals delegate (if any) and appends the results as RuleParameters.
+        private static RuleParameter[] AppendGlobals(RuleParameter[] ruleParameters, Func<object[], Dictionary<string, object>> globalParamsDelegate)
+        {
+            if (globalParamsDelegate == null)
+            {
+                return ruleParameters;
+            }
+            var inputs = ruleParameters.Select(c => c.Value).ToArray();
+            var evaluated = globalParamsDelegate(inputs);
+            var globals = evaluated.Select(kv => new RuleParameter(kv.Key, kv.Value));
+            return ruleParameters.Concat(globals).ToArray();
+        }
+
+        private void ThrowIfActionExceptionShouldPropagate(ActionRuleResult actionResult, RuleResultTree resultTree)
+        {
+            if (actionResult?.Exception == null)
+            {
+                return;
+            }
+            if (_reSettings.IgnoreException || _reSettings.EnableExceptionAsErrorMessage)
+            {
+                return;
+            }
+            actionResult.Exception.Data[nameof(Rule.RuleName)] = resultTree?.Rule?.RuleName;
+            throw actionResult.Exception;
         }
 
         private async ValueTask<ActionRuleResult> ExecuteActionForRuleResult(RuleResultTree resultTree, bool includeRuleResults = false)
@@ -300,11 +361,33 @@ namespace RulesEngine
                     _reSettings.CustomTypes = collector.ToArray();
                 }
 
-                // add separate compilation for global params
+                // Compile global params ONCE per workflow registration. The resulting delegate is
+                // invoked once per ExecuteAllRulesAsync call (in ExecuteAllRuleByWorkflow) and its
+                // results passed as extra RuleParameters to each rule. See #714.
+                RuleExpressionParameter[] globalParamValues;
+                try
+                {
+                    globalParamValues = _ruleCompiler.GetRuleExpressionParameters(workflow.RuleExpressionType, workflow.GlobalParams, ruleParams);
+                }
+                catch (Exception ex)
+                {
+                    // Mirror the legacy per-rule error reporting when global-param compilation fails.
+                    foreach (var rule in workflow.Rules.Where(c => c.Enabled))
+                    {
+                        var msg = $"Error while compiling rule `{rule.RuleName}`: {ex.Message}";
+                        dictFunc.Add(rule.RuleName, Helpers.ToRuleExceptionResult(_reSettings, rule, new RuleException(msg, ex)));
+                    }
+                    _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, dictFunc);
+                    return true;
+                }
 
-                var globalParamExp = new Lazy<RuleExpressionParameter[]>(
-                    () => _ruleCompiler.GetRuleExpressionParameters(workflow.RuleExpressionType, workflow.GlobalParams, ruleParams)
-                );
+                var globalParamExp = new Lazy<RuleExpressionParameter[]>(() => globalParamValues);
+
+                if (globalParamValues.Length > 0)
+                {
+                    var globalParamsDelegate = _ruleCompiler.CompileScopedParams(workflow.RuleExpressionType, ruleParams, globalParamValues);
+                    _rulesCache.AddOrUpdateGlobalParamsDelegate(compileRulesKey, globalParamsDelegate);
+                }
 
                 foreach (var rule in workflow.Rules.Where(c => c.Enabled))
                 {
@@ -378,14 +461,49 @@ namespace RulesEngine
         {
             var result = new List<RuleResultTree>();
             var compiledRulesCacheKey = GetCompiledRulesKey(workflowName, ruleParameters);
-            foreach (var compiledRule in _rulesCache.GetCompiledRules(compiledRulesCacheKey)?.Values)
+            var compiledRules = _rulesCache.GetCompiledRules(compiledRulesCacheKey);
+
+            RuleParameter[] extendedRuleParameters;
+            Exception globalEvaluationException = null;
+            try
             {
-                var resultTree = compiledRule(ruleParameters);
+                extendedRuleParameters = ApplyGlobalParams(compiledRulesCacheKey, ruleParameters);
+            }
+            catch (Exception ex)
+            {
+                globalEvaluationException = ex;
+                extendedRuleParameters = ruleParameters;
+            }
+
+            var ruleByName = new Dictionary<string, Rule>();
+            foreach (var rule in _rulesCache.GetWorkflow(workflowName)?.Rules?.Where(c => c.Enabled) ?? Enumerable.Empty<Rule>())
+            {
+                ruleByName[rule.RuleName] = rule;
+            }
+
+            foreach (var compiledRule in compiledRules)
+            {
+                RuleResultTree resultTree;
+                if (globalEvaluationException != null && ruleByName != null && ruleByName.TryGetValue(compiledRule.Key, out var rule))
+                {
+                    var msg = $"Error while executing scoped params for rule `{rule.RuleName}` - {globalEvaluationException.Message}";
+                    var errFn = Helpers.ToRuleExceptionResult(_reSettings, rule, new RuleException(msg, globalEvaluationException));
+                    resultTree = errFn(ruleParameters);
+                }
+                else
+                {
+                    resultTree = compiledRule.Value(extendedRuleParameters);
+                }
                 result.Add(resultTree);
             }
 
             FormatErrorMessages(result);
             return result;
+        }
+
+        private RuleParameter[] ApplyGlobalParams(string compiledRulesCacheKey, RuleParameter[] ruleParameters)
+        {
+            return AppendGlobals(ruleParameters, _rulesCache.GetGlobalParamsDelegate(compiledRulesCacheKey));
         }
 
         private string GetCompiledRulesKey(string workflowName, RuleParameter[] ruleParams)
@@ -426,9 +544,7 @@ namespace RulesEngine
                             var property = paramVal?.Substring(2, paramVal.Length - 3);
                             if (property?.Split('.')?.Count() > 1)
                             {
-                                var typeName = property?.Split('.')?[0];
-                                var propertyName = property?.Split('.')?[1];
-                                errorMessage = UpdateErrorMessage(errorMessage, inputs, property, typeName, propertyName);
+                                errorMessage = UpdateErrorMessage(errorMessage, inputs, property);
                             }
                             else
                             {
@@ -447,28 +563,38 @@ namespace RulesEngine
         }
 
         /// <summary>
-        /// Updates the error message.
+        /// Resolves a dotted-path placeholder like $(input1.Inner.Name) against the rule inputs,
+        /// walking arbitrary depth. See #696.
         /// </summary>
-        /// <param name="errorMessage">The error message.</param>
-        /// <param name="evaluatedParams">The evaluated parameters.</param>
-        /// <param name="property">The property.</param>
-        /// <param name="typeName">Name of the type.</param>
-        /// <param name="propertyName">Name of the property.</param>
-        /// <returns>Updated error message.</returns>
-        private static string UpdateErrorMessage(string errorMessage, IDictionary<string, object> inputs, string property, string typeName, string propertyName)
+        private static string UpdateErrorMessage(string errorMessage, IDictionary<string, object> inputs, string property)
         {
-            var arrParams = inputs?.Select(c => new { Name = c.Key, c.Value });
-            var model = arrParams?.Where(a => string.Equals(a.Name, typeName))?.FirstOrDefault();
-            if (model != null)
+            var segments = property.Split('.');
+            var typeName = segments[0];
+            var model = inputs?.FirstOrDefault(c => string.Equals(c.Key, typeName));
+            if (model?.Value == null)
             {
-                var modelJson = JsonSerializer.Serialize(model?.Value);
-                var jObj = JsonObject.Parse(modelJson).AsObject();
-                JsonNode jToken = null;
-                var val = jObj?.TryGetPropertyValue(propertyName, out jToken);
-                errorMessage = errorMessage.Replace($"$({property})", jToken != null ? jToken?.ToString() : $"({property})");
+                return errorMessage;
             }
 
-            return errorMessage;
+            var modelJson = JsonSerializer.Serialize(model.Value.Value);
+            JsonNode current = JsonNode.Parse(modelJson);
+            for (var i = 1; i < segments.Length && current != null; i++)
+            {
+                current = current is JsonObject jObj && jObj.TryGetPropertyValue(segments[i], out var next)
+                    ? next
+                    : null;
+            }
+
+            if (current == null)
+            {
+                return errorMessage;
+            }
+
+            // JsonValue (leaf scalar) should render without quotes; objects/arrays render as JSON.
+            var replacement = current is JsonValue v && v.TryGetValue<string>(out var stringValue)
+                ? stringValue
+                : current.ToString();
+            return errorMessage.Replace($"$({property})", replacement);
         }
         #endregion
     }

@@ -34,11 +34,24 @@ namespace RulesEngine.ExpressionBuilders
             {
                 Helpers.HandleRuleException(ex,rule,_reSettings);
 
-                var exceptionMessage = Helpers.GetExceptionMessage($"Exception while parsing expression `{rule?.Expression}` - {ex.Message}",
+                var detail = ex.Message;
+                if (detail != null
+                    && (detail.Contains("exists in type 'Object'")
+                        || detail.Contains("'System.Object'"))
+                    && (rule?.Expression?.Contains('(') == true))
+                {
+                    // Dynamic.Core can only resolve members and operators against a static return type.
+                    // If a custom/static method's declared return type is `object`, member access or
+                    // operator usage on its result fails. See #717.
+                    detail += " (Hint: a method called in this expression appears to have an `object` return type. " +
+                              "Change its return type to the concrete class — Dynamic.Core cannot resolve members or operators on `object`.)";
+                }
+
+                var exceptionMessage = Helpers.GetExceptionMessage($"Exception while parsing expression `{rule?.Expression}` - {detail}",
                                                                     _reSettings);
 
                 bool func(object[] param) => false;
-                
+
                 return Helpers.ToResultTree(_reSettings, rule, null,func, exceptionMessage);
             }
         }
