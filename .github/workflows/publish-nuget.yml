@@ -20,12 +20,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: |
             6.0.x
@@ -37,12 +37,17 @@ jobs:
         run: dotnet restore src/RulesEngine/RulesEngine.csproj
 
       - name: Build signed
-        run: >
-          dotnet build src/RulesEngine/RulesEngine.csproj
-          --configuration Release
-          -p:ContinuousIntegrationBuild=true
-          -p:DelaySign=false
-          -p:AssemblyOriginatorKeyFile=../../signing/RulesEngine-publicKey.snk
+        shell: pwsh
+        env:
+          NUGET_SIGNING_KEY: ${{ secrets.NUGET_SIGNING_KEY }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:NUGET_SIGNING_KEY)) {
+            throw "Missing NUGET_SIGNING_KEY secret. The checked-in signing/RulesEngine-publicKey.snk does not include a private key."
+          }
+
+          ./deployment/build-signed.ps1 `
+            -csprojFilePath src/RulesEngine/RulesEngine.csproj `
+            -signingKey $env:NUGET_SIGNING_KEY
 
       - name: Pack
         run: >
