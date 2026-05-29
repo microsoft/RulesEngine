@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RulesEngine
@@ -103,20 +104,38 @@ namespace RulesEngine
         /// <returns>List of rule results</returns>
         public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params RuleParameter[] ruleParams)
         {
+            return await ExecuteAllRulesAsync(workflowName, ruleParams, default);
+        }
+
+        /// <summary>
+        /// This will execute all the rules of the specified workflow with cooperative cancellation.
+        /// </summary>
+        /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
+        /// <param name="ruleParams">The rule parameters</param>
+        /// <param name="cancellationToken">Token observed between rules and before each action. A single
+        /// rule's compiled expression is not interrupted mid-evaluation; cancellation is cooperative at
+        /// rule and action boundaries.</param>
+        /// <returns>List of rule results</returns>
+        public async ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, RuleParameter[] ruleParams, CancellationToken cancellationToken)
+        {
             var sortedRuleParams = ruleParams.ToList();
             sortedRuleParams.Sort((RuleParameter a, RuleParameter b) => string.Compare(a.Name, b.Name));
-            var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, sortedRuleParams.ToArray());
-            await ExecuteActionAsync(ruleResultList);
+            var ruleResultList = ValidateWorkflowAndExecuteRule(workflowName, sortedRuleParams.ToArray(), cancellationToken);
+            if (_reSettings.AutoExecuteActions)
+            {
+                await ExecuteActionAsync(ruleResultList, cancellationToken);
+            }
             return ruleResultList;
         }
 
-        private async ValueTask ExecuteActionAsync(IEnumerable<RuleResultTree> ruleResultList)
+        private async ValueTask ExecuteActionAsync(IEnumerable<RuleResultTree> ruleResultList, CancellationToken cancellationToken = default)
         {
             foreach (var ruleResult in ruleResultList)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 if(ruleResult.ChildResults !=  null)
                 {
-                    await ExecuteActionAsync(ruleResult.ChildResults);
+                    await ExecuteActionAsync(ruleResult.ChildResults, cancellationToken);
                 }
                 var actionResult = await ExecuteActionForRuleResult(ruleResult, false);
                 ruleResult.ActionResult = new ActionResult {
@@ -304,13 +323,13 @@ namespace RulesEngine
         /// <param name="input">input</param>
         /// <param name="workflowName">workflow name</param>
         /// <returns>list of rule result set</returns>
-        private List<RuleResultTree> ValidateWorkflowAndExecuteRule(string workflowName, RuleParameter[] ruleParams)
+        private List<RuleResultTree> ValidateWorkflowAndExecuteRule(string workflowName, RuleParameter[] ruleParams, CancellationToken cancellationToken = default)
         {
             List<RuleResultTree> result;
 
             if (RegisterRule(workflowName, ruleParams))
             {
-                result = ExecuteAllRuleByWorkflow(workflowName, ruleParams);
+                result = ExecuteAllRuleByWorkflow(workflowName, ruleParams, cancellationToken);
             }
             else
             {
@@ -430,7 +449,7 @@ namespace RulesEngine
         /// <param name="workflowName"></param>
         /// <param name="ruleParams"></param>
         /// <returns>list of rule result set</returns>
-        private List<RuleResultTree> ExecuteAllRuleByWorkflow(string workflowName, RuleParameter[] ruleParameters)
+        private List<RuleResultTree> ExecuteAllRuleByWorkflow(string workflowName, RuleParameter[] ruleParameters, CancellationToken cancellationToken = default)
         {
             var result = new List<RuleResultTree>();
             var compiledRulesCacheKey = GetCompiledRulesKey(workflowName, ruleParameters);
@@ -456,6 +475,7 @@ namespace RulesEngine
 
             foreach (var compiledRule in compiledRules)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 RuleResultTree resultTree;
                 if (globalEvaluationException != null && ruleByName != null && ruleByName.TryGetValue(compiledRule.Key, out var rule))
                 {
