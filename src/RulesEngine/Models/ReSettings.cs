@@ -29,6 +29,7 @@ namespace RulesEngine.Models
             AutoRegisterInputType = reSettings.AutoRegisterInputType;
             UseFastExpressionCompiler = reSettings.UseFastExpressionCompiler;
             EnableExceptionAsErrorMessageForRuleExpressionParsing = reSettings.EnableExceptionAsErrorMessageForRuleExpressionParsing;
+            AutoExecuteActions = reSettings.AutoExecuteActions;
         }
 
 
@@ -90,6 +91,13 @@ namespace RulesEngine.Models
         /// Default: true
         /// </summary>
         public bool EnableExceptionAsErrorMessageForRuleExpressionParsing { get; set; } = true;
+
+        /// <summary>
+        /// When true (default), ExecuteAllRulesAsync automatically runs each matched rule's
+        /// OnSuccess/OnFailure action after evaluation. Set to false to evaluate rules only and
+        /// run actions yourself (e.g. via ExecuteActionWorkflowAsync) for selective control. See #596.
+        /// </summary>
+        public bool AutoExecuteActions { get; set; } = true;
     }
 
     public enum NestedRuleExecutionMode
