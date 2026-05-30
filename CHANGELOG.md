@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 - New `ReSettings.AutoExecuteActions` (default `true`). Set to `false` to evaluate rules without automatically running their OnSuccess/OnFailure actions, so callers can run actions selectively via `ExecuteActionWorkflowAsync` (#596).
 - Documented and tested passing computed `additionalInputs` into the `EvaluateRule` action — the additionalInput `Name` is referenced directly in the target rule's expression (#573).
 
+### Fixes
+- `Utils.CreateAbstractClassType` / `CreateObject` now unwrap `System.Text.Json.JsonElement` scalar values to their native CLR types (string / int / long / double / bool / null) when building typed objects from `ExpandoObject` inputs. This restores the pre-System.Text.Json behavior for rule expressions like `input1.country == "india"` that previously failed with "binary operator Equal is not defined for the types 'JsonElement' and 'String'" (#668).
+
+### Docs
+- Removed the obsolete `ErrorType` field from JSON examples in `README.md`, `docs/Getting-Started.md`, and `docs/index.md`. `ErrorType` was removed from the `Rule` model in 4.0.0 (#676).
+
+### Regression guards added (already correct on master, now covered by tests)
+- #692 — Nullable `DateTime` comparisons against `null` (`null < someDate` / `null > someDate`) return `false`, matching standard C# `Nullable<T>` semantics. Test documents the recommended `HasValue` workaround for users who want null-aware ordering.
+
 ## [6.0.1-preview.1]
 
 ### Performance

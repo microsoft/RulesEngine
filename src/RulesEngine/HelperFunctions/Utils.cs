@@ -35,10 +35,11 @@ namespace RulesEngine.HelperFunctions
 
             if (input is System.Text.Json.JsonElement jsonElement)
             {
-                if (jsonElement.ValueKind == System.Text.Json.JsonValueKind.Null)
-                {
-                    return typeof(object);
-                }
+                // STJ leaves scalar properties as JsonElement values. Infer the native CLR type
+                // so member comparisons in rule expressions (e.g. `input1.country == "india"`)
+                // work without users seeing "binary operator Equal is not defined for the types
+                // 'JsonElement' and 'String'." See #668.
+                return InferJsonElementClrType(jsonElement);
             }
             else if (input == null)
             {
@@ -66,6 +67,43 @@ namespace RulesEngine.HelperFunctions
 
             var type = DynamicClassFactory.CreateType(props);
             return type;
+        }
+
+        // Maps a JsonElement to the CLR type its scalar value would have once unwrapped.
+        // Objects and arrays keep their JsonElement type — callers using objects/arrays in
+        // expressions are already on a typed-path with Newtonsoft-style models. See #668.
+        private static Type InferJsonElementClrType(System.Text.Json.JsonElement el)
+        {
+            switch (el.ValueKind)
+            {
+                case System.Text.Json.JsonValueKind.String: return typeof(string);
+                case System.Text.Json.JsonValueKind.True:
+                case System.Text.Json.JsonValueKind.False: return typeof(bool);
+                case System.Text.Json.JsonValueKind.Number:
+                    if (el.TryGetInt32(out _)) return typeof(int);
+                    if (el.TryGetInt64(out _)) return typeof(long);
+                    return typeof(double);
+                case System.Text.Json.JsonValueKind.Null:
+                case System.Text.Json.JsonValueKind.Undefined: return typeof(object);
+                default: return typeof(System.Text.Json.JsonElement);
+            }
+        }
+
+        private static object UnwrapJsonElementScalar(System.Text.Json.JsonElement el)
+        {
+            switch (el.ValueKind)
+            {
+                case System.Text.Json.JsonValueKind.String: return el.GetString();
+                case System.Text.Json.JsonValueKind.True: return true;
+                case System.Text.Json.JsonValueKind.False: return false;
+                case System.Text.Json.JsonValueKind.Number:
+                    if (el.TryGetInt32(out var i)) return i;
+                    if (el.TryGetInt64(out var l)) return l;
+                    return el.GetDouble();
+                case System.Text.Json.JsonValueKind.Null:
+                case System.Text.Json.JsonValueKind.Undefined: return null;
+                default: return el;
+            }
         }
 
         // Returns the CLR List<T> type that should represent a heterogeneous IList of ExpandoObject /
@@ -158,11 +196,20 @@ namespace RulesEngine.HelperFunctions
                         };
                         val = newList;
                     }
+                    else if (expando.Value is System.Text.Json.JsonElement je)
+                    {
+                        // Unwrap scalar JsonElement to its native value so the typed property
+                        // receives a string/int/bool/etc. rather than a JsonElement. See #668.
+                        val = UnwrapJsonElementScalar(je);
+                    }
                     else
                     {
                         val = expando.Value;
                     }
-                    propInfo.SetValue(obj, val, null);
+                    if (val != null)
+                    {
+                        propInfo.SetValue(obj, val, null);
+                    }
                 }
             }
 
