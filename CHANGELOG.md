@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [6.0.1-preview.2]
+
 ### Features
 - `IRulesEngine.ExecuteAllRulesAsync` gains an overload accepting a `CancellationToken`, observed cooperatively between rules and before each action. The existing `params object[]` and `params RuleParameter[]` overloads are unchanged; call-site overload resolution continues to pick them when no token is supplied (#609).
 - New `ReSettings.AutoExecuteActions` (default `true`). Set to `false` to evaluate rules without automatically running their OnSuccess/OnFailure actions, so callers can run actions selectively via `ExecuteActionWorkflowAsync` (#596).
