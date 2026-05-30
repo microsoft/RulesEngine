@@ -356,7 +356,6 @@ Define OnSuccess or OnFailure Action for your Rule:
       "RuleName": "GiveDiscount10Percent",
       "SuccessEvent": "10",
       "ErrorMessage": "One or more adjust rules failed.",
-      "ErrorType": "Error",
       "RuleExpressionType": "LambdaExpression",
       "Expression": "input1.couy == \"india\" AND input1.loyalityFactor <= 2 AND input1.totalPurchasesToDate >= 5000 AND input2.totalOrders > 2 AND input2.noOfVisitsPerMonth > 2",
       "Actions": {
@@ -414,7 +413,6 @@ Define OnSuccess or OnFailure Action for your Rule:
       "RuleName": "GiveDiscount10Percent",
       "SuccessEvent": "10",
       "ErrorMessage": "One or more adjust rules failed.",
-      "ErrorType": "Error",
       "RuleExpressionType": "LambdaExpression",
       "Expression": "input1.couy == \"india\" AND input1.loyalityFactor <= 2 AND input1.totalPurchasesToDate >= 5000 AND input2.totalOrders > 2 AND input2.noOfVisitsPerMonth > 2",
       "Actions": {
@@ -515,7 +513,6 @@ Actions can have async code as well
       "RuleName": "GiveDiscount10Percent",
       "SuccessEvent": "10",
       "ErrorMessage": "One or more adjust rules failed.",
-      "ErrorType": "Error",
       "RuleExpressionType": "LambdaExpression",
       "Expression": "input1.couy == \"india\" AND input1.loyalityFactor <= 2 AND input1.totalPurchasesToDate >= 5000 AND input2.totalOrders > 2 AND input2.noOfVisitsPerMonth > 2",
       "Actions": {

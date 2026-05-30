@@ -31,7 +31,6 @@ An example rule:
         "RuleName": "GiveDiscount10",
         "SuccessEvent": "10",
         "ErrorMessage": "One or more adjust rules failed.",
-        "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
         "Expression": "input1.country == \"india\" AND input1.loyaltyFactor <= 2 AND input1.totalPurchasesToDate >= 5000"
       },
@@ -39,7 +38,6 @@ An example rule:
         "RuleName": "GiveDiscount20",
         "SuccessEvent": "20",
         "ErrorMessage": "One or more adjust rules failed.",
-        "ErrorType": "Error",
         "RuleExpressionType": "LambdaExpression",
         "Expression": "input1.country == \"india\" AND input1.loyaltyFactor >= 3 AND input1.totalPurchasesToDate >= 10000"
       }
