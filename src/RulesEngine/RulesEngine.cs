@@ -399,9 +399,33 @@ namespace RulesEngine
                     _rulesCache.AddOrUpdateGlobalParamsDelegate(compileRulesKey, globalParamsDelegate);
                 }
 
-                foreach (var rule in workflow.Rules.Where(c => c.Enabled))
+                var enabledRules = workflow.Rules.Where(c => c.Enabled).ToArray();
+                var compiledFuncs = new RuleFunc<RuleResultTree>[enabledRules.Length];
+                if (_reSettings.EnableParallelRuleCompilation)
                 {
-                    dictFunc.Add(rule.RuleName, CompileRule(rule,workflow.RuleExpressionType, ruleParams, globalParamExp));
+                    try
+                    {
+                        System.Threading.Tasks.Parallel.For(0, enabledRules.Length, i => {
+                            compiledFuncs[i] = CompileRule(enabledRules[i], workflow.RuleExpressionType, ruleParams, globalParamExp);
+                        });
+                    }
+                    catch (AggregateException ae)
+                    {
+                        // Preserve the serial-compilation contract: the first rule that fails
+                        // to compile surfaces its own exception, not an AggregateException.
+                        System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ae.InnerExceptions[0]).Throw();
+                    }
+                }
+                else
+                {
+                    for (var i = 0; i < enabledRules.Length; i++)
+                    {
+                        compiledFuncs[i] = CompileRule(enabledRules[i], workflow.RuleExpressionType, ruleParams, globalParamExp);
+                    }
+                }
+                for (var i = 0; i < enabledRules.Length; i++)
+                {
+                    dictFunc.Add(enabledRules[i].RuleName, compiledFuncs[i]);
                 }
 
                 _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, dictFunc);

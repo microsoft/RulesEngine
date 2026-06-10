@@ -30,6 +30,7 @@ namespace RulesEngine.Models
             UseFastExpressionCompiler = reSettings.UseFastExpressionCompiler;
             EnableExceptionAsErrorMessageForRuleExpressionParsing = reSettings.EnableExceptionAsErrorMessageForRuleExpressionParsing;
             AutoExecuteActions = reSettings.AutoExecuteActions;
+            EnableParallelRuleCompilation = reSettings.EnableParallelRuleCompilation;
         }
 
 
@@ -98,6 +99,13 @@ namespace RulesEngine.Models
         /// run actions yourself (e.g. via ExecuteActionWorkflowAsync) for selective control. See #596.
         /// </summary>
         public bool AutoExecuteActions { get; set; } = true;
+
+        /// <summary>
+        /// When true, rules within a workflow are compiled in parallel during registration.
+        /// Significantly reduces warmup time for workflows with many rules.
+        /// Default: false
+        /// </summary>
+        public bool EnableParallelRuleCompilation { get; set; } = false;
     }
 
     public enum NestedRuleExecutionMode
