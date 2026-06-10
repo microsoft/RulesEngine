@@ -83,12 +83,33 @@ namespace RulesEngine.ExpressionBuilders
             _methodInfo.Add("dict_add", dict_add);
         }
 
+        private ParsingConfig _cachedParsingConfig;
+        private Type[] _cachedParsingConfigCustomTypes;
+
+        private ParsingConfig GetParsingConfig()
+        {
+            // Building a CustomTypeProvider is expensive: System.Linq.Dynamic.Core's
+            // DefaultDynamicLinqCustomTypeProvider scans all AppDomain assemblies for
+            // [DynamicLinqType] and only caches per provider instance. Reuse one config
+            // until ReSettings.CustomTypes is swapped (AutoRegisterInputType does this
+            // on workflow registration).
+            var customTypes = _reSettings.CustomTypes;
+            var config = _cachedParsingConfig;
+            if (config == null || !ReferenceEquals(_cachedParsingConfigCustomTypes, customTypes))
+            {
+                config = new ParsingConfig {
+                    CustomTypeProvider = new CustomTypeProvider(customTypes),
+                    IsCaseSensitive = _reSettings.IsExpressionCaseSensitive
+                };
+                _cachedParsingConfigCustomTypes = customTypes;
+                _cachedParsingConfig = config;
+            }
+            return config;
+        }
+
         public Expression Parse(string expression, ParameterExpression[] parameters, Type returnType)
         {
-            var config = new ParsingConfig {
-                CustomTypeProvider = new CustomTypeProvider(_reSettings.CustomTypes),
-                IsCaseSensitive = _reSettings.IsExpressionCaseSensitive
-            };
+            var config = GetParsingConfig();
 
             // Instead of immediately returning default values, allow for expression parsing to handle dynamic evaluation.
             try
