@@ -21,6 +21,9 @@ namespace RulesEngine.HelperFunctions
         public const string LAMBDA_EXPRESSION_EXPRESSION_NULL_ERRMSG = "Expression cannot be null or empty when RuleExpressionType is LambdaExpression";
         public const string LAMBDA_EXPRESSION_OPERATOR_ERRMSG = "Cannot use Operator field when RuleExpressionType is LambdaExpression";
         public const string LAMBDA_EXPRESSION_RULES_ERRMSG = "Cannot use Rules field when RuleExpressionType is LambdaExpression";
+        public const string DUPLICATE_GLOBAL_PARAM_NAME_ERRMSG = "Duplicate GlobalParam name '{0}'. GlobalParam names must be unique within a workflow.";
+        public const string DUPLICATE_LOCAL_PARAM_NAME_ERRMSG = "Duplicate LocalParam name '{0}'. LocalParam names must be unique within a rule.";
+        public const string GLOBAL_PARAM_INPUT_COLLISION_ERRMSG = "GlobalParam name '{0}' collides with an input RuleParameter of the same name. Rename either the global or the input to disambiguate.";
 
     }
 }
