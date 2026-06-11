@@ -42,11 +42,19 @@ namespace RulesEngine
             _types.Add(typeof(IEnumerable));
         }
 
+        private HashSet<Type> _mergedTypes;
+
         public override HashSet<Type> GetCustomTypes()
         {
-            var all = new HashSet<Type>(base.GetCustomTypes());
-            all.UnionWith(_types);
-            return all;
+            // base.GetCustomTypes() scans every assembly in the AppDomain for [DynamicLinqType].
+            // The provider's type set is fixed after construction, so merge exactly once.
+            if (_mergedTypes == null)
+            {
+                var all = new HashSet<Type>(base.GetCustomTypes());
+                all.UnionWith(_types);
+                _mergedTypes = all;
+            }
+            return _mergedTypes;
         }
     }
 }
