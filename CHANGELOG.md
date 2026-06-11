@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Features
+- New `ReSettings.EnableParallelRuleCompilation` (default `false`). When `true`, workflow rules are compiled in parallel during registration, materially reducing warmup time for workflows with many thousands of rules. Silently falls back to serial compilation when combined with `UseFastExpressionCompiler = true` (which regresses ~3× under contention) or for workflows below an internal scheduling-cost threshold. Builds on the warmup work in #740 (#741).
+
 ## [6.0.1-preview.2]
 
 ### Features
