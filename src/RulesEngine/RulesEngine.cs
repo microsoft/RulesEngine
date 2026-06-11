@@ -190,6 +190,18 @@ namespace RulesEngine
             }
             var inputs = ruleParameters.Select(c => c.Value).ToArray();
             var evaluated = globalParamsDelegate(inputs);
+
+            // Catch input/global name collisions here with a clear error instead of letting
+            // Helpers.ToResultTree's ToDictionary throw the cryptic "key already added" message.
+            var inputNames = new HashSet<string>(ruleParameters.Select(c => c.Name), StringComparer.Ordinal);
+            foreach (var key in evaluated.Keys)
+            {
+                if (inputNames.Contains(key))
+                {
+                    throw new RuleException(string.Format(Constants.GLOBAL_PARAM_INPUT_COLLISION_ERRMSG, key));
+                }
+            }
+
             var globals = evaluated.Select(kv => new RuleParameter(kv.Key, kv.Value));
             return ruleParameters.Concat(globals).ToArray();
         }
