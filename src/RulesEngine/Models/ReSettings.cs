@@ -102,9 +102,18 @@ namespace RulesEngine.Models
 
         /// <summary>
         /// When true, rules within a workflow are compiled in parallel during registration.
-        /// Significantly reduces warmup time for workflows with many rules.
-        /// Default: false
+        /// Significantly reduces warmup time for workflows with many thousands of rules.
         /// </summary>
+        /// <remarks>
+        /// Silently falls back to serial compilation when:
+        /// <list type="bullet">
+        /// <item><see cref="UseFastExpressionCompiler"/> is also <c>true</c> — FastExpressionCompiler
+        /// regresses ~3× under parallel contention, so the engine declines to parallelize that mix.</item>
+        /// <item>The workflow has fewer enabled rules than an internal threshold (32) where
+        /// the dispatch cost outweighs the speedup.</item>
+        /// </list>
+        /// Default: <c>false</c>.
+        /// </remarks>
         public bool EnableParallelRuleCompilation { get; set; } = false;
     }
 

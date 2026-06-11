@@ -35,6 +35,10 @@ namespace RulesEngine
         private readonly RuleCompiler _ruleCompiler;
         private readonly ActionFactory _actionFactory;
         private const string ParamParseRegex = "(\\$\\(.*?\\))";
+
+        // Below this rule count, Parallel.For's scheduling cost exceeds the speedup from
+        // distributing CompileRule across threads. See ReSettings.EnableParallelRuleCompilation.
+        private const int MinRulesForParallelCompilation = 32;
         #endregion
 
         #region Constructor
@@ -401,15 +405,25 @@ namespace RulesEngine
 
                 var enabledRules = workflow.Rules.Where(c => c.Enabled).ToArray();
                 var compiledFuncs = new RuleFunc<RuleResultTree>[enabledRules.Length];
-                if (_reSettings.EnableParallelRuleCompilation)
+
+                // Parallel compilation helps only when:
+                //   - the user opted in,
+                //   - they're not also on UseFastExpressionCompiler (which regresses ~3× under
+                //     parallel contention; FEC's internal locking serializes effort), and
+                //   - there are enough rules to amortize Parallel.For's scheduling cost.
+                var shouldParallelize = _reSettings.EnableParallelRuleCompilation
+                                     && !_reSettings.UseFastExpressionCompiler
+                                     && enabledRules.Length >= MinRulesForParallelCompilation;
+
+                if (shouldParallelize)
                 {
                     try
                     {
-                        System.Threading.Tasks.Parallel.For(0, enabledRules.Length, i => {
+                        Parallel.For(0, enabledRules.Length, i => {
                             compiledFuncs[i] = CompileRule(enabledRules[i], workflow.RuleExpressionType, ruleParams, globalParamExp);
                         });
                     }
-                    catch (AggregateException ae)
+                    catch (AggregateException ae) when (ae.InnerExceptions.Count > 0)
                     {
                         // Preserve the serial-compilation contract: the first rule that fails
                         // to compile surfaces its own exception, not an AggregateException.
