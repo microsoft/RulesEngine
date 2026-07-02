@@ -6,6 +6,14 @@
 [download-image]: https://img.shields.io/nuget/dt/RulesEngine
 [download-url]: https://www.nuget.org/packages/RulesEngine/
 
+### Supported target frameworks
+[![.NET 6](https://img.shields.io/badge/.NET-6.0-512bd4?logo=dotnet&logoColor=white)](#)
+[![.NET 8](https://img.shields.io/badge/.NET-8.0-512bd4?logo=dotnet&logoColor=white)](#)
+[![.NET 9](https://img.shields.io/badge/.NET-9.0-512bd4?logo=dotnet&logoColor=white)](#)
+[![.NET 10](https://img.shields.io/badge/.NET-10.0-512bd4?logo=dotnet&logoColor=white)](#)
+[![.NET Standard 2.0](https://img.shields.io/badge/.NET_Standard-2.0-512bd4?logo=dotnet&logoColor=white)](#)
+[![.NET Standard 2.1](https://img.shields.io/badge/.NET_Standard-2.1-512bd4?logo=dotnet&logoColor=white)](#)
+
 ## Overview
 
 Rules Engine is a library/NuGet package for abstracting business logic/rules/policies out of a system. It provides a simple way of giving you the ability to put your rules in a store outside the core logic of the system, thus ensuring that any change in rules don't affect the core system.
