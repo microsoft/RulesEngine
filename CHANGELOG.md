@@ -4,10 +4,28 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [6.0.1]
+
+Stable release rolling up everything from `6.0.1-preview.1` through `6.0.1-preview.3` — no additional code changes beyond preview.3. See per-preview sections below for the full delta from `6.0.0`.
+
+### Headline changes since 6.0.0
+- **Perf:** Restored the compiled-expression cache in `RuleExpressionParser` — 100×–1900× speedups on paths not served by `RulesCache` (#673, #727).
+- **Perf:** Fixed the warmup regression from per-expression AppDomain assembly scans in `CustomTypeProvider` — ~6.6× faster registration on realistic large workflows (#739, #740).
+- **Feature:** Opt-in `ReSettings.EnableParallelRuleCompilation` for further warmup gains on very large (10k+ rule) workflows (#741, #744).
+- **Feature:** `IRulesEngine.ExecuteAllRulesAsync` overload accepting a `CancellationToken` with cooperative cancellation between rules and before each action (#609).
+- **Feature:** `ReSettings.AutoExecuteActions` (default `true`) — set to `false` to evaluate rules without automatically running their OnSuccess/OnFailure actions (#596).
+- **Fixes:** Cleaner errors for exception propagation (#624), list schema union (#704), OutputExpression syntax hints (#711), global-param dedup (#714), object-return diagnostics (#717), `ExecuteActionWorkflowAsync` error message population (#519), `ActionContext` null guard (#576), deep dotted `ErrorMessage` interpolation (#696), STJ `JsonElement` unwrap for `ExpandoObject` inputs (#668), and clear errors for duplicate param names or input/global collisions (#743).
+
 ## [6.0.1-preview.3]
 
+### Performance
+- Fixed the warmup regression introduced by #675: `CustomTypeProvider.GetCustomTypes()` scanned every AppDomain assembly on every expression parse. Now memoized on the provider, and `RuleExpressionParser` reuses a single `ParsingConfig` until `ReSettings.CustomTypes` swaps. Restores 5.0.3 warmup on the reporter's 20,000-rule benchmark: 113.8s → 16.4s (#739, #740).
+
 ### Features
-- New `ReSettings.EnableParallelRuleCompilation` (default `false`). When `true`, workflow rules are compiled in parallel during registration, materially reducing warmup time for workflows with many thousands of rules. Silently falls back to serial compilation when combined with `UseFastExpressionCompiler = true` (which regresses ~3× under contention) or for workflows below an internal scheduling-cost threshold. Builds on the warmup work in #740 (#741).
+- New `ReSettings.EnableParallelRuleCompilation` (default `false`). When `true`, workflow rules are compiled in parallel during registration, materially reducing warmup time for workflows with many thousands of rules. Silently falls back to serial compilation when combined with `UseFastExpressionCompiler = true` (which regresses ~3× under contention) or for workflows below an internal scheduling-cost threshold (~32). Builds on the warmup work in #740 (#741, #744).
+
+### Fixes
+- `WorkflowsValidator` and `RuleValidator` now surface clear `RuleValidationException` messages when two `GlobalParams` (or two `LocalParams`) share a name, instead of failing later with the cryptic "An item with the same key has already been added" from result-tree construction. `RulesEngine.AppendGlobals` similarly detects when a caller-supplied `RuleParameter.Name` collides with a workflow `GlobalParam.Name` and surfaces the collision via the same per-rule error-surfacing path used elsewhere (#743).
 
 ## [6.0.1-preview.2]
 

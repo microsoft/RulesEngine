@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net6.0;net8.0;net9.0;net10.0;netstandard2.0;netstandard2.1</TargetFrameworks>
     <LangVersion>13.0</LangVersion>
-    <Version>6.0.1-preview.3</Version>
+    <Version>6.0.1</Version>
     <Copyright>Copyright (c) Microsoft Corporation.</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/microsoft/RulesEngine</PackageProjectUrl>
