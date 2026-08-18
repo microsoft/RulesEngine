@@ -10,9 +10,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
       with:
         dotnet-version: |
           6.0.x
@@ -38,7 +38,7 @@ jobs:
       run: ./scripts/check-coverage.ps1 -reportPath coveragereport/Cobertura.xml -threshold 94
     
     - name: Coveralls GitHub Action
-      uses: coverallsapp/github-action@v2.3.6
+      uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
       if: ${{ github.event_name == 'push' }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
