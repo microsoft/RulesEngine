@@ -378,13 +378,21 @@ namespace RulesEngine
                 if (_reSettings.AutoRegisterInputType)
                 {
                     var collector = new HashSet<Type>(_reSettings.CustomTypes.Safe());
+                    var originalCount = collector.Count;
 
                     foreach (var rp in ruleParams)
                     {
                         CollectAllElementTypes(rp.Type, collector);
                     }
 
-                    _reSettings.CustomTypes = collector.ToArray();
+                    // Only swap the array when new types were actually discovered. Reassigning it
+                    // unconditionally replaces the reference on every registration, which breaks the
+                    // ReferenceEquals-based cache in RuleExpressionParser and forces a fresh assembly
+                    // scan each time workflows are added. See #749.
+                    if (collector.Count != originalCount)
+                    {
+                        _reSettings.CustomTypes = collector.ToArray();
+                    }
                 }
 
                 // Compile global params ONCE per workflow registration. The resulting delegate is

@@ -42,7 +42,7 @@ namespace RulesEngine.ExpressionBuilders
             var customTypesKey = settings.CustomTypes == null
                 ? "<null>"
                 : string.Join(",", settings.CustomTypes.Where(t => t != null).Select(t => t.AssemblyQualifiedName));
-            return $"cs={settings.IsExpressionCaseSensitive};fast={settings.UseFastExpressionCompiler};types={customTypesKey}";
+            return $"cs={settings.IsExpressionCaseSensitive};fast={settings.UseFastExpressionCompiler};scan={settings.EnableAssemblyScanning};types={customTypesKey}";
         }
 
         private string BuildCompileCacheKey(string expression, RuleParameter[] ruleParams, Type returnType)
@@ -98,7 +98,7 @@ namespace RulesEngine.ExpressionBuilders
             if (config == null || !ReferenceEquals(_cachedParsingConfigCustomTypes, customTypes))
             {
                 config = new ParsingConfig {
-                    CustomTypeProvider = new CustomTypeProvider(customTypes),
+                    CustomTypeProvider = new CustomTypeProvider(customTypes, _reSettings.EnableAssemblyScanning),
                     IsCaseSensitive = _reSettings.IsExpressionCaseSensitive
                 };
                 _cachedParsingConfigCustomTypes = customTypes;

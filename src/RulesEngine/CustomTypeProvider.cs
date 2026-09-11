@@ -14,9 +14,15 @@ namespace RulesEngine
     public class CustomTypeProvider : DefaultDynamicLinqCustomTypeProvider
     {
         private readonly HashSet<Type> _types;
+        private readonly bool _enableAssemblyScanning;
 
-        public CustomTypeProvider(Type[] types) : base(ParsingConfig.Default)
+        public CustomTypeProvider(Type[] types) : this(types, true)
         {
+        }
+
+        public CustomTypeProvider(Type[] types, bool enableAssemblyScanning) : base(ParsingConfig.Default)
+        {
+            _enableAssemblyScanning = enableAssemblyScanning;
             _types = new HashSet<Type>(types ?? Array.Empty<Type>());
 
             _types.Add(typeof(ExpressionUtils));
@@ -50,7 +56,9 @@ namespace RulesEngine
             // The provider's type set is fixed after construction, so merge exactly once.
             if (_mergedTypes == null)
             {
-                var all = new HashSet<Type>(base.GetCustomTypes());
+                var all = _enableAssemblyScanning
+                    ? new HashSet<Type>(base.GetCustomTypes())
+                    : new HashSet<Type>();
                 all.UnionWith(_types);
                 _mergedTypes = all;
             }
