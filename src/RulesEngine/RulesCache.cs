@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using RulesEngine.HelperFunctions;
@@ -39,6 +39,12 @@ namespace RulesEngine
         public Func<object[], Dictionary<string, object>> GetGlobalParamsDelegate(string compiledRuleKey)
         {
             return _compiledGlobalParams.Get<Func<object[], Dictionary<string, object>>>(compiledRuleKey);
+        }
+
+        /// <summary>Removes any cached workflow-level global-params delegate for the specified compiled rule key.</summary>
+        public void RemoveGlobalParamsDelegate(string compiledRuleKey)
+        {
+            _compiledGlobalParams.Remove(compiledRuleKey);
         }
 
 
@@ -150,7 +156,7 @@ namespace RulesEngine
         {
             if (_workflow.TryRemove(workflowName, out var workflowObj))
             {
-                var compiledKeysToRemove = _compileRules.GetKeys().Where(key => key.StartsWith(workflowName)).ToList();
+                var compiledKeysToRemove = _compileRules.GetKeys().Where(key => key.StartsWith($"{workflowName}-", StringComparison.Ordinal)).ToList();
                 foreach (var key in compiledKeysToRemove)
                 {
                     _compileRules.Remove(key);
