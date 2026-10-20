@@ -1,4 +1,4 @@
-ï»¿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using FluentValidation;
@@ -157,7 +157,7 @@ namespace RulesEngine
             sortedRuleParams.Sort((a, b) => string.Compare(a.Name, b.Name));
             var sortedArr = sortedRuleParams.ToArray();
 
-            // Compile the whole workflow once and reuse â€” was previously recompiled every call,
+            // Compile the whole workflow once and reuse — was previously recompiled every call,
             // which was the hot path the reporter of #471 saw.
             if (!RegisterRule(workflowName, sortedArr))
             {
@@ -428,7 +428,7 @@ namespace RulesEngine
 
                 // Parallel compilation helps only when:
                 //   - the user opted in,
-                //   - they're not also on UseFastExpressionCompiler (which regresses ~3Ã— under
+                //   - they're not also on UseFastExpressionCompiler (which regresses ~3× under
                 //     parallel contention; FEC's internal locking serializes effort), and
                 //   - there are enough rules to amortize Parallel.For's scheduling cost.
                 var shouldParallelize = _reSettings.EnableParallelRuleCompilation
@@ -577,12 +577,27 @@ namespace RulesEngine
         /// </summary>
         /// <param name="ruleResultList">The result.</param>
         /// <returns>Updated error message.</returns>
+        private static readonly JsonSerializerOptions ErrorMessageSerializerOptions = new JsonSerializerOptions
+        {
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+        };
+
         private IEnumerable<RuleResultTree> FormatErrorMessages(IEnumerable<RuleResultTree> ruleResultList)
         {
-            if (_reSettings.EnableFormattedErrorMessage)
+            if (_reSettings.EnableFormattedErrorMessage && ruleResultList != null)
             {
-                foreach (var ruleResult in ruleResultList?.Where(r => !r.IsSuccess))
+                foreach (var ruleResult in ruleResultList)
                 {
+                    if (ruleResult?.ChildResults != null)
+                    {
+                        FormatErrorMessages(ruleResult.ChildResults);
+                    }
+
+                    if (ruleResult == null || ruleResult.IsSuccess)
+                    {
+                        continue;
+                    }
+
                     var errorMessage = ruleResult?.Rule?.ErrorMessage;
                     if (string.IsNullOrWhiteSpace(ruleResult.ExceptionMessage) && errorMessage != null)
                     {
@@ -601,7 +616,7 @@ namespace RulesEngine
                             {
                                 var arrParams = inputs?.Select(c => new { Name = c.Key, c.Value });
                                 var model = arrParams?.Where(a => string.Equals(a.Name, property))?.FirstOrDefault();
-                                var value = model?.Value != null ? JsonSerializer.Serialize(model?.Value) : null;
+                                var value = model?.Value != null ? JsonSerializer.Serialize(model?.Value, ErrorMessageSerializerOptions) : null;
                                 errorMessage = errorMessage?.Replace($"$({property})", value ?? $"$({property})");
                             }
                         }
@@ -627,7 +642,7 @@ namespace RulesEngine
                 return errorMessage;
             }
 
-            var modelJson = JsonSerializer.Serialize(model.Value.Value);
+            var modelJson = JsonSerializer.Serialize(model.Value.Value, ErrorMessageSerializerOptions);
             JsonNode current = JsonNode.Parse(modelJson);
             for (var i = 1; i < segments.Length && current != null; i++)
             {
