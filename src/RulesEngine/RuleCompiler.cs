@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using RulesEngine.Exceptions;
@@ -89,7 +89,7 @@ namespace RulesEngine
 
             RuleFunc<RuleResultTree> ruleFn;
             
-            if (Enum.TryParse(rule.Operator, out ExpressionType nestedOperator) && nestedOperators.Contains(nestedOperator) &&
+            if (Enum.TryParse(rule.Operator, ignoreCase: true, out ExpressionType nestedOperator) && nestedOperators.Contains(nestedOperator) &&
                 rule.Rules != null && rule.Rules.Any())
             {
                 ruleFn = BuildNestedRuleFunc(rule, nestedOperator, extendedRuleParams);
