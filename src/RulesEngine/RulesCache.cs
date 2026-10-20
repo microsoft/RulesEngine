@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using RulesEngine.HelperFunctions;
@@ -106,25 +106,52 @@ namespace RulesEngine
         /// <exception cref="Exception">Could not find injected Workflow: {wfname}</exception>
         public Workflow GetWorkflow(string workflowName)
         {
+            return GetWorkflow(workflowName, null);
+        }
+
+        private Workflow GetWorkflow(string workflowName, HashSet<string> visited)
+        {
             if (_workflow.TryGetValue(workflowName, out (Workflow rules, long tick) WorkflowsObj))
             {
                 var workflow = WorkflowsObj.rules;
                 if (workflow.WorkflowsToInject?.Any() == true)
                 {
-                    if (workflow.Rules == null)
+                    visited ??= new HashSet<string>(StringComparer.Ordinal);
+                    if (!visited.Add(workflowName))
                     {
-                        workflow.Rules = new List<Rule>();
+                        throw new InvalidOperationException($"Circular WorkflowsToInject reference detected involving workflow: {workflowName}");
                     }
+
+                    var combinedRules = workflow.Rules?.ToList() ?? new List<Rule>();
                     foreach (string wfname in workflow.WorkflowsToInject)
                     {
-                        var injectedWorkflow = GetWorkflow(wfname);
+                        if (visited.Contains(wfname))
+                        {
+                            throw new InvalidOperationException($"Circular WorkflowsToInject reference detected involving workflow: {wfname}");
+                        }
+
+                        var injectedWorkflow = GetWorkflow(wfname, visited);
                         if (injectedWorkflow == null)
                         {
                             throw new Exception($"Could not find injected Workflow: {wfname}");
                         }
 
-                        workflow.Rules = workflow.Rules.Concat(injectedWorkflow.Rules).ToList();
+                        if (injectedWorkflow.Rules != null)
+                        {
+                            combinedRules.AddRange(injectedWorkflow.Rules);
+                        }
                     }
+
+                    visited.Remove(workflowName);
+
+                    return new Workflow
+                    {
+                        WorkflowName = workflow.WorkflowName,
+                        RuleExpressionType = workflow.RuleExpressionType,
+                        GlobalParams = workflow.GlobalParams,
+                        WorkflowsToInject = workflow.WorkflowsToInject,
+                        Rules = combinedRules
+                    };
                 }
 
                 return workflow;
