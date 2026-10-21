@@ -56,6 +56,18 @@ namespace RulesEngine
             return _workflow.Keys.ToList();
         }
 
+        /// <summary>Names of the workflow's own GlobalParams; empty if the workflow is unknown.</summary>
+        /// <remarks>Reads the stored workflow directly: GetWorkflow resolves WorkflowsToInject, which only adds rules, not globals.</remarks>
+        internal IEnumerable<string> GetGlobalParamNames(string workflowName)
+        {
+            if (string.IsNullOrEmpty(workflowName) || !_workflow.TryGetValue(workflowName, out var entry))
+            {
+                return Enumerable.Empty<string>();
+            }
+            return entry.Item1.GlobalParams?.Where(p => !string.IsNullOrEmpty(p?.Name)).Select(p => p.Name)
+                ?? Enumerable.Empty<string>();
+        }
+
         /// <summary>Adds the or update workflow rules.</summary>
         /// <param name="workflowName">Name of the workflow.</param>
         /// <param name="rules">The rules.</param>

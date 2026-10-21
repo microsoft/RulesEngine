@@ -181,6 +181,18 @@ namespace RulesEngine
             return actionResult;
         }
 
+        // GlobalParams the workflow evaluates itself, compared the way the expression parser compares identifiers.
+        // Used by EvaluateRuleAction to drop forwarded values the target workflow recomputes (#626).
+        internal ISet<string> GetEvaluatedGlobalParamNames(string workflowName)
+        {
+            var comparer = _reSettings.IsExpressionCaseSensitive ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+            if (!_reSettings.EnableScopedParams)
+            {
+                return new HashSet<string>(comparer);
+            }
+            return new HashSet<string>(_rulesCache.GetGlobalParamNames(workflowName), comparer);
+        }
+
         // Invokes the supplied globals delegate (if any) and appends the results as RuleParameters.
         private static RuleParameter[] AppendGlobals(RuleParameter[] ruleParameters, Func<object[], Dictionary<string, object>> globalParamsDelegate)
         {
