@@ -1,9 +1,6 @@
 name: publish-nuget
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
     inputs:
       skip_duplicate:
@@ -14,6 +11,8 @@ on:
 
 jobs:
   publish:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    environment: release
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -22,6 +21,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
+          ref: ${{ github.sha }}
           fetch-depth: 0
 
       - name: Setup .NET
