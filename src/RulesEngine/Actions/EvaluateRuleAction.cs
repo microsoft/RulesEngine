@@ -47,6 +47,10 @@ namespace RulesEngine.Actions
             {
                 filteredRuleParameters = ruleParameters.Where(c => inputFilter.Contains(c.Name)).ToList();
             }
+            // The forwarded inputs include the source rule's evaluated GlobalParams. The target workflow
+            // evaluates its own globals again, so a same-named forwarded value would be defined twice (#626).
+            var targetGlobals = _ruleEngine.GetEvaluatedGlobalParamNames(workflowName);
+            filteredRuleParameters.RemoveAll(c => targetGlobals.Contains(c.Name));
             if (context.TryGetContext<List<ScopedParam>>("additionalInputs", out var additionalInputs))
             {
                 foreach(var additionalInput in additionalInputs)
