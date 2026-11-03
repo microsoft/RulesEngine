@@ -423,17 +423,17 @@ namespace RulesEngine
                         var msg = $"Error while compiling rule `{rule.RuleName}`: {ex.Message}";
                         dictFunc.Add(rule.RuleName, Helpers.ToRuleExceptionResult(_reSettings, rule, new RuleException(msg, ex)));
                     }
-                    _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, dictFunc);
+                    // Drop the previous version's globals delegate, or it keeps running next to these error results.
+                    _rulesCache.RemoveGlobalParamsDelegate(compileRulesKey);
+                    _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, workflowName, dictFunc);
                     return true;
                 }
 
                 var globalParamExp = new Lazy<RuleExpressionParameter[]>(() => globalParamValues);
 
-                if (globalParamValues.Length > 0)
-                {
-                    var globalParamsDelegate = _ruleCompiler.CompileScopedParams(workflow.RuleExpressionType, ruleParams, globalParamValues);
-                    _rulesCache.AddOrUpdateGlobalParamsDelegate(compileRulesKey, globalParamsDelegate);
-                }
+                var globalParamsDelegate = globalParamValues.Length > 0
+                    ? _ruleCompiler.CompileScopedParams(workflow.RuleExpressionType, ruleParams, globalParamValues)
+                    : null;
 
                 var enabledRules = workflow.Rules.Where(c => c.Enabled).ToArray();
                 var compiledFuncs = new RuleFunc<RuleResultTree>[enabledRules.Length];
@@ -474,7 +474,16 @@ namespace RulesEngine
                     dictFunc.Add(enabledRules[i].RuleName, compiledFuncs[i]);
                 }
 
-                _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, dictFunc);
+                // Update the globals delegate only once the rules compiled, so both caches hold the same version.
+                if (globalParamsDelegate != null)
+                {
+                    _rulesCache.AddOrUpdateGlobalParamsDelegate(compileRulesKey, globalParamsDelegate);
+                }
+                else
+                {
+                    _rulesCache.RemoveGlobalParamsDelegate(compileRulesKey);
+                }
+                _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, workflowName, dictFunc);
                 return true;
             }
             else
@@ -584,6 +593,11 @@ namespace RulesEngine
             };
         }
 
+        private static readonly JsonSerializerOptions ErrorMessageSerializerOptions = new JsonSerializerOptions
+        {
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+        };
+
         /// <summary>
         /// The result
         /// </summary>
@@ -591,10 +605,20 @@ namespace RulesEngine
         /// <returns>Updated error message.</returns>
         private IEnumerable<RuleResultTree> FormatErrorMessages(IEnumerable<RuleResultTree> ruleResultList)
         {
-            if (_reSettings.EnableFormattedErrorMessage)
+            if (_reSettings.EnableFormattedErrorMessage && ruleResultList != null)
             {
-                foreach (var ruleResult in ruleResultList?.Where(r => !r.IsSuccess))
+                foreach (var ruleResult in ruleResultList)
                 {
+                    if (ruleResult?.ChildResults != null)
+                    {
+                        FormatErrorMessages(ruleResult.ChildResults);
+                    }
+
+                    if (ruleResult == null || ruleResult.IsSuccess)
+                    {
+                        continue;
+                    }
+
                     var errorMessage = ruleResult?.Rule?.ErrorMessage;
                     if (string.IsNullOrWhiteSpace(ruleResult.ExceptionMessage) && errorMessage != null)
                     {
@@ -613,7 +637,7 @@ namespace RulesEngine
                             {
                                 var arrParams = inputs?.Select(c => new { Name = c.Key, c.Value });
                                 var model = arrParams?.Where(a => string.Equals(a.Name, property))?.FirstOrDefault();
-                                var value = model?.Value != null ? JsonSerializer.Serialize(model?.Value) : null;
+                                var value = model?.Value != null ? JsonSerializer.Serialize(model?.Value, ErrorMessageSerializerOptions) : null;
                                 errorMessage = errorMessage?.Replace($"$({property})", value ?? $"$({property})");
                             }
                         }
@@ -639,7 +663,7 @@ namespace RulesEngine
                 return errorMessage;
             }
 
-            var modelJson = JsonSerializer.Serialize(model.Value.Value);
+            var modelJson = JsonSerializer.Serialize(model.Value.Value, ErrorMessageSerializerOptions);
             JsonNode current = JsonNode.Parse(modelJson);
             for (var i = 1; i < segments.Length && current != null; i++)
             {
