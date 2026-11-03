@@ -73,11 +73,12 @@ namespace RulesEngine
 
         /// <summary>Adds the or update compiled rule.</summary>
         /// <param name="compiledRuleKey">The compiled rule key.</param>
+        /// <param name="workflowName">The workflow the rules were compiled from.</param>
         /// <param name="compiledRule">The compiled rule.</param>
-        public void AddOrUpdateCompiledRule(string compiledRuleKey, IDictionary<string, RuleFunc<RuleResultTree>> compiledRule)
+        public void AddOrUpdateCompiledRule(string compiledRuleKey, string workflowName, IDictionary<string, RuleFunc<RuleResultTree>> compiledRule)
         {
             long ticks = DateTime.UtcNow.Ticks;
-            _compileRules.Set(compiledRuleKey,(compiledRule, ticks));
+            _compileRules.Set(compiledRuleKey, (compiledRule, ticks, workflowName));
         }
 
         /// <summary>Checks if the compiled rules are up-to-date.</summary>
@@ -87,7 +88,7 @@ namespace RulesEngine
         ///   <c>true</c> if [compiled rules] is newer than the [workflow rules]; otherwise, <c>false</c>.</returns>
         public bool AreCompiledRulesUpToDate(string compiledRuleKey, string workflowName)
         {
-            if (_compileRules.TryGetValue(compiledRuleKey, out (IDictionary<string, RuleFunc<RuleResultTree>> rules, long tick) compiledRulesObj))
+            if (_compileRules.TryGetValue(compiledRuleKey, out (IDictionary<string, RuleFunc<RuleResultTree>> rules, long tick, string workflowName) compiledRulesObj))
             {
                 if (_workflow.TryGetValue(workflowName, out (Workflow rules, long tick) WorkflowsObj))
                 {
@@ -147,7 +148,7 @@ namespace RulesEngine
         /// <returns>CompiledRule.</returns>
         public IDictionary<string, RuleFunc<RuleResultTree>> GetCompiledRules(string compiledRulesKey)
         {
-            return _compileRules.Get<(IDictionary<string, RuleFunc<RuleResultTree>> rules, long tick)>(compiledRulesKey).rules;
+            return _compileRules.Get<(IDictionary<string, RuleFunc<RuleResultTree>> rules, long tick, string workflowName)>(compiledRulesKey).rules;
         }
 
         /// <summary>Removes the specified workflow name.</summary>
@@ -156,7 +157,11 @@ namespace RulesEngine
         {
             if (_workflow.TryRemove(workflowName, out var workflowObj))
             {
-                var compiledKeysToRemove = _compileRules.GetKeys().Where(key => key.StartsWith($"{workflowName}-", StringComparison.Ordinal)).ToList();
+                // Match on the stored workflow name: a key prefix can't tell workflow "A" from "A-B".
+                var compiledKeysToRemove = _compileRules.GetKeys()
+                    .Where(key => _compileRules.TryGetValue(key, out (IDictionary<string, RuleFunc<RuleResultTree>> rules, long tick, string workflowName) entry)
+                        && string.Equals(entry.workflowName, workflowName, StringComparison.Ordinal))
+                    .ToList();
                 foreach (var key in compiledKeysToRemove)
                 {
                     _compileRules.Remove(key);
