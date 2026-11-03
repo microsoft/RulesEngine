@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation.
+ï»¿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using FluentValidation;
@@ -157,7 +157,7 @@ namespace RulesEngine
             sortedRuleParams.Sort((a, b) => string.Compare(a.Name, b.Name));
             var sortedArr = sortedRuleParams.ToArray();
 
-            // Compile the whole workflow once and reuse — was previously recompiled every call,
+            // Compile the whole workflow once and reuse â€” was previously recompiled every call,
             // which was the hot path the reporter of #471 saw.
             if (!RegisterRule(workflowName, sortedArr))
             {
@@ -432,7 +432,7 @@ namespace RulesEngine
 
                 // Parallel compilation helps only when:
                 //   - the user opted in,
-                //   - they're not also on UseFastExpressionCompiler (which regresses ~3× under
+                //   - they're not also on UseFastExpressionCompiler (which regresses ~3Ã— under
                 //     parallel contention; FEC's internal locking serializes effort), and
                 //   - there are enough rules to amortize Parallel.For's scheduling cost.
                 var shouldParallelize = _reSettings.EnableParallelRuleCompilation
