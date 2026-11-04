@@ -3,6 +3,7 @@
 
 using RulesEngine.Models;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RulesEngine.Interfaces
@@ -24,6 +25,16 @@ namespace RulesEngine.Interfaces
         /// <param name="ruleParams">A variable number of rule parameters</param>
         /// <returns>List of rule results</returns>
         ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, params RuleParameter[] ruleParams);
+
+        /// <summary>
+        /// This will execute all the rules of the specified workflow with cooperative cancellation.
+        /// </summary>
+        /// <param name="workflowName">The name of the workflow with rules to execute against the inputs</param>
+        /// <param name="ruleParams">The rule parameters</param>
+        /// <param name="cancellationToken">Token observed between rules and before each action</param>
+        /// <returns>List of rule results</returns>
+        ValueTask<List<RuleResultTree>> ExecuteAllRulesAsync(string workflowName, RuleParameter[] ruleParams, CancellationToken cancellationToken);
+
         ValueTask<ActionRuleResult> ExecuteActionWorkflowAsync(string workflowName, string ruleName, RuleParameter[] ruleParameters);
 
         /// <summary>
