@@ -181,6 +181,18 @@ namespace RulesEngine
             return actionResult;
         }
 
+        // GlobalParams the workflow evaluates itself, compared the way the expression parser compares identifiers.
+        // Used by EvaluateRuleAction to drop forwarded values the target workflow recomputes (#626).
+        internal ISet<string> GetEvaluatedGlobalParamNames(string workflowName)
+        {
+            var comparer = _reSettings.IsExpressionCaseSensitive ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+            if (!_reSettings.EnableScopedParams)
+            {
+                return new HashSet<string>(comparer);
+            }
+            return new HashSet<string>(_rulesCache.GetGlobalParamNames(workflowName), comparer);
+        }
+
         // Invokes the supplied globals delegate (if any) and appends the results as RuleParameters.
         private static RuleParameter[] AppendGlobals(RuleParameter[] ruleParameters, Func<object[], Dictionary<string, object>> globalParamsDelegate)
         {
@@ -378,13 +390,21 @@ namespace RulesEngine
                 if (_reSettings.AutoRegisterInputType)
                 {
                     var collector = new HashSet<Type>(_reSettings.CustomTypes.Safe());
+                    var originalCount = collector.Count;
 
                     foreach (var rp in ruleParams)
                     {
                         CollectAllElementTypes(rp.Type, collector);
                     }
 
-                    _reSettings.CustomTypes = collector.ToArray();
+                    // Only swap the array when new types were actually discovered. Reassigning it
+                    // unconditionally replaces the reference on every registration, which breaks the
+                    // ReferenceEquals-based cache in RuleExpressionParser and forces a fresh assembly
+                    // scan each time workflows are added. See #749.
+                    if (collector.Count != originalCount)
+                    {
+                        _reSettings.CustomTypes = collector.ToArray();
+                    }
                 }
 
                 // Compile global params ONCE per workflow registration. The resulting delegate is
@@ -403,17 +423,17 @@ namespace RulesEngine
                         var msg = $"Error while compiling rule `{rule.RuleName}`: {ex.Message}";
                         dictFunc.Add(rule.RuleName, Helpers.ToRuleExceptionResult(_reSettings, rule, new RuleException(msg, ex)));
                     }
-                    _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, dictFunc);
+                    // Drop the previous version's globals delegate, or it keeps running next to these error results.
+                    _rulesCache.RemoveGlobalParamsDelegate(compileRulesKey);
+                    _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, workflowName, dictFunc);
                     return true;
                 }
 
                 var globalParamExp = new Lazy<RuleExpressionParameter[]>(() => globalParamValues);
 
-                if (globalParamValues.Length > 0)
-                {
-                    var globalParamsDelegate = _ruleCompiler.CompileScopedParams(workflow.RuleExpressionType, ruleParams, globalParamValues);
-                    _rulesCache.AddOrUpdateGlobalParamsDelegate(compileRulesKey, globalParamsDelegate);
-                }
+                var globalParamsDelegate = globalParamValues.Length > 0
+                    ? _ruleCompiler.CompileScopedParams(workflow.RuleExpressionType, ruleParams, globalParamValues)
+                    : null;
 
                 var enabledRules = workflow.Rules.Where(c => c.Enabled).ToArray();
                 var compiledFuncs = new RuleFunc<RuleResultTree>[enabledRules.Length];
@@ -454,7 +474,16 @@ namespace RulesEngine
                     dictFunc.Add(enabledRules[i].RuleName, compiledFuncs[i]);
                 }
 
-                _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, dictFunc);
+                // Update the globals delegate only once the rules compiled, so both caches hold the same version.
+                if (globalParamsDelegate != null)
+                {
+                    _rulesCache.AddOrUpdateGlobalParamsDelegate(compileRulesKey, globalParamsDelegate);
+                }
+                else
+                {
+                    _rulesCache.RemoveGlobalParamsDelegate(compileRulesKey);
+                }
+                _rulesCache.AddOrUpdateCompiledRule(compileRulesKey, workflowName, dictFunc);
                 return true;
             }
             else
@@ -551,7 +580,7 @@ namespace RulesEngine
 
         private string GetCompiledRulesKey(string workflowName, RuleParameter[] ruleParams)
         {
-            var ruleParamsKey = string.Join("-", ruleParams.Select(c => $"{c.Name}_{c.Type.Name}"));
+            var ruleParamsKey = string.Join("-", ruleParams.Select(c => $"{c.Name}_{c.Type?.FullName ?? c.Type?.Name}"));
             var key = $"{workflowName}-" + ruleParamsKey;
             return key;
         }
@@ -564,6 +593,11 @@ namespace RulesEngine
             };
         }
 
+        private static readonly JsonSerializerOptions ErrorMessageSerializerOptions = new JsonSerializerOptions
+        {
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+        };
+
         /// <summary>
         /// The result
         /// </summary>
@@ -571,10 +605,20 @@ namespace RulesEngine
         /// <returns>Updated error message.</returns>
         private IEnumerable<RuleResultTree> FormatErrorMessages(IEnumerable<RuleResultTree> ruleResultList)
         {
-            if (_reSettings.EnableFormattedErrorMessage)
+            if (_reSettings.EnableFormattedErrorMessage && ruleResultList != null)
             {
-                foreach (var ruleResult in ruleResultList?.Where(r => !r.IsSuccess))
+                foreach (var ruleResult in ruleResultList)
                 {
+                    if (ruleResult?.ChildResults != null)
+                    {
+                        FormatErrorMessages(ruleResult.ChildResults);
+                    }
+
+                    if (ruleResult == null || ruleResult.IsSuccess)
+                    {
+                        continue;
+                    }
+
                     var errorMessage = ruleResult?.Rule?.ErrorMessage;
                     if (string.IsNullOrWhiteSpace(ruleResult.ExceptionMessage) && errorMessage != null)
                     {
@@ -593,7 +637,7 @@ namespace RulesEngine
                             {
                                 var arrParams = inputs?.Select(c => new { Name = c.Key, c.Value });
                                 var model = arrParams?.Where(a => string.Equals(a.Name, property))?.FirstOrDefault();
-                                var value = model?.Value != null ? JsonSerializer.Serialize(model?.Value) : null;
+                                var value = model?.Value != null ? JsonSerializer.Serialize(model?.Value, ErrorMessageSerializerOptions) : null;
                                 errorMessage = errorMessage?.Replace($"$({property})", value ?? $"$({property})");
                             }
                         }
@@ -619,7 +663,7 @@ namespace RulesEngine
                 return errorMessage;
             }
 
-            var modelJson = JsonSerializer.Serialize(model.Value.Value);
+            var modelJson = JsonSerializer.Serialize(model.Value.Value, ErrorMessageSerializerOptions);
             JsonNode current = JsonNode.Parse(modelJson);
             for (var i = 1; i < segments.Length && current != null; i++)
             {

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Features
+- New `ReSettings.EnableAssemblyScanning` (default `true`). Set to `false` to opt out of scanning every AppDomain assembly for `[DynamicLinqType]`-marked types during rule expression parsing. When disabled, only the explicitly supplied `CustomTypes` (plus auto-registered input types) are available in expressions, avoiding the scan cost. Preserves existing behavior by default (#749).
+
+### Fixes
+- `AutoRegisterInputType` no longer replaces `ReSettings.CustomTypes` with a new array on every workflow registration when no new types were discovered. The unconditional reassignment broke the `ReferenceEquals` cache in `RuleExpressionParser`, forcing a fresh `CustomTypeProvider` (and assembly scan) each time workflows were added (#749).
+
 ## [6.0.1]
 
 Stable release rolling up everything from `6.0.1-preview.1` through `6.0.1-preview.3` — no additional code changes beyond preview.3. See per-preview sections below for the full delta from `6.0.0`.

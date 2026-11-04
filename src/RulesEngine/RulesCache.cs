@@ -41,6 +41,12 @@ namespace RulesEngine
             return _compiledGlobalParams.Get<Func<object[], Dictionary<string, object>>>(compiledRuleKey);
         }
 
+        /// <summary>Removes any cached workflow-level global-params delegate for the specified compiled rule key.</summary>
+        public void RemoveGlobalParamsDelegate(string compiledRuleKey)
+        {
+            _compiledGlobalParams.Remove(compiledRuleKey);
+        }
+
 
         /// <summary>Determines whether [contains workflow rules] [the specified workflow name].</summary>
         /// <param name="workflowName">Name of the workflow.</param>
@@ -56,6 +62,18 @@ namespace RulesEngine
             return _workflow.Keys.ToList();
         }
 
+        /// <summary>Names of the workflow's own GlobalParams; empty if the workflow is unknown.</summary>
+        /// <remarks>Reads the stored workflow directly: GetWorkflow resolves WorkflowsToInject, which only adds rules, not globals.</remarks>
+        internal IEnumerable<string> GetGlobalParamNames(string workflowName)
+        {
+            if (string.IsNullOrEmpty(workflowName) || !_workflow.TryGetValue(workflowName, out var entry))
+            {
+                return Enumerable.Empty<string>();
+            }
+            return entry.Item1.GlobalParams?.Where(p => !string.IsNullOrEmpty(p?.Name)).Select(p => p.Name)
+                ?? Enumerable.Empty<string>();
+        }
+
         /// <summary>Adds the or update workflow rules.</summary>
         /// <param name="workflowName">Name of the workflow.</param>
         /// <param name="rules">The rules.</param>
@@ -67,11 +85,12 @@ namespace RulesEngine
 
         /// <summary>Adds the or update compiled rule.</summary>
         /// <param name="compiledRuleKey">The compiled rule key.</param>
+        /// <param name="workflowName">The workflow the rules were compiled from.</param>
         /// <param name="compiledRule">The compiled rule.</param>
-        public void AddOrUpdateCompiledRule(string compiledRuleKey, IDictionary<string, RuleFunc<RuleResultTree>> compiledRule)
+        public void AddOrUpdateCompiledRule(string compiledRuleKey, string workflowName, IDictionary<string, RuleFunc<RuleResultTree>> compiledRule)
         {
             long ticks = DateTime.UtcNow.Ticks;
-            _compileRules.Set(compiledRuleKey,(compiledRule, ticks));
+            _compileRules.Set(compiledRuleKey, (compiledRule, ticks, workflowName));
         }
 
         /// <summary>Checks if the compiled rules are up-to-date.</summary>
@@ -81,7 +100,7 @@ namespace RulesEngine
         ///   <c>true</c> if [compiled rules] is newer than the [workflow rules]; otherwise, <c>false</c>.</returns>
         public bool AreCompiledRulesUpToDate(string compiledRuleKey, string workflowName)
         {
-            if (_compileRules.TryGetValue(compiledRuleKey, out (IDictionary<string, RuleFunc<RuleResultTree>> rules, long tick) compiledRulesObj))
+            if (_compileRules.TryGetValue(compiledRuleKey, out (IDictionary<string, RuleFunc<RuleResultTree>> rules, long tick, string workflowName) compiledRulesObj))
             {
                 if (_workflow.TryGetValue(workflowName, out (Workflow rules, long tick) WorkflowsObj))
                 {
@@ -106,25 +125,52 @@ namespace RulesEngine
         /// <exception cref="Exception">Could not find injected Workflow: {wfname}</exception>
         public Workflow GetWorkflow(string workflowName)
         {
+            return GetWorkflow(workflowName, null);
+        }
+
+        private Workflow GetWorkflow(string workflowName, HashSet<string> visited)
+        {
             if (_workflow.TryGetValue(workflowName, out (Workflow rules, long tick) WorkflowsObj))
             {
                 var workflow = WorkflowsObj.rules;
                 if (workflow.WorkflowsToInject?.Any() == true)
                 {
-                    if (workflow.Rules == null)
+                    visited ??= new HashSet<string>(StringComparer.Ordinal);
+                    if (!visited.Add(workflowName))
                     {
-                        workflow.Rules = new List<Rule>();
+                        throw new InvalidOperationException($"Circular WorkflowsToInject reference detected involving workflow: {workflowName}");
                     }
+
+                    var combinedRules = workflow.Rules?.ToList() ?? new List<Rule>();
                     foreach (string wfname in workflow.WorkflowsToInject)
                     {
-                        var injectedWorkflow = GetWorkflow(wfname);
+                        if (visited.Contains(wfname))
+                        {
+                            throw new InvalidOperationException($"Circular WorkflowsToInject reference detected involving workflow: {wfname}");
+                        }
+
+                        var injectedWorkflow = GetWorkflow(wfname, visited);
                         if (injectedWorkflow == null)
                         {
                             throw new Exception($"Could not find injected Workflow: {wfname}");
                         }
 
-                        workflow.Rules = workflow.Rules.Concat(injectedWorkflow.Rules).ToList();
+                        if (injectedWorkflow.Rules != null)
+                        {
+                            combinedRules.AddRange(injectedWorkflow.Rules);
+                        }
                     }
+
+                    visited.Remove(workflowName);
+
+                    return new Workflow
+                    {
+                        WorkflowName = workflow.WorkflowName,
+                        RuleExpressionType = workflow.RuleExpressionType,
+                        GlobalParams = workflow.GlobalParams,
+                        WorkflowsToInject = workflow.WorkflowsToInject,
+                        Rules = combinedRules
+                    };
                 }
 
                 return workflow;
@@ -141,7 +187,7 @@ namespace RulesEngine
         /// <returns>CompiledRule.</returns>
         public IDictionary<string, RuleFunc<RuleResultTree>> GetCompiledRules(string compiledRulesKey)
         {
-            return _compileRules.Get<(IDictionary<string, RuleFunc<RuleResultTree>> rules, long tick)>(compiledRulesKey).rules;
+            return _compileRules.Get<(IDictionary<string, RuleFunc<RuleResultTree>> rules, long tick, string workflowName)>(compiledRulesKey).rules;
         }
 
         /// <summary>Removes the specified workflow name.</summary>
@@ -150,7 +196,11 @@ namespace RulesEngine
         {
             if (_workflow.TryRemove(workflowName, out var workflowObj))
             {
-                var compiledKeysToRemove = _compileRules.GetKeys().Where(key => key.StartsWith(workflowName)).ToList();
+                // Match on the stored workflow name: a key prefix can't tell workflow "A" from "A-B".
+                var compiledKeysToRemove = _compileRules.GetKeys()
+                    .Where(key => _compileRules.TryGetValue(key, out (IDictionary<string, RuleFunc<RuleResultTree>> rules, long tick, string workflowName) entry)
+                        && string.Equals(entry.workflowName, workflowName, StringComparison.Ordinal))
+                    .ToList();
                 foreach (var key in compiledKeysToRemove)
                 {
                     _compileRules.Remove(key);
