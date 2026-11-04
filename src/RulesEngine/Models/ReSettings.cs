@@ -27,6 +27,7 @@ namespace RulesEngine.Models
             CacheConfig = reSettings.CacheConfig;
             IsExpressionCaseSensitive = reSettings.IsExpressionCaseSensitive;
             AutoRegisterInputType = reSettings.AutoRegisterInputType;
+            EnableAssemblyScanning = reSettings.EnableAssemblyScanning;
             UseFastExpressionCompiler = reSettings.UseFastExpressionCompiler;
             EnableExceptionAsErrorMessageForRuleExpressionParsing = reSettings.EnableExceptionAsErrorMessageForRuleExpressionParsing;
             AutoExecuteActions = reSettings.AutoExecuteActions;
@@ -77,6 +78,15 @@ namespace RulesEngine.Models
         /// Default : true
         /// </summary>
         public bool AutoRegisterInputType { get; set; } = true;
+
+        /// <summary>
+        /// When true (default), the CustomTypeProvider scans all assemblies loaded in the
+        /// AppDomain for types decorated with [DynamicLinqType] so they can be used in rule
+        /// expressions. Set to false to opt out of this scan entirely (only the explicitly
+        /// supplied CustomTypes and input types are registered), which avoids the scanning
+        /// cost on workflow registration. See #749.
+        /// </summary>
+        public bool EnableAssemblyScanning { get; set; } = true;
 
         /// <summary>
         /// Sets the mode for Nested rule execution, Default: All
