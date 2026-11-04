@@ -27,8 +27,11 @@ namespace RulesEngine.Models
             CacheConfig = reSettings.CacheConfig;
             IsExpressionCaseSensitive = reSettings.IsExpressionCaseSensitive;
             AutoRegisterInputType = reSettings.AutoRegisterInputType;
+            EnableAssemblyScanning = reSettings.EnableAssemblyScanning;
             UseFastExpressionCompiler = reSettings.UseFastExpressionCompiler;
             EnableExceptionAsErrorMessageForRuleExpressionParsing = reSettings.EnableExceptionAsErrorMessageForRuleExpressionParsing;
+            AutoExecuteActions = reSettings.AutoExecuteActions;
+            EnableParallelRuleCompilation = reSettings.EnableParallelRuleCompilation;
         }
 
 
@@ -77,6 +80,15 @@ namespace RulesEngine.Models
         public bool AutoRegisterInputType { get; set; } = true;
 
         /// <summary>
+        /// When true (default), the CustomTypeProvider scans all assemblies loaded in the
+        /// AppDomain for types decorated with [DynamicLinqType] so they can be used in rule
+        /// expressions. Set to false to opt out of this scan entirely (only the explicitly
+        /// supplied CustomTypes and input types are registered), which avoids the scanning
+        /// cost on workflow registration. See #749.
+        /// </summary>
+        public bool EnableAssemblyScanning { get; set; } = true;
+
+        /// <summary>
         /// Sets the mode for Nested rule execution, Default: All
         /// </summary>
         public NestedRuleExecutionMode NestedRuleExecutionMode { get; set; } = NestedRuleExecutionMode.All;
@@ -90,6 +102,29 @@ namespace RulesEngine.Models
         /// Default: true
         /// </summary>
         public bool EnableExceptionAsErrorMessageForRuleExpressionParsing { get; set; } = true;
+
+        /// <summary>
+        /// When true (default), ExecuteAllRulesAsync automatically runs each matched rule's
+        /// OnSuccess/OnFailure action after evaluation. Set to false to evaluate rules only and
+        /// run actions yourself (e.g. via ExecuteActionWorkflowAsync) for selective control. See #596.
+        /// </summary>
+        public bool AutoExecuteActions { get; set; } = true;
+
+        /// <summary>
+        /// When true, rules within a workflow are compiled in parallel during registration.
+        /// Significantly reduces warmup time for workflows with many thousands of rules.
+        /// </summary>
+        /// <remarks>
+        /// Silently falls back to serial compilation when:
+        /// <list type="bullet">
+        /// <item><see cref="UseFastExpressionCompiler"/> is also <c>true</c> — FastExpressionCompiler
+        /// regresses ~3× under parallel contention, so the engine declines to parallelize that mix.</item>
+        /// <item>The workflow has fewer enabled rules than an internal threshold (32) where
+        /// the dispatch cost outweighs the speedup.</item>
+        /// </list>
+        /// Default: <c>false</c>.
+        /// </remarks>
+        public bool EnableParallelRuleCompilation { get; set; } = false;
     }
 
     public enum NestedRuleExecutionMode

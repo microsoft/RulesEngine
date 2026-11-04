@@ -33,6 +33,14 @@ namespace RulesEngine.Validators
                 });
             });
             RegisterExpressionTypeRules();
+
+            // Surface duplicate LocalParam names with a clear message instead of a cryptic
+            // "An item with the same key has already been added" failure later at execution.
+            RuleFor(c => c)
+                .Must(rule => WorkflowsValidator.FindDuplicateName(rule.LocalParams?.Select(p => p?.Name)) == null)
+                .WithMessage(rule => string.Format(
+                    Constants.DUPLICATE_LOCAL_PARAM_NAME_ERRMSG,
+                    WorkflowsValidator.FindDuplicateName(rule.LocalParams?.Select(p => p?.Name))));
         }
 
         private void RegisterExpressionTypeRules()
