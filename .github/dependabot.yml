@@ -10,6 +10,8 @@ updates:
     #   - assignee_one
     # reviewers:
     #   - reviewer_one
+    cooldown:
+      default-days: 7
   - package-ecosystem: "nuget"
     # location of package manifests
     directory: "/"

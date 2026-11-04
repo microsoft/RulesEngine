@@ -59,10 +59,10 @@ namespace RulesEngine
                 var globalParamExp = globalParams.Value;
                 var extendedRuleParams = ruleParams.Concat(globalParamExp.Select(c => new RuleParameter(c.ParameterExpression.Name,c.ParameterExpression.Type)))
                                                    .ToArray();
-                var ruleExpression = GetDelegateForRule(rule, extendedRuleParams);
-                
-
-                return GetWrappedRuleFunc(rule,ruleExpression,ruleParams,globalParamExp);
+                // Note: globals are no longer evaluated here per rule. The caller is expected
+                // to evaluate workflow-level globals once and pass them as extra RuleParameters
+                // when invoking the returned delegate. See #714.
+                return GetDelegateForRule(rule, extendedRuleParams);
             }
             catch (Exception ex)
             {
@@ -89,7 +89,7 @@ namespace RulesEngine
 
             RuleFunc<RuleResultTree> ruleFn;
             
-            if (Enum.TryParse(rule.Operator, out ExpressionType nestedOperator) && nestedOperators.Contains(nestedOperator) &&
+            if (Enum.TryParse(rule.Operator, ignoreCase: true, out ExpressionType nestedOperator) && nestedOperators.Contains(nestedOperator) &&
                 rule.Rules != null && rule.Rules.Any())
             {
                 ruleFn = BuildNestedRuleFunc(rule, nestedOperator, extendedRuleParams);
